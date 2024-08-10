@@ -1,6 +1,6 @@
 import styles from './style';
 import { Navbar, Hero, Stats, GetStarted, CardDeal, FeedBackCard, Business, Billing, Testimonials, Clients, CTA, Footer } from './view/components';
-
+import './index.css'; 
 const App = () => {
   return (
     <div className="bg-white w-full overflow-hidden">

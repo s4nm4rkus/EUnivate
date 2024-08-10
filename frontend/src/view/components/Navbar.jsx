@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { navLinks, downArrow } from '../../constants/constants';  // Ensure this path is correct
+import { navLinks } from '../../constants/constants';  
+import { downArrow } from '../../constants/assets'; 
 
 const Navbar = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -10,50 +11,59 @@ const Navbar = () => {
 
   return (
     <nav className="w-full flex justify-between items-center py-4 bg-white px-8">
-      <div className="flex items-center space-x-10"> {/* Adjusted spacing between logo and links */}
+      <div className="flex items-center space-x-10">
         <div className="flex items-center">
-          <span className="text-4xl font-bold text-red-700">
-            EU
-          </span>
-          <span className="text-4xl font-bold text-yellow-500">
-            nivate
-          </span>
+          <span className="text-4xl font-bold text-red-700">EU</span>
+          <span className="text-4xl font-bold text-yellow-500">nivate</span>
         </div>
-        
-        <ul className="flex items-center space-x-9 ">  {/* Adjusted spacing between nav links */}
+
+        <ul className="hidden sm:flex items-center space-x-9">
           {navLinks.map((link) => (
             <li key={link.id} className="relative group">
               <button
                 onClick={() => link.hasDropdown && toggleDropdown(link.id)}
-                className="text-gray-700 hover:text-black flex items-center focus:outline-none"
+                className="text-gray-700 hover:text-red-500 flex items-center focus:outline-none"
               >
                 {link.title}
                 {link.hasDropdown && (
                   <img
                     src={downArrow}
                     alt="Dropdown Arrow"
-                    className="ml-1 h-4 w-4 transform transition-transform group-hover:rotate-180"
+                    className="ml-1 h-6 w-6 transform transition-transform group-hover:rotate-180"
                   />
                 )}
               </button>
 
               {link.hasDropdown && activeDropdown === link.id && (
-                <ul className="absolute left-0 mt-2 w-40 bg-white shadow-lg rounded-lg">
-                  {link.subLinks.map((subLink) => (
-                    <li key={subLink.id} className="px-4 py-2 hover:bg-gray-100">
-                      <a href={subLink.href} className="text-gray-700 hover:text-black">
-                        {subLink.title}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
+                <div className="absolute left-0 top-full mt-2 w-[350px] text-gray-700 bg-white shadow-lg rounded-lg flex z-50">
+                  <ul className="p-4 w-1/2">
+                    <li className="font-semibold mb-2">{link.title.toUpperCase()}</li>
+                    {link.subLinks.map((subLink) => (
+                      <li key={subLink.id} className="cursor-pointer mb-1 hover:text-red-500 text-sm">
+                        <a href={subLink.href}>{subLink.title}</a>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="w-1/2 relative">
+                    <div className="absolute top-0 left-0 p-2 text-gray-700 text-xs font-semibold bg-white bg-opacity-75">
+                      {link.description}
+                    </div>
+                    <img
+                      src={link.imageUrl}
+                      alt={link.description}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                </div>
               )}
             </li>
           ))}
         </ul>
       </div>
-
-      <button className="bg-yellow-500 text-white px-4 py-2 rounded-full hover:bg-yellow-600">
+      <button
+        className="bg-yellow-500 text-white px-4 py-2 rounded-full hover:bg-red-800 transition-all duration-300"
+        style={{ transitionDelay: '0.2s' }}
+      >
         Get Started
       </button>
     </nav>

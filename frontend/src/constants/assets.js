@@ -1,4 +1,4 @@
-import bilog from '../assets/bilog.png';
+
 import cisco from '../assets/cisco.png';
 import close from '../assets/close.png';
 import downArrow from '../assets/downArrow.png';
@@ -14,9 +14,13 @@ import webinar from '../assets/webinar.png';
 import thinkTogether from '../assets/thinkTogether.png';
 import indMeets from '../assets/indMeets.png';
 import futureSolution from '../assets/futureSolution.png';
-
+import yellow_gradient from '../assets/yellow_gradient.svg';
+import red_gradient from '../assets/red_gradient.svg';
+import loop from '../assets/loop.svg';
 export {
-    bilog,
+   yellow_gradient,
+   red_gradient,
+   loop,
     cisco,
     close,
     downArrow,

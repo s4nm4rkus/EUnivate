@@ -1,27 +1,27 @@
-import Navbar from './Navbar';
-import Hero from './Hero';
-import Clients from './Clients';
-import Billing from './Billing';
-import CardDeal from './carddeal';
-import Testimonials from './Testimonials';  
-import CTA from './CTA';
-import Stats from './stats';
-import Footer from './Footer';
-import FeedBackCard from './FeedBackCard';
-import GetStarted from './GetStarted';
-import Business from './Business';
+import Blog from './view/components/LastSection/Blog';
+import Navbar from './view/components/LandingPage/Navbar';
+import Hero from './view/components/LandingPage/Hero';
+import CTA from './view/components/LastSection/CTA';
+import Footer from './view/components/LastSection/Footer';
+import Feature_uni from './view/components/SecondSection/Feature_uni';
+import Pmt from './view/components/SecondSection/Pmt';
+import Products from './view/components/SecondSection/Products';
+import HIW from './view/components/ThirdSection/HIW';
+import Partnerships from './view/components/ThirdSection/Partnerships';
+
+
+
+
 
 export {
   Navbar,
   Hero,
-  Stats,
-  GetStarted,
-  CardDeal,
-  FeedBackCard,
-  Business,
-  Billing,
-  Testimonials,  
-  Clients,
+  Feature_uni,
+  Pmt,
+  Products,
+  Blog,
+  HIW,
+  Partnerships,
   CTA,
   Footer
 };

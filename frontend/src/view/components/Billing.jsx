@@ -2,7 +2,7 @@ import React from 'react'
 
 const billing = () => {
   return (
-    <div>billing</div>
+    <div></div>
   )
 }
 

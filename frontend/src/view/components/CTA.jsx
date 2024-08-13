@@ -168,13 +168,13 @@ const Contact = () => {
       <FontAwesomeIcon icon={faTwitter} className="text-white" />
     </a>
   </div>
-  <div className="w-9 h-9 flex items-center justify-center bg-white rounded-full hover:bg-gray-800 transition-colors">
+  <div className="w-9 h-9 flex items-center justify-center bg-white rounded-full hover:bg-gray-100 transition-colors">
     <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
       <FontAwesomeIcon icon={faInstagram} className="text-black" />
     </a>
   </div>
   <div className="w-9 h-9 flex items-center justify-center bg-black rounded-full hover:bg-gray-800 transition-colors">
-    <a href="https://discord.com" target="_blank" rel="noopener noreferrer">``
+    <a href="https://discord.com" target="_blank" rel="noopener noreferrer">
       <FontAwesomeIcon icon={faDiscord} className="text-white" />
     </a>
   </div>

@@ -1,5 +1,8 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+
 
 @tailwind base;
 @tailwind components;
@@ -144,4 +147,155 @@
 .white__gradient {
   background: rgba(255, 255, 255, 0.6);
   filter: blur(750px);
+}
+
+
+/* HowItWorks|Partnerships */
+
+.text-red-gradient {
+  background: linear-gradient(90deg, #780a0a 35%, #ff000e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-howitworks-grey {
+ color: #667085;
+}
+
+.steps-howitworks-content{
+  margin: 4rem 4rem 1rem 4rem;
+}
+
+.steps-cards-howitworks{
+  background-color: white;
+  padding: 2rem;
+  box-shadow: 0 19px 15px rgba(0, 0, 0, 0.01);
+}
+.cards-hiw-title{
+  font-size: 24px;
+  font-weight: bold;
+  font-family: 'Inter', sans-serif;
+}
+.sub-card-hiw-title{
+  font-size: 16px;
+  color: #667085;
+  width: 18rem;
+  line-height: 180%;
+  
+}
+/* LogoSlides Animation Line 1 */
+@keyframes slide {
+  0% {
+    transform: translateX(0); 
+  }
+  100% {
+    transform: translateX(-100%); 
+  }
+}
+
+.animate-slide {
+  animation: slide 20s linear infinite;
+  display: flex;
+  width: calc(150px * 13 + 13 * 3.5rem);
+}
+
+.wrapper {
+  overflow: hidden;
+  width: 100%;
+}
+
+.marquee {
+  display: flex;
+  width: calc(150px * 13 + 13 * 3.5rem); 
+}
+
+/* LogoSlides Animation Line 2 */
+@keyframes slideReverse {
+  0% {
+    transform: translateX(-100%); 
+  }
+  100% {
+    transform: translateX(0); 
+  }
+}
+
+.animate-slide-reverse {
+  animation: slideReverse 20s linear infinite;
+  display: flex;
+  width: calc(150px * 12 + 12 * 3rem); 
+}
+
+.wrapper-reverse {
+  overflow: hidden;
+  width: 100%;
+}
+
+.marquee-reverse {
+  display: flex;
+  width: calc(150px * 12 + 12 * 3rem); 
+}
+
+/* ProjectHoursSupport */
+
+.grids{
+  margin-right: .8rem;
+  margin-left: .8rem;
+  text-align: center;
+  width: 230px;
+}
+
+.grids-title{
+  font-family: 'Open Sans', sans-serif;
+  font-weight: bold;
+  font-size: 48px;
+  text-align: center;
+  background: linear-gradient(90deg, rgba(182,126,5,1) 30%, rgba(241,172,21,1) 100%);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.grids-subtitle{
+  padding-top: .5rem;
+  padding-bottom: .5rem;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  text-align: center;
+}
+
+.grids-content{
+  font-size: 16px;
+  font-family: 'Open Sans', sans-serif;
+  line-height: 180%;
+  color:#667085;
+}
+
+.get-free-qoutation{
+    background-color: white;
+    box-shadow: 0 0px 15px rgba(0, 0, 0, 0.1); 
+    display: flex;
+    color: #170F49;
+    justify-content: space-between;
+    font-family: 'DM Sans', sans-serif;
+    width: 80%;
+    padding: 2rem;
+    border-radius: 20px;
+}
+
+.free-qoutation-btn{
+    padding: 10px 18px;  
+    font-size: 16px;   
+    border-radius: 50px;
+    background-color: #FFEEC9;
+    color: #B67E05;
+    transition: all 0.3s ease;
+}
+
+.free-qoutation-btn:hover{
+  padding: 10px 18px;  
+  font-size: 16px;   
+  border-radius: 50px;
+  background-color: #B67E05;
+  color: #ffffff;
 }

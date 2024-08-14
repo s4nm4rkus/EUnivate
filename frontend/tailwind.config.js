@@ -16,7 +16,10 @@
         danger: "#A02334"
       },
       fontFamily: {
-        roboto: ["Roboto", "sans-serif"]
+        roboto: ["Roboto", "sans-serif"],
+        inter: ["Inter", "sans-serif"],
+        opensans: ["Open Sans", "sans-serif"],
+        DMsans: ["DM Sans", "sans-serif"],
       },
     },
     screens: {

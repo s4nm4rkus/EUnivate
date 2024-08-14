@@ -11,7 +11,7 @@ const Contact = () => {
   };
 
   return (
-    <section className="py-16 px-1 lg:px-24">
+    <section id="CTA" className="py-16 px-1 lg:px-24">
       <div className="max-w-1xl mx-auto">
         <div className="bg-white lg:shadow-lg rounded-lg p-8">
           <div className="flex flex-col lg:flex-row">
@@ -23,7 +23,7 @@ const Contact = () => {
                 Let's discuss how innovation can benefit you.
               </p>
 
-              <div className="mb-8 mt-30 lg:mt-20 md:mt-12 sm:mt-8"> {/* Adjust top margin for different screen sizes */}
+              <div className="mb-8 mt-30 lg:mt-20 md:mt-12 sm:mt-8"> 
         <p className="text-gray-800 text-left mb-9 flex items-center">
             <FontAwesomeIcon icon={faPhone} className="mr-6" />
           +639 12 345 6789
@@ -94,7 +94,7 @@ const Contact = () => {
   <label className="block text-gray-700 text-sm font-bold mb-2 mt-7">
     Select Subject
   </label>
-  <div className="flex flex-row space-x-4 mb-4"> {/* Added mb-4 for spacing */}
+  <div className="flex flex-row space-x-4 mb-4"> 
     <div className="flex items-center">
       <input
         type="radio"
@@ -147,19 +147,17 @@ const Contact = () => {
     className="border-b border-gray-400 w-full py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 resize-none"
   ></textarea>
 
-<div className="flex justify-center mt-4 md:justify-end"> {/* Center on mobile, right align on desktop */}
+<div className="flex justify-center mt-4 md:justify-end"> 
   <button
     type="submit"
-    className="bg-yellow-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline w-full md:w-auto" // Full width on mobile, auto on larger screens
-  >
+    className="bg-yellow-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline w-full md:w-auto" 
+>
     Send Message
   </button>
-</div>
-
-</div>
-
-            </div>
-          </div>
+        </div>
+        </div>
+        </div>
+        </div>
 
          {/* Social Media Icons */}
 <div className="hidden lg:flex justify-start mt-8 space-x-4">

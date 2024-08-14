@@ -17,6 +17,12 @@ import futureSolution from '../assets/futureSolution.png';
 import yellow_gradient from '../assets/yellow_gradient.svg';
 import red_gradient from '../assets/red_gradient.svg';
 import loop from '../assets/loop.svg';
+
+/* FOOTER IMG */
+import webinar1 from '../assets/webinar1.png';
+import webinar2 from '../assets/webinar2.png';
+import webinar3 from '../assets/webinar3.png';
+
 export {
    yellow_gradient,
    red_gradient,
@@ -35,5 +41,12 @@ export {
     webinar,
     thinkTogether,
     indMeets,
-    futureSolution
+    futureSolution,
+
+     /* FOOTER IMG */
+    webinar1,
+    webinar2,
+    webinar3,
+
+
 };

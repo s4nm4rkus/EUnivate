@@ -17,6 +17,13 @@ import {
 } from '../../constants/assets';
 
 const Hero = () => {
+  const scrollTocta = () => {
+    const footerSection = document.getElementById('CTA');
+    if (footerSection) {
+      footerSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <>
       <section className="py-16 px-8 lg:px-24 flex flex-col lg:flex-row justify-between items-center relative">
@@ -50,7 +57,10 @@ const Hero = () => {
           <p className="text-gray-700 text-lg lg:text-xl mt-4 lg:mt-8 relative z-30">
             EUnivate connects your business with the brightest minds from universities. Tap into cutting-edge solutions, reduce development costs, and gain a competitive edge through real-world innovation.
           </p>
-          <button className="bg-yellow-500 text-white px-6 py-3 rounded-full mt-8 hover:bg-red-800 transition-all duration-300 relative z-30">
+          <button 
+            onClick={scrollTocta} 
+            className="bg-yellow-500 text-white px-6 py-3 rounded-full mt-8 hover:bg-red-800 transition-all duration-300 relative z-30"
+          >
             Get Started
           </button>
           <div className="flex flex-col sm:flex-row items-center space-x-0 sm:space-x-12 space-y-4 sm:space-y-0 mt-8 sm:mt-24 relative z-30">
@@ -83,14 +93,13 @@ const Hero = () => {
           </div>
           <div className="absolute bottom-1 left-[200px]">
             <img src={proj_man} alt="Project Management Tool Icon" className="w-[400px] h-[130px]" />
-            </div>
-              {/* Additional Loop SVG (Below Light Image) */}
-              <img 
-                src={loop} 
-                alt="Loop Below" 
-                className="absolute bottom-[-250px] right-[-200px] lg:w-[500px] lg:h-[500px] w-[300px] h-[300px] z-[-1]" 
-              />
-
+          </div>
+          {/* Additional Loop SVG (Below Light Image) */}
+          <img 
+            src={loop} 
+            alt="Loop Below" 
+            className="absolute bottom-[-250px] right-[-200px] lg:w-[500px] lg:h-[500px] w-[300px] h-[300px] z-[-1]" 
+          />
         </div>
         
       </section>

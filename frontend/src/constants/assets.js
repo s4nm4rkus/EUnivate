@@ -75,6 +75,12 @@ import logo28_ln4 from '../assets/LogoSlides/logo28_ln4.png';
 
 
 
+
+/* FOOTER IMG */
+import webinar1 from '../assets/webinar1.png';
+import webinar2 from '../assets/webinar2.png';
+import webinar3 from '../assets/webinar3.png';
+
 export {
    yellow_gradient,
    red_gradient,
@@ -94,6 +100,13 @@ export {
     thinkTogether,
     indMeets,
     futureSolution,
+
+     /* FOOTER IMG */
+    webinar1,
+    webinar2,
+    webinar3,
+
+
     // LogoSlides Assets - Line 1
     logo1_ln1,
     logo2_ln1,

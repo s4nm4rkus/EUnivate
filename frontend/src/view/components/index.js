@@ -11,6 +11,11 @@ import Footer from './Footer';
 import FeedBackCard from './FeedBackCard';
 import GetStarted from './GetStarted';
 import Business from './Business';
+import Howitworks from './Howitworks';
+import Partnerships from './Partnerships';
+import LogoSlides from './LogoSlides';
+import ProjectHoursSupport from './ProjectHoursSupport';
+
 
 
 export {
@@ -26,5 +31,9 @@ export {
   Testimonials,  
   Clients,
   CTA,
-  Footer
+  Footer,
+  Howitworks,
+  Partnerships,
+  LogoSlides,
+  ProjectHoursSupport,
 };

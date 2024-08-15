@@ -58,7 +58,7 @@ const Products = () => {
       {/* Carousel Section */}
       <div className="PMT-carousel">
         <div className="text-center font-sans">
-          <span className="text-sm font-bold text-red-800 block mb-2">
+          <span className="pmt font-bold text-red-800 block mb-2">
             Project Management Tool
           </span>
           <span className="text-3xl font-bold block" style={{ marginBottom: '40px' }}>
@@ -125,137 +125,112 @@ const Products = () => {
           .slick-dots li button:before {
             color: red;
           }
-        `}</style>
-      </div>
+
+        /* Responsive Adjustments */
+          @media (max-width: 576px) {
+          .PMT-carousel{
+          margin-bottom: -20px;
+          }
+      
+          .carousel-img {
+          width: 400px;
+          height: 250px;
+          object-fit: cover;
+          transition: transform 0.5s ease-in-out;
+          border-radius: 15px;
+          display: block; 
+          padding: 0 auto;
+          margin: 0 auto; 
+          }
+          .text-3xl {
+          font-size: 1.70rem;
+          margin-bottom: 6vh;
+          margin-left: 450px;
+          margin-right: 450px;
+          text-align: center;
+          }
+        }
+      `}</style>
+    </div>
 
       {/* Products Section */}
-      <div className="products">
-        <span className="text-sm font-bold text-red-800 block mb-2">
-          Products
-        </span>
-        <h2 className="section-title">Products</h2>
-        <p className="EU text-sm">
-          EUnivate is proud to feature innovative products developed by our talented student-professor teams.
-        </p>
+<div className="products">
+  <span className="programs font-bold text-red-800 block mb-2">
+    Explore Programs
+  </span>
+  <h2 className="section-title">Our Featured Products</h2>
+  <p className="EU text-sm">
+    EUnivate is proud to feature innovative products developed by our talented student-professor teams.
+  </p>
 
-        <div className="product-cards">
-          {/* Product 1 */}
-          <div className="product-card">
-            <img src={link1} alt="Product 1" className="product-image" />
-            <h3 className="product-title">OptiWaste Management... <img src={arrowIcon} alt="Arrow Icon" className="arrow-icon" /></h3>
-            <p className="product-description">OptiWaste utilizes AI and machine learning to analyze waste streams and optimize collection routes. </p>
-            <div className="developer-info">
-              <span className="developed-by">Developed by: Team Phoenix</span>
-              <div className="developer">
-                <img src={dev1} alt="Developer 1" className="developer-image" />
-                <div className="developer-details">
-                  <span className="developer-name">Engr. Cheeky Tanaka</span>
-                  <span className="developer-profession">Lead Professor</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Product 2 */}
-          <div className="product-card">
-            <img src={link2} alt="Product 2" className="product-image" />
-            <h3 className="product-title">Interactive Language L... <img src={arrowIcon} alt="Arrow Icon" className="arrow-icon" /></h3>
-            <p className="product-description">Utilizes gamification techniques and immersive storytelling to make language learning fun and interactive.</p>
-            <div className="developer-info">
-              <span className="developed-by">Developed by: Team LingoMasters</span>
-              <div className="developer">
-                <img src={dev2} alt="Developer 2" className="developer-image" />
-                <div className="developer-details">
-                  <span className="developer-name">David Hernandez</span>
-                  <span className="developer-profession">Lead Professor</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Product 3 */}
-          <div className="product-card">
-            <img src={link3} alt="Product 3" className="product-image" />
-            <h3 className="product-title">AI-Powered Disaster Re... <img src={arrowIcon} alt="Arrow Icon" className="arrow-icon" /></h3>
-            <p className="product-description">PhiloSAFE uses AI to analyze historical data and predict potential disaster scenarios.</p>
-            <div className="developer-info">
-              <br></br>
-              <span className="developed-by">Developed by: Team Phoenix</span>
-              <div className="developer">
-                <img src={dev3} alt="Developer 3" className="developer-image" />
-                <div className="developer-details">
-                  <span className="developer-name">Peter Domingo</span>
-                  <span className="developer-profession">Lead Professor</span>
-                </div>
-              </div>
-            </div>
+  <div className="product-cards">
+    {/* Product 1 */}
+    <div className="product-card">
+      <img src={link1} alt="Product 1" className="product-image" />
+      <h3 className="product-title">
+        OptiWaste Management... <img src={arrowIcon} alt="Arrow Icon" className="arrow-icon" />
+      </h3>
+      <p className="product-description">
+        OptiWaste utilizes AI and machine learning to analyze waste streams and optimize collection routes.
+      </p>
+      <div className="developer-info">
+        <span className="developed-by">Developed by: Team Phoenix</span>
+        <div className="developer">
+          <img src={dev1} alt="Developer 1" className="developer-image" />
+          <div className="developer-details">
+            <span className="developer-name">Engr. Cheeky Tanaka</span>
+            <span className="developer-profession">Lead Professor</span>
           </div>
         </div>
       </div>
+    </div>
 
-      {/* Professors Section */}
-      <div className="professors-section">
-        <span className="text-sm font-bold text-red-800 block mb-2">
-          Professors
-        </span>
-        <h2 className="section-title">Featured University Experts</h2>
-        <p className="prof text-sm">
-          EUnivate connects you with a vast network of top university minds across diverse disciplines. Here are just a few of our featured experts ready to tackle your toughest challenges:
-        </p>
-
-        <div className="professor-cards">
-          {/* Professor 1 */}
-          <div className="professor-card">
-            <img src={prof1} alt="Professor 1" className="professor-image" />
-            <h3 className="professor-name">Theresa Webb</h3>
-            <p className="professor-profession">Application Support Analyst Lead</p>
-            <p className="professor-bio">Former co-founder of Opendoor. Early staff at Spotify and Clearbit.</p>
-            <div className="social-icons">
-              <img src={twitterIcon} alt="Twitter" className="social-icon" />
-              <img src={linkedinIcon} alt="LinkedIn" className="social-icon" />
-            </div>
-          </div>
-
-          {/* Professor 2 */}
-          <div className="professor-card">
-            <img src={prof2} alt="Professor 2" className="professor-image" />
-            <h3 className="professor-name">Courtney Henry</h3>
-            <p className="professor-profession">Director, Undergraduate Analytics and Planning</p>
-            <p className="professor-bio">Lead engineering teams at Figma, Pitch, and Protocol Labs.</p>
-            <div className="social-icons">
-              <img src={twitterIcon} alt="Twitter" className="social-icon" />
-              <img src={linkedinIcon} alt="LinkedIn" className="social-icon" />
-            </div>
-          </div>
-
-          {/* Professor 3 */}
-          <div className="professor-card">
-            <img src={prof3} alt="Professor 3" className="professor-image" />
-            <h3 className="professor-name">Albert Flores</h3>
-            <p className="professor-profession">Career Educator</p>
-            <p className="professor-bio">Former PM for Linear, Lambda School, and On Deck.</p>
-            <br></br>
-            <div className="social-icons">
-              <img src={twitterIcon} alt="Twitter" className="social-icon" />
-              <img src={linkedinIcon} alt="LinkedIn" className="social-icon" />
-            </div>
-          </div>
-
-          {/* Professor 4 */}
-          <div className="professor-card">
-            <img src={prof4} alt="Professor 4" className="professor-image" />
-            <h3 className="professor-name">Marvin McKinney</h3>
-            <p className="professor-profession">Co-op & Internships Program & Operations Manager</p>
-            <p className="professor-bio">Former frontend dev for Linear, Coinbase, and Postscript.</p>
-            <div className="social-icons">
-              <img src={twitterIcon} alt="Twitter" className="social-icon" />
-              <img src={linkedinIcon} alt="LinkedIn" className="social-icon" />
-            </div>
+    {/* Product 2 */}
+    <div className="product-card">
+      <img src={link2} alt="Product 2" className="product-image" />
+      <h3 className="product-title">
+        Interactive Language L... <img src={arrowIcon} alt="Arrow Icon" className="arrow-icon" />
+      </h3>
+      <p className="product-description">
+        Utilizes gamification techniques and immersive storytelling to make language learning fun and interactive.
+      </p>
+      <div className="developer-info">
+        <span className="developed-by">Developed by: Team LingoMasters</span>
+        <div className="developer">
+          <img src={dev2} alt="Developer 2" className="developer-image" />
+          <div className="developer-details">
+            <span className="developer-name">David Hernandez</span>
+            <span className="developer-profession">Lead Professor</span>
           </div>
         </div>
       </div>
+    </div>
 
-      <style jsx>{`
+    {/* Product 3 */}
+    <div className="product-card">
+      <img src={link3} alt="Product 3" className="product-image" />
+      <h3 className="product-title">
+        AI-Powered Disaster Re... <img src={arrowIcon} alt="Arrow Icon" className="arrow-icon" />
+      </h3>
+      <p className="product-description">
+        PhiloSAFE uses AI to analyze historical data and predict potential disaster scenarios.
+      </p>
+      <div className="developer-info">
+        <br></br>
+        <span className="developed-by">Developed by: Team Phoenix</span>
+        <div className="developer">
+          <img src={dev3} alt="Developer 3" className="developer-image" />
+          <div className="developer-details">
+            <span className="developer-name">Peter Domingo</span>
+            <span className="developer-profession">Lead Professor</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style jsx>{`
   .products {
     padding: 40px;
     text-align: left;
@@ -281,6 +256,11 @@ const Products = () => {
     border-radius: 10px;
     box-shadow: 0 10px 12px rgba(0, 0, 0, 0.2);
     width: 337px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  .product-card:hover {
+    transform: scale(1.05);
   }
   .product-image {
     width: 100%;
@@ -333,7 +313,6 @@ const Products = () => {
   }
   .developer-name {
     font-weight: bold;
-    font-weight: 600;
     margin-bottom: 5px;
   }
   .developer-profession {
@@ -341,7 +320,100 @@ const Products = () => {
     color: #777;
     margin-top: -3px;
   }
+    /* Responsive Adjustments */
+          @media (max-width: 576px) {
+          .programs{
+          text-allign: left;
+          }
+          .products {
+          padding: 0px;
+          text-align: left;
+          margin-bottom: 60px;
+        }
+      }
+`}</style>
 
+
+
+      {/* Professors Section */}
+<div className="professors-section">
+  <span className="professors font-bold text-red-800 block mb-2">
+    Professors
+  </span>
+  <h2 className="section-title">Featured University Experts</h2>
+  <p className="prof text-sm">
+    EUnivate connects you with a vast network of top university minds across diverse disciplines. Here are just a few of our featured experts ready to tackle your toughest challenges:
+  </p>
+
+  <div className="professor-cards">
+    {/* Professor 1 */}
+    <div className="professor-card">
+      <img src={prof1} alt="Professor 1" className="professor-image" />
+      <h3 className="professor-name">Theresa Webb</h3>
+      <p className="professor-profession">Application Support Analyst Lead</p>
+      <p className="professor-bio">Former co-founder of Opendoor. Early staff at Spotify and Clearbit.</p>
+      <div className="social-icons">
+        <a href="#" className="social-link">
+          <img src={twitterIcon} alt="Twitter" className="social-icon" />
+        </a>
+        <a href="#" className="social-link">
+          <img src={linkedinIcon} alt="LinkedIn" className="social-icon" />
+        </a>
+      </div>
+    </div>
+
+    {/* Professor 2 */}
+    <div className="professor-card">
+      <img src={prof2} alt="Professor 2" className="professor-image" />
+      <h3 className="professor-name">Courtney Henry</h3>
+      <p className="professor-profession">Director, Undergraduate Analytics and Planning</p>
+      <p className="professor-bio">Lead engineering teams at Figma, Pitch, and Protocol Labs.</p>
+      <div className="social-icons">
+        <a href="#" className="social-link">
+          <img src={twitterIcon} alt="Twitter" className="social-icon" />
+        </a>
+        <a href="#" className="social-link">
+          <img src={linkedinIcon} alt="LinkedIn" className="social-icon" />
+        </a>
+      </div>
+    </div>
+
+    {/* Professor 3 */}
+    <div className="professor-card">
+      <img src={prof3} alt="Professor 3" className="professor-image" />
+      <h3 className="professor-name">Albert Flores</h3>
+      <p className="professor-profession">Career Educator</p>
+      <p className="professor-bio">Former PM for Linear, Lambda School, and On Deck.</p>
+      <br></br>
+      <div className="social-icons">
+        <a href="#" className="social-link">
+          <img src={twitterIcon} alt="Twitter" className="social-icon" />
+        </a>
+        <a href="#" className="social-link">
+          <img src={linkedinIcon} alt="LinkedIn" className="social-icon" />
+        </a>
+      </div>
+    </div>
+
+    {/* Professor 4 */}
+    <div className="professor-card">
+      <img src={prof4} alt="Professor 4" className="professor-image" />
+      <h3 className="professor-name">Marvin McKinney</h3>
+      <p className="professor-profession">Co-op & Internships Program & Operations Manager</p>
+      <p className="professor-bio">Former frontend dev for Linear, Coinbase, and Postscript.</p>
+      <div className="social-icons">
+        <a href="#" className="social-link">
+          <img src={twitterIcon} alt="Twitter" className="social-icon" />
+        </a>
+        <a href="#" className="social-link">
+          <img src={linkedinIcon} alt="LinkedIn" className="social-icon" />
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style jsx>{`
   .professors-section {
     padding: 10px;
     text-align: center;
@@ -391,11 +463,31 @@ const Products = () => {
     gap: 10px;
     justify-content: center;
   }
+  .social-link {
+    transition: color 0.3s ease;
+  }
   .social-icon {
     width: 20px;
     height: 20px;
+    cursor: pointer;
   }
+    /* Responsive Adjustments */
+          @media (max-width: 576px) {
+          .professors{
+          text-align: left;
+          }
+          .prof {
+          font-size: 1rem;
+          padding-right: 100px;
+          text-align: left;
+          line-height: 1.6;
+          }
+          .professors-section{
+          margin-bottom: -15 0px;
+          }
+        }
 `}</style>
+
 
     </div>
   );

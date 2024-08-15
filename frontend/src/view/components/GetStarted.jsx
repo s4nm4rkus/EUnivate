@@ -7,7 +7,7 @@ function Footer() {
       <footer className="footer mt-4">
         <div className="container mx-auto">
           <div className="row flex flex-wrap justify-center lg:justify-between">
-            
+
             {/* Social Section */}
             <div className="w-full lg:w-auto order-1 lg:order-none mb-4 lg:mb-0">
               <div className="block">
@@ -58,7 +58,7 @@ function Footer() {
               <h3 className="footer-heading text-red-800">Visit Us</h3>
               <div className="map-container mt-2">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3872.4702326480938!2d121.42872577586695!3d13.930583793127607!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33bd4633b33e65e1%3A0x9344177fec55f63c!2sManuel%20S.%20Enverga%20University%20Foundation%20Candelaria!5e0!3m2!1sen!2sph!4v1723643549310!5m2!1sen!2sph"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3872.15355284525!2d121.61782927586715!3d13.949461192684938!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33bd4cae8de55193%3A0xf7df7b3e9e5679d3!2sManuel%20S.%20Enverga%20University%20Foundation!5e0!3m2!1sen!2sph!4v1723717749129!5m2!1sen!2sph"
                   width="300"
                   height="200"
                   className="w-full lg:w-auto"
@@ -70,7 +70,7 @@ function Footer() {
               </div>
             </div>
           </div>
-          
+
           <div className="text-center mt-4 text-gray-400">
             <p>All rights reserved. Copyright © 2024 EUnivate</p>
           </div>

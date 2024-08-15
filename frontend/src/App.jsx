@@ -2,20 +2,23 @@ import styles from './style';
 import { Navbar, 
          Hero, 
          Stats, 
-         GetStarted, 
+         Products,
          CardDeal, 
          FeedBackCard, 
          Business, 
          Billing, 
          Testimonials, 
-         Clients, 
-         CTA, Footer, 
+         Clients,
          Howitworks, 
          Partnerships,
          LogoSlides,
-         ProjectHoursSupport, Products } from './view/components';
+         ProjectHoursSupport,
+         GetStarted, 
+         CTA, Footer,  
+       } from './view/components';
 
 import './index.css'; 
+
 const App = () => {
   return (
     <div className="bg-white w-full overflow-hidden">
@@ -24,6 +27,7 @@ const App = () => {
           <Navbar />
         </div>
       </div>
+
       <div className={`${styles.flexStart}`}>
         <div className={`${styles.boxWidth}`}>
           <Hero />
@@ -32,54 +36,66 @@ const App = () => {
 
       <div className={`${styles.paddingX} ${styles.flexStart}`}>
         <div className={`${styles.boxWidth}`}>
-        <Stats />
+          <Products />
+          <Stats />
           <Business />
           <Billing />
-          <Products />
           <Testimonials />
           <Clients />
-          <CTA />
-          <Footer />
-          <GetStarted /> 
           <CardDeal />
           <FeedBackCard />
         </div>
       </div>
+
       <div className="bg-secondary w-full overflow-hidden shadow-md">
-      <div className={`${styles.marginY} ${styles.paddingX}  ${styles.flexStart}`}>
-        <div className={`${styles.boxWidth}`}>
-          <Howitworks />
+        <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexStart}`}>
+          <div className={`${styles.boxWidth}`}>
+            <Howitworks />
           </div>
-      </div>
+        </div>
       </div>
 
-      <div className="bg-white w-full overflow-hidden shadow-md" style={{ marginTop: "4rem", paddingBottom:"1rem" }}>
-      <div className={`${styles.marginY} ${styles.paddingX}  ${styles.flexCenter}`}>
-        <div className={`${styles.boxWidth}`}>
-          <Partnerships />
+      <div className="bg-white w-full overflow-hidden shadow-md" style={{ marginTop: "4rem", paddingBottom: "1rem" }}>
+        <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
+          <div className={`${styles.boxWidth}`}>
+            <Partnerships />
           </div>
-      </div>
+        </div>
       </div>
 
       <div className="w-full overflow-hidden" style={{ marginTop: "10px", backgroundColor: "#FCFCFF" }}>
-      <div className={`${styles.flexCenter}`}>
-        <div className={`${styles.boxWidth}`}>
-          <LogoSlides />
+        <div className={`${styles.flexCenter}`}>
+          <div className={`${styles.boxWidth}`}>
+            <LogoSlides />
           </div>
-      </div>
+        </div>
       </div>
 
-      <div className="w-full overflow-hidden shadow-md" style={{ paddingTop: "4rem", paddingBottom:"4rem", backgroundColor: "#F8F9FA" }}>
-      <div className={`${styles.marginY} ${styles.paddingX}  ${styles.flexCenter}`}>
-        <div className={`${styles.boxWidth}`}>
-          <ProjectHoursSupport />
+      <div className="w-full overflow-hidden shadow-md" style={{ paddingTop: "4rem", paddingBottom: "4rem", backgroundColor: "#F8F9FA" }}>
+        <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
+          <div className={`${styles.boxWidth}`}>
+            <ProjectHoursSupport />
           </div>
-      </div>
+        </div>
       </div>
 
+      {/* Moved Footer to before GetStarted */}
+      <div className={`${styles.paddingX} ${styles.flexStart}`}>
+        <div className={`${styles.boxWidth}`}>
+          <CTA />
+          <Footer />
+        </div>
+      </div>
+
+      {/* GetStarted component placed after Footer */}
+      <div className="w-full overflow-hidden" style={{ paddingTop: "4rem", paddingBottom: "4rem", backgroundColor: "#F8F9FA" }}>
+        <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
+          <div className={`${styles.boxWidth}`}>
+            <GetStarted />
+          </div>
+        </div>
+      </div>
     </div>
-
-    
   );
 }
 

@@ -2,7 +2,7 @@ import React from 'react';
 
 function Footer() {
   return (
-    <section className="py-20 px-1 lg:px-20 relative">
+    <section className="footer py-10 px-1 lg:px-20 relative"> {/* Added bg-white */}
       <div className="absolute left-0 right-0 border-t border-gray-300 -mt-4"></div>
       <footer className="footer mt-4">
         <div className="container mx-auto">
@@ -76,6 +76,14 @@ function Footer() {
           </div>
         </div>
       </footer>
+
+      <style jsx>{`
+        .footer{
+          padding: 0;
+          margin-top: -50px;
+          margin-bottom: -110px;
+        }
+      `}</style>
     </section>
   );
 }

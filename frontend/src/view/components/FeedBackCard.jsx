@@ -2,7 +2,7 @@ import React from 'react'
 
 const feedbackcard = () => {
   return (
-    <div>feedbackcard</div>
+    <div></div>
   )
 }
 

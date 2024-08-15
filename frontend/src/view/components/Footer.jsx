@@ -8,9 +8,9 @@ const Footer = () => {
   };
 
   return (
-    <section className="py-16 px-1 lg:px-20 relative">
+    <section className="py-16 px-1 lg:px-20 relative"> {/* Added bg-gray-100 */}
       <h3 className="text-2xl font-bold p-4 text-left">
-        Our Recent Blog
+        Our recent blogs
       </h3>
       
       <div className="flex flex-col lg:flex-row items-start mt-4 gap-4">

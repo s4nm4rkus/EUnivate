@@ -1,5 +1,4 @@
-
-import downArrow from '../assets/down-arrow.png';
+import { webinar } from './assets';
 
 export const navLinks = [
   {
@@ -12,29 +11,37 @@ export const navLinks = [
     title: "Products",
     hasDropdown: true,
     subLinks: [
-      { id: "product1", title: "Product 1", href: "#product1" },
-      { id: "product2", title: "Product 2", href: "#product2" },
+      { id: "showcases", title: "Showcases", href: "#showcases" },
+      { id: "quotation", title: "Quotation", href: "#quotation" },
+      { id: "eustore", title: "EU Store", href: "#eustore" },
     ],
+    imageUrl: webinar,
+    description: 'IT Solution',  
   },
   {
     id: "resources",
     title: "Resources",
     hasDropdown: true,
     subLinks: [
-      { id: "resource1", title: "Resource 1", href: "#resource1" },
-      { id: "resource2", title: "Resource 2", href: "#resource2" },
+      { id: "webinars", title: "Webinars", href: "#webinars" },
+      { id: "events", title: "Events", href: "#events" },
+      { id: "challenges", title: "Challenges", href: "#challenges" },
+      { id: "projectManagement", title: "Project Management", href: "#projectManagement" },
     ],
+    imageUrl: webinar,
+    description: 'WEBINAR',  
   },
   {
     id: "aboutus",
     title: "About Us",
     hasDropdown: true,
     subLinks: [
-      { id: "team", title: "Our Team", href: "#team" },
-      { id: "contact", title: "Contact Us", href: "#contact" },
+      { id: "mission", title: "Mission", href: "#mission" },
+      { id: "advantage", title: "Advantage", href: "#advantage" },
+      { id: "contactUs", title: "Contact Us", href: "#contactUs" },
+      { id: "ourTeam", title: "Our Team", href: "#ourTeam" },
     ],
+    imageUrl: webinar,
+    description: 'EUNIVATE',  
   },
 ];
-
-
-export { downArrow };

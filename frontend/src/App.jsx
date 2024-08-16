@@ -7,7 +7,7 @@ import Feature_uni from './view/components/SecondSection/Feature_uni';
 import Pmt from './view/components/SecondSection/Pmt';
 import Products from './view/components/SecondSection/Products';
 import HIW from './view/components/ThirdSection/HIW';
-import Partnerships from './view/components/ThirdSection/Partnerships';
+import Partnerships from './view/components/ThirdSection/Partnerships.jsx';
 import './index.css'; 
 import styles from './style';
 

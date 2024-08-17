@@ -1,15 +1,16 @@
-import Blog from './view/components/LastSection/Blog';
-import Navbar from './view/components/LandingPage/Navbar';
-import Hero from './view/components/LandingPage/Hero';
-import CTA from './view/components/LastSection/CTA';
-import Footer from './view/components/LastSection/Footer';
-import Feature_uni from './view/components/SecondSection/Feature_uni';
-import Pmt from './view/components/SecondSection/Pmt';
-import Products from './view/components/SecondSection/Products';
-import HIW from './view/components/ThirdSection/HIW';
-import Partnerships from './view/components/ThirdSection/Partnerships.jsx';
+import Navbar from './view/components/Client/LandingPage/Navbar.jsx';
+import Hero from './view/components/Client/LandingPage/Hero.jsx';
+import CTA from './view/components/Client/LastSection/CTA.jsx';
+import Footer from './view/components/Client/LastSection/Footer.jsx';
+import GetStarted from './view/components/Client/LastSection/GetStarted.jsx';
+import ProjectHoursSupport from './view/components/Client/LastSection/ProjectHoursSupport.jsx';
+import Products from './view/components/Client/SecondSection/Products.jsx';
+import Partnerships from './view/components/Client/ThirdSection/Partnerships.jsx';
+import Howitworks from './view/components/Client/ThirdSection/Howitworks.jsx';
+import LogoSlides from './view/components/Client/ThirdSection/LogoSlides.jsx';
 import './index.css'; 
 import styles from './style';
+
 
 
 const App = () => {
@@ -17,25 +18,68 @@ const App = () => {
     <div className="bg-white w-full overflow-hidden">
       <div className={`${styles.paddingX} ${styles.flexCenter}`}>
         <div className={`${styles.boxWidth}`}>
-          <Navbar />
+          <Navbar/>
         </div>
       </div>
+
       <div className={`${styles.flexStart}`}>
         <div className={`${styles.boxWidth}`}>
-          <Hero />
+          <Hero/>
         </div>
       </div>
 
       <div className={`${styles.paddingX} ${styles.flexStart}`}>
         <div className={`${styles.boxWidth}`}>
-          <Blog />
-          <Feature_uni />
-          <Pmt />
-          <CTA />
-          <Footer />
-          <Products /> 
-          <HIW />
-          <Partnerships />
+        <Products/> 
+        </div>
+        </div>
+
+        <div className="bg-secondary w-full overflow-hidden shadow-md">
+        <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexStart}`}>
+          <div className={`${styles.boxWidth}`}>
+            <Howitworks/>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white w-full overflow-hidden shadow-md" style={{ marginTop: "4rem", paddingBottom: "1rem" }}>
+        <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
+          <div className={`${styles.boxWidth}`}>
+            <Partnerships/>
+          </div>
+        </div>
+      </div>
+
+      <div className="w-full overflow-hidden" style={{ marginTop: "10px", backgroundColor: "#FCFCFF" }}>
+        <div className={`${styles.flexCenter}`}>
+          <div className={`${styles.boxWidth}`}>
+            <LogoSlides/>
+          </div>
+        </div>
+      </div>
+
+      <div className="w-full overflow-hidden shadow-md" style={{ paddingTop: "4rem", paddingBottom: "4rem", backgroundColor: "#F8F9FA" }}>
+        <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
+          <div className={`${styles.boxWidth}`}>
+            <ProjectHoursSupport/>
+          </div>
+        </div>
+      </div>
+
+      {/* Moved Footer to before GetStarted */}
+      <div className={`${styles.paddingX} ${styles.flexStart}`}>
+        <div className={`${styles.boxWidth}`}>
+          <CTA/>
+          <Footer/>
+        </div>
+      </div>
+
+      {/* GetStarted component placed after Footer */}
+      <div className="w-full overflow-hidden" style={{ paddingTop: "4rem", paddingBottom: "4rem", backgroundColor: "#F8F9FA" }}>
+        <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
+          <div className={`${styles.boxWidth}`}>
+            <GetStarted />
+          </div>
         </div>
       </div>
     </div>

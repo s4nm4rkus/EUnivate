@@ -54,9 +54,6 @@ const Hero = () => {
             <button className="bg-yellow-500 text-white px-6 py-3 rounded-full hover:bg-red-800 transition-all duration-300 relative z-30">
               Get Started
             </button>
-            <button className="bg-[#eec773] text-white px-6 py-3 rounded-full hover:bg-yellow-600 transition-all duration-300 relative z-30">
-              Request Demo
-            </button>
           </div>
           <div className="hidden sm:flex flex-col sm:flex-row items-center space-x-0 sm:space-x-12 space-y-4 sm:space-y-0 mt-8 sm:mt-16 relative z-30">
             <div className="flex items-center">

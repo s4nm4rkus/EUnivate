@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { navLinks } from '../../../../constants/constants';
 import { downArrow, menu, close } from '../../../../constants/assets';
-
+import { Link } from 'react-scroll';
 const Navbar = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [toggle, setToggle] = useState(false);
@@ -64,12 +64,10 @@ const Navbar = () => {
       </ul>
 
       {/* "Get Started" button */}
-      <button
-        className="hidden sm:block bg-yellow-500 text-white px-4 py-2 rounded-full hover:bg-red-800 transition-all duration-300"
-        style={{ transitionDelay: '0.2s' }}
-      >
-        Get Started
-      </button>
+      <Link to = "CTA" spy = {true} smooth = {true} offset = {50} duration={500} 
+      className="bg-yellow-500 text-white px-6 py-3 rounded-full hover:bg-red-800 transition-all duration-300 relative z-30 hidden sm:block"> 
+              Get Started
+         </Link>    
 
       {/* Mobile Menu */}
       <div className="sm:hidden flex items-center">

@@ -12,6 +12,7 @@ import LogoSlides from './view/components/Client/ThirdSection/LogoSlides.jsx';
 export {
   Navbar,
   Hero,
+
   CTA,
   Footer,
   GetStarted,

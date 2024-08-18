@@ -1,3 +1,14 @@
+import React from 'react';
+import {
+  BrowserRouter,
+  createBrowserRouter,
+  createRoutesFromElements,
+  Route,
+  RouterProvider,
+  useNavigate
+} from "react-router-dom";
+
+/*Client Components*/
 import Navbar from './view/components/Client/LandingPage/Navbar.jsx';
 import Hero from './view/components/Client/LandingPage/Hero.jsx';
 import CTA from './view/components/Client/LastSection/CTA.jsx';
@@ -8,81 +19,119 @@ import Products from './view/components/Client/SecondSection/Products.jsx';
 import Partnerships from './view/components/Client/ThirdSection/Partnerships.jsx';
 import Howitworks from './view/components/Client/ThirdSection/Howitworks.jsx';
 import LogoSlides from './view/components/Client/ThirdSection/LogoSlides.jsx';
+
+/*Client Pages*/
+import About from './view/pages/Client/AboutUs/About.jsx';
+import Advantage from './view/pages/Client/AboutUs/Advantage.jsx';
+import Contact from './view/pages/Client/AboutUs/Contact.jsx';
+import OurTeam from './view/pages/Client/AboutUs/OurTeam.jsx';
+import EuStore from './view/pages/Client/Products/EuStore.jsx';
+import Mission from './view/pages/Client/Products/Mission.jsx';
+import Events from './view/pages/Client/Resources/Events.jsx';
+import Quotation from './view/pages/Client/Products/Quotation.jsx';
+import Showcases from './view/pages/Client/Products/Showcases.jsx';
+import Challages from './view/pages/Client/Products/Challenges.jsx';
+import Events from './view/pages/Client/Resources/Events.jsx';
+import ProjectManagement from './view/pages/Client/Resources/ProjectManagement.jsx';
+import Webinars from './view/pages/Client/Resources/Webinars.jsx';
+
+/*Global Css*/
 import './index.css'; 
 import styles from './style';
 
 
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" >
+ <Route path="/" element={<Navbar />} />
+      <Route path="/about" element={<About />}/>
+      <Route path="/advantage" element={<Advantage />} />
+      <Route path="/contact" element={<Contact /> } />
+      <Route path="/our-team" element={<OurTeam />} />
+      <Route path="/eu-store" element={<EuStore />} />
+      <Route path="/mission" element={<Mission /> } />
+ //to be continued
+    </Route>
+  )
+)
 
 const App = () => {
   return (
-    <div className="bg-white w-full overflow-hidden">
-      <div className={`${styles.paddingX} ${styles.flexCenter}`}>
-        <div className={`${styles.boxWidth}`}>
-          <Navbar/>
-        </div>
-      </div>
-
-      <div className={`${styles.flexStart}`}>
-        <div className={`${styles.boxWidth}`}>
-          <Hero/>
-        </div>
-      </div>
-
-      <div className={`${styles.paddingX} ${styles.flexStart}`}>
-        <div className={`${styles.boxWidth}`}>
-        <Products/> 
-        </div>
-        </div>
-
-        <div className="bg-secondary w-full overflow-hidden shadow-md">
-        <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexStart}`}>
+    <Router>
+      <div className="bg-white w-full overflow-hidden">
+        <div className={`${styles.paddingX} ${styles.flexCenter}`}>
           <div className={`${styles.boxWidth}`}>
-            <Howitworks/>
+            <Navbar/>
+          </div>
+        </div>
+
+        <div className={`${styles.flexStart}`}>
+          <div className={`${styles.boxWidth}`}>
+            <Hero/>
+          </div>
+        </div>
+
+        <div className="bg-white w-full overflow-hidden">
+          <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
+            <div className={`${styles.boxWidth}`}>
+              <Products/>
+            </div>
+          </div>
+        </div>
+
+        <div className=" w-full overflow-hidden">
+          <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexStart}`}>
+            <div className={`${styles.boxWidth}`}>
+              <Howitworks/>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white w-full overflow-hidden">
+          <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
+            <div className={`${styles.boxWidth}`}>
+              <Partnerships/>
+            </div>
+          </div>
+        </div>
+
+        <div className="w-full overflow-hidden">
+          <div className={`${styles.flexCenter}`}>
+            <div className={`${styles.boxWidth}`}>
+              <LogoSlides/>
+            </div>
+          </div>
+        </div>
+
+        <div className="w-full overflow-hidden mb-16">
+          <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
+            <div className={`${styles.boxWidth}`}>
+              <ProjectHoursSupport/>
+            </div>
+          </div>
+        </div>
+
+        {/* Moved Footer to before GetStarted */}
+        <div className={`${styles.paddingX} ${styles.flexStart}`}>
+          <div className={`${styles.boxWidth}`}>
+            <CTA/>
+            <Footer/>
+          </div>
+        </div>
+
+        {/* GetStarted component placed after Footer */}
+        <div className="w-full overflow-hidden">
+          <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
+            <div className={`${styles.boxWidth}`}>
+              <GetStarted />
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white w-full overflow-hidden shadow-md" style={{ marginTop: "4rem", paddingBottom: "1rem" }}>
-        <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
-          <div className={`${styles.boxWidth}`}>
-            <Partnerships/>
-          </div>
-        </div>
-      </div>
-
-      <div className="w-full overflow-hidden" style={{ marginTop: "10px", backgroundColor: "#FCFCFF" }}>
-        <div className={`${styles.flexCenter}`}>
-          <div className={`${styles.boxWidth}`}>
-            <LogoSlides/>
-          </div>
-        </div>
-      </div>
-
-      <div className="w-full overflow-hidden shadow-md" style={{ paddingTop: "4rem", paddingBottom: "4rem", backgroundColor: "#F8F9FA" }}>
-        <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
-          <div className={`${styles.boxWidth}`}>
-            <ProjectHoursSupport/>
-          </div>
-        </div>
-      </div>
-
-      {/* Moved Footer to before GetStarted */}
-      <div className={`${styles.paddingX} ${styles.flexStart}`}>
-        <div className={`${styles.boxWidth}`}>
-          <CTA/>
-          <Footer/>
-        </div>
-      </div>
-
-      {/* GetStarted component placed after Footer */}
-      <div className="w-full overflow-hidden" style={{ paddingTop: "4rem", paddingBottom: "4rem", backgroundColor: "#F8F9FA" }}>
-        <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
-          <div className={`${styles.boxWidth}`}>
-            <GetStarted />
-          </div>
-        </div>
-      </div>
-    </div>
+      
+    </Router>
+    
   );
 }
 

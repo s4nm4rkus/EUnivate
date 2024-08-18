@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from 'react-scroll';
+
 import { 
   thinkTogether, 
   indMeets, 
@@ -17,6 +19,8 @@ import {
 } from '../../../../constants/assets';
 
 const Hero = () => {
+
+
   return (
     <>
       <section className="py-16 px-8 lg:px-24 flex flex-col lg:flex-row justify-between items-center relative">
@@ -38,7 +42,7 @@ const Hero = () => {
         <img 
           src={loop} 
           alt="Loop" 
-          className="absolute top-2 left-2 lg:w-[400px] lg:h-[450px] w-[450px] h-[400px] z-30 hidden sm:block" 
+          className="absolute top-2 lg:w-[400px] lg:h-[450px] w-[450px] h-[400px] z-30" 
         />
 
         <div className="lg:w-1/2 w-full relative z-10">
@@ -51,22 +55,22 @@ const Hero = () => {
             EUnivate connects your business with the brightest minds from universities. Tap into cutting-edge solutions, reduce development costs, and gain a competitive edge through real-world innovation.
           </p>
           <div className="flex space-x-4 mt-8">
-            <button className="bg-yellow-500 text-white px-6 py-3 rounded-full hover:bg-red-800 transition-all duration-300 relative z-30">
+       <Link to = "CTA" spy = {true} smooth = {true} offset = {50} duration={500}
+        className="bg-yellow-500 text-white px-6 py-3 rounded-full hover:bg-red-800 transition-all duration-300 relative z-30"> 
               Get Started
-            </button>
-
+         </Link>    
           </div>
-          <div className="hidden sm:flex flex-col sm:flex-row items-center space-x-0 sm:space-x-12 space-y-4 sm:space-y-0 mt-8 sm:mt-16 relative z-30">
-            <div className="hidden sm:block items-center">
+          <div className="flex  items-center justify-center space-x-12 mt-8 sm:mt-16 relative z-30">
+            <div className="hidden sm:flex  items-center">
               <img src={thinkTogether} alt="Innovate Together" className="w-8 h-8" />
               <span className="text-sm ml-2">Innovate Together</span>
             </div>
             
-            <div className="hidden sm:block items-center">
+            <div className="hidden sm:flex  items-center">
               <img src={futureSolution} alt="Future Solutions" className="w-8 h-8" />
               <span className="text-sm ml-2">Future Solutions</span>
             </div>
-            <div className="hidden sm:block items-center">
+            <div className="hidden sm:flex  items-center">
               <img src={indMeets} alt="Industry Meets Minds" className="w-8 h-8" />
               <span className="text-sm ml-2">Industry Meets Minds</span>
             </div>

@@ -27,7 +27,7 @@ function Footer() {
             <div className="w-full lg:w-auto order-2 lg:order-none mb-4 lg:mb-0">
               <h3 className="footer-heading text-red-800">Quick Links</h3>
               <ul className="footer-list text-gray-600 space-y-2 mt-2">
-                <li><a href="#">MSEUF Website</a></li>
+                <li><a href="https://mseuf.edu.ph/">MSEUF Website</a></li>
                 <li><a href="#">EU Store</a></li>
                 <li><a href="#">About Us</a></li>
                 <li><a href="#">Products</a></li>
@@ -48,7 +48,7 @@ function Footer() {
             <div className="w-full lg:w-auto order-4 lg:order-none mb-4 lg:mb-0">
               <h3 className="footer-heading text-red-800">Contact Us</h3>
               <ul className="footer-list text-gray-600 space-y-2 mt-2">
-                <li><a href="#">MSEUF:</a></li>
+                <li><a href="https://mseuf.edu.ph/">MSEUF:</a></li>
                 <li><a href="#">RPIUC:</a></li>
               </ul>
             </div>

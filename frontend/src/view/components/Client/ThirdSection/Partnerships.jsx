@@ -4,7 +4,7 @@ const Partnerships = () => {
     return (
         <div className="flex justify-center">
             <div
-                class="ms-7 me-7 text-center"
+                className="ms-7 me-7 text-center"
                 style={{
                 width: "768px"
             }}>

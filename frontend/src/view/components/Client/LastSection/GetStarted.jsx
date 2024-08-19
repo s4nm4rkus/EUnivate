@@ -77,13 +77,8 @@ function Footer() {
         </div>
       </footer>
 
-      <style jsx>{`
-        .footer{
-          padding: 0;
-          margin-top: -50px;
-          margin-bottom: -110px;
-        }
-      `}</style>
+
+
     </section>
   );
 }

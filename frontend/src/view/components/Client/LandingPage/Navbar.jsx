@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { Link as ScrollLink } from 'react-scroll';
+import { Link as RouterLink } from 'react-router-dom';
 import { navLinks } from '../../../../constants/constants';
 import { downArrow, menu, close } from '../../../../constants/assets';
-import { Link } from 'react-scroll';
+
 const Navbar = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [toggle, setToggle] = useState(false);
@@ -43,7 +45,7 @@ const Navbar = () => {
                   <li className="font-semibold mb-2">{link.title.toUpperCase()}</li>
                   {link.subLinks.map((subLink) => (
                     <li key={subLink.id} className="cursor-pointer mb-1 hover:text-red-500 text-sm">
-                      <a href={subLink.href}>{subLink.title}</a>
+                      <RouterLink to={subLink.href}>{subLink.title}</RouterLink>
                     </li>
                   ))}
                 </ul>
@@ -64,10 +66,16 @@ const Navbar = () => {
       </ul>
 
       {/* "Get Started" button */}
-      <Link to = "CTA" spy = {true} smooth = {true} offset = {50} duration={500} 
-      className="bg-yellow-500 text-white px-6 py-3 rounded-full hover:bg-red-800 transition-all duration-300 relative z-30 hidden sm:block"> 
-              Get Started
-         </Link>    
+      <ScrollLink
+        to="CTA"
+        spy={true}
+        smooth={true}
+        offset={50}
+        duration={500}
+        className="bg-yellow-500 text-white px-6 py-3 rounded-full hover:bg-red-800 transition-all duration-300 relative z-30 hidden sm:block cursor-pointer"
+      >
+        Get Started
+      </ScrollLink>    
 
       {/* Mobile Menu */}
       <div className="sm:hidden flex items-center">
@@ -85,7 +93,7 @@ const Navbar = () => {
             {navLinks.map((link) => (
               <li key={link.id} className="relative group font-medium cursor-pointer text-[16px] mb-4">
                 <div onClick={() => link.hasDropdown && toggleDropdown(link.id)} className="flex items-center justify-between w-full">
-                  <a href={link.href}>{link.title}</a>
+                  <RouterLink to={link.href}>{link.title}</RouterLink>
                   {link.hasDropdown && (
                     <img
                       src={downArrow}
@@ -99,7 +107,7 @@ const Navbar = () => {
                   <ul className="mt-2 ml-4 text-gray-600">
                     {link.subLinks.map((subLink) => (
                       <li key={subLink.id} className="cursor-pointer mb-2 hover:text-red-500 text-sm">
-                        <a href={subLink.href}>{subLink.title}</a>
+                        <RouterLink to={subLink.href}>{subLink.title}</RouterLink>
                       </li>
                     ))}
                   </ul>

@@ -99,11 +99,13 @@
 }
 
 /* Footer Styles */
-.footer {
-  padding: 40px 0;
-  margin-top: 50px;
-}
 
+  .footer{
+    padding: 0;
+    margin-top: 50px;
+
+  }
+  
 .container {
   max-width: 1200px;
   margin: 0 auto;

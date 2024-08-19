@@ -33,77 +33,79 @@ import styles from './style';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/" element={<div className="bg-white w-full overflow-hidden">
-      <div className={`${styles.paddingX} ${styles.flexCenter}`}>
-        <div className={`${styles.boxWidth}`}>
-          <Navbar />
-        </div>
-      </div>
-
-      <div className={`${styles.flexStart}`}>
-        <div className={`${styles.boxWidth}`}>
-          <Hero />
-        </div>
-      </div>
-
+    <Route path="/" element={
       <div className="bg-white w-full overflow-hidden">
-        <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
+        <div className={`${styles.paddingX} ${styles.flexCenter}`}>
           <div className={`${styles.boxWidth}`}>
-            <Products />
+            <Navbar />
           </div>
         </div>
-      </div>
 
-      <div className=" w-full overflow-hidden">
-        <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexStart}`}>
+        <div className={`${styles.flexStart}`}>
           <div className={`${styles.boxWidth}`}>
-            <Howitworks />
+            <Hero />
           </div>
         </div>
-      </div>
 
-      <div className="bg-white w-full overflow-hidden">
-        <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
-          <div className={`${styles.boxWidth}`}>
-            <Partnerships />
+        <div className="bg-white w-full overflow-hidden">
+          <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
+            <div className={`${styles.boxWidth}`}>
+              <Products />
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="w-full overflow-hidden">
-        <div className={`${styles.flexCenter}`}>
-          <div className={`${styles.boxWidth}`}>
-            <LogoSlides />
+        <div className=" w-full overflow-hidden">
+          <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexStart}`}>
+            <div className={`${styles.boxWidth}`}>
+              <Howitworks />
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="w-full overflow-hidden mb-16">
-        <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
-          <div className={`${styles.boxWidth}`}>
-            <ProjectHoursSupport />
+        <div className="bg-white w-full overflow-hidden">
+          <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
+            <div className={`${styles.boxWidth}`}>
+              <Partnerships />
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Moved Footer to before GetStarted */}
-      <div className={`${styles.paddingX} ${styles.flexStart}`}>
-        <div className={`${styles.boxWidth}`}>
-          <CTA />
-          <Footer />
-        </div>
-      </div>
-
-      {/* GetStarted component placed after Footer */}
-      <div className="w-full overflow-hidden">
-        <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
-          <div className={`${styles.boxWidth}`}>
-            <GetStarted />
+        <div className="w-full overflow-hidden">
+          <div className={`${styles.flexCenter}`}>
+            <div className={`${styles.boxWidth}`}>
+              <LogoSlides />
+            </div>
           </div>
         </div>
-      </div>
-    </div>}>
+
+        <div className="w-full overflow-hidden mb-16">
+          <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
+            <div className={`${styles.boxWidth}`}>
+              <ProjectHoursSupport />
+            </div>
+          </div>
+        </div>
+
+        {/* Moved Footer to before GetStarted */}
+        <div className={`${styles.paddingX} ${styles.flexStart}`}>
+          <div className={`${styles.boxWidth}`}>
+            <CTA />
+            <Footer />
+          </div>
+        </div>
+
+        {/* GetStarted component placed after Footer */}
+        <div className="w-full overflow-hidden">
+          <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
+            <div className={`${styles.boxWidth}`}>
+              <GetStarted />
+            </div>
+          </div>
+        </div>
+      </div>}>
       {/* Define the routes for your pages */}
+      <Route path="/" element={<Navbar />} />
       <Route path="/about" element={<About />} />
       <Route path="/advantage" element={<Advantage />} />
       <Route path="/contact" element={<Contact />} />

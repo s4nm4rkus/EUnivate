@@ -17,7 +17,10 @@ import futureSolution from '../assets/futureSolution.png';
 import yellow_gradient from '../assets/yellow_gradient.svg';
 import red_gradient from '../assets/red_gradient.svg';
 import loop from '../assets/loop.svg';
+<<<<<<< HEAD
 
+=======
+>>>>>>> 01dbd895dc3489ff5c29dea3509a7a7b18f5d563
 // LogoSlides Assets - Line 1
 import logo1_ln1 from '../assets/LogoSlides/logo1_ln1.png';
 import logo2_ln1 from '../assets/LogoSlides/logo2_ln1.png';
@@ -73,6 +76,7 @@ import logo10_ln4 from '../assets/LogoSlides/logo10_ln4.png';
 import logo33_ln4 from '../assets/LogoSlides/logo33_ln4.png';
 import logo28_ln4 from '../assets/LogoSlides/logo28_ln4.png';
 
+<<<<<<< HEAD
 /* Products */
 import p1 from '../assets/p1.jpg';
 import p2 from '../assets/p2.jpg';
@@ -90,12 +94,18 @@ import prof1 from '../assets/prof1.jpg';
 import prof2 from '../assets/prof2.jpg';
 import prof3 from '../assets/prof3.jpg';
 import prof4 from '../assets/prof4.jpg';
+=======
+
+>>>>>>> 01dbd895dc3489ff5c29dea3509a7a7b18f5d563
 
 
 
 /* FOOTER IMG */
 import webinar1 from '../assets/webinar1.png';
+<<<<<<< HEAD
 
+=======
+>>>>>>> 01dbd895dc3489ff5c29dea3509a7a7b18f5d563
 import webinar2 from '../assets/webinar2.png';
 import webinar3 from '../assets/webinar3.png';
 
@@ -181,6 +191,7 @@ export {
       logo33_ln4,
       logo28_ln4,
        
+<<<<<<< HEAD
       // Products Assets
       p1,
       p2,
@@ -198,4 +209,6 @@ export {
       prof2,
       prof3,
       prof4
+=======
+>>>>>>> 01dbd895dc3489ff5c29dea3509a7a7b18f5d563
 };

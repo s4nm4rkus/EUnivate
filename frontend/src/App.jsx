@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React from 'react';
 import { RouterProvider, createBrowserRouter, createRoutesFromElements, Route } from "react-router-dom";
 
@@ -34,6 +35,32 @@ import styles from './style';
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<div className="bg-white w-full overflow-hidden">
+=======
+import styles from './style';
+import { Navbar, 
+         Hero, 
+         Stats, 
+         Products,
+         CardDeal, 
+         FeedBackCard, 
+         Business, 
+         Billing, 
+         Testimonials, 
+         Clients,
+         Howitworks, 
+         Partnerships,
+         LogoSlides,
+         ProjectHoursSupport,
+         GetStarted, 
+         CTA, Footer,  
+       } from './view/components';
+
+import './index.css'; 
+
+const App = () => {
+  return (
+    <div className="bg-white w-full overflow-hidden">
+>>>>>>> 01dbd895dc3489ff5c29dea3509a7a7b18f5d563
       <div className={`${styles.paddingX} ${styles.flexCenter}`}>
         <div className={`${styles.boxWidth}`}>
           <Navbar />
@@ -46,6 +73,7 @@ const router = createBrowserRouter(
         </div>
       </div>
 
+<<<<<<< HEAD
       <div className="bg-white w-full overflow-hidden">
         <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
           <div className={`${styles.boxWidth}`}>
@@ -55,6 +83,22 @@ const router = createBrowserRouter(
       </div>
 
       <div className=" w-full overflow-hidden">
+=======
+      <div className={`${styles.paddingX} ${styles.flexStart}`}>
+        <div className={`${styles.boxWidth}`}>
+          <Products />
+          <Stats />
+          <Business />
+          <Billing />
+          <Testimonials />
+          <Clients />
+          <CardDeal />
+          <FeedBackCard />
+        </div>
+      </div>
+
+      <div className="bg-secondary w-full overflow-hidden shadow-md">
+>>>>>>> 01dbd895dc3489ff5c29dea3509a7a7b18f5d563
         <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexStart}`}>
           <div className={`${styles.boxWidth}`}>
             <Howitworks />
@@ -62,7 +106,11 @@ const router = createBrowserRouter(
         </div>
       </div>
 
+<<<<<<< HEAD
       <div className="bg-white w-full overflow-hidden">
+=======
+      <div className="bg-white w-full overflow-hidden shadow-md" style={{ marginTop: "4rem", paddingBottom: "1rem" }}>
+>>>>>>> 01dbd895dc3489ff5c29dea3509a7a7b18f5d563
         <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
           <div className={`${styles.boxWidth}`}>
             <Partnerships />
@@ -70,7 +118,11 @@ const router = createBrowserRouter(
         </div>
       </div>
 
+<<<<<<< HEAD
       <div className="w-full overflow-hidden">
+=======
+      <div className="w-full overflow-hidden" style={{ marginTop: "10px", backgroundColor: "#FCFCFF" }}>
+>>>>>>> 01dbd895dc3489ff5c29dea3509a7a7b18f5d563
         <div className={`${styles.flexCenter}`}>
           <div className={`${styles.boxWidth}`}>
             <LogoSlides />
@@ -78,7 +130,11 @@ const router = createBrowserRouter(
         </div>
       </div>
 
+<<<<<<< HEAD
       <div className="w-full overflow-hidden mb-16">
+=======
+      <div className="w-full overflow-hidden shadow-md" style={{ paddingTop: "4rem", paddingBottom: "4rem", backgroundColor: "#F8F9FA" }}>
+>>>>>>> 01dbd895dc3489ff5c29dea3509a7a7b18f5d563
         <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
           <div className={`${styles.boxWidth}`}>
             <ProjectHoursSupport />
@@ -95,13 +151,18 @@ const router = createBrowserRouter(
       </div>
 
       {/* GetStarted component placed after Footer */}
+<<<<<<< HEAD
       <div className="w-full overflow-hidden">
+=======
+      <div className="w-full overflow-hidden" style={{ paddingTop: "4rem", paddingBottom: "4rem", backgroundColor: "#F8F9FA" }}>
+>>>>>>> 01dbd895dc3489ff5c29dea3509a7a7b18f5d563
         <div className={`${styles.marginY} ${styles.paddingX} ${styles.flexCenter}`}>
           <div className={`${styles.boxWidth}`}>
             <GetStarted />
           </div>
         </div>
       </div>
+<<<<<<< HEAD
     </div>}>
       {/* Define the routes for your pages */}
       <Route path="/about" element={<About />} />
@@ -123,6 +184,9 @@ const router = createBrowserRouter(
 const App = () => {
   return (
     <RouterProvider router={router} />
+=======
+    </div>
+>>>>>>> 01dbd895dc3489ff5c29dea3509a7a7b18f5d563
   );
 }
 

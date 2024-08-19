@@ -1,44 +1,44 @@
-import Blog from './view/components/LastSection/Blog';
-import Navbar from './view/components/LandingPage/Navbar';
-import Hero from './view/components/LandingPage/Hero';
-import CTA from './view/components/LastSection/CTA';
-import Footer from './view/components/LastSection/Footer';
-import Feature_uni from './view/components/SecondSection/Feature_uni';
-import Pmt from './view/components/SecondSection/Pmt';
-import Products from './view/components/SecondSection/Products';
-import HIW from './view/components/ThirdSection/HIW';
-import Partnerships from './view/components/ThirdSection/Partnerships.jsx';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+/* Client Pages */
+import LandingPage from './view/pages/Client/MainPage'; 
+import About from './view/pages/Client/About';
+import Advantage from './view/pages/Client/Advantage';
+import Contact from './view/pages/Client/Contact';
+import OurTeam from './view/pages/Client/OurTeam';
+import EuStore from './view/pages/Client/EuStore';
+import Mission from './view/pages/Client/Mission';
+import Events from './view/pages/Client/Events';
+import Quotation from './view/pages/Client/Quotation';
+import Showcases from './view/pages/Client/Showcases';
+import Challenges from './view/pages/Client/Challenges';
+import ProjectManagement from './view/pages/Client/ProjectManagement';
+import Webinars from './view/pages/Client/Webinars';
+
+/* Global CSS */
 import './index.css'; 
 import styles from './style';
 
-
 const App = () => {
   return (
-    <div className="bg-white w-full overflow-hidden">
-      <div className={`${styles.paddingX} ${styles.flexCenter}`}>
-        <div className={`${styles.boxWidth}`}>
-          <Navbar />
-        </div>
-      </div>
-      <div className={`${styles.flexStart}`}>
-        <div className={`${styles.boxWidth}`}>
-          <Hero />
-        </div>
-      </div>
-
-      <div className={`${styles.paddingX} ${styles.flexStart}`}>
-        <div className={`${styles.boxWidth}`}>
-          <Blog />
-          <Feature_uni />
-          <Pmt />
-          <CTA />
-          <Footer />
-          <Products /> 
-          <HIW />
-          <Partnerships />
-        </div>
-      </div>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/advantage" element={<Advantage />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/our-team" element={<OurTeam />} />
+        <Route path="/eu-store" element={<EuStore />} />
+        <Route path="/mission" element={<Mission />} />
+        <Route path="/events" element={<Events />} />
+        <Route path="/quotation" element={<Quotation />} />
+        <Route path="/showcases" element={<Showcases />} />
+        <Route path="/challenges" element={<Challenges />} />
+        <Route path="/project" element={<ProjectManagement />} />
+        <Route path="/webinar" element={<Webinars />} />
+      </Routes>
+    </Router>
   );
 }
 

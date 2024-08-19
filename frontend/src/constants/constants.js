@@ -3,7 +3,7 @@ import webinar from '../assets/webinar.png';
 
 export const navLinks = [
   {
-    id: "home",
+    id: "home", path: "/",
     title: "Home",
     hasDropdown: false,
   },

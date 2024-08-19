@@ -1,6 +1,5 @@
-
+import { useHref } from 'react-router';
 import webinar from '../assets/webinar.png';
-
 
 export const navLinks = [
   {
@@ -13,9 +12,9 @@ export const navLinks = [
     title: "Products",
     hasDropdown: true,
     subLinks: [
-      { id: "showcases", title: "Showcases", href: "/showcases" },
-      { id: "quotation", title: "Quotation", href: "/quotation" },  
-      { id: "eustore", title: "EU Store", href: "/eu-store" },
+      { id: "showcases", title: "Showcases", path: "/showcases" },
+      { id: "quotation", title: "Quotation", path: "/quotation" },  
+      { id: "eustore", title: "EU Store", path: "/eu-store" },
     ],
     imageUrl: webinar,
     description: 'IT Solution',  
@@ -25,10 +24,10 @@ export const navLinks = [
     title: "Resources",
     hasDropdown: true,
     subLinks: [
-      { id: "webinars", title: "Webinars", href: "/webinar" },
-      { id: "events", title: "Events", href: "/events" },
-      { id: "challenges", title: "Challenges", href: "/challenges" },
-      { id: "projectManagement", title: "Project Management", href: "/project" },
+      { id: "webinars", title: "Webinars", path: "/webinar" },
+      { id: "events", title: "Events", path: "/events" },
+      { id: "challenges", title: "Challenges", path: "/challenges" },
+      { id: "projectManagement", title: "Project Management", path: "/project" },
     ],
     imageUrl: webinar,
     description: 'WEBINAR',  
@@ -38,10 +37,10 @@ export const navLinks = [
     title: "About Us",
     hasDropdown: true,
     subLinks: [
-      { id: "mission", title: "Mission", href: "/mission" },
-      { id: "advantage", title: "Advantage", href: "/advantage" },
-      { id: "contactUs", title: "Contact Us", href: "/contact" },
-      { id: "ourTeam", title: "Our Team", href: "/our-team" },
+      { id: "mission", title: "Mission", path: "/mission" },
+      { id: "advantage", title: "Advantage", path: "/advantage" },
+      { id: "contactUs", title: "Contact Us", path: "/contact" },
+      { id: "ourTeam", title: "Our Team", path: "/our-team" },
     ],
     imageUrl: webinar,
     description: 'EUNIVATE',  

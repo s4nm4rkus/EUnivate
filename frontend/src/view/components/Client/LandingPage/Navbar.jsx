@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
 import { Link as ScrollLink } from 'react-scroll';
-import { Link as RouterLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { navLinks } from '../../../../constants/constants';
 import { downArrow, menu, close } from '../../../../constants/assets';
 
 const Navbar = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [toggle, setToggle] = useState(false);
+  const navigate = useNavigate();
 
   const toggleDropdown = (id) => {
     setActiveDropdown(activeDropdown === id ? null : id);
+  };
+
+  const handleNavigation = (path) => {
+    navigate(path);
+    setToggle(false);  // Close the mobile menu after navigation
   };
 
   return (
@@ -26,7 +32,7 @@ const Navbar = () => {
         {navLinks.map((link) => (
           <li key={link.id} className="relative group">
             <button
-              onClick={() => link.hasDropdown && toggleDropdown(link.id)}
+              onClick={() => link.hasDropdown ? toggleDropdown(link.id) : handleNavigation('/')}
               className="text-gray-700 hover:text-red-500 flex items-center focus:outline-none"
             >
               {link.title}
@@ -44,8 +50,12 @@ const Navbar = () => {
                 <ul className="p-4 w-1/2">
                   <li className="font-semibold mb-2">{link.title.toUpperCase()}</li>
                   {link.subLinks.map((subLink) => (
-                    <li key={subLink.id} className="cursor-pointer mb-1 hover:text-red-500 text-sm">
-                      <RouterLink to={subLink.href}>{subLink.title}</RouterLink>
+                    <li
+                      key={subLink.id}
+                      className="cursor-pointer mb-1 hover:text-red-500 text-sm"
+                      onClick={() => handleNavigation(subLink.path)}
+                    >
+                      {subLink.title}
                     </li>
                   ))}
                 </ul>
@@ -92,8 +102,11 @@ const Navbar = () => {
           <ul className="list-none flex justify-end items-start flex-1 flex-col">
             {navLinks.map((link) => (
               <li key={link.id} className="relative group font-medium cursor-pointer text-[16px] mb-4">
-                <div onClick={() => link.hasDropdown && toggleDropdown(link.id)} className="flex items-center justify-between w-full">
-                  <RouterLink to={link.href}>{link.title}</RouterLink>
+                <div
+                  onClick={() => link.hasDropdown ? toggleDropdown(link.id) : handleNavigation('/')}
+                  className="flex items-center justify-between w-full"
+                >
+                  {link.title}
                   {link.hasDropdown && (
                     <img
                       src={downArrow}
@@ -106,8 +119,12 @@ const Navbar = () => {
                 {link.hasDropdown && activeDropdown === link.id && (
                   <ul className="mt-2 ml-4 text-gray-600">
                     {link.subLinks.map((subLink) => (
-                      <li key={subLink.id} className="cursor-pointer mb-2 hover:text-red-500 text-sm">
-                        <RouterLink to={subLink.href}>{subLink.title}</RouterLink>
+                      <li
+                        key={subLink.id}
+                        className="cursor-pointer mb-2 hover:text-red-500 text-sm"
+                        onClick={() => handleNavigation(subLink.path)}
+                      >
+                        {subLink.title}
                       </li>
                     ))}
                   </ul>
@@ -122,3 +139,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+  

@@ -1,21 +1,17 @@
-import styles from './style';
-import { Navbar, 
-         Hero, 
-         Stats, 
-         GetStarted, 
-         CardDeal, 
-         FeedBackCard, 
-         Business, 
-         Billing, 
-         Testimonials, 
-         Clients, 
-         CTA, Footer, 
-         Howitworks, 
-         Partnerships,
-         LogoSlides,
-         ProjectHoursSupport } from './view/components';
-
+import Blog from './view/components/LastSection/Blog';
+import Navbar from './view/components/LandingPage/Navbar';
+import Hero from './view/components/LandingPage/Hero';
+import CTA from './view/components/LastSection/CTA';
+import Footer from './view/components/LastSection/Footer';
+import Feature_uni from './view/components/SecondSection/Feature_uni';
+import Pmt from './view/components/SecondSection/Pmt';
+import Products from './view/components/SecondSection/Products';
+import HIW from './view/components/ThirdSection/HIW';
+import Partnerships from './view/components/ThirdSection/Partnerships.jsx';
 import './index.css'; 
+import styles from './style';
+
+
 const App = () => {
   return (
     <div className="bg-white w-full overflow-hidden">
@@ -32,16 +28,14 @@ const App = () => {
 
       <div className={`${styles.paddingX} ${styles.flexStart}`}>
         <div className={`${styles.boxWidth}`}>
-          <Stats />
-          <Business />
-          <Billing />
-          <Testimonials />
-          <Clients />
+          <Blog />
+          <Feature_uni />
+          <Pmt />
           <CTA />
           <Footer />
-          <GetStarted /> 
-          <CardDeal />
-          <FeedBackCard />
+          <Products /> 
+          <HIW />
+          <Partnerships />
         </div>
       </div>
       <div className="bg-secondary w-full overflow-hidden shadow-md">

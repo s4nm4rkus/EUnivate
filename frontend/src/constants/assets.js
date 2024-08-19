@@ -17,6 +17,7 @@ import futureSolution from '../assets/futureSolution.png';
 import yellow_gradient from '../assets/yellow_gradient.svg';
 import red_gradient from '../assets/red_gradient.svg';
 import loop from '../assets/loop.svg';
+import OksYun from '../assets/OksYun.png';
 // LogoSlides Assets - Line 1
 import logo1_ln1 from '../assets/LogoSlides/logo1_ln1.png';
 import logo2_ln1 from '../assets/LogoSlides/logo2_ln1.png';
@@ -72,7 +73,23 @@ import logo10_ln4 from '../assets/LogoSlides/logo10_ln4.png';
 import logo33_ln4 from '../assets/LogoSlides/logo33_ln4.png';
 import logo28_ln4 from '../assets/LogoSlides/logo28_ln4.png';
 
-
+/* Products */
+import p1 from '../assets/p1.jpg';
+import p2 from '../assets/p2.jpg';
+import p3 from '../assets/p3.jpg';
+import dev2 from '../assets/dev2.jpg';
+import dev1 from '../assets/dev1.jpg'; 
+import dev3 from '../assets/dev3.jpg';
+import link1 from '../assets/link1.jpg';
+import link2 from '../assets/link2.jpg';
+import link3 from '../assets/link3.jpg';
+import arrowIcon from '../assets/arrowIcon.jpg'; 
+import twitterIcon from '../assets/twitterIcon.jpg'; 
+import linkedinIcon from '../assets/linkedinIcon.jpg';
+import prof1 from '../assets/prof1.jpg';
+import prof2 from '../assets/prof2.jpg';
+import prof3 from '../assets/prof3.jpg';
+import prof4 from '../assets/prof4.jpg';
 
 
 
@@ -82,6 +99,7 @@ import webinar2 from '../assets/webinar2.png';
 import webinar3 from '../assets/webinar3.png';
 
 export {
+  
    yellow_gradient,
    red_gradient,
    loop,
@@ -100,6 +118,7 @@ export {
     thinkTogether,
     indMeets,
     futureSolution,
+    OksYun,
 
      /* FOOTER IMG */
     webinar1,
@@ -162,4 +181,21 @@ export {
       logo33_ln4,
       logo28_ln4,
        
+      // Products Assets
+      p1,
+      p2,
+      p3,
+      dev2,
+      dev1,
+      dev3,
+      link1,
+      link2,
+      link3,
+      arrowIcon,
+      twitterIcon,
+      linkedinIcon,
+      prof1,
+      prof2,
+      prof3,
+      prof4
 };

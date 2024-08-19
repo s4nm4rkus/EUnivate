@@ -3,7 +3,7 @@ import React from 'react';
 function Footer() {
   return (
     <section className="footer py-10 px-1 lg:px-20 relative"> {/* Added bg-white */}
-      <div className="absolute left-0 right-0 border-t border-gray-300 -mt-4"></div>
+      <div className="absolute left-0 right-0  -mt-4"></div>
       <footer className="footer mt-4">
         <div className="container mx-auto">
           <div className="row flex flex-wrap justify-center lg:justify-between">
@@ -27,7 +27,7 @@ function Footer() {
             <div className="w-full lg:w-auto order-2 lg:order-none mb-4 lg:mb-0">
               <h3 className="footer-heading text-red-800">Quick Links</h3>
               <ul className="footer-list text-gray-600 space-y-2 mt-2">
-                <li><a href="#">MSEUF Website</a></li>
+                <li><a href="https://mseuf.edu.ph/">MSEUF Website</a></li>
                 <li><a href="#">EU Store</a></li>
                 <li><a href="#">About Us</a></li>
                 <li><a href="#">Products</a></li>
@@ -48,7 +48,7 @@ function Footer() {
             <div className="w-full lg:w-auto order-4 lg:order-none mb-4 lg:mb-0">
               <h3 className="footer-heading text-red-800">Contact Us</h3>
               <ul className="footer-list text-gray-600 space-y-2 mt-2">
-                <li><a href="#">MSEUF:</a></li>
+                <li><a href="https://mseuf.edu.ph/">MSEUF:</a></li>
                 <li><a href="#">RPIUC:</a></li>
               </ul>
             </div>
@@ -77,13 +77,8 @@ function Footer() {
         </div>
       </footer>
 
-      <style jsx>{`
-        .footer{
-          padding: 0;
-          margin-top: -50px;
-          margin-bottom: -110px;
-        }
-      `}</style>
+
+
     </section>
   );
 }

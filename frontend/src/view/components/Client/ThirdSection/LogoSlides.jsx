@@ -1,61 +1,61 @@
 import React from "react";
 // Slide Import 1
-import { logo1_ln1 } from "../../constants/assets";
-import { logo2_ln1 } from "../../constants/assets";
-import { logo3_ln1 } from "../../constants/assets";
-import { logo4_ln1 } from "../../constants/assets";
-import { logo5_ln1 } from "../../constants/assets";
-import { logo18_ln1 } from "../../constants/assets";
-import { logo19_ln1 } from "../../constants/assets";
-import { logo20_ln1 } from "../../constants/assets";
-import { logo21_ln1 } from "../../constants/assets";
-import { logo22_ln1 } from "../../constants/assets";
-import { logo31_ln1 } from "../../constants/assets";
-import { logo32_ln1 } from "../../constants/assets";
-import { logo35_ln1 } from "../../constants/assets";
+import { logo1_ln1 } from "../../../../constants/assets";
+import { logo2_ln1 } from "../../../../constants/assets";
+import { logo3_ln1 } from "../../../../constants/assets";
+import { logo4_ln1 } from "../../../../constants/assets";
+import { logo5_ln1 } from "../../../../constants/assets";
+import { logo18_ln1 } from "../../../../constants/assets";
+import { logo19_ln1 } from "../../../../constants/assets";
+import { logo20_ln1 } from "../../../../constants/assets";
+import { logo21_ln1 } from "../../../../constants/assets";
+import { logo22_ln1 } from "../../../../constants/assets";
+import { logo31_ln1 } from "../../../../constants/assets";
+import { logo32_ln1 } from "../../../../constants/assets";
+import { logo35_ln1 } from "../../../../constants/assets";
 
 // Slide Import 2
-import { logo6_ln2 } from "../../constants/assets";
-import { logo7_ln2 } from "../../constants/assets";
-import { logo8_ln2 } from "../../constants/assets";
-import { logo9_ln2 } from "../../constants/assets";
-import { logo10_ln2 } from "../../constants/assets";
-import { logo11_ln2 } from "../../constants/assets";
-import { logo27_ln2 } from "../../constants/assets";
-import { logo26_ln2 } from "../../constants/assets";
-import { logo25_ln2 } from "../../constants/assets";
-import { logo23_ln2 } from "../../constants/assets";
-import { logo24_ln2 } from "../../constants/assets";
-import { logo2_ln2 } from "../../constants/assets";
+import { logo6_ln2 } from "../../../../constants/assets";
+import { logo7_ln2 } from "../../../../constants/assets";
+import { logo8_ln2 } from "../../../../constants/assets";
+import { logo9_ln2 } from "../../../../constants/assets";
+import { logo10_ln2 } from "../../../../constants/assets";
+import { logo11_ln2 } from "../../../../constants/assets";
+import { logo27_ln2 } from "../../../../constants/assets";
+import { logo26_ln2 } from "../../../../constants/assets";
+import { logo25_ln2 } from "../../../../constants/assets";
+import { logo23_ln2 } from "../../../../constants/assets";
+import { logo24_ln2 } from "../../../../constants/assets";
+import { logo2_ln2 } from "../../../../constants/assets";
 
 // Slide Import 3
-import { logo34_ln3 } from "../../constants/assets";
-import { logo32_ln3 } from "../../constants/assets";
-import { logo10_ln3 } from "../../constants/assets";
-import { logo12_ln3 } from "../../constants/assets";
-import { logo33_ln3 } from "../../constants/assets";
-import { logo11_ln3 } from "../../constants/assets";
-import { logo26_ln3 } from "../../constants/assets";
-import { logo13_ln3 } from "../../constants/assets";
-import { logo31_ln3 } from "../../constants/assets";
-import { logo9_ln3 } from "../../constants/assets";
-import { logo14_ln3 } from "../../constants/assets";
-import { logo28_ln3 } from "../../constants/assets";
-import { logo29_ln3 } from "../../constants/assets";
+import { logo34_ln3 } from "../../../../constants/assets";
+import { logo32_ln3 } from "../../../../constants/assets";
+import { logo10_ln3 } from "../../../../constants/assets";
+import { logo12_ln3 } from "../../../../constants/assets";
+import { logo33_ln3 } from "../../../../constants/assets";
+import { logo11_ln3 } from "../../../../constants/assets";
+import { logo26_ln3 } from "../../../../constants/assets";
+import { logo13_ln3 } from "../../../../constants/assets";
+import { logo31_ln3 } from "../../../../constants/assets";
+import { logo9_ln3 } from "../../../../constants/assets";
+import { logo14_ln3 } from "../../../../constants/assets";
+import { logo28_ln3 } from "../../../../constants/assets";
+import { logo29_ln3 } from "../../../../constants/assets";
 
 // Slide Import 4
-import { logo25_ln4 } from "../../constants/assets";
-import { logo40_ln4 } from "../../constants/assets";
-import { logo14_ln4 } from "../../constants/assets";
-import { logo15_ln4 } from "../../constants/assets";
-import { logo7_ln4 } from "../../constants/assets";
-import { logo16_ln4 } from "../../constants/assets";
-import { logo17_ln4 } from "../../constants/assets";
-import { logo8_ln4 } from "../../constants/assets";
-import { logo1_ln4 } from "../../constants/assets";
-import { logo10_ln4 } from "../../constants/assets";
-import { logo33_ln4 } from "../../constants/assets";
-import { logo28_ln4 } from "../../constants/assets";
+import { logo25_ln4 } from "../../../../constants/assets";
+import { logo40_ln4 } from "../../../../constants/assets";
+import { logo14_ln4 } from "../../../../constants/assets";
+import { logo15_ln4 } from "../../../../constants/assets";
+import { logo7_ln4 } from "../../../../constants/assets";
+import { logo16_ln4 } from "../../../../constants/assets";
+import { logo17_ln4 } from "../../../../constants/assets";
+import { logo8_ln4 } from "../../../../constants/assets";
+import { logo1_ln4 } from "../../../../constants/assets";
+import { logo10_ln4 } from "../../../../constants/assets";
+import { logo33_ln4 } from "../../../../constants/assets";
+import { logo28_ln4 } from "../../../../constants/assets";
 
 
 const LogoSlides = () => {

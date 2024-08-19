@@ -1,5 +1,5 @@
 import React from 'react';
-import { webinar1, webinar2, webinar3 } from '../../constants/assets';
+import { webinar1, webinar2, webinar3 } from '../../../../constants/assets';
 import { FaArrowUp } from 'react-icons/fa';
 
 const Footer = () => {
@@ -8,7 +8,7 @@ const Footer = () => {
   };
 
   return (
-    <section className="py-16 px-1 lg:px-20 relative"> {/* Added bg-gray-100 */}
+    <section className="py-16 px-1 lg:px-20 relative">
       <h3 className="text-2xl font-bold p-4 text-left">
         Our recent blogs
       </h3>
@@ -16,7 +16,7 @@ const Footer = () => {
       <div className="flex flex-col lg:flex-row items-start mt-4 gap-4">
         <div className="flex flex-col gap-4 w-full lg:w-1/2">
           {/* Webinar 3 */}
-          <div className="flex flex-col lg:flex-row items-start gap-4 w-full order-1 lg:order-none">
+          <div className="flex flex-col lg:flex-row items-start gap-4 w-full lg:order-none">
             <div className="relative w-full lg:w-1/2 aspect-w-1 aspect-h-1">
               <img 
                 src={webinar3} 
@@ -28,14 +28,14 @@ const Footer = () => {
               <h3 className="text-red-500 font-bold text-[16px]">November 16, 2014</h3>
               <h3 className="font-bold text-lg mt-2">Webinar</h3>
               <p className="text-gray-400">
-                Delight can be experienced <span className="block ">viscerally, behaviourally, and</span>
+                Delight can be experienced <span className="block">viscerally, behaviourally, and</span>
                 <span className="block">reflectively. A great design is ...</span>
               </p>
             </div>
           </div>
 
           {/* Webinar 1 */}
-          <div className="flex flex-col lg:flex-row items-start gap-4 mt-4 w-full order-3 lg:order-none lg:mt-4">
+          <div className="flex flex-col lg:flex-row items-start gap-4 mt-4 w-full lg:order-none lg:mt-4">
             <div className="relative w-full lg:w-1/2 aspect-w-1 aspect-h-1">
               <img 
                 src={webinar1} 
@@ -57,7 +57,7 @@ const Footer = () => {
         </div>
 
         {/* Webinar 2 */}
-        <div className="flex flex-col items-start w-full lg:w-1/2 mt-1 order-2 lg:order-none">
+        <div className="flex flex-col items-start w-full lg:w-1/2 mt-1 lg:order-none">
           <div className="relative w-full aspect-w-1 aspect-h-1">
             <img 
               src={webinar2} 
@@ -84,26 +84,6 @@ const Footer = () => {
           <FaArrowUp className="text-xl" />
         </button>
       </div>
-
-      {/* Mobile styles */}
-      <style jsx>{`
-        @media (max-width: 640px) {
-          .flex-col {
-            display: flex;
-            flex-direction: column;
-          }
-          .lg\:flex-row {
-            display: none; /* Hide the row layout on mobile */
-          }
-          .order-1, .order-3 {
-            order: 1; /* Make Webinar 3 and 1 come first */
-          }
-          .order-2 {
-            order: 2; /* Center Webinar 2 in the order */
-            margin: 0 auto; /* Center it */
-          }
-        }
-      `}</style>
     </section>
   );
 }

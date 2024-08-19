@@ -19,7 +19,11 @@ import {
 } from '../../../../constants/assets';
 
 const Hero = () => {
-
+  
+  const CTAnavigate = () => {
+    navigate('/CTA');
+  
+  };
   return (
     <>
       <section className="py-16 px-8 lg:px-24 flex flex-col lg:flex-row justify-between items-center relative">

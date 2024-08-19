@@ -33,16 +33,7 @@ export const navLinks = [
     description: 'WEBINAR',  
   },
   {
-    id: "aboutus",
+    id: "aboutus" ,path: "/about",
     title: "About Us",
-    hasDropdown: true,
-    subLinks: [
-      { id: "mission", title: "Mission", path: "/mission" },
-      { id: "advantage", title: "Advantage", path: "/advantage" },
-      { id: "contactUs", title: "Contact Us", path: "/contact" },
-      { id: "ourTeam", title: "Our Team", path: "/our-team" },
-    ],
-    imageUrl: webinar,
-    description: 'EUNIVATE',  
   },
 ];

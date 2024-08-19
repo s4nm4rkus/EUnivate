@@ -17,6 +17,7 @@ import futureSolution from '../assets/futureSolution.png';
 import yellow_gradient from '../assets/yellow_gradient.svg';
 import red_gradient from '../assets/red_gradient.svg';
 import loop from '../assets/loop.svg';
+import OksYun from '../assets/OksYun.png';
 // LogoSlides Assets - Line 1
 import logo1_ln1 from '../assets/LogoSlides/logo1_ln1.png';
 import logo2_ln1 from '../assets/LogoSlides/logo2_ln1.png';
@@ -117,6 +118,7 @@ export {
     thinkTogether,
     indMeets,
     futureSolution,
+    OksYun,
 
      /* FOOTER IMG */
     webinar1,

@@ -18,15 +18,19 @@ const Navbar = () => {
     setToggle(false);  // Close the mobile menu after navigation
   };
 
+  const handleLogoClick = () => {
+    navigate('/');
+  };
+
+
   return (
     <nav className="w-full flex justify-between items-center py-4 bg-white px-4 sm:px-8">
-      <div className="flex items-center space-x-2 sm:space-x-10">
+         <div className="flex items-center space-x-2 sm:space-x-10 cursor-pointer" onClick={handleLogoClick}>
         <div className="flex items-center">
           <span className="text-3xl sm:text-5xl font-bold text-red-800">EU</span>
           <span className="text-3xl sm:text-5xl font-bold text-yellow-500">nivate</span>
         </div>
       </div>
-
       {/* Desktop NavLinks */}
       <ul className="hidden sm:flex items-center space-x-6 sm:space-x-6 md:space-x-8 text-base sm:text-xl">
         {navLinks.map((link) => (

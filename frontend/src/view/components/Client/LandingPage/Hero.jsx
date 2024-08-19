@@ -19,16 +19,6 @@ import {
 } from '../../../../constants/assets';
 
 const Hero = () => {
-<<<<<<< HEAD:frontend/src/view/components/Client/LandingPage/Hero.jsx
-
-=======
-  const scrollTocta = () => {
-    const footerSection = document.getElementById('CTA');
-    if (footerSection) {
-      footerSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
->>>>>>> 01dbd895dc3489ff5c29dea3509a7a7b18f5d563:frontend/src/view/components/Hero.jsx
 
   return (
     <>
@@ -63,7 +53,6 @@ const Hero = () => {
           <p className="text-gray-700 text-lg lg:text-xl mt-4 lg:mt-8 relative z-30">
             EUnivate connects your business with the brightest minds from universities. Tap into cutting-edge solutions, reduce development costs, and gain a competitive edge through real-world innovation.
           </p>
-<<<<<<< HEAD:frontend/src/view/components/Client/LandingPage/Hero.jsx
           <div className="flex space-x-4 mt-8">
        <Link to = "CTA" spy = {true} smooth = {true} offset = {50} duration={500}
         className="bg-yellow-500 text-white px-6 py-3 rounded-full hover:bg-red-800 transition-all duration-300 relative z-30"> 
@@ -72,16 +61,6 @@ const Hero = () => {
           </div>
           <div className="flex  items-center justify-center space-x-12 mt-8 sm:mt-16 relative z-30">
             <div className="hidden sm:flex  items-center">
-=======
-          <button 
-            onClick={scrollTocta} 
-            className="bg-yellow-500 text-white px-6 py-3 rounded-full mt-8 hover:bg-red-800 transition-all duration-300 relative z-30"
-          >
-            Get Started
-          </button>
-          <div className="flex flex-col sm:flex-row items-center space-x-0 sm:space-x-12 space-y-4 sm:space-y-0 mt-8 sm:mt-24 relative z-30">
-            <div className="flex items-center">
->>>>>>> 01dbd895dc3489ff5c29dea3509a7a7b18f5d563:frontend/src/view/components/Hero.jsx
               <img src={thinkTogether} alt="Innovate Together" className="w-8 h-8" />
               <span className="text-sm ml-2">Innovate Together</span>
             </div>
@@ -119,11 +98,7 @@ const Hero = () => {
           <img 
             src={loop} 
             alt="Loop Below" 
-<<<<<<< HEAD:frontend/src/view/components/Client/LandingPage/Hero.jsx
             className="absolute bottom-[-250px] right-[-200px] lg:w-[500px] lg:h-[500px] w-[300px] h-[300px] z-[-1] hidden sm:block" 
-=======
-            className="absolute bottom-[-250px] right-[-200px] lg:w-[500px] lg:h-[500px] w-[300px] h-[300px] z-[-1]" 
->>>>>>> 01dbd895dc3489ff5c29dea3509a7a7b18f5d563:frontend/src/view/components/Hero.jsx
           />
         </div>
         

@@ -1,31 +1,24 @@
-import Blog from './view/components/LastSection/Blog';
-import Navbar from './view/components/LandingPage/Navbar';
-import Hero from './view/components/LandingPage/Hero';
-import CTA from './view/components/LastSection/CTA';
-import Footer from './view/components/LastSection/Footer';
-import Feature_uni from './view/components/SecondSection/Feature_uni';
-import Pmt from './view/components/SecondSection/Pmt';
-import Products from './view/components/SecondSection/Products';
-import HIW from './view/components/ThirdSection/HIW';
-import Partnerships from './view/components/ThirdSection/Partnerships';
-
-
-
-
+import Navbar from './view/components/Client/LandingPage/Navbar.jsx';
+import Hero from './view/components/Client/LandingPage/Hero.jsx';
+import CTA from './view/components/Client/LastSection/CTA.jsx';
+import Footer from './view/components/Client/LastSection/Footer.jsx';
+import GetStarted from './view/components/Client/LastSection/GetStarted.jsx';
+import ProjectHoursSupport from './view/components/Client/LastSection/ProjectHoursSupport.jsx';
+import Products from './view/components/Client/SecondSection/Products.jsx';
+import Partnerships from './view/components/Client/ThirdSection/Partnerships.jsx';
+import Howitworks from './view/components/Client/ThirdSection/Howitworks.jsx';
+import LogoSlides from './view/components/Client/ThirdSection/LogoSlides.jsx';
 
 export {
   Navbar,
   Hero,
-  Feature_uni,
-  Pmt,
-  Products,
-  Blog,
-  HIW,
-  Partnerships,
   CTA,
   Footer,
-  Howitworks,
-  Partnerships,
-  LogoSlides,
+  GetStarted,
   ProjectHoursSupport,
+  Products,
+  Partnerships,
+  Howitworks,
+  LogoSlides,
+  GetStarted,
 };

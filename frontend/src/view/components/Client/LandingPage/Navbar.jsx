@@ -21,7 +21,9 @@ const Navbar = () => {
   const handleLogoClick = () => {
     navigate('/');
   };
-
+ const handleCTAClick = () => {
+  navigate('/cta');
+ }
   return (
     <nav className="w-full flex justify-between items-center py-4 bg-white px-4 sm:px-8">
       <div className="flex items-center space-x-2 sm:space-x-10 cursor-pointer" onClick={handleLogoClick}>
@@ -79,16 +81,9 @@ const Navbar = () => {
       </ul>
 
       {/* "Get Started" button */}
-      <ScrollLink
-        to="CTA"
-        spy={true}
-        smooth={true}
-        offset={50}
-        duration={500}
-        className="bg-yellow-500 text-white px-6 py-3 rounded-full hover:bg-red-800 transition-all duration-300 relative z-30 hidden sm:block cursor-pointer"
-      >
+     <button className="bg-yellow-500 text-white px-6 py-3 rounded-full hover:bg-red-800 transition-all duration-300 relative z-30 hidden sm:block cursor-pointer " onClick={handleCTAClick}>
         Get Started
-      </ScrollLink>    
+        </button>   
 
       {/* Mobile Menu */}
       <div className="sm:hidden flex items-center">

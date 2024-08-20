@@ -4,15 +4,16 @@ import { faUser, faEnvelope, faPhone, faBuilding } from '@fortawesome/free-solid
 
 const QuotationStep1 = ({ formData, setFormData, nextStep }) => {
     return (
-        <div className="w-full max-w-2xl mx-auto mt-10 p-8 bg-white shadow-lg rounded-lg relative">
-            <div className="text-center mb-6">
-                <h2 className="text-3xl font-semibold text-gray-800">Get a project quote</h2>
-                <p className="text-gray-500 mt-2">
-                    Please fill the form below to receive a quote for your project. Feel free to add as much detail as needed.
-                </p>
-            </div>
+        <>
+            {/* Header */}
+            <h2 className="text-3xl font-bold text-gray-800 text-center">Get a project quote</h2>
+            <p className="text-gray-500 mt-2 text-center">
+                Please fill the form below to receive a quote for your project. Feel free to add as much detail as needed.
+            </p>
+            
 
-            <div className="w-full max-w-lg mx-auto">
+            {/* Form Container */}
+            <div className="w-full max-w-lg mx-auto mt-8">
                 <div className="flex items-center justify-center space-x-2 mb-8">
                     <div className="flex items-center space-x-2">
                         <div className="w-8 h-8 flex items-center justify-center bg-red-600 text-white rounded-full">
@@ -24,59 +25,66 @@ const QuotationStep1 = ({ formData, setFormData, nextStep }) => {
                     <div className="h-1 w-16 bg-gray-300"></div>
                     <div className="h-1 w-16 bg-gray-300"></div>
                 </div>
+                <hr className="my-4 border-t-2 border-gray-200" />
+                <br />
+
+                <h1 className = "font-semibold mb-3 text-xl text-gray-800">Contact details</h1>
+                <p className='mb-5 text-gray-800'>Please fill your information so we can get in touch with you.</p>
+
+
                 <div className="space-y-4">
                     <div className="flex space-x-4">
                         <div className="w-1/2">
-                            <label className="block text-gray-600 mb-2">Name</label>
+                            <label className="block font-semibold text-gray-600 mb-2">Name</label>
                             <div className="relative">
-                                <FontAwesomeIcon icon={faUser} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                <FontAwesomeIcon icon={faUser} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                                 <input
                                     type="text"
                                     placeholder="Name"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full pl-10 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full pl-10 p-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
                         </div>
                         <div className="w-1/2">
-                            <label className="block text-gray-600 mb-2">Email</label>
+                            <label className="block font-semibold text-gray-600 mb-2">Email</label>
                             <div className="relative">
-                                <FontAwesomeIcon icon={faEnvelope} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                <FontAwesomeIcon icon={faEnvelope} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                                 <input
                                     type="email"
                                     placeholder="Email address"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    className="w-full pl-10 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full pl-10 p-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
                         </div>
                     </div>
                     <div className="flex space-x-4">
                         <div className="w-1/2">
-                            <label className="block text-gray-600 mb-2">Phone Number</label>
+                            <label className="block font-semibold text-gray-600 mb-2">Phone Number</label>
                             <div className="relative">
-                                <FontAwesomeIcon icon={faPhone} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                <FontAwesomeIcon icon={faPhone} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                                 <input
                                     type="text"
                                     placeholder="Phone Number"
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                    className="w-full pl-10 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full pl-10 p-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
                         </div>
                         <div className="w-1/2">
-                            <label className="block text-gray-600 mb-2">Company</label>
+                            <label className="block font-semibold text-gray-600 mb-2">Company</label>
                             <div className="relative">
-                                <FontAwesomeIcon icon={faBuilding} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                <FontAwesomeIcon icon={faBuilding} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                                 <input
                                     type="text"
                                     placeholder="Company name"
                                     value={formData.company}
                                     onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                                    className="w-full pl-10 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full pl-10 p-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
                         </div>
@@ -91,7 +99,7 @@ const QuotationStep1 = ({ formData, setFormData, nextStep }) => {
                     </button>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 

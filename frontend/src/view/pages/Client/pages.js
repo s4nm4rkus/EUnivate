@@ -11,7 +11,9 @@ import Showcases from './view/pages/Client/Showcases.jsx';
 import Challenges from './view/pages/Client/Challenges.jsx';
 import ProjectManagement from './view/pages/Client/ProjectManagement.jsx';
 import Webinars from './view/pages/Client/Webinars.jsx';
-
+import Login from './view/pages/Client/Login.jsx';
+import Signup from './view/pages/Client/Signup.jsx';
+import Forgotpassword from './view/pages/Client/Forgotpassword.jsx';
 
 export {
     About,
@@ -25,6 +27,9 @@ export {
     Showcases,
     Challenges,
     ProjectManagement,
-    Webinars
+    Webinars,
+    Login,
+    Signup,
+    Forgotpassword
 
 }

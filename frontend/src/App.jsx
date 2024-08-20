@@ -15,7 +15,10 @@ import Showcases from './view/pages/Client/Showcases';
 import Challenges from './view/pages/Client/Challenges';
 import ProjectManagement from './view/pages/Client/ProjectManagement';
 import Webinars from './view/pages/Client/Webinars';
-
+import Login from './view/pages/Client/Login.jsx';
+import Signup from './view/pages/Client/Signup.jsx';
+import Forgotpassword from './view/pages/Client/Forgotpassword.jsx';
+import CTA from "./view/components/Client/LastSection/CTA.jsx"
 /* Global CSS */
 import './index.css'; 
 import styles from './style';
@@ -25,6 +28,7 @@ const App = () => {
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+       <Route path = "/cta" element = {<CTA />} />
         <Route path="/about" element={<About />} />
         <Route path="/advantage" element={<Advantage />} />
         <Route path="/contact" element={<Contact />} />
@@ -37,6 +41,9 @@ const App = () => {
         <Route path="/challenges" element={<Challenges />} />
         <Route path="/project" element={<ProjectManagement />} />
         <Route path="/webinar" element={<Webinars />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot" element={<Forgotpassword />} />
       </Routes>
     </Router>
   );

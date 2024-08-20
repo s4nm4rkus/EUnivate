@@ -66,9 +66,9 @@ const LandingPage = () => {
         </div>
       </div>
 
-      <div id="cta" className={`${styles.paddingX} ${styles.flexStart}`}>
+      <div  className={`${styles.paddingX} ${styles.flexStart}`}>
         <div className={`${styles.boxWidth}`}>
-          <CTA />
+       <CTA />
           <Footer />
         </div>
       </div>

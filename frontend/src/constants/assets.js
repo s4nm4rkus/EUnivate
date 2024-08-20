@@ -91,7 +91,11 @@ import prof2 from '../assets/prof2.jpg';
 import prof3 from '../assets/prof3.jpg';
 import prof4 from '../assets/prof4.jpg';
 
+//Quotation Step4
+import Step4 from '../assets/Step4-quotation.svg';
 
+//Login Back
+import Loginback from '../assets/loginback.png';
 
 /* FOOTER IMG */
 import webinar1 from '../assets/webinar1.png';
@@ -197,5 +201,11 @@ export {
       prof1,
       prof2,
       prof3,
-      prof4
+      prof4,
+      
+      //Quotation Step4
+      Step4,
+
+            //Quotation Step4
+            Loginback
 };

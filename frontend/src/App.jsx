@@ -18,10 +18,13 @@ import Webinars from './view/pages/Client/Webinars';
 import Login from './view/pages/Client/Login.jsx';
 import Signup from './view/pages/Client/Signup.jsx';
 import Forgotpassword from './view/pages/Client/Forgotpassword.jsx';
-import CTA from "./view/components/Client/LastSection/CTA.jsx"
+import CTA from "./view/components/Client/LastSection/CTA.jsx";
+//Super Admin
+import SuperAdminDashboard from './view/pages/Admin/SuperAdmin.jsx';
 /* Global CSS */
 import './index.css'; 
-import styles from './style';
+
+
 
 const App = () => {
   return (
@@ -44,6 +47,8 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot" element={<Forgotpassword />} />
+            {/* SuperAdmin Route */}
+            <Route path="/superadmin" element={<SuperAdminDashboard />} />
       </Routes>
     </Router>
   );

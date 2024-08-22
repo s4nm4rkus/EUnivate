@@ -1,14 +1,18 @@
 import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
-    name: {
+    firstName: {
+        type: String,
+        required: true,
+    },
+    lastName: {
         type: String,
         required: true,
     },
     email: {
         type: String,
         required: true,
-        unique: true,
+        unique: true,  // Ensure emails are unique
     },
     password: {
         type: String,
@@ -16,8 +20,7 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['super admin', 'admin', 'user', 'collaborator'],
-        default: 'user',
+        default: 'User',  // Default role is 'User'
     },
 }, {
     timestamps: true,

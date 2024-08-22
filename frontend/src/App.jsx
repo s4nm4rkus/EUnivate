@@ -19,8 +19,13 @@ import Login from './view/pages/Client/Login.jsx';
 import Signup from './view/pages/Client/Signup.jsx';
 import Forgotpassword from './view/pages/Client/Forgotpassword.jsx';
 import CTA from "./view/components/Client/LastSection/CTA.jsx";
-//Super Admin
+// Admins
 import SuperAdminDashboard from './view/pages/Admin/SuperAdmin.jsx';
+import Admin from './view/pages/Admin/Admin.jsx';
+import Collaborator from './view/pages/Admin/Collaborator.jsx';
+
+//Client
+import User from './view/pages/Client/User.jsx';
 /* Global CSS */
 import './index.css'; 
 
@@ -47,8 +52,12 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot" element={<Forgotpassword />} />
-            {/* SuperAdmin Route */}
-            <Route path="/superadmin" element={<SuperAdminDashboard />} />
+            {/* Admin Route */}
+        <Route path="/superadmin" element={<SuperAdminDashboard />} />
+        <Route path="/collab" element={<Admin />} />
+        <Route path="/admin" element={<Collaborator />} />
+          {/* Client */}
+        <Route path="/user" element={<User />} />
       </Routes>
     </Router>
   );

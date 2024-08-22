@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { Loginback } from '../../../constants/assets';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faEnvelope, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import axios from 'axios';  // Fix the import spelling
 
 const Signup = () => {
   const [firstName, setFirstName] = useState("");
@@ -10,26 +10,38 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("User"); // Default role
-  const [showPassword, setShowPassword] = useState(false); // Define showPassword state
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState(""); // For displaying errors
+  const [success, setSuccess] = useState(""); // For displaying success message
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    axios.post("/api/user/signup", {
-      firstName,
-      lastName,
-      email,
-      password,
-      role // Include the role in the signup request
-    }).then(response => {
-      console.log(response);
-    }).catch(err => {
+    setError(""); // Clear any previous errors
+    setSuccess(""); // Clear any previous success message
+
+    try {
+      const response = await axios.post("http://localhost:5000/api/users", {
+        firstName,
+        lastName,
+        email,
+        password,
+        role
+      });
+      setSuccess("Account created successfully!"); // Display success message
+      console.log(response.data);
+      // Clear form fields after successful signup
+      setFirstName("");
+      setLastName("");
+      setEmail("");
+      setPassword("");
+    } catch (err) {
+      setError(err.response?.data?.message || "An error occurred during signup."); // Display error message
       console.log(err);
-    });
+    }
   };
 
   return (
@@ -39,6 +51,9 @@ const Signup = () => {
     >
       <div className="bg-white p-8 rounded-xl shadow-lg max-w-lg w-full">
         <h2 className="text-3xl font-bold text-center mb-6">Create Account</h2>
+
+        {error && <p className="text-red-600 mb-4">{error}</p>}
+        {success && <p className="text-green-600 mb-4">{success}</p>}
 
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-2 gap-4">

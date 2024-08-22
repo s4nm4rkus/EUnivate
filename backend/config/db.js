@@ -1,12 +1,13 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+
+// Load environment variables
+dotenv.config();
 
 const connectDB = async () => {
     try {
-        const mongoURI = 'mongodb://127.0.0.1:27017/Eunivate'; // Hard-coded MongoDB URI
-        await mongoose.connect(mongoURI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
+        const mongoURI = process.env.MONGO_URI; // Use MONGO_URI from .env
+        await mongoose.connect(mongoURI);
         console.log('Successfully connected to MongoDB');
     } catch (error) {
         console.error(`ERROR: ${error.message}`);

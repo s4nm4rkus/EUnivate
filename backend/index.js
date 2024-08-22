@@ -4,10 +4,10 @@ import cookieParser from 'cookie-parser';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
 import cors from 'cors';
+import dotenv from 'dotenv';
 
-// Hard-code the port number
-const port = 5000;
 
+dotenv.config();
 // Connect to the database
 connectDB();
 
@@ -20,12 +20,13 @@ app.use(cookieParser());
 
 // CORS configuration
 app.use(cors({
-    origin: 'http://localhost:5173', // Allow requests from your frontend
+    origin: 'http://127.0.0.1:5173', // Allow requests from your frontend
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
 }));
 
 // Routes
-app.use('/api/user', userRoutes);
+app.use('/api/user/signup', userRoutes);
+
 
 // Serve static assets if in production
 if (process.env.NODE_ENV === 'production') {
@@ -40,6 +41,7 @@ if (process.env.NODE_ENV === 'production') {
         res.send('API is running...');
     });
 }
+const port = process.env.PORT || 5000;  // Default to 5000 if PORT is not set
 
 // Start the server
 app.listen(port, () => console.log(`Server running on port: ${port}`));

@@ -98,6 +98,13 @@ import webinar1 from '../assets/webinar1.png';
 import webinar2 from '../assets/webinar2.png';
 import webinar3 from '../assets/webinar3.png';
 
+// Admin Img
+import dashboard_logo from '../assets/dashboard_logo.png';
+import dashboard_sidenav_icon from '../assets/dashboard_sidenav_icon.svg';
+import dashboard_sidenav_icon_hover from '../assets/dashboard_sidenav_icon_hover.svg';
+
+
+
 export {
   
    yellow_gradient,
@@ -124,6 +131,13 @@ export {
     webinar1,
     webinar2,
     webinar3,
+
+    //Admin Img
+    dashboard_logo, 
+    dashboard_sidenav_icon,
+    dashboard_sidenav_icon_hover,
+    
+  
 
 
     // LogoSlides Assets - Line 1

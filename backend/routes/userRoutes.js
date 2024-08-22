@@ -4,7 +4,7 @@ import User from '../models/Users.js';
 
 const router = express.Router();
 
-router.post('/signup', async (req, res) => {
+      router.post('/signup', async (req, res) => {
     const { firstName, lastName, email, password, role } = req.body;
     const name = `${firstName} ${lastName}`;
   

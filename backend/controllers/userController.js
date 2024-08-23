@@ -1,6 +1,8 @@
 import User from '../models/userModels.js';
-
+import bcrypt from 'bcrypt';
 // Get all users
+
+
 export const getUsers = async (req, res) => {
   try {
     const users = await User.find({});
@@ -10,30 +12,31 @@ export const getUsers = async (req, res) => {
   }
 };
 
-// Create a new user
 export const createUser = async (req, res) => {
   const { firstName, lastName, email, password, role } = req.body;
 
   try {
     const userExists = await User.findOne({ email });
-
     if (userExists) {
       return res.status(400).json({ message: 'Email already exists' });
     }
+
+    const salt = await bcrypt.genSalt(10); // Generate salt
+    const hashedPassword = await bcrypt.hash(password, salt); // Hash the password with the salt
 
     const user = new User({
       firstName,
       lastName,
       email,
-      password,  // Ideally, you should hash the password before saving
+      password: hashedPassword, // Use the hashed password
       role,
     });
 
     const createdUser = await user.save();
-
     res.status(201).json(createdUser);
   } catch (error) {
-    res.status(500).json({ message: 'Error creating user', error });
+    console.error("Error details:", error);
+    res.status(500).json({ message: 'Error creating user', error: error.message });
   }
 };
 

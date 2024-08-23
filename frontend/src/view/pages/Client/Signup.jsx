@@ -18,23 +18,23 @@ const Signup = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(""); // Clear any previous errors
-    setSuccess(""); // Clear any previous success message
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      setError(""); // Clear any previous errors
+      setSuccess(""); // Clear any previous success message
 
-    try {
-      const response = await axios.post("http://localhost:5000/api/users", {
-        firstName,
-        lastName,
-        email,
-        password,
-        role
-      });
-      setSuccess("Account created successfully!"); // Display success message
-      console.log(response.data);
-      // Clear form fields after successful signup
-      setFirstName("");
+      try {
+        const response = await axios.post("http://localhost:5000/api/users", {
+          firstName,
+          lastName,
+          email,
+          password,
+          role
+        });
+        setSuccess("Account created successfully!"); // Display success message
+        console.log(response.data);
+        // Clear form fields after successful signup
+        setFirstName("");
       setLastName("");
       setEmail("");
       setPassword("");

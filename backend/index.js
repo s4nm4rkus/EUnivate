@@ -13,6 +13,14 @@ app.use(express.json());
 
 // Use user routes
 app.use('/api/users', userRoutes);
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    message: 'Something went wrong on the server!',
+    error: process.env.NODE_ENV === 'production' ? {} : err.message, // Hide detailed error messages in production
+  });
+});
 
 app.get('/', (req, res) => {
   res.send('Welcome to the API');

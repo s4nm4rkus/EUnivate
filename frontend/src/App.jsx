@@ -20,6 +20,7 @@ import Signup from './view/pages/Client/Signup.jsx';
 import Forgotpassword from './view/pages/Client/Forgotpassword.jsx';
 import ResetPassword from './view/pages/Client/Resetpassword.jsx';
 import CTA from "./view/components/Client/LastSection/CTA.jsx";
+
 // Admins
 import SuperAdminDashboard from './view/pages/Admin/SuperAdmin.jsx';
 import Admin from './view/pages/Admin/Admin.jsx';
@@ -34,8 +35,16 @@ import './index.css';
 //Hooks
 
 
+const SuperAdminRoute = ({ element }) => {
+  const user = JSON.parse(localStorage.getItem('user')); // Assuming you store user info in localStorage
+  return user && user.role === 'superadmin' ? element : <Navigate to="/not-authorized" />;
+};
+
+
 const App = () => {
+
   return (
+    
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
@@ -56,7 +65,7 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot" element={<Forgotpassword />} />
             {/* Admin Route */}
-        <Route path="/superadmin" element={<SuperAdminDashboard />} />
+        <Route path="/superadmin-dashboard" element={<SuperAdminRoute element={<SuperAdminDashboard />} />} />
         <Route path="/collab" element={<Admin />} />
         <Route path="/admin" element={<Collaborator />} />
           {/* Client */}

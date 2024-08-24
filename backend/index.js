@@ -13,6 +13,7 @@ app.use(express.json());
 
 // Use user routes
 app.use('/api/users', userRoutes);
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -22,9 +23,11 @@ app.use((err, req, res, next) => {
   });
 });
 
+
 app.get('/', (req, res) => {
   res.send('Welcome to the API');
 });
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+

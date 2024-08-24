@@ -1,6 +1,6 @@
-import User from '../models/userModels.js';
+  import User from '../models/userModels.js';
 import bcrypt from 'bcrypt';
-// Get all users
+import { generateToken } from '../utils/jwtUtils.js';
 
 
 export const getUsers = async (req, res) => {
@@ -39,25 +39,48 @@ export const createUser = async (req, res) => {
     res.status(500).json({ message: 'Error creating user', error: error.message });
   }
 };
-
-// Login user
-export const loginUser = async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    const user = await User.findOne({ email });
-
-    if (user && (password === user.password)) {
-      res.status(200).json({ message: 'Login successful!', user });
-    } else {
-      res.status(401).json({ message: 'Invalid email or password' });
+  // Login user
+  export const loginUser = async (req, res) => {
+    console.log("Received email: ", req.body.email);  // Debugging log
+    console.log("Received password: ", req.body.password);  // Debugging log
+  
+    const { email, password } = req.body;
+  
+    try {
+      const user = await User.findOne({ email});
+  
+      if (!user) {
+        return res.status(404).json({ message: 'Email not found' });
+      }
+  
+      const passwordCheck = await bcrypt.compare(password, user.password);
+  
+      if (!passwordCheck) {
+        return res.status(400).json({ message: 'Passwords do not match' });
+      }
+  
+      const token = generateToken(user._id);
+      res.status(200).json({
+        message: 'Login successful!',
+        email: user.email,
+        token: token,
+        role: user.role // Ensure this is correctly included
+      });
+      
+    } catch (error) {
+      console.error('Error logging in:', error);
+      res.status(500).json({ message: 'Error logging in', error: error.message });
     }
-  } catch (error) {
-    res.status(500).json({ message: 'Error logging in', error });
-  }
-};
+  };
 
 // Test connection
 export const testConnection = (req, res) => {
   res.status(200).json({ message: 'Connection successful!' });
 };
+
+
+
+
+
+
+

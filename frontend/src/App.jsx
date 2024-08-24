@@ -18,6 +18,7 @@ import Webinars from './view/pages/Client/Webinars';
 import Login from './view/pages/Client/Login.jsx';
 import Signup from './view/pages/Client/Signup.jsx';
 import Forgotpassword from './view/pages/Client/Forgotpassword.jsx';
+import ResetPassword from './view/pages/Client/Resetpassword.jsx';
 import CTA from "./view/components/Client/LastSection/CTA.jsx";
 // Admins
 import SuperAdminDashboard from './view/pages/Admin/SuperAdmin.jsx';
@@ -26,9 +27,11 @@ import Collaborator from './view/pages/Admin/Collaborator.jsx';
 
 //Client
 import User from './view/pages/Client/User.jsx';
+
 /* Global CSS */
 import './index.css'; 
 
+//Hooks
 
 
 const App = () => {
@@ -58,6 +61,9 @@ const App = () => {
         <Route path="/admin" element={<Collaborator />} />
           {/* Client */}
         <Route path="/user" element={<User />} />
+
+          {/*Hooks*/}
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
     </Router>
   );

@@ -14,6 +14,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,  // Ensure emails are unique
+        
     },
     password: {
         type: String,
@@ -22,7 +23,10 @@ const userSchema = new mongoose.Schema({
     role: {
         type: String,
         default: 'User',  // Default role is 'User'
+
     },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
 }, {
     timestamps: true,
 });

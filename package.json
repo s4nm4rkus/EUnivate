@@ -7,9 +7,6 @@
     "start": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "start": "vite",
-    "build": "vite build",
-    "serve": "vite preview",
     "backend": "nodemon backend/index.js",
     "frontend": "npm run dev --prefix frontend",
     "dev": "concurrently \"npm run frontend\" \"npm run backend\""
@@ -24,6 +21,7 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@heroicons/react": "^2.1.5",
     "@svgr/webpack": "^8.1.0",
+    "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "concurrently": "^8.2.2",
     "cookie-parser": "^1.4.6",

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import Navbar from '../../components/Client/LandingPage/Navbar.jsx';
 import Hero from '../../components/Client/LandingPage/Hero.jsx';
 import CTA from '../../components/Client/LastSection/CTA.jsx';
@@ -12,6 +13,15 @@ import LogoSlides from '../../components/Client/ThirdSection/LogoSlides.jsx';
 import styles from '../../../style';
 
 const LandingPage = () => {
+  const ctaRef = useRef(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash === '#CTA' && ctaRef.current) {
+      ctaRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [location]);
+
   return (
     <div className="bg-white w-full overflow-hidden">
       <div className={`${styles.paddingX} ${styles.flexCenter}`}>
@@ -66,9 +76,9 @@ const LandingPage = () => {
         </div>
       </div>
 
-      <div  className={`${styles.paddingX} ${styles.flexStart}`}>
-        <div className={`${styles.boxWidth}`}>
-       <CTA />
+      <div className={`${styles.paddingX} ${styles.flexStart}`}>
+        <div className={`${styles.boxWidth}`} ref={ctaRef} id="CTA">
+          <CTA />
           <Footer />
         </div>
       </div>

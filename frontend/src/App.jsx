@@ -24,7 +24,7 @@ import CTA from "./view/components/Client/LastSection/CTA.jsx";
 import SuperAdminDashboard from './view/pages/Admin/SuperAdmin.jsx';
 import Admin from './view/pages/Admin/Admin.jsx';
 import Collaborator from './view/pages/Admin/Collaborator.jsx';
-
+import MainPage from './view/pages/Client/MainPage.jsx';
 //Client
 import User from './view/pages/Client/User.jsx';
 
@@ -61,6 +61,7 @@ const App = () => {
         <Route path="/admin" element={<Collaborator />} />
           {/* Client */}
         <Route path="/user" element={<User />} />
+        <Route path="/main" element={<MainPage />} />
 
           {/*Hooks*/}
           <Route path="/reset-password/:token" element={<ResetPassword />} />

@@ -21,9 +21,11 @@ const Navbar = () => {
   const handleLogoClick = () => {
     navigate('/');
   };
- const handleCTAClick = () => {
-  navigate('/cta');
- }
+  
+  const handleCTAClick = () => {
+    navigate('/main#CTA');
+  };
+  
   return (
     <nav className="w-full flex justify-between items-center py-4 bg-white px-4 sm:px-8">
       <div className="flex items-center space-x-2 sm:space-x-10 cursor-pointer" onClick={handleLogoClick}>

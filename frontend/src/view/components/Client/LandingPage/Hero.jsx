@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-scroll';
+import { Button } from 'react-scroll';
 
 import { 
   thinkTogether, 
@@ -19,14 +19,9 @@ import {
 } from '../../../../constants/assets';
 
 const Hero = () => {
-  
-  const CTAnavigate = () => {
-    navigate('/CTA');
-  
-  };
   return (
     <>
-      <section className="py-16 px-8 lg:px-24 flex flex-col lg:flex-row justify-between items-center relative">
+      <section id="Hero" className="py-16 px-8 lg:px-24 flex flex-col lg:flex-row justify-between items-center relative">
         {/* Red Gradient */}
         <img 
           src={red_gradient} 
@@ -45,7 +40,12 @@ const Hero = () => {
         <img 
           src={loop} 
           alt="Loop" 
-          className="absolute top-2 lg:w-[400px] lg:h-[450px] w-[450px] h-[400px] z-30" 
+          className="absolute top-2 lg:w-[400px] lg:h-[450px] w-[450px] h-[400px] z-30 hidden sm:block"
+        />
+        <img 
+          src={loop} 
+          alt="Loop Mobile" 
+          className="absolute top-[10%] left-[5%] lg:w-[300px] lg:h-[300px] w-[250px] h-[250px] z-30 block sm:hidden"
         />
 
         <div className="lg:w-1/2 w-full relative z-10">
@@ -57,23 +57,31 @@ const Hero = () => {
           <p className="text-gray-700 text-lg lg:text-xl mt-4 lg:mt-8 relative z-30">
             EUnivate connects your business with the brightest minds from universities. Tap into cutting-edge solutions, reduce development costs, and gain a competitive edge through real-world innovation.
           </p>
+
           <div className="flex space-x-4 mt-8">
-       <Link to = "CTA" spy = {true} smooth = {true} offset = {50} duration={500}
-        className="bg-yellow-500 text-white px-6 py-3 rounded-full hover:bg-red-800 transition-all duration-300 relative z-30"> 
+            <Button 
+              to="CTA" 
+              spy={true} 
+              smooth={true} 
+              offset={50} 
+              duration={500}
+              className="bg-yellow-500 text-white px-6 py-3 rounded-full hover:bg-red-800 transition-all duration-300 relative z-30"
+            >
               Get Started
-         </Link>    
+            </Button>
           </div>
-          <div className="flex  items-center justify-center space-x-12 mt-8 sm:mt-16 relative z-30">
-            <div className="hidden sm:flex  items-center">
+
+          <div className="flex items-center justify-center space-x-12 mt-8 sm:mt-16 relative z-30">
+            <div className="hidden sm:flex items-center">
               <img src={thinkTogether} alt="Innovate Together" className="w-8 h-8" />
               <span className="text-sm ml-2">Innovate Together</span>
             </div>
             
-            <div className="hidden sm:flex  items-center">
+            <div className="hidden sm:flex items-center">
               <img src={futureSolution} alt="Future Solutions" className="w-8 h-8" />
               <span className="text-sm ml-2">Future Solutions</span>
             </div>
-            <div className="hidden sm:flex  items-center">
+            <div className="hidden sm:flex items-center">
               <img src={indMeets} alt="Industry Meets Minds" className="w-8 h-8" />
               <span className="text-sm ml-2">Industry Meets Minds</span>
             </div>
@@ -86,8 +94,9 @@ const Hero = () => {
           </div>
         </div>
 
-        <div className="lg:w-1/2 w-full mt-8 lg:mt-0 relative z-10 hidden sm:block">
-          <img src={light} alt="Hero" className="w-[600px] h-[600px] object-cover rounded-full" /> 
+        <div className="hidden md:block lg:w-1/2 w-full mt-8 lg:mt-0 relative z-10">
+  <img src={light} alt="Hero" className="w-[600px] h-[600px] object-cover rounded-full" />
+
 
           <div className="absolute top-[90px] p-1 hidden sm:block"> 
             <img src={fifty} alt="50+ Experts Icon" className="w-[180px] h-[120px]" />
@@ -105,7 +114,6 @@ const Hero = () => {
             className="absolute bottom-[-250px] right-[-200px] lg:w-[500px] lg:h-[500px] w-[300px] h-[300px] z-[-1] hidden sm:block" 
           />
         </div>
-        
       </section>
 
       {/* Collaboration Section for Desktop */}

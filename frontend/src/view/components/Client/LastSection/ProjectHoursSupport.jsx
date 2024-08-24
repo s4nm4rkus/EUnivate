@@ -1,6 +1,15 @@
 import React from "react";
+import { useNavigate } from 'react-router-dom';
+
 
 const ProjectHoursSupport = () => {
+
+    const navigate = useNavigate();
+
+    const handleButtonClick = () => {
+      navigate('/quotation'); // Navigate to the /quotation route
+    };
+
     return (
         <div>
             <div className="flex justify-center mb-24">
@@ -33,7 +42,12 @@ const ProjectHoursSupport = () => {
 
                         <div className="get-free-quotation">
             <p className="quotation-text font-bold">Get Free Quotation</p>
-            <button className="free-quotation-btn font-semibold">Free Quotation</button>
+            <button
+                className="free-quotation-btn font-semibold"
+                onClick={handleButtonClick}
+            >
+                Free Quotation
+            </button>
             </div>
 
             </div>

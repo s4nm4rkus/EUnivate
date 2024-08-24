@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 
 // Generate JWT Token
 export const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1h' });  // Adjust expiresIn as needed
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 };
 
 // Middleware to protect routes and verify token

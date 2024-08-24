@@ -14,18 +14,22 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,  // Ensure emails are unique
+        
     },
     password: {
         type: String,
         required: true,
     },
     role: {
-        type: String,
-        default: 'User',  // Default role is 'User'
+        type: String, enum: ['User', 'Admin', 'Superadmin'], default: 'User'
     },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
 }, {
     timestamps: true,
 });
 
 const User = mongoose.model('User', userSchema);
 export default User;
+
+

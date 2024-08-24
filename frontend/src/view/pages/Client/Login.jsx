@@ -6,6 +6,7 @@
       const [email, setEmail] = useState('');
       const [password, setPassword] = useState('');
       const [showPassword, setShowPassword] = useState(false);
+      const [error, setError] = useState(''); // State for error message
       const navigate = useNavigate();
 
       const togglePasswordVisibility = () => {
@@ -39,9 +40,11 @@
             }
           } else {
             console.error('Login failed:', data.message);
+            setError(data.message); 
           }
         } catch (error) {
           console.error('Error logging in:', error);
+          setError('An error occurred while trying to log in. Please try again later.');
         }
       };
       
@@ -50,6 +53,7 @@
         <div className="flex items-center justify-center min-h-screen bg-cover bg-no-repeat" style={{ backgroundImage: `url(${Loginback})` }}>
           <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
             <h2 className="text-3xl font-bold text-center mb-6">Log In</h2>
+            {error && <p className="text-red-600 mb-4">{error}</p>}
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-semibold mb-2">Email</label>
               <input

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Loginback } from '../../../constants/assets';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faEnvelope, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-
+import {useNavigate} from 'react-router-dom';
 const Signup = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -14,6 +14,8 @@ const Signup = () => {
   const [error, setError] = useState(""); // For displaying errors
   const [success, setSuccess] = useState(""); // For displaying success message
 
+
+  const navigate = useNavigate();
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -48,6 +50,7 @@ const Signup = () => {
       setLastName("");
       setEmail("");
       setPassword("");
+      navigate("/login")
     } catch (err) {
       setError(err.response?.data?.message || "An error occurred during signup."); // Display error message
       console.log(err);

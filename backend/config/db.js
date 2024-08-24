@@ -1,13 +1,19 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const connectDB = async () => {
-    try {
-        await mongoose.connect(process.env.MONGO_URI); // Fixed typo
-        console.log('Successfully connected to MongoDB');
-    } catch (error) {
-        console.error(`ERROR: ${error.message}`); // Use backticks
-        process.exit(1);
-    }
-};
+  mongoose
+    .connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    })
+    .then(() => {
+      console.log("Successfully connected to MongoDB Atlas!");
+    })
+    .catch((error) => {
+      console.log("Unable to connect to MongoDB Atlas!");
+      console.error(error);
+    });
+}
 
 export default connectDB;
+  

@@ -3,7 +3,7 @@ import webinar from '../assets/webinar.png';
 
 export const navLinks = [
   {
-    id: "home",
+    id: "home", path: "/",
     title: "Home",
     hasDropdown: false,
   },
@@ -27,22 +27,13 @@ export const navLinks = [
       { id: "webinars", title: "Webinars", path: "/webinar" },
       { id: "events", title: "Events", path: "/events" },
       { id: "challenges", title: "Challenges", path: "/challenges" },
-      { id: "projectManagement", title: "Project Management", path: "/project" },
+      { id: "projectManagement", title: "Project Management", path: "/login" },
     ],
     imageUrl: webinar,
     description: 'WEBINAR',  
   },
   {
-    id: "aboutus",
+    id: "aboutus" ,path: "/about",
     title: "About Us",
-    hasDropdown: true,
-    subLinks: [
-      { id: "mission", title: "Mission", path: "/mission" },
-      { id: "advantage", title: "Advantage", path: "/advantage" },
-      { id: "contactUs", title: "Contact Us", path: "/contact" },
-      { id: "ourTeam", title: "Our Team", path: "/our-team" },
-    ],
-    imageUrl: webinar,
-    description: 'EUNIVATE',  
   },
 ];

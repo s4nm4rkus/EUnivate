@@ -15,7 +15,17 @@ import Showcases from './view/pages/Client/Showcases';
 import Challenges from './view/pages/Client/Challenges';
 import ProjectManagement from './view/pages/Client/ProjectManagement';
 import Webinars from './view/pages/Client/Webinars';
+import Login from './view/pages/Client/Login.jsx';
+import Signup from './view/pages/Client/Signup.jsx';
+import Forgotpassword from './view/pages/Client/Forgotpassword.jsx';
+import CTA from "./view/components/Client/LastSection/CTA.jsx";
+// Admins
+import SuperAdminDashboard from './view/pages/Admin/SuperAdmin.jsx';
+import Admin from './view/pages/Admin/Admin.jsx';
+import Collaborator from './view/pages/Admin/Collaborator.jsx';
 
+//Client
+import User from './view/pages/Client/User.jsx';
 // Admin
 import AdminLayout from './view/components/Admin/AdminLayout';
 import Dashboard from './view/pages/Admin/Dashboard';
@@ -27,39 +37,40 @@ import Messages from './view/pages/Admin/Messages';
 /* Global CSS */
 import './index.css';
 import './admin.css';
-import styles from './style';
+
+
 
 
 const App = () => {
-    return (
-        <Router>
-            <Routes>
-                <Route path="/" element={< LandingPage />}/>
-                <Route path="/about" element={< About />}/>
-                <Route path="/advantage" element={< Advantage />}/>
-                <Route path="/contact" element={< Contact />}/>
-                <Route path="/our-team" element={< OurTeam />}/>
-                <Route path="/eu-store" element={< EuStore />}/>
-                <Route path="/mission" element={< Mission />}/>
-                <Route path="/events" element={< Events />}/>
-                <Route path="/quotation" element={< Quotation />}/>
-                <Route path="/showcases" element={< Showcases />}/>
-                <Route path="/challenges" element={< Challenges />}/>
-                <Route path="/project" element={< ProjectManagement />}/>
-                <Route path="/webinar" element={< Webinars />}/> 
-                
-                {/* Admin */}
-                <Route path="/admin/*" element={<AdminLayout />}>
-                <Route path="dashboard" element={<Dashboard />} />
-                <Route path="project" element={<Project />} />
-                <Route path="task" element={<Task />} />
-                <Route path="people" element={<People/>}/>
-                <Route path="messages" element={<Messages/>}/>
-                </Route>               
-              </Routes>
-        </Router>
-
-    );
-};
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+       <Route path = "/cta" element = {<CTA />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/advantage" element={<Advantage />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/our-team" element={<OurTeam />} />
+        <Route path="/eu-store" element={<EuStore />} />
+        <Route path="/mission" element={<Mission />} />
+        <Route path="/events" element={<Events />} />
+        <Route path="/quotation" element={<Quotation />} />
+        <Route path="/showcases" element={<Showcases />} />
+        <Route path="/challenges" element={<Challenges />} />
+        <Route path="/project" element={<ProjectManagement />} />
+        <Route path="/webinar" element={<Webinars />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot" element={<Forgotpassword />} />
+            {/* Admin Route */}
+        <Route path="/superadmin" element={<SuperAdminDashboard />} />
+        <Route path="/collab" element={<Admin />} />
+        <Route path="/admin" element={<Collaborator />} />
+          {/* Client */}
+        <Route path="/user" element={<User />} />
+      </Routes>
+    </Router>
+  );
+}
 
 export default App;

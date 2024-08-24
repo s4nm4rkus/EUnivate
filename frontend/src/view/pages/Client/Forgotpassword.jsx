@@ -7,17 +7,34 @@ const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you can add your email validation logic
+  
     if (email === '') {
       setError('We cannot find your email.');
     } else {
       setError(null);
-      // Proceed with the forgot password logic
+      try {
+        const response = await fetch('http://localhost:5000/api/users/forgot-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email }),
+        });
+  
+        const data = await response.json();
+        if (response.ok) {
+          setError(null);
+          alert('Password reset link sent to your email');
+        } else {
+          setError(data.message || 'Something went wrong');
+        }
+      } catch (err) {
+        setError('An error occurred');
+      }
     }
   };
-
   return (
     <div
       className="flex items-center justify-center min-h-screen bg-cover bg-no-repeat"

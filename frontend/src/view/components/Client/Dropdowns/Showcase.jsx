@@ -5,7 +5,6 @@ import { faBookmark as farBookmark } from '@fortawesome/free-regular-svg-icons';
 const Showcase = ({ showcase }) => {
   return (
     <div className="bg-white rounded-xl shadow-lg p-4 relative">
- 
 
       {/* Save/Bookmark Icon */}
       <div className="absolute top-4 right-4">

@@ -1,23 +1,33 @@
-import path from "path";
-import express from "express";
-import dotenv from "dotenv";
-import cookieParser from "cookie-parser";
-
-
-import connectDB from "./config/db.js";
+import express from 'express';
+import dotenv from 'dotenv';
+import connectDB from './config/db.js';
+import userRoutes from './routes/userRoutes.js';
+import cors from 'cors';
 
 dotenv.config();
-const port = process.env.PORT || 5000;
-
 connectDB();
 
 const app = express();
-app.use(express.json()); 
-app.use(express.urlencoded({ extended: true}));
-app.use(cookieParser());
+app.use(cors());
+app.use(express.json());
 
-app.get("/", (req, res) => {
-    res.send("Hello World");
+// Use user routes
+app.use('/api/users', userRoutes);
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    message: 'Something went wrong on the server!',
+    error: process.env.NODE_ENV === 'production' ? {} : err.message, // Hide detailed error messages in production
+  });
 });
 
-app.listen(port, () => console.log(`server running on port: ${port}`)); 
+
+app.get('/', (req, res) => {
+  res.send('Welcome to the API');
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+

@@ -11,7 +11,6 @@ import Howitworks from '../../components/Client/ThirdSection/Howitworks.jsx';
 import LogoSlides from '../../components/Client/ThirdSection/LogoSlides.jsx';
 import styles from '../../../style';
 
-
 const LandingPage = () => {
   return (
     <div className="bg-white w-full overflow-hidden">
@@ -67,9 +66,9 @@ const LandingPage = () => {
         </div>
       </div>
 
-      <div className={`${styles.paddingX} ${styles.flexStart}`}>
+      <div  className={`${styles.paddingX} ${styles.flexStart}`}>
         <div className={`${styles.boxWidth}`}>
-          <CTA />
+       <CTA />
           <Footer />
         </div>
       </div>

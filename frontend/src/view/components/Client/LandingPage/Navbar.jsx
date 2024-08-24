@@ -21,11 +21,12 @@ const Navbar = () => {
   const handleLogoClick = () => {
     navigate('/');
   };
-
-
+ const handleCTAClick = () => {
+  navigate('/cta');
+ }
   return (
     <nav className="w-full flex justify-between items-center py-4 bg-white px-4 sm:px-8">
-         <div className="flex items-center space-x-2 sm:space-x-10 cursor-pointer" onClick={handleLogoClick}>
+      <div className="flex items-center space-x-2 sm:space-x-10 cursor-pointer" onClick={handleLogoClick}>
         <div className="flex items-center">
           <span className="text-3xl sm:text-5xl font-bold text-red-800">EU</span>
           <span className="text-3xl sm:text-5xl font-bold text-yellow-500">nivate</span>
@@ -36,7 +37,7 @@ const Navbar = () => {
         {navLinks.map((link) => (
           <li key={link.id} className="relative group">
             <button
-              onClick={() => link.hasDropdown ? toggleDropdown(link.id) : handleNavigation('/')}
+              onClick={() => link.hasDropdown ? toggleDropdown(link.id) : handleNavigation(link.path)}
               className="text-gray-700 hover:text-red-500 flex items-center focus:outline-none"
             >
               {link.title}
@@ -80,16 +81,9 @@ const Navbar = () => {
       </ul>
 
       {/* "Get Started" button */}
-      <ScrollLink
-        to="CTA"
-        spy={true}
-        smooth={true}
-        offset={50}
-        duration={500}
-        className="bg-yellow-500 text-white px-6 py-3 rounded-full hover:bg-red-800 transition-all duration-300 relative z-30 hidden sm:block cursor-pointer"
-      >
+     <button className="bg-yellow-500 text-white px-6 py-3 rounded-full hover:bg-red-800 transition-all duration-300 relative z-30 hidden sm:block cursor-pointer " onClick={handleCTAClick}>
         Get Started
-      </ScrollLink>    
+        </button>   
 
       {/* Mobile Menu */}
       <div className="sm:hidden flex items-center">
@@ -107,7 +101,7 @@ const Navbar = () => {
             {navLinks.map((link) => (
               <li key={link.id} className="relative group font-medium cursor-pointer text-[16px] mb-4">
                 <div
-                  onClick={() => link.hasDropdown ? toggleDropdown(link.id) : handleNavigation('/')}
+                  onClick={() => link.hasDropdown ? toggleDropdown(link.id) : handleNavigation(link.path)}
                   className="flex items-center justify-between w-full"
                 >
                   {link.title}
@@ -143,4 +137,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-  

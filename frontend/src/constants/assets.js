@@ -91,12 +91,32 @@ import prof2 from '../assets/prof2.jpg';
 import prof3 from '../assets/prof3.jpg';
 import prof4 from '../assets/prof4.jpg';
 
+//Quotation Step4
+import Step4 from '../assets/Step4-quotation.svg';
 
+//Login Back
+import Loginback from '../assets/loginback.png';
 
 /* FOOTER IMG */
 import webinar1 from '../assets/webinar1.png';
 import webinar2 from '../assets/webinar2.png';
 import webinar3 from '../assets/webinar3.png';
+
+/* ABOUT US HERO IMG */
+import image1 from '../assets/abt1.png';
+import image2 from '../assets/abt2.png';
+import background from '../assets/backg.png';
+
+/* ABOUT US MISSION IMG */
+import road from '../assets/road.png';
+
+/* ABOUT US ADVANTAGE IMG */
+import Pie1 from '../assets/pie1.png';
+import Pie2 from '../assets/pie2.png';
+import Pie3 from '../assets/pie3.png';
+import Pie4 from '../assets/pie4.png';
+
+
 
 export {
   
@@ -125,6 +145,19 @@ export {
     webinar2,
     webinar3,
 
+    /* ABOUT US HERO IMG */
+    image1,
+    image2,  
+    background,
+
+    /* ABOUT US MISSION IMG */
+    road,
+
+    /* ABOUT US ADVANTAGE IMG */
+    Pie1,
+    Pie2,
+    Pie3,
+    Pie4,
 
     // LogoSlides Assets - Line 1
     logo1_ln1,
@@ -197,5 +230,13 @@ export {
       prof1,
       prof2,
       prof3,
-      prof4
+      prof4,
+      
+      //Quotation Step4
+      Step4,
+
+            //Quotation Step4
+            Loginback
+
+            
 };

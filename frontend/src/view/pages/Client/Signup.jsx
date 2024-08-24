@@ -18,11 +18,21 @@ const Signup = () => {
     setShowPassword(!showPassword);
   };
 
+    const validatePassword = (password) => {
+      const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{9,}$/;
+      return passwordRegex.test(password);
+    };
+
     const handleSubmit = async (e) => {
       e.preventDefault();
       setError(""); // Clear any previous errors
       setSuccess(""); // Clear any previous success message
 
+      if (!validatePassword(password)) {
+        setError("Password must be at least 9 characters long and include at least one number and one symbol.");
+        return;
+      }
+      
       try {
         const response = await axios.post("http://localhost:5000/api/users", {
           firstName,

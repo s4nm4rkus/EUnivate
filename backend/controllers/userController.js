@@ -41,8 +41,7 @@ export const createUser = async (req, res) => {
 };
   // Login user
   export const loginUser = async (req, res) => {
-    console.log("Received email: ", req.body.email);  // Debugging log
-    console.log("Received password: ", req.body.password);  // Debugging log
+
   
     const { email, password } = req.body;
   

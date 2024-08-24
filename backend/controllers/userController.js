@@ -22,15 +22,15 @@ export const createUser = async (req, res) => {
       return res.status(400).json({ message: 'Email already exists' });
     }
 
-    const salt = await bcrypt.genSalt(10); // Generate salt
-    const hashedPassword = await bcrypt.hash(password, salt); // Hash the password with the salt
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = new User({
       firstName,
       lastName,
       email,
-      password: hashedPassword, // Use the hashed password
-      role,
+      password: hashedPassword,
+      role: role || 'User', // Default role is 'User' if not provided
     });
 
     const createdUser = await user.save();
@@ -40,12 +40,14 @@ export const createUser = async (req, res) => {
     res.status(500).json({ message: 'Error creating user', error: error.message });
   }
 };
+
+
   // Login user
   export const loginUser = async (req, res) => {
 
   
     const { email, password } = req.body;
-  
+
     try {
       const user = await User.findOne({ email});
   

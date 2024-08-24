@@ -21,9 +21,7 @@ const userSchema = new mongoose.Schema({
         required: true,
     },
     role: {
-        type: String,
-        default: 'User',  // Default role is 'User'
-
+        type: String, enum: ['User', 'Admin', 'Superadmin'], default: 'User'
     },
     resetPasswordToken: String,
     resetPasswordExpire: Date,
@@ -33,3 +31,5 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 export default User;
+
+

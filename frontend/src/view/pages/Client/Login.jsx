@@ -24,13 +24,13 @@
           });
           
           const data = await res.json();
-          
+          console.log(data); // Check the response
           if (res.ok) {
             const role = data.role.toLowerCase(); // Ensure 'data.role' is accessed correctly
             if (role === 'superadmin') {
-              navigate('/superadmin-dashboard');
+              navigate('/superadmin');
             } else if (role === 'admin') {
-              navigate('/admin-dashboard');
+              navigate('/admin');
             } else if (role === 'collaborator') {
               navigate('/collaborator-dashboard');
             } else if (role === 'user') {

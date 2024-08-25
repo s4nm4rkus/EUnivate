@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"; // Import Navigate
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"; 
 
 /* Client Pages */
 import LandingPage from './view/pages/Client/MainPage';
@@ -20,15 +20,15 @@ import Signup from './view/pages/Client/Signup.jsx';
 import Forgotpassword from './view/pages/Client/Forgotpassword.jsx';
 import ResetPassword from './view/pages/Client/Resetpassword.jsx';
 import CTA from "./view/components/Client/LastSection/CTA.jsx";
-
-// Admins
-import SuperAdminDashboard from './view/pages/Admin/SuperAdmin.jsx';
-import Admin from './view/pages/Admin/Admin.jsx';
-import Collaborator from './view/pages/Admin/Collaborator.jsx';
 import MainPage from './view/pages/Client/MainPage.jsx';
+
+
 //Client
 import User from './view/pages/Client/User.jsx';
-// Admin
+
+
+
+// Admins
 import AdminLayout from './view/components/Admin/AdminLayout';
 import Dashboard from './view/pages/Admin/Dashboard';
 import Project from './view/pages/Admin/Project';
@@ -40,17 +40,12 @@ import Messages from './view/pages/Admin/Messages';
 import './index.css';
 import './admin.css';
 
-
-//Hooks
-
-
 const SuperAdminRoute = ({ element }) => {
   const user = JSON.parse(localStorage.getItem('user')); // Assuming you store user info in localStorage
-  return user && user.role === 'superadmin' ? element : <Navigate to="/superadmin-dashboard" />;
+  return user && user.role === 'superadmin' ? element : <Navigate to="/superadmin" />;
 };
 
 const App = () => {
-
   return (
     <Router>
       <Routes>
@@ -72,18 +67,22 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot" element={<Forgotpassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-        
+
         {/* Admin Route */}
-        <Route path="/superadmin-dashboard" element={<SuperAdminRoute element={<SuperAdminDashboard />} />} />
-        <Route path="/collab" element={<Admin />} />
-        <Route path="/admin" element={<Collaborator />} />
+ 
         
+        {/* Admin Layout */}
+        <Route path="/superadmin/*" element={<AdminLayout />}>
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="project" element={<Project />} />
+          <Route path="task" element={<Task />} />
+          <Route path="people" element={<People />} />
+          <Route path="messages" element={<Messages />} />
+        </Route>
+
         {/* Client */}
         <Route path="/user" element={<User />} />
         <Route path="/main" element={<MainPage />} />
-
-          {/*Hooks*/}
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
     </Router>
   );

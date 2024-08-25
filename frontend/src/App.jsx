@@ -22,6 +22,8 @@ import ResetPassword from './view/pages/Client/Resetpassword.jsx';
 import CTA from "./view/components/Client/LastSection/CTA.jsx";
 import MainPage from './view/pages/Client/MainPage.jsx';
 
+//Hooks
+
 
 //Client
 import User from './view/pages/Client/User.jsx';
@@ -40,11 +42,21 @@ import Messages from './view/pages/Admin/Messages';
 import './index.css';
 import './admin.css';
 
-const SuperAdminRoute = ({ element }) => {
-  const user = JSON.parse(localStorage.getItem('user')); // Assuming you store user info in localStorage
-  return user && user.role === 'superadmin' ? element : <Navigate to="/superadmin" />;
-};
+const PrivateRoute = ({ children }) => {
+  const isAuthenticated = !!localStorage.getItem('user'); // Simple check if user is logged in
+  const user = JSON.parse(localStorage.getItem('user'));
 
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // You can add more conditions to check for roles here
+  if (user && user.role !== 'superadmin') {
+    return <Navigate to="/" replace />; // Redirect if not superadmin
+  }
+
+  return children;
+};
 const App = () => {
   return (
     <Router>
@@ -68,11 +80,16 @@ const App = () => {
         <Route path="/forgot" element={<Forgotpassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-        {/* Admin Route */}
- 
-        
-        {/* Admin Layout */}
-        <Route path="/superadmin/*" element={<AdminLayout />}>
+
+        {/* Admin Routes */}
+        <Route
+          path="/superadmin/*"
+          element={
+            <PrivateRoute>
+              <AdminLayout />
+            </PrivateRoute>
+          }
+        >
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="project" element={<Project />} />
           <Route path="task" element={<Task />} />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"; // Import Navigate
 
 /* Client Pages */
 import LandingPage from './view/pages/Client/MainPage'; 
@@ -32,23 +32,18 @@ import User from './view/pages/Client/User.jsx';
 /* Global CSS */
 import './index.css'; 
 
-//Hooks
-
-
 const SuperAdminRoute = ({ element }) => {
   const user = JSON.parse(localStorage.getItem('user')); // Assuming you store user info in localStorage
-  return user && user.role === 'superadmin' ? element : <Navigate to="/not-authorized" />;
+  return user && user.role === 'superadmin' ? element : <Navigate to="/superadmin-dashboard" />;
 };
-
 
 const App = () => {
 
   return (
-    
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-       <Route path = "/cta" element = {<CTA />} />
+        <Route path="/cta" element={<CTA />} />
         <Route path="/about" element={<About />} />
         <Route path="/advantage" element={<Advantage />} />
         <Route path="/contact" element={<Contact />} />
@@ -64,15 +59,15 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot" element={<Forgotpassword />} />
-            {/* Admin Route */}
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
+        
+        {/* Admin Route */}
         <Route path="/superadmin-dashboard" element={<SuperAdminRoute element={<SuperAdminDashboard />} />} />
         <Route path="/collab" element={<Admin />} />
         <Route path="/admin" element={<Collaborator />} />
-          {/* Client */}
+        
+        {/* Client */}
         <Route path="/user" element={<User />} />
-
-          {/*Hooks*/}
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
     </Router>
   );

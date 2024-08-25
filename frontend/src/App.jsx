@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"; // Import Navigate
 
 /* Client Pages */
-import LandingPage from './view/pages/Client/MainPage'; 
+import LandingPage from './view/pages/Client/MainPage';
 import About from './view/pages/Client/About';
 import Advantage from './view/pages/Client/Advantage';
 import Contact from './view/pages/Client/Contact';
@@ -25,12 +25,24 @@ import CTA from "./view/components/Client/LastSection/CTA.jsx";
 import SuperAdminDashboard from './view/pages/Admin/SuperAdmin.jsx';
 import Admin from './view/pages/Admin/Admin.jsx';
 import Collaborator from './view/pages/Admin/Collaborator.jsx';
-
+import MainPage from './view/pages/Client/MainPage.jsx';
 //Client
 import User from './view/pages/Client/User.jsx';
+// Admin
+import AdminLayout from './view/components/Admin/AdminLayout';
+import Dashboard from './view/pages/Admin/Dashboard';
+import Project from './view/pages/Admin/Project';
+import Task from './view/pages/Admin/Task';
+import People from './view/pages/Admin/People';
+import Messages from './view/pages/Admin/Messages';
 
 /* Global CSS */
-import './index.css'; 
+import './index.css';
+import './admin.css';
+
+
+//Hooks
+
 
 const SuperAdminRoute = ({ element }) => {
   const user = JSON.parse(localStorage.getItem('user')); // Assuming you store user info in localStorage
@@ -68,6 +80,10 @@ const App = () => {
         
         {/* Client */}
         <Route path="/user" element={<User />} />
+        <Route path="/main" element={<MainPage />} />
+
+          {/*Hooks*/}
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
     </Router>
   );

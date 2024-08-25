@@ -118,6 +118,13 @@ import Pie4 from '../assets/pie4.png';
 
 
 
+// Admin Img
+import dashboard_logo from '../assets/dashboard_logo.png';
+import dashboard_sidenav_icon from '../assets/dashboard_sidenav_icon.svg';
+import dashboard_sidenav_icon_hover from '../assets/dashboard_sidenav_icon_hover.svg';
+
+
+
 export {
   
    yellow_gradient,
@@ -158,6 +165,13 @@ export {
     Pie2,
     Pie3,
     Pie4,
+    //Admin Img
+    dashboard_logo, 
+    dashboard_sidenav_icon,
+    dashboard_sidenav_icon_hover,
+    
+  
+
 
     // LogoSlides Assets - Line 1
     logo1_ln1,

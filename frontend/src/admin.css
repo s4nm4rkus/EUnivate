@@ -1,0 +1,62 @@
+
+.side-nav-admin {
+    height: 100%;
+    width: 250px;
+    position: fixed;
+    padding: 1rem;
+    top: 0;
+    left: 0;
+    background-color: #980808;
+    padding-top: 20px;
+    text-align: start;
+    color: white;
+
+}
+
+.side-nav-admin h2{
+    font-family: "Poppins", sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    color: white;
+    padding-left: 8px;
+    padding-bottom: 8px;
+}
+
+.side-nav-admin img{
+    font-size: 20px;
+    margin: 5px 10px 0 8px;
+}
+
+.side-nav-admin ul {
+    list-style-type: none;
+    padding: 5px 0 0 0;
+}
+
+.side-nav-admin ul li {
+    font-size: 14px;
+    font-family: "Manrope", sans-serif;
+    padding: 8px;
+    
+}
+
+.side-nav-admin ul li a {
+    padding: 5px;
+    font-size: 14px;
+    color: white;
+    font-family: "Manrope", sans-serif;
+    text-decoration: none;
+    display: block; 
+    transition: background-color 0.3s ease;
+    border-radius: 5px;
+}
+
+.side-nav-admin ul li a:hover{
+    font-family: "Poppins", sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    color: #980808;
+    background-color: white;
+    border-radius: 5px;
+}
+
+

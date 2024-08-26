@@ -23,6 +23,8 @@ import CTA from "./view/components/Client/LastSection/CTA.jsx";
 import MainPage from './view/pages/Client/MainPage.jsx';
 
 //Hooks
+import Auth from './view/hooks/Auth.jsx';
+import SuperAdminRoute from './view/hooks/SuperadminAuth.jsx';
 
 
 //Client
@@ -58,7 +60,7 @@ const App = () => {
         <Route path="/eu-store" element={<EuStore />} />
         <Route path="/mission" element={<Mission />} />
         <Route path="/events" element={<Events />} />x
-        <Route path="/quotation" element={<Quotation />} />
+        <Route path="/quotation" element={<Auth><Quotation /></Auth>}/>
         <Route path="/showcases" element={<Showcases />} />
         <Route path="/challenges" element={<Challenges />} />
         <Route path="/project" element={<ProjectManagement />} />
@@ -73,9 +75,9 @@ const App = () => {
         <Route
           path="/superadmin/*"
           element={
-      
+            <SuperAdminRoute>
               <AdminLayout />
-            
+            </SuperAdminRoute>
           }
         >
           <Route path="dashboard" element={<Dashboard />} />

@@ -12,42 +12,50 @@
       const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
       };
-
-      const handleLogin = async () => {
-        try {
-          const res = await fetch('http://localhost:5000/api/users/login', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password }),
-          });
-          
-          const data = await res.json();
-          console.log(data); // Check the response
-          if (res.ok) {
-            const role = data.role.toLowerCase(); // Ensure 'data.role' is accessed correctly
-            if (role === 'superadmin') {
-              navigate('/superadmin');
-            } else if (role === 'admin') {
-              navigate('/admin');
-            } else if (role === 'collaborator') {
-              navigate('/collaborator-dashboard');
-            } else if (role === 'user') {
-              navigate('/user');
-            } else {
-              console.error('Unknown role:', data.role);
-            }
-          } else {
-            console.error('Login failed:', data.message);
-            setError(data.message); 
-          }
-        } catch (error) {
-          console.error('Error logging in:', error);
-          setError('An error occurred while trying to log in. Please try again later.');
-        }
-      };
       
+        const handleLogin = async () => {
+          try {
+            const res = await fetch('http://localhost:5000/api/users/login', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ email, password }),
+            });
+      
+            const data = await res.json();
+            console.log(data); // Check the response
+            if (res.ok) {
+              // Save user details to localStorage
+              localStorage.setItem('user', JSON.stringify({
+                firstName: data.firstName,
+                lastName: data.lastName,
+                email: data.email,
+                token: data.token,
+                role: data.role,
+              }));
+      
+              const role = data.role.toLowerCase(); // Ensure 'data.role' is accessed correctly
+              if (role === 'superadmin') {
+                navigate('/superadmin');
+              } else if (role === 'admin') {
+                navigate('/admin');
+              } else if (role === 'collaborator') {
+                navigate('/collaborator-dashboard');
+              } else if (role === 'user') {
+                navigate('/');
+              } else {
+                console.error('Unknown role:', data.role);
+              }
+            } else {
+              console.error('Login failed:', data.message);
+              setError(data.message); 
+            }
+          } catch (error) {
+            console.error('Error logging in:', error);
+            setError('An error occurred while trying to log in. Please try again later.');
+          }
+        };
       
       return (
         <div className="flex items-center justify-center min-h-screen bg-cover bg-no-repeat" style={{ backgroundImage: `url(${Loginback})` }}>

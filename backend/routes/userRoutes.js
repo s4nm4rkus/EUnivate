@@ -10,7 +10,7 @@ router.post('/forgot-password', forgotPassword);
 router.post("/reset-password/:token", resetPassword);
 
 // Protect and restrict access to superadmin route
-router.get('/superadmin-dashboard', protect, verifySuperAdmin, (req, res) => {
+router.get('/superadmin', protect, verifySuperAdmin, (req, res) => {
   res.status(200).json({ message: 'Welcome to the SuperAdmin dashboard' });
 });
 

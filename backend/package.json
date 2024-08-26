@@ -1,6 +1,9 @@
 {
   "name": "backend",
   "version": "1.0.0",
+  "start": "vite",
+  "build": "vite build",
+  "serve": "vite preview",
   "main": "index.js",
   "type": "module",
   "scripts": {

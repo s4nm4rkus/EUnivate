@@ -6,9 +6,14 @@ const ProjectHoursSupport = () => {
 
     const navigate = useNavigate();
 
-    const handleButtonClick = () => {
-      navigate('/quotation'); // Navigate to the /quotation route
-    };
+    const handleButtonClick  = () => {
+        const isAuthenticated = !!localStorage.getItem('user');
+        if (!isAuthenticated) {
+          navigate('/login');
+        } else {
+          navigate('/quotation');
+        }
+      };    
 
     return (
         <div>

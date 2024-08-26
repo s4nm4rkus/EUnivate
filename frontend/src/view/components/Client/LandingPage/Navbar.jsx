@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faSignOutAlt, faSignInAlt } from '@fortawesome/free-solid-svg-icons'; // Import faSignInAlt for the login icon
-import { navLinks } from '../../../../constants/constants';
-import { downArrow, menu, close } from '../../../../constants/assets';
+import { faUser, faSignOutAlt, faSignInAlt } from '@fortawesome/free-solid-svg-icons'; 
+import { downArrow, menu, close, webinar } from '../../../../constants/assets';
 
 const Navbar = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [toggle, setToggle] = useState(false);
   const [userDropdown, setUserDropdown] = useState(false);
-  const [userName, setUserName] = useState('User');
+  const [userName, setUserName] = useState('Signin');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
 
@@ -20,6 +19,47 @@ const Navbar = () => {
       setIsAuthenticated(true);
     }
   }, []);
+
+  const navLinks = [
+    {
+      id: "home", path: "/",
+      title: "Home",
+      hasDropdown: false,
+    },
+    {
+      id: "products",
+      title: "Products",
+      hasDropdown: true,
+      subLinks: [
+        { id: "showcases", title: "Showcases", path: "/showcases" },
+        {
+          id: "quotation",
+          title: "Quotation",
+          path: isAuthenticated ? "/quotation" : "/login", // Change path based on authentication
+        },
+        { id: "eustore", title: "EU Store", path: "/eu-store" },
+      ],
+      imageUrl: webinar,
+      description: 'IT Solution',
+    },
+    {
+      id: "resources",
+      title: "Resources",
+      hasDropdown: true,
+      subLinks: [
+        { id: "webinars", title: "Webinars", path: "/webinar" },
+        { id: "events", title: "Events", path: "/events" },
+        { id: "challenges", title: "Challenges", path: "/challenges" },
+        { id: "projectManagement", title: "Project Management", path: "/login" },
+      ],
+      imageUrl: webinar,
+      description: 'WEBINAR',
+    },
+    {
+      id: "aboutus", path: "/about",
+      title: "About Us",
+    },
+  ];
 
   const toggleDropdown = (id) => {
     setActiveDropdown(activeDropdown === id ? null : id);
@@ -37,7 +77,8 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem('user');
     setIsAuthenticated(false);
-    navigate('/login');
+    navigate('/');
+    window.location.reload(); 
   };
 
   const handleLogin = () => {
@@ -166,7 +207,6 @@ const Navbar = () => {
                     ))}
                   </ul>
                 )}
-
               </li>
             ))}
           </ul>

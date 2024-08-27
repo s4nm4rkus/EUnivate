@@ -184,8 +184,8 @@ const Products = () => {
     Professors
   </span>
   
-  <h2 className="section-title-products">Featured University Experts</h2>
-  <p className="prof-products text-sm">
+  <h2 className="section-title-products font-bold mb-4">Featured University Experts</h2>
+  <p className="prof-products text-gray-800 text-sm">
     EUnivate connects you with a vast network of top university minds across diverse disciplines. Here are just a few of our featured experts ready to tackle your toughest challenges:
   </p>
 

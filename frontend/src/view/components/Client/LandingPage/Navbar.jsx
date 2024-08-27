@@ -7,9 +7,9 @@ import { downArrow, menu, close, webinar } from '../../../../constants/assets';
 const Navbar = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [toggle, setToggle] = useState(false);
-  const [userDropdown, setUserDropdown] = useState(false);
-  const [userName, setUserName] = useState('Signin');
+  const [userName, setUserName] = useState('Sign In');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showLogoutBox, setShowLogoutBox] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const Navbar = () => {
         {
           id: "quotation",
           title: "Quotation",
-          path: isAuthenticated ? "/quotation" : "/login", // Change path based on authentication
+          path: isAuthenticated ? "/quotation" : "/login",
         },
         { id: "eustore", title: "EU Store", path: "/eu-store" },
       ],
@@ -67,7 +67,7 @@ const Navbar = () => {
 
   const handleNavigation = (path) => {
     navigate(path);
-    setToggle(false);  // Close the mobile menu after navigation
+    setToggle(false); 
   };
 
   const handleLogoClick = () => {
@@ -77,16 +77,25 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem('user');
     setIsAuthenticated(false);
+    setUserName('Sign In'); // Reset userName
     navigate('/');
-    window.location.reload(); 
+    window.location.reload();
   };
 
   const handleLogin = () => {
-    navigate('/login');
+    navigate('/login'); // Directly navigate to the login page
+  };
+
+  const handleUserNameClick = () => {
+    if (isAuthenticated) {
+      setShowLogoutBox(!showLogoutBox); // Toggle logout box visibility
+    } else {
+      handleLogin();
+    }
   };
 
   return (
-    <nav className="w-full flex justify-between items-center py-4 bg-white px-4 sm:px-8">
+    <nav className="w-full flex justify-between items-center py-4 bg-white px-4 sm:px-8 relative">
       <div className="flex items-center space-x-2 sm:space-x-10 cursor-pointer" onClick={handleLogoClick}>
         <div className="flex items-center">
           <span className="text-3xl sm:text-5xl font-bold text-red-800">EU</span>
@@ -94,7 +103,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Desktop NavLinks */}
       <ul className="hidden sm:flex items-center space-x-6 sm:space-x-6 md:space-x-8 text-base sm:text-xl">
         {navLinks.map((link) => (
           <li key={link.id} className="relative group">
@@ -142,30 +150,27 @@ const Navbar = () => {
         ))}
       </ul>
 
-      {/* User Dropdown */}
-      <div className="relative hidden sm:block">
-        <button onClick={() => setUserDropdown(!userDropdown)} className="flex items-center space-x-2 text-gray-700 hover:text-red-500 focus:outline-none">
+      <div className="hidden sm:block relative">
+        <button 
+          onClick={handleUserNameClick} 
+          className="flex items-center space-x-2 text-gray-700 hover:text-red-500 focus:outline-none"
+        >
           <FontAwesomeIcon icon={faUser} />
-          <span>{userName}</span> {/* Display the user's name */}
+          <span>{userName}</span>
         </button>
-        {userDropdown && (
-          <div className="absolute right-0 mt-2 w-[150px] text-gray-700 bg-white shadow-lg rounded-lg flex flex-col z-50">
-            {isAuthenticated ? (
-              <button onClick={handleLogout} className="p-2 hover:bg-gray-100">
-                <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
-                Logout
-              </button>
-            ) : (
-              <button onClick={handleLogin} className="p-2 hover:bg-gray-100">
-                <FontAwesomeIcon icon={faSignInAlt} className="mr-2" />
-                Login
-              </button>
-            )}
+        {showLogoutBox && isAuthenticated && (
+          <div className="absolute right-0 top-full mt-2 bg-white border border-gray-200 shadow-lg rounded-lg flex flex-col items-start p-4 z-50">
+            <button 
+              onClick={handleLogout} 
+              className="text-gray-700 hover:text-red-500 flex items-center space-x-2"
+            >
+              <FontAwesomeIcon icon={faSignOutAlt} />
+              <span>Logout</span>
+            </button>
           </div>
         )}
       </div>
 
-      {/* Mobile Menu */}
       <div className="sm:hidden flex items-center">
         <img 
           src={toggle ? close : menu} 
@@ -175,9 +180,9 @@ const Navbar = () => {
         />
 
         <div 
-          className={`${toggle ? 'flex' : 'hidden'} p-6 bg-white absolute top-20 right-0 mx-4 my-2 min-w-[200px] rounded-xl shadow-lg z-50 `}
+          className={`${toggle ? 'flex' : 'hidden'} p-6 bg-white absolute top-20 right-0 mx-4 my-2 min-w-[200px] rounded-xl shadow-lg z-50 flex-col`}
         >
-          <ul className="list-none flex justify-end items-start flex-1 flex-col">
+          <ul className="list-none flex justify-start items-start flex-1 flex-col mb-4">
             {navLinks.map((link) => (
               <li key={link.id} className="relative group font-medium cursor-pointer text-[16px] mb-4">
                 <div
@@ -210,8 +215,15 @@ const Navbar = () => {
               </li>
             ))}
           </ul>
-          <button onClick={isAuthenticated ? handleLogout : handleLogin} className="btn-for-useracc mt-4 text-gray-700 hover:text-red-500">
-            <FontAwesomeIcon icon={isAuthenticated ? faSignOutAlt : faSignInAlt} className="mr-2" />
+
+          <button 
+            onClick={isAuthenticated ? handleLogout : handleLogin} 
+            className="mt-auto text-gray-700 hover:text-red-500 flex items-center"
+          >
+            <FontAwesomeIcon 
+              icon={isAuthenticated ? faSignOutAlt : faSignInAlt} 
+              className="mr-2" 
+            />
             {isAuthenticated ? 'Logout' : 'Login'}
           </button>
         </div>

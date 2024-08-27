@@ -20,8 +20,7 @@ const Contact = () => {
       firstName.trim() !== '' &&
       lastName.trim() !== '' &&
       companyEmail.trim() !== '' &&
-      phoneNumber.trim() !== '' &&
-      message.trim() !== ''
+      phoneNumber.trim() !== ''
     );
   };
 

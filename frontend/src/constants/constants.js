@@ -1,5 +1,6 @@
-
 import webinar from '../assets/webinar.png';
+
+const isAuthenticated = !!localStorage.getItem('user');
 
 export const navLinks = [
   {
@@ -13,7 +14,11 @@ export const navLinks = [
     hasDropdown: true,
     subLinks: [
       { id: "showcases", title: "Showcases", path: "/showcases" },
-      { id: "quotation", title: "Quotation", path: "/quotation" },  
+      {
+        id: "quotation",
+        title: "Quotation",
+        path: isAuthenticated ? "/quotation" : "/login", // Change path based on authentication
+      },
       { id: "eustore", title: "EU Store", path: "/eu-store" },
     ],
     imageUrl: webinar,

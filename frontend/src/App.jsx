@@ -1,5 +1,5 @@
 import React from 'react';
-import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"; 
 
 /* Client Pages */
 import LandingPage from './view/pages/Client/MainPage';
@@ -20,15 +20,19 @@ import Signup from './view/pages/Client/Signup.jsx';
 import Forgotpassword from './view/pages/Client/Forgotpassword.jsx';
 import ResetPassword from './view/pages/Client/Resetpassword.jsx';
 import CTA from "./view/components/Client/LastSection/CTA.jsx";
-
-// Admins
-import SuperAdminDashboard from './view/pages/Admin/SuperAdmin.jsx';
-import Admin from './view/pages/Admin/Admin.jsx';
-import Collaborator from './view/pages/Admin/Collaborator.jsx';
 import MainPage from './view/pages/Client/MainPage.jsx';
+
+//Hooks
+import Auth from './view/hooks/Auth.jsx';
+import SuperAdminRoute from './view/hooks/SuperadminAuth.jsx';
+
+
 //Client
 import User from './view/pages/Client/User.jsx';
-// Admin
+
+
+
+// Admins
 import AdminLayout from './view/components/Admin/AdminLayout';
 import Dashboard from './view/pages/Admin/Dashboard';
 import Project from './view/pages/Admin/Project';
@@ -41,31 +45,22 @@ import './index.css';
 import './admin.css';
 
 
-//Hooks
-
-
-const SuperAdminRoute = ({ element }) => {
-  const user = JSON.parse(localStorage.getItem('user')); // Assuming you store user info in localStorage
-  return user && user.role === 'superadmin' ? element : <Navigate to="/not-authorized" />;
-};
 
 
 const App = () => {
-
   return (
-    
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path = "/cta" element = {<CTA />} />
+        <Route path="/cta" element={<CTA />} />
         <Route path="/about" element={<About />} />
         <Route path="/advantage" element={<Advantage />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/our-team" element={<OurTeam />} />
         <Route path="/eu-store" element={<EuStore />} />
         <Route path="/mission" element={<Mission />} />
-        <Route path="/events" element={<Events />} />
-        <Route path="/quotation" element={<Quotation />} />
+        <Route path="/events" element={<Events />} />x
+        <Route path="/quotation" element={<Auth><Quotation /></Auth>}/>
         <Route path="/showcases" element={<Showcases />} />
         <Route path="/challenges" element={<Challenges />} />
         <Route path="/project" element={<ProjectManagement />} />
@@ -73,16 +68,28 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot" element={<Forgotpassword />} />
-            {/* Admin Route */}
-        <Route path="/superadmin-dashboard" element={<SuperAdminRoute element={<SuperAdminDashboard />} />} />
-        <Route path="/collab" element={<Admin />} />
-        <Route path="/admin" element={<Collaborator />} />
-          {/* Client */}
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
+
+
+        {/* Admin Routes */}
+        <Route
+          path="/superadmin/*"
+          element={
+            <SuperAdminRoute>
+              <AdminLayout />
+            </SuperAdminRoute>
+          }
+        >
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="project" element={<Project />} />
+          <Route path="task" element={<Task />} />
+          <Route path="people" element={<People />} />
+          <Route path="messages" element={<Messages />} />
+        </Route>
+
+        {/* Client */}
         <Route path="/user" element={<User />} />
         <Route path="/main" element={<MainPage />} />
-
-          {/*Hooks*/}
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
     </Router>
   );

@@ -43,7 +43,7 @@ const QuotationStep1 = ({ formData, setFormData, nextStep }) => {
                                     placeholder="Name"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full pl-10 p-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full pl-3 p-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
                         </div>
@@ -56,7 +56,7 @@ const QuotationStep1 = ({ formData, setFormData, nextStep }) => {
                                     placeholder="Email address"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    className="w-full pl-10 p-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full pl-3 p-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
                         </div>
@@ -71,7 +71,7 @@ const QuotationStep1 = ({ formData, setFormData, nextStep }) => {
                                     placeholder="Phone Number"
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                    className="w-full pl-10 p-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full pl-3 p-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
                         </div>
@@ -84,7 +84,7 @@ const QuotationStep1 = ({ formData, setFormData, nextStep }) => {
                                     placeholder="Company name"
                                     value={formData.company}
                                     onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                                    className="w-full pl-10 p-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full pl-3 p-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
                         </div>

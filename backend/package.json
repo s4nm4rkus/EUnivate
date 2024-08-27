@@ -1,6 +1,9 @@
 {
   "name": "backend",
   "version": "1.0.0",
+  "start": "vite",
+  "build": "vite build",
+  "serve": "vite preview",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -12,8 +15,7 @@
   "description": "",
   "dependencies": {
     "bcrypt": "^5.1.1",
-    " ": "^2.4.3",
-    "np-parser": "^1.20.2",
+    "bcryptjs": "^2.4.3",
     "concurrently": "^8.2.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",

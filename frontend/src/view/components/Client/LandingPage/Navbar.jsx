@@ -22,8 +22,8 @@ const Navbar = () => {
 
   const navLinks = [
     {
-      id: "home", path: "/",
-      title: "Home",
+      id: "services", path: "/services",
+      title: "Services",
       hasDropdown: false,
     },
     {

@@ -73,6 +73,8 @@ import logo10_ln4 from '../assets/LogoSlides/logo10_ln4.png';
 import logo33_ln4 from '../assets/LogoSlides/logo33_ln4.png';
 import logo28_ln4 from '../assets/LogoSlides/logo28_ln4.png';
 
+/* Services */
+import Services_IMG from'../assets/Services_IMG.png';
 /* Products */
 import p1 from '../assets/p1.jpg';
 import p2 from '../assets/p2.jpg';
@@ -146,6 +148,9 @@ export {
     indMeets,
     futureSolution,
     OksYun,
+
+      /* Services */
+      Services_IMG,
 
      /* FOOTER IMG */
     webinar1,

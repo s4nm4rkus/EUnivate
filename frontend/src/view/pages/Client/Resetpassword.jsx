@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Loginback } from '../../../constants/assets';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';  // Add faArrowLeft here
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+
 const ResetPassword = () => {
   const { token } = useParams(); // Get token from URL
   const navigate = useNavigate();
@@ -10,6 +11,16 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // State for confirm password visibility
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -50,28 +61,44 @@ const ResetPassword = () => {
         {success && <p className="text-green-600 mb-4">{success}</p>}
 
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
+          <div className="mb-4 relative">
             <label className="block text-gray-700 mb-2">New Password</label>
-            <input
-              type="password"
-              placeholder="Enter new password"
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'} // Toggle input type based on state
+                placeholder="Enter new password"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-10"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <span
+                onClick={togglePasswordVisibility}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+              >
+                <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+              </span>
+            </div>
           </div>
 
-          <div className="mb-4">
+          <div className="mb-4 relative">
             <label className="block text-gray-700 mb-2">Confirm New Password</label>
-            <input
-              type="password"
-              placeholder="Confirm new password"
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? 'text' : 'password'} // Toggle input type based on state
+                placeholder="Confirm new password"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-10"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+              <span
+                onClick={toggleConfirmPasswordVisibility}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+              >
+                <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
+              </span>
+            </div>
           </div>
 
           <button

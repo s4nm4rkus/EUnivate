@@ -6,50 +6,62 @@
       const [email, setEmail] = useState('');
       const [password, setPassword] = useState('');
       const [showPassword, setShowPassword] = useState(false);
+      const [error, setError] = useState(''); // State for error message
       const navigate = useNavigate();
 
       const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
       };
-
-      const handleLogin = async () => {
-        try {
-          const res = await fetch('http://localhost:5000/api/users/login', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password }),
-          });
-          
-          const data = await res.json();
-          
-          if (res.ok) {
-            const role = data.role.toLowerCase(); // Ensure 'data.role' is accessed correctly
-            if (role === 'superadmin') {
-              navigate('/superadmin-dashboard');
-            } else if (role === 'admin') {
-              navigate('/admin-dashboard');
-            } else if (role === 'collaborator') {
-              navigate('/collaborator-dashboard');
-            } else if (role === 'user') {
-              navigate('/user');
-            } else {
-              console.error('Unknown role:', data.role);
-            }
-          } else {
-            console.error('Login failed:', data.message);
-          }
-        } catch (error) {
-          console.error('Error logging in:', error);
-        }
-      };
       
+        const handleLogin = async () => {
+          try {
+            const res = await fetch('http://localhost:5000/api/users/login', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ email, password }),
+            });
+      
+            const data = await res.json();
+            console.log(data); // Check the response
+            if (res.ok) {
+              // Save user details to localStorage
+              localStorage.setItem('user', JSON.stringify({
+                firstName: data.firstName,
+                lastName: data.lastName,
+                email: data.email,
+                token: data.token,
+                role: data.role,
+              }));
+      
+              const role = data.role.toLowerCase(); // Ensure 'data.role' is accessed correctly
+              if (role === 'superadmin') {
+                navigate('/superadmin');
+              } else if (role === 'admin') {
+                navigate('/admin');
+              } else if (role === 'collaborator') {
+                navigate('/collaborator-dashboard');
+              } else if (role === 'user') {
+                navigate('/');
+              } else {
+                console.error('Unknown role:', data.role);
+              }
+            } else {
+              console.error('Login failed:', data.message);
+              setError(data.message); 
+            }
+          } catch (error) {
+            console.error('Error logging in:', error);
+            setError('An error occurred while trying to log in. Please try again later.');
+          }
+        };
       
       return (
         <div className="flex items-center justify-center min-h-screen bg-cover bg-no-repeat" style={{ backgroundImage: `url(${Loginback})` }}>
           <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
             <h2 className="text-3xl font-bold text-center mb-6">Log In</h2>
+            {error && <p className="text-red-600 mb-4">{error}</p>}
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-semibold mb-2">Email</label>
               <input

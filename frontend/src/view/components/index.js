@@ -9,6 +9,9 @@ import Partnerships from './view/components/Client/ThirdSection/Partnerships.jsx
 import Howitworks from './view/components/Client/ThirdSection/Howitworks.jsx';
 import LogoSlides from './view/components/Client/ThirdSection/LogoSlides.jsx';
 
+// Admin
+import SideNav from './view/components/Admin/Dashboard/SideNav.jsx';
+
 export {
   Navbar,
   Hero,
@@ -21,4 +24,7 @@ export {
   Howitworks,
   LogoSlides,
   GetStarted,
+
+  // Admin
+  SideNav,
 };

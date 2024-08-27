@@ -1,8 +1,7 @@
-// middleware/authMiddleware.js
-
 import jwt from 'jsonwebtoken';
 import User from '../models/userModels.js';
 
+// Middleware to protect routes and verify token
 export const protect = async (req, res, next) => {
   let token;
 
@@ -25,4 +24,13 @@ export const protect = async (req, res, next) => {
   }
 };
 
-export default protect;
+// Middleware to verify superadmin role
+export const verifySuperAdmin = (req, res, next) => {
+  if (req.user && req.user.role === 'superadmin') {
+    next();
+  } else {
+    res.status(403).json({ message: 'Access denied. Superadmin only.' });
+  }
+};
+
+export default { protect, verifySuperAdmin };

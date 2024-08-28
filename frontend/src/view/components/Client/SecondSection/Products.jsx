@@ -175,6 +175,87 @@ const Products = () => {
             Explore All Products
           </button>
         </div>
+
+        
+
+      {/* Professors Section */}
+<div className="professors-section-products text-2xl">
+  <span className="professors-products font-bold text-red-800 block mb-2">
+    Professors
+  </span>
+  
+  <h2 className="section-title-products font-bold mb-4">Featured University Experts</h2>
+  <p className="prof-products text-gray-800 text-sm">
+    EUnivate connects you with a vast network of top university minds across diverse disciplines. Here are just a few of our featured experts ready to tackle your toughest challenges:
+  </p>
+
+  <div className="professor-cards-products">
+    {/* Professor 1 */}
+    <div className="professor-card-products">
+      <img src={prof1} alt="Professor 1" className="professor-image-products" />
+      <h3 className="professor-name-products">Theresa Webb</h3>
+      <p className="professor-profession-products">Application Support Analyst Lead</p>
+      <p className="professor-bio-products">Former co-founder of Opendoor. Early staff at Spotify and Clearbit.</p>
+      <div className="social-icons-products">
+        <a href="#" className="social-link-products">
+          <img src={twitterIcon} alt="Twitter" className="social-icon-products" />
+        </a>
+        <a href="#" className="social-link-products">
+          <img src={linkedinIcon} alt="LinkedIn" className="social-icon-products" />
+        </a>
+      </div>
+    </div>
+
+    {/* Professor 2 */}
+    <div className="professor-card-products">
+      <img src={prof2} alt="Professor 2" className="professor-image-products" />
+      <h3 className="professor-name-products">Courtney Henry</h3>
+      <p className="professor-profession-products">Director, Undergraduate Analytics and Planning</p>
+      <p className="professor-bio-products">Lead engineering teams at Figma, Pitch, and Protocol Labs.</p>
+      <div className="social-icons-products">
+        <a href="#" className="social-link-products">
+          <img src={twitterIcon} alt="Twitter" className="social-icon-products" />
+        </a>
+        <a href="#" className="social-link">
+          <img src={linkedinIcon} alt="LinkedIn" className="social-icon-products" />
+        </a>
+      </div>
+    </div>
+
+    {/* Professor 3 */}
+    <div className="professor-card-products">
+      <img src={prof3} alt="Professor 3" className="professor-image-products" />
+      <h3 className="professor-name-products">Albert Flores</h3>
+      <p className="professor-profession-products">Career Educator</p>
+      <p className="professor-bio-products">Former PM for Linear, Lambda School, and On Deck.</p>
+      <br></br>
+      <div className="social-icons-products">
+        <a href="#" className="social-link-products">
+          <img src={twitterIcon} alt="Twitter" className="social-icon-products" />
+        </a>
+        <a href="#" className="social-link-products">
+          <img src={linkedinIcon} alt="LinkedIn" className="social-icon-products" />
+        </a>
+      </div>
+    </div>
+
+    {/* Professor 4 */}
+    <div className="professor-card-products">
+      <img src={prof4} alt="Professor 4" className="professor-image-products" />
+      <h3 className="professor-name-products">Marvin McKinney</h3>
+      <p className="professor-profession-products">Co-op & Internships Program & Operations Manager</p>
+      <p className="professor-bio-products">Former frontend dev for Linear, Coinbase, and Postscript.</p>
+      <div className="social-icons-products">
+        <a href="#" className="social-link-products">
+          <img src={twitterIcon} alt="Twitter" className="social-icon-products" />
+        </a>
+        <a href="#" className="social-link-products">
+          <img src={linkedinIcon} alt="LinkedIn" className="social-icon-products" />
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
       </div>
     </div>
   );

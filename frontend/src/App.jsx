@@ -25,7 +25,7 @@ import Servicespage from './view/pages/Client/Servicespage.jsx';
 //Hooks
 import Auth from './view/hooks/Auth.jsx';
 import SuperAdminRoute from './view/hooks/SuperadminAuth.jsx';
-
+import ProjectmanagementAuth from './view/hooks/AuthProjectmanagement.jsx'
 
 //Client
 import User from './view/pages/Client/User.jsx';
@@ -64,7 +64,7 @@ const App = () => {
         <Route path="/quotation" element={<Auth><Quotation /></Auth>}/>
         <Route path="/showcases" element={<Showcases />} />
         <Route path="/challenges" element={<Challenges />} />
-        <Route path="/project" element={<ProjectManagement />} />
+        <Route path="/project" element={<ProjectmanagementAuth><ProjectManagement /></ProjectmanagementAuth>} />
         <Route path="/webinar" element={<Webinars />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />

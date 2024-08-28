@@ -42,21 +42,22 @@ import Messages from './view/pages/Admin/Messages';
 import './index.css';
 import './admin.css';
 
-const PrivateRoute = ({ children }) => {
-  const isAuthenticated = !!localStorage.getItem('user'); // Simple check if user is logged in
-  const user = JSON.parse(localStorage.getItem('user'));
+// const PrivateRoute = ({ children }) => {
+//   const isAuthenticated = !!localStorage.getItem('user'); // Simple check if user is logged in
+//   const user = JSON.parse(localStorage.getItem('user'));
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
+//   if (!isAuthenticated) {
+//     return <Navigate to="/login" replace />;
+//   }
 
-  // You can add more conditions to check for roles here
-  if (user && user.role !== 'superadmin') {
-    return <Navigate to="/" replace />; // Redirect if not superadmin
-  }
+//   // You can add more conditions to check for roles here
+//   if (user && user.role !== 'superadmin') {
+//     return <Navigate to="/" replace />; // Redirect if not superadmin
+//   }
 
-  return children;
-};
+//   return children;
+// };
+
 const App = () => {
   return (
     <Router>
@@ -85,9 +86,9 @@ const App = () => {
         <Route
           path="/superadmin/*"
           element={
-            <PrivateRoute>
+          
               <AdminLayout />
-            </PrivateRoute>
+            
           }
         >
           <Route path="dashboard" element={<Dashboard />} />

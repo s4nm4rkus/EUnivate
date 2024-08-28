@@ -21,9 +21,11 @@ import Forgotpassword from './view/pages/Client/Forgotpassword.jsx';
 import ResetPassword from './view/pages/Client/Resetpassword.jsx';
 import CTA from "./view/components/Client/LastSection/CTA.jsx";
 import MainPage from './view/pages/Client/MainPage.jsx';
-
+import Servicespage from './view/pages/Client/Servicespage.jsx';
 //Hooks
-
+import Auth from './view/hooks/Auth.jsx';
+import SuperAdminRoute from './view/hooks/SuperadminAuth.jsx';
+import ProjectmanagementAuth from './view/hooks/AuthProjectmanagement.jsx'
 
 //Client
 import User from './view/pages/Client/User.jsx';
@@ -42,27 +44,15 @@ import Messages from './view/pages/Admin/Messages';
 import './index.css';
 import './admin.css';
 
-// const PrivateRoute = ({ children }) => {
-//   const isAuthenticated = !!localStorage.getItem('user'); // Simple check if user is logged in
-//   const user = JSON.parse(localStorage.getItem('user'));
 
-//   if (!isAuthenticated) {
-//     return <Navigate to="/login" replace />;
-//   }
 
-//   // You can add more conditions to check for roles here
-//   if (user && user.role !== 'superadmin') {
-//     return <Navigate to="/" replace />; // Redirect if not superadmin
-//   }
-
-//   return children;
-// };
 
 const App = () => {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/services" element={<Servicespage />} />
         <Route path="/cta" element={<CTA />} />
         <Route path="/about" element={<About />} />
         <Route path="/advantage" element={<Advantage />} />
@@ -70,11 +60,11 @@ const App = () => {
         <Route path="/our-team" element={<OurTeam />} />
         <Route path="/eu-store" element={<EuStore />} />
         <Route path="/mission" element={<Mission />} />
-        <Route path="/events" element={<Events />} />
-        <Route path="/quotation" element={<Quotation />} />
+        <Route path="/events" element={<Events />} />x
+        <Route path="/quotation" element={<Auth><Quotation /></Auth>}/>
         <Route path="/showcases" element={<Showcases />} />
         <Route path="/challenges" element={<Challenges />} />
-        <Route path="/project" element={<ProjectManagement />} />
+        <Route path="/project" element={<ProjectmanagementAuth><ProjectManagement /></ProjectmanagementAuth>} />
         <Route path="/webinar" element={<Webinars />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
@@ -86,9 +76,9 @@ const App = () => {
         <Route
           path="/superadmin/*"
           element={
-          
+            <SuperAdminRoute>
               <AdminLayout />
-            
+            </SuperAdminRoute>
           }
         >
           <Route path="dashboard" element={<Dashboard />} />

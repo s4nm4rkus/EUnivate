@@ -1,13 +1,65 @@
-import React, { useState } from 'react';
-import { Link as ScrollLink } from 'react-scroll';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { navLinks } from '../../../../constants/constants';
-import { downArrow, menu, close } from '../../../../constants/assets';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faSignOutAlt, faSignInAlt } from '@fortawesome/free-solid-svg-icons'; 
+import { downArrow, menu, close, webinar } from '../../../../constants/assets';
 
 const Navbar = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [toggle, setToggle] = useState(false);
+  const [userName, setUserName] = useState('Sign In');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showLogoutBox, setShowLogoutBox] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      setUserName(`${user.firstName} ${user.lastName}`);
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const navLinks = [
+    {
+      id: "services", path: "/services",
+      title: "Services",
+      hasDropdown: false,
+    },
+    {
+      id: "products",
+      title: "Products",
+      hasDropdown: true,
+      subLinks: [
+        { id: "showcases", title: "Showcases", path: "/showcases" },
+        {
+          id: "quotation",
+          title: "Quotation",
+          path: isAuthenticated ? "/quotation" : "/login",
+        },
+        { id: "eustore", title: "EU Store", path: "/eu-store" },
+      ],
+      imageUrl: webinar,
+      description: 'IT Solution',
+    },
+    {
+      id: "resources",
+      title: "Resources",
+      hasDropdown: true,
+      subLinks: [
+        { id: "webinars", title: "Webinars", path: "/webinar" },
+        { id: "events", title: "Events", path: "/events" },
+        { id: "challenges", title: "Challenges", path: "/challenges" },
+        { id: "projectManagement", title: "Project Management", path: isAuthenticated ? "/project" : "/superadmin"},
+      ],
+      imageUrl: webinar,
+      description: 'WEBINAR',
+    },
+    {
+      id: "aboutus", path: "/about",
+      title: "About Us",
+    },
+  ];
 
   const toggleDropdown = (id) => {
     setActiveDropdown(activeDropdown === id ? null : id);
@@ -15,26 +67,42 @@ const Navbar = () => {
 
   const handleNavigation = (path) => {
     navigate(path);
-    setToggle(false);  // Close the mobile menu after navigation
+    setToggle(false); 
   };
 
   const handleLogoClick = () => {
     navigate('/');
   };
-  
-  const handleCTAClick = () => {
-    navigate('/main#CTA');
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setIsAuthenticated(false);
+    setUserName('Sign In'); // Reset userName
+    navigate('/');
+    window.location.reload();
   };
-  
+
+  const handleLogin = () => {
+    navigate('/login'); // Directly navigate to the login page
+  };
+
+  const handleUserNameClick = () => {
+    if (isAuthenticated) {
+      setShowLogoutBox(!showLogoutBox); // Toggle logout box visibility
+    } else {
+      handleLogin();
+    }
+  };
+
   return (
-    <nav className="w-full flex justify-between items-center py-4 bg-white px-4 sm:px-8">
+    <nav className="w-full flex justify-between items-center py-4 bg-white px-4 sm:px-8 relative">
       <div className="flex items-center space-x-2 sm:space-x-10 cursor-pointer" onClick={handleLogoClick}>
         <div className="flex items-center">
           <span className="text-3xl sm:text-5xl font-bold text-red-800">EU</span>
           <span className="text-3xl sm:text-5xl font-bold text-yellow-500">nivate</span>
         </div>
       </div>
-      {/* Desktop NavLinks */}
+
       <ul className="hidden sm:flex items-center space-x-6 sm:space-x-6 md:space-x-8 text-base sm:text-xl">
         {navLinks.map((link) => (
           <li key={link.id} className="relative group">
@@ -82,12 +150,27 @@ const Navbar = () => {
         ))}
       </ul>
 
-      {/* "Get Started" button */}
-     <button className="bg-yellow-500 text-white px-6 py-3 rounded-full hover:bg-red-800 transition-all duration-300 relative z-30 hidden sm:block cursor-pointer " onClick={handleCTAClick}>
-        Get Started
-        </button>   
+      <div className="hidden sm:block relative">
+        <button 
+          onClick={handleUserNameClick} 
+          className="flex items-center space-x-2 text-gray-700 hover:text-red-500 focus:outline-none"
+        >
+          <FontAwesomeIcon icon={faUser} />
+          <span>{userName}</span>
+        </button>
+        {showLogoutBox && isAuthenticated && (
+          <div className="absolute right-0 top-full mt-2 bg-white border border-gray-200 shadow-lg rounded-lg flex flex-col items-start p-4 z-50">
+            <button 
+              onClick={handleLogout} 
+              className="text-gray-700 hover:text-red-500 flex items-center space-x-2"
+            >
+              <FontAwesomeIcon icon={faSignOutAlt} />
+              <span>Logout</span>
+            </button>
+          </div>
+        )}
+      </div>
 
-      {/* Mobile Menu */}
       <div className="sm:hidden flex items-center">
         <img 
           src={toggle ? close : menu} 
@@ -97,9 +180,9 @@ const Navbar = () => {
         />
 
         <div 
-          className={`${toggle ? 'flex' : 'hidden'} p-6 bg-white absolute top-20 right-0 mx-4 my-2 min-w-[200px] rounded-xl shadow-lg z-50 `}
+          className={`${toggle ? 'flex' : 'hidden'} p-6 bg-white absolute top-20 right-0 mx-4 my-2 min-w-[200px] rounded-xl shadow-lg z-50 flex-col`}
         >
-          <ul className="list-none flex justify-end items-start flex-1 flex-col">
+          <ul className="list-none flex justify-start items-start flex-1 flex-col mb-4">
             {navLinks.map((link) => (
               <li key={link.id} className="relative group font-medium cursor-pointer text-[16px] mb-4">
                 <div
@@ -132,6 +215,17 @@ const Navbar = () => {
               </li>
             ))}
           </ul>
+
+          <button 
+            onClick={isAuthenticated ? handleLogout : handleLogin} 
+            className="mt-auto text-gray-700 hover:text-red-500 flex items-center"
+          >
+            <FontAwesomeIcon 
+              icon={isAuthenticated ? faSignOutAlt : faSignInAlt} 
+              className="mr-2" 
+            />
+            {isAuthenticated ? 'Logout' : 'Login'}
+          </button>
         </div>
       </div>
     </nav>

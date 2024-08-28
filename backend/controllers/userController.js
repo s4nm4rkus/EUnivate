@@ -4,6 +4,7 @@ import { generateToken } from '../utils/jwtUtils.js';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 
+
 export const getUsers = async (req, res) => {
   try {
     const users = await User.find({});
@@ -13,6 +14,7 @@ export const getUsers = async (req, res) => {
   }
 };
 
+//Create new users
 export const createUser = async (req, res) => {
   const { firstName, lastName, email, password, role } = req.body;
 
@@ -42,6 +44,7 @@ export const createUser = async (req, res) => {
 };
 
 
+
   // Login user
   export const loginUser = async (req, res) => {
 
@@ -65,6 +68,8 @@ export const createUser = async (req, res) => {
       res.status(200).json({
         message: 'Login successful!',
         email: user.email,
+        firstName: user.firstName, // Include firstName
+        lastName: user.lastName,   // Include lastName
         token: token,
         role: user.role // Ensure this is correctly included
       });

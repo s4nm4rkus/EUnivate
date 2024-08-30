@@ -1,8 +1,26 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faBell, faUserCircle, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { useNavigate } from 'react-router-dom';
 
 const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
+  const [user, setUser] = useState({ firstName: '', lastName: '', profilePicture: '' });
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (storedUser) {
+      setUser(storedUser);
+    }
+  }, []);
+
+  const handleLogout = () => {  
+    // Clear user data from localStorage
+    localStorage.removeItem('user');
+    localStorage.removeItem('token'); // Remove the token if stored separately
+    // Redirect to login page
+    navigate('/');
+  };
   return (
     <>
       {/* Search Bar, Notification, and User Profile */}
@@ -32,11 +50,21 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
 
         {/* User Profile */}
         <div className="relative flex items-center cursor-pointer" onClick={toggleAccountDropdown}>
-          <FontAwesomeIcon 
-            icon={faUserCircle} 
-            className="text-3xl text-blue-500"
-          />
-          <span className="ml-2 font-medium text-gray-800">Jackson Pierce</span>
+          {user.profilePicture ? (
+            <img
+              src={user.profilePicture}
+              alt="User Profile"
+              className="w-8 h-8 rounded-full"
+            />
+          ) : (
+            <FontAwesomeIcon 
+              icon={faUserCircle} 
+              className="text-3xl text-gray-500"
+            />
+          )}
+          <span className="ml-2 font-medium text-gray-800">
+            {user.firstName} {user.lastName}
+          </span>
           <FontAwesomeIcon 
             icon={faChevronDown} 
             className="ml-1 text-gray-600"
@@ -47,12 +75,12 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
             className={`absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg ${
               isAccountDropdownOpen ? 'block' : 'hidden'
             }`}
-            style={{ top: '100%' }}  // Adjust this style to position dropdown below
+            style={{ top: '100%' }} 
           >
             <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">
               Profile
             </a>
-            <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+            <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100" onClick={handleLogout}>
               Logout
             </a>
           </div>

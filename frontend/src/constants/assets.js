@@ -125,6 +125,11 @@ import dashboard_logo from '../assets/dashboard_logo.png';
 import dashboard_sidenav_icon from '../assets/dashboard_sidenav_icon.svg';
 import dashboard_sidenav_icon_hover from '../assets/dashboard_sidenav_icon_hover.svg';
 
+// Admin Dashboard
+import i1 from '../assets/i1.jpg';  // Import your images
+import i2 from '../assets/i2.jpg';
+import i3 from '../assets/i3.jpg';
+import i4 from '../assets/i4.jpg';
 
 
 export {
@@ -175,7 +180,11 @@ export {
     dashboard_sidenav_icon,
     dashboard_sidenav_icon_hover,
     
-  
+    //Admin Dashboard
+    i1,
+    i2,
+    i3,
+    i4,
 
 
     // LogoSlides Assets - Line 1

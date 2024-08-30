@@ -60,17 +60,3 @@
 }
 
 
-/* Dashboard.css */
-.activity-title {
-    margin-right: 325px; 
-}
-
-.projects-div {
- margin-left: 585px;
- max-height: fit-content;
-}
-
-.today-task-div {
-    height: auto; /* Increase the height as needed */
-    overflow-y: auto; /* Ensure content can scroll if it's too tall */
-}

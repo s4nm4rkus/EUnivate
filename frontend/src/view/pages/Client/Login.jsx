@@ -51,7 +51,7 @@ const Login = () => {
 
         const role = data.role.toLowerCase();
         if (role === 'superadmin') {
-          navigate('/superadmin');
+          navigate('/superadmin/dashboard');
         } else if (role === 'admin') {
           navigate('/admin');
         } else if (role === 'collaborator') {

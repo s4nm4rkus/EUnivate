@@ -10,7 +10,7 @@ const AuthProjectmanagement = ({ children }) => {
     }
 
     // If not authenticated, redirect to the Super Admin login or dashboard page
-    return <Navigate to="/superadmin" />;
+    return <Navigate to="/superadmin/dashboard" />;
 }
 
 export default AuthProjectmanagement;

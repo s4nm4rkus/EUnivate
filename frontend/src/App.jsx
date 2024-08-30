@@ -34,6 +34,7 @@ import User from './view/pages/Client/User.jsx';
 
 // Admins
 import AdminLayout from './view/components/Admin/AdminLayout';
+
 import Dashboard from './view/pages/Admin/Dashboard';
 import Project from './view/pages/Admin/Project';
 import Task from './view/pages/Admin/Task';
@@ -74,7 +75,7 @@ const App = () => {
 
         {/* Admin Routes */}
         <Route
-          path="/superadmin/*"
+          path="/superadmin"
           element={
             <SuperAdminRoute>
               <AdminLayout />
@@ -86,6 +87,7 @@ const App = () => {
           <Route path="task" element={<Task />} />
           <Route path="people" element={<People />} />
           <Route path="messages" element={<Messages />} />
+      
         </Route>
 
         {/* Client */}

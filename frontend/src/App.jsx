@@ -39,6 +39,10 @@ import Project from './view/pages/Admin/Project';
 import Task from './view/pages/Admin/Task';
 import People from './view/pages/Admin/People';
 import Messages from './view/pages/Admin/Messages';
+import Activity from './view/pages/Admin/Activity';
+import Settings from './view/pages/Admin/Settings';
+
+
 
 /* Global CSS */
 import './index.css';
@@ -86,6 +90,8 @@ const App = () => {
           <Route path="task" element={<Task />} />
           <Route path="people" element={<People />} />
           <Route path="messages" element={<Messages />} />
+          <Route path="activity" element={<Activity />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
 
         {/* Client */}

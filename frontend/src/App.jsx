@@ -75,7 +75,7 @@ const App = () => {
 
         {/* Admin Routes */}
         <Route
-          path="/superadmin/dashboard"
+          path="/superadmin"
           element={
             <SuperAdminRoute>
               <AdminLayout />

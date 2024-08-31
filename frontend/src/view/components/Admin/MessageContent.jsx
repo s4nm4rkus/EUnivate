@@ -34,25 +34,27 @@ const MessageContent = () => {
   };
 
   return (
-    <div className="message-content flex-1 bg-gray-100 p-6">
+    <div className="message-content pl-6 flex-1 bg-white">
       {/* Header */}
       <div className="header mb-4">
         <h2 className="text-xl font-semibold">Superboard</h2>
-        <p className="text-sm text-gray-600">Superboard general chat</p>
+        <p className="text-sm text-gray-600 mt-2">Superboard general chat</p>
       </div>
+
+      <hr className="border border-gray-200 mt-4" />
 
       {/* Messages */}
       <div className="messages flex flex-col space-y-4">
         <div className="message flex">
-          <div className="avatar mr-4">
-            <img src="https://via.placeholder.com/40" alt="Mark Wazauiski" className="rounded-full" />
+          <div className="avatar">
+            <img src="https://via.placeholder.com/40" alt="Mark Wazauiski" className="rounded-full mt-5" />
           </div>
-          <div className="message-content bg-white p-4 rounded-lg shadow-sm flex-1">
+          <div className="bg-white p-4 rounded-lg shadow-sm flex-1">
             <div className="message-header flex justify-between items-center mb-2">
               <p className="text-sm font-semibold">Dan Carlo Pogi</p>
               <p className="text-xs text-gray-400">12:50 PM</p>
             </div>
-            <p className="text-sm">Kati ng bulbol ko mga pri. Sarap mag pa brazillian wax.</p>
+            <p className="text-sm">This project is under development.</p>
             <div className="message-actions flex space-x-2 mt-2">
               <FontAwesomeIcon icon={faReply} className="text-gray-400 cursor-pointer" />
               <FontAwesomeIcon icon={faStar} className="text-gray-400 cursor-pointer" />
@@ -65,7 +67,7 @@ const MessageContent = () => {
       </div>
 
       {/* Message Input */}
-      <div className="message-input mt-4">
+      <div className="message-input">
         <div className="relative">
           {/* ReactQuill with placeholder */}
           <ReactQuill

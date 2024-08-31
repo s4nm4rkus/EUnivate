@@ -5,10 +5,10 @@ import '../../../admin.css';
 
 const SidebarMessage = () => {
   return (
-    <div className="bg-white h-full w-80 flex flex-col border-r border-gray-300">
+    <div className="bg-white h-full w-80 flex flex-col border-r border-gray-300 sidebar-message-content">
       {/* About Section */}
       <div className="p-4">
-        <h2 className="text-xl font-semibold mb-4">About</h2>
+        <h2 className="text-xl font-semibold mb-4 ml-2">About</h2>
         <div className="bg-gray-100 p-4 rounded-lg">
           <div className="mb-4">
             <p className="text-sm font-medium text-gray-600 mb-3">Topic</p>
@@ -25,7 +25,7 @@ const SidebarMessage = () => {
       </div>
 
       {/* Members Section */}
-      <div className="p-4 flex-1 overflow-y-auto">
+      <div className="p-4 flex-1 ml-2 overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Member <span className='bg-orange-500 text-white rounded-lg pl-2 pr-2'>1,042</span></h2>
         

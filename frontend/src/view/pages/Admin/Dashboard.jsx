@@ -12,9 +12,6 @@ const Dashboard = () => {
     const toggleProjectDropdown = () => setIsProjectDropdownOpen(!isProjectDropdownOpen);
     const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
 
-    // Icon paths
-    const icons = [i1, i2, i3, i4];  // Ensure icons match the order
-
     return (
         <div className="bg-gray-100 min-h-screen p-6">
             {/* Header */}
@@ -32,7 +29,7 @@ const Dashboard = () => {
                             <span className="mr-16 mb-1 text-sm font-medium">Projects</span>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="w-5 h-5"
+                                className={`w-5 h-5 transform transition-transform duration-300 ${isProjectDropdownOpen ? 'rotate-180' : 'rotate-0'}`}
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="currentColor"
@@ -85,7 +82,7 @@ const Dashboard = () => {
                             <span className="mr-2">Account</span>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="w-5 h-5"
+                                className={`w-5 h-5 transform transition-transform duration-300 ${isAccountDropdownOpen ? 'rotate-180' : 'rotate-0'}`}
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="currentColor"
@@ -142,26 +139,26 @@ const Dashboard = () => {
 
             {/* Today Task and Activity Divs */}
             <div className="flex space-x-4 mb-6">
-    {/* Today Task Div */}
-    <div className="w-3/5 bg-white p-4 border border-gray-300 rounded-lg shadow-sm today-task-div">
-        {/* Content for Today Task */}
-        <p>Content for Today Task goes here...</p>
-    </div>
-    {/* Activity Div */}
-    <div className="w-2/5 h-72 bg-white p-4 border border-gray-300 rounded-lg shadow-sm">
-        {/* Content for Activity */}
-        <p>Content for Activity goes here...</p>
-    </div>
-</div>
+                {/* Today Task Div */}
+                <div className="w-3/5 bg-white p-4 border border-gray-300 rounded-lg shadow-sm today-task-div">
+                    {/* Content for Today Task */}
+                    <p>Content for Today Task goes here...</p>
+                </div>
+                {/* Activity Div */}
+                <div className="w-2/5 h-72 bg-white p-4 border border-gray-300 rounded-lg shadow-sm">
+                    {/* Content for Activity */}
+                    <p>Content for Activity goes here...</p>
+                </div>
+            </div>
 
             {/* Ongoing Projects Title and Div */}
             <div className="w-2/5 flex flex-col projects-div">
-    <h2 className="text-medium font-semibold text-gray-800 mb-2">Ongoing Project</h2>
-    <div className="w-full bg-white p-4 border border-gray-300 rounded-lg shadow-sm h-72 ongoing-projects">
-        {/* Content for Ongoing Projects */}
-        <p>Content for Ongoing Projects goes here...</p>
-    </div>
-</div>
+                <h2 className="text-medium font-semibold text-gray-800 mb-2">Ongoing Project</h2>
+                <div className="w-full bg-white p-4 border border-gray-300 rounded-lg shadow-sm h-72 ongoing-projects">
+                    {/* Content for Ongoing Projects */}
+                    <p>Content for Ongoing Projects goes here...</p>
+                </div>
+            </div>
         </div>
     );
 }

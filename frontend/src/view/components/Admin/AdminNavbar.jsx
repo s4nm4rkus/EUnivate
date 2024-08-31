@@ -37,16 +37,16 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
             className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
           />
         </div>
-
-        {/* Notification Icon */}
+{/* 
+     Notification Icon 
         <div className="relative">
           <FontAwesomeIcon 
             icon={faBell} 
             className="text-gray-600 text-xl cursor-pointer"
           />
-          {/* Notification dot */}
+          {/* Notification dot 
           <span className="absolute top-0 right-0 inline-block w-2 h-2 transform translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full"></span>
-        </div>
+        </div> */}
 
         {/* User Profile */}
         <div className="relative flex items-center cursor-pointer" onClick={toggleAccountDropdown}>

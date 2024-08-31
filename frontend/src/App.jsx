@@ -21,7 +21,7 @@ import Forgotpassword from './view/pages/Client/Forgotpassword.jsx';
 import ResetPassword from './view/pages/Client/Resetpassword.jsx';
 import CTA from "./view/components/Client/LastSection/CTA.jsx";
 import MainPage from './view/pages/Client/MainPage.jsx';
-import Servicespage from './view/pages/Client/Servicespage.jsx';
+// import Servicespage from './view/pages/Client/Servicespage.jsx';
 //Hooks
 import Auth from './view/hooks/Auth.jsx';
 import SuperAdminRoute from './view/hooks/SuperadminAuth.jsx';
@@ -57,7 +57,7 @@ const App = () => {
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/services" element={<Servicespage />} />
+        {/* <Route path="/services" element={<Servicespage />} /> */}
         <Route path="/cta" element={<CTA />} />
         <Route path="/about" element={<About />} />
         <Route path="/advantage" element={<Advantage />} />

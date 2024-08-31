@@ -1,7 +1,7 @@
 import React from 'react';
 import { Step4 } from '../../../../constants/assets'; // Assuming you have this in your assets
 
-const QuotationStep4 = ({  submitForm, prevStep }) => {
+const QuotationStep4 = ({ submitForm, prevStep }) => {
     return (
         <>
             {/* Header */}
@@ -14,16 +14,14 @@ const QuotationStep4 = ({  submitForm, prevStep }) => {
             <div className="w-full max-w-lg mx-auto mt-8">
                 <div className="flex items-center justify-center space-x-2 mb-8">
                     <div className="flex items-center space-x-2">
-                    <div className="h-1 w-16 bg-gray-300"></div>
-                    <div className="h-1 w-16 bg-gray-300"></div>
-                    <div className="h-1 w-16 bg-gray-300"></div>
+                        <div className="h-1 w-16 bg-gray-300"></div>
+                        <div className="h-1 w-16 bg-gray-300"></div>
+                        <div className="h-1 w-16 bg-gray-300"></div>
                         <div className="h-1 w-16 bg-red-600"></div>
                         <div className="w-8 h-8 flex items-center justify-center bg-red-600 text-white rounded-full">
                             4
                         </div>
-                   
                     </div>
-                
                 </div>
                 
                 <hr className="my-4 border-t-2 border-gray-200" />
@@ -47,7 +45,7 @@ const QuotationStep4 = ({  submitForm, prevStep }) => {
                         Previous step
                     </button>
                     <button
-                        onClick={submitForm}
+                        onClick={submitForm} // Call the submitForm function when clicked
                         className="px-12 py-3 bg-yellow-500 text-white rounded-lg flex shadow hover:bg-yellow-600 transition duration-300"
                     >
                         Submit

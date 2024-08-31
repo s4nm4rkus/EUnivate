@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import AdminNavbar from "../../components/Admin/adminNavbar";
+import AdminNavbar from "../../components/Admin/AdminNavbar";
 import MessageContent from '../../components/Admin/MessageContent';
 import SidebarMessage from '../../components/Admin/SidebarMessage';
 

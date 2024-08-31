@@ -153,49 +153,50 @@ const Contact = () => {
                 </div>
 
                 <div className="flex flex-col text-left md:col-span-2">
-                  <label className="block text-gray-700 text-sm font-bold mb-2 mt-7">
-                    Select Subject
-                  </label>
-                  <div className="flex flex-row space-x-4 mb-4"> 
-                    <div className="flex items-center">
-                      <input
-                        type="radio"
-                        id="demo_request"
-                        name="subject"
-                        value="demo_request"
-                        className="hidden"
-                        checked={selectedSubject === 'demo_request'}
-                        onChange={handleChange}
-                      />
-                      <div
-                        className={`w-5 h-5 rounded-full border-2 border-black flex items-center justify-center cursor-pointer ${selectedSubject === 'demo_request' ? 'bg-black' : ''}`}
-                        onClick={() => setSelectedSubject('demo_request')}
-                      >
-                        {selectedSubject === 'demo_request' && <span className="text-white">✓</span>}
-                      </div>
-                      <label htmlFor="demo_request" className="ml-2 text-gray-700">
-                        Demo Request
-                      </label>
-                    </div>
-                    <div className="flex items-center">
-                      <input
-                        type="radio"
-                        id="general_inquiry"
-                        name="subject"
-                        value="general_inquiry"
-                        className="hidden"
-                        checked={selectedSubject === 'general_inquiry'}
-                        onChange={handleChange}
-                      />
-                      <div
-                        className={`w-5 h-5 rounded-full border-2 border-black flex items-center justify-center cursor-pointer ${selectedSubject === 'general_inquiry' ? 'bg-black' : ''}`}
-                        onClick={() => setSelectedSubject('general_inquiry')}
-                      >
-                        {selectedSubject === 'genera' && <span className="text-white">✓</span>}
-                      </div>
-                      <label htmlFor="general_inquiry" className="ml-2 text-gray-700">
-                        General Inquiry
-                      </label>
+                <label className="block text-gray-700 text-sm font-bold mb-2 mt-7">
+    Select Subject
+  </label>
+  <div className="flex flex-row space-x-4 mb-4">
+    <div className="flex items-center">
+      <input
+        type="radio"
+        id="demo_request"
+        name="subject"
+        value="demo_request"
+        className="hidden"
+        checked={selectedSubject === 'demo_request'}
+        onChange={handleChange}
+      />
+      <div
+        className={`w-5 h-5 rounded-full border-2 border-black flex items-center justify-center cursor-pointer ${selectedSubject === 'demo_request' ? 'bg-black' : ''}`}
+        onClick={() => setSelectedSubject('demo_request')}
+      >
+        {selectedSubject === 'demo_request' && <span className="text-white">✓</span>}
+      </div>
+      <label htmlFor="demo_request" className="ml-2 text-gray-700">
+        Demo Request
+      </label>
+    </div>
+
+    <div className="flex items-center">
+      <input
+        type="radio"
+        id="general_inquiry"
+        name="subject"
+        value="general_inquiry"
+        className="hidden"
+        checked={selectedSubject === 'general_inquiry'}
+        onChange={handleChange}
+      />
+      <div
+        className={`w-5 h-5 rounded-full border-2 border-black flex items-center justify-center cursor-pointer ${selectedSubject === 'general_inquiry' ? 'bg-black' : ''}`}
+        onClick={() => setSelectedSubject('general_inquiry')}
+      >
+        {selectedSubject === 'general_inquiry' && <span className="text-white">✓</span>}
+      </div>
+      <label htmlFor="general_inquiry" className="ml-2 text-gray-700">
+        General Inquiry
+      </label>
                     </div>
                   </div>
 

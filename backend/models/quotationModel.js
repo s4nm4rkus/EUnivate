@@ -14,7 +14,7 @@ const QuotationSchema = new mongoose.Schema({
         required: true
     },
     company: {
-        type: String,
+        type: String, 
         required: true
     },
     service: {
@@ -22,14 +22,14 @@ const QuotationSchema = new mongoose.Schema({
         required: true
     },
     budget: {
-        type: Number,
+        type:  String,
         required: true
     },
     additionalInfo: {
         type: String,
     },
 }, {
-    timestamps: true, // Automatically adds createdAt and updatedAt fields
+    timestamps: true, 
 });
 
 

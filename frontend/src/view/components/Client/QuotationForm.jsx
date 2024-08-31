@@ -1,15 +1,10 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 
-import QuotationStep1 from './QuotationStep1.jsx';
-import QuotationStep2 from './QuotationStep2.jsx';
-import QuotationStep3 from './QuotationStep3.jsx';
-import QuotationStep4 from './QuotationStep4.jsx';
+import {QuotationStep1, QuotationStep2, QuotationStep3, QuotationStep4} from '../../components/index.js'
 
 const QuotationForm = () => {
-    const [step,
-        setStep] = useState(1);
-    const [formData,
-        setFormData] = useState({
+    const [step, setStep] = useState(1);
+    const [formData, setFormData] = useState({
         name: '',
         email: '',
         phone: '',
@@ -30,7 +25,7 @@ const QuotationForm = () => {
     };
 
     // Function to handle form submission
-    const submitForm = async() => {
+    const submitForm = async () => {
         try {
             // Send formData to the backend
             const response = await fetch('http://localhost:5000/api/users/quotation', {
@@ -65,33 +60,44 @@ const QuotationForm = () => {
         }
     };
 
-    // Render the current step
-    switch (step) {
-        case 1:
-            return (<QuotationStep1
+    // Render the current step using if-else statements
+    if (step === 1) {
+        return (
+            <QuotationStep1
                 nextStep={nextStep}
                 formData={formData}
-                setFormData={setFormData}/>);
-        case 2:
-            return (<QuotationStep2
+                setFormData={setFormData}
+            />
+        );
+    } else if (step === 2) {
+        return (
+            <QuotationStep2
                 nextStep={nextStep}
-                prevStep={prevStep}
-                formData={formData}
-                setFormData={setFormData}/>);
-        case 3:
-            return (<QuotationStep3
-                nextStep={nextStep}
-                prevStep={prevStep}
-                formData={formData}
-                setFormData={setFormData}/>);
-        case 4:
-            return (<QuotationStep4
                 prevStep={prevStep}
                 formData={formData}
                 setFormData={setFormData}
-                submitForm={submitForm}/>);
-        default:
-            return null;
+            />
+        );
+    } else if (step === 3) {
+        return (
+            <QuotationStep3
+                nextStep={nextStep}
+                prevStep={prevStep}
+                formData={formData}
+                setFormData={setFormData}
+            />
+        );
+    } else if (step === 4) {
+        return (
+            <QuotationStep4
+                prevStep={prevStep}
+                formData={formData}
+                setFormData={setFormData}
+                submitForm={submitForm}
+            />
+        );
+    } else {
+        return null;
     }
 };
 

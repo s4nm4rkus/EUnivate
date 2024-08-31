@@ -4,7 +4,6 @@ export const createQuotation = async (req, res) => {
     const { name, email, phone, company, service, budget, additionalInfo } = req.body;
 
     try {
-        // Create a new quotation document with the received data
         const quotation = new Quotation({
             name,
             email,
@@ -15,19 +14,18 @@ export const createQuotation = async (req, res) => {
             additionalInfo,
         });
 
-        // Save the document to the database
         await quotation.save();
-
-        // Send a success response with the saved quotation
+        console.log('Quotation saved successfully:', quotation); 
+        
         res.status(201).json({
-            message: 'Quotation saved successfully',
+        message: 'Quotation saved successfully',
             quotation,
         });
     } catch (error) {
-        // Handle any errors that occur during saving
+        console.error('Error saving quotation:', error);
         res.status(400).json({
             message: 'Error saving quotation',
-            error,
+            error: error.message,
         });
     }
 };

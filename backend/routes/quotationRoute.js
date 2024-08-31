@@ -1,8 +1,8 @@
-import express from 'express';
-import { createQuotation } from '../controllers/quotationController';
+// import express from 'express';
+// import { createQuotation } from '../controllers/quotationController';
 
-const router = express.Router();
+// const router = express.Router();
 
-router.post('/quotation',createQuotation);
+// router.post('/quotation',createQuotation);
 
-export default router;
+// export default router;

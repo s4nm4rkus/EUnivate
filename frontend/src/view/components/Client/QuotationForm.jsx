@@ -33,7 +33,7 @@ const QuotationForm = () => {
     const submitForm = async() => {
         try {
             // Send formData to the backend
-            const response = await fetch('/api/quotation', {
+            const response = await fetch('http://localhost:5000/api/users/quotation', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

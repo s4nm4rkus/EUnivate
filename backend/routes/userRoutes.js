@@ -2,6 +2,8 @@ import express from 'express';
 import { getUsers, createUser, loginUser, forgotPassword, resetPassword } from '../controllers/userController.js';
 import { protect, verifySuperAdmin } from '../middlewares/middleware.js';
 import { ContactEunivate } from '../controllers/contactEunivate.js';
+import { createQuotation } from '../controllers/quotationController.js';
+
 
 const router = express.Router();
 
@@ -12,6 +14,8 @@ router.post("/reset-password/:token", resetPassword);
 //User Contact Eunivate Request API route
 router.post('/contactEunivate', ContactEunivate);
 
+// quotation route
+router.post('/quotation',createQuotation);
 
 // Protect and restrict access to superadmin route
 router.get('/superadmin', protect, verifySuperAdmin, (req, res) => {

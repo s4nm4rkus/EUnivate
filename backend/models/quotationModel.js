@@ -1,15 +1,23 @@
 import mongoose from 'mongoose';
 
 const QuotationSchema = new mongoose.Schema({
-    clientName: {
+    name: {
         type: String,
         required: true
     },
-    clientEmail: {
+    email: {
         type: String,
         required: true
     },
-    projectDetails: {
+    phone: {
+        type: String,
+        required: true
+    },
+    company: {
+        type: String,
+        required: true
+    },
+    service: {
         type: String,
         required: true
     },
@@ -17,12 +25,13 @@ const QuotationSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    timeline: {
+    additionalInfo: {
         type: String,
-        required: true
     },
-    // Add other fields as necessary
+}, {
+    timestamps: true, // Automatically adds createdAt and updatedAt fields
 });
+
 
 const Quotation = mongoose.model('Quotation', QuotationSchema);
 

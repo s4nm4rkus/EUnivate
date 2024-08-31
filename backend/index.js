@@ -2,7 +2,6 @@ import express from 'express';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
-import quotationRoute from './routes/quotationRoute.js';
 import cors from 'cors';
 
 dotenv.config();
@@ -14,7 +13,6 @@ app.use(express.json());
 
 // Use user routes
 app.use('/api/users', userRoutes);
-app.use('/api/quotation', quotationRoute);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

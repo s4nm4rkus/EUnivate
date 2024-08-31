@@ -144,6 +144,12 @@ import task_red from '../assets/Redicon/task-red.png';
 
 /* ADMIN SETTINGS IMG */
 import User from '../assets/User.png';
+// Admin Dashboard
+import i1 from '../assets/i1.jpg';  // Import your images
+import i2 from '../assets/i2.jpg';
+import i3 from '../assets/i3.jpg';
+import i4 from '../assets/i4.jpg';
+
 
 export {
   /* RED ICON ADMIN */
@@ -212,7 +218,11 @@ export {
     dashboard_sidenav_icon,
     dashboard_sidenav_icon_hover,
     
-  
+    //Admin Dashboard
+    i1,
+    i2,
+    i3,
+    i4,
 
 
     // LogoSlides Assets - Line 1

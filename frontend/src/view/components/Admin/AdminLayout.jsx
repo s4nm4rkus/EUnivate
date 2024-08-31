@@ -6,7 +6,7 @@ const AdminLayout = () => {
     return (
         <div className="flex">
             <SideNav />
-            <main style={{ marginLeft: '250px', padding: '20px', width: '100%', height: '100vh' }}>
+            <main style={{ marginLeft: '250px', width: '100%', height: '100vh' }}>
                 <Outlet />
             </main>
         </div>

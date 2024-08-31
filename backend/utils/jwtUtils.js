@@ -8,18 +8,17 @@ export const generateToken = (id) => {
 // Middleware to protect routes and verify token
 export const protect = async (req, res, next) => {
   let token;
+
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     try {
       token = req.headers.authorization.split(' ')[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = decoded;  // Add more user details as needed from your database
-      next();
+      req.user = decoded;  // Assuming the token contains the user's ID
+      next(); // Proceed to the next middleware or route handler
     } catch (error) {
-      res.status(401).json({ message: 'Not authorized, token failed' });
+      res.status(401).json({ message: 'Not authorized, token failed', error: error.message });
     }
-  }
-
-  if (!token) {
+  } else {
     res.status(401).json({ message: 'Not authorized, no token' });
   }
 };

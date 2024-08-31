@@ -142,6 +142,9 @@ import project_red from '../assets/Redicon/project-red.png';
 import settings_red from '../assets/Redicon/settings-red.png';
 import task_red from '../assets/Redicon/task-red.png';
 
+/* ADMIN SETTINGS IMG */
+import User from '../assets/User.png';
+
 export {
   /* RED ICON ADMIN */
   activity_red,
@@ -160,10 +163,12 @@ export {
   settings_icon,
   task_icon,
 
+  /* ADMIN SETTINGS IMG */
+  User,
   
-   yellow_gradient,
-   red_gradient,
-   loop,
+    yellow_gradient,
+    red_gradient,
+    loop,
     cisco,
     close,
     downArrow,

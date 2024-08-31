@@ -22,8 +22,8 @@ const Navbar = () => {
 
   const navLinks = [
     {
-      id: "services", path: "/services",
-      title: "Services",
+      id: "home", path: "/",
+      title: "Home",
       hasDropdown: false,
     },
     {
@@ -43,8 +43,8 @@ const Navbar = () => {
       description: 'IT Solution',
     },
     {
-      id: "resources",
-      title: "Resources",
+      id: "servoces",
+      title: "Services",
       hasDropdown: true,
       subLinks: [
         { id: "webinars", title: "Webinars", path: "/webinar" },

@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { i1, i2, i3, i4 } from '../../../constants/assets';
+import i1 from '../../../assets/i1.jpg';  // Import your images
+import i2 from '../../../assets/i2.jpg';
+import i3 from '../../../assets/i3.jpg';
+import i4 from '../../../assets/i4.jpg';
 import '../../../admin.css';
-import AdminNavbar from '../../components/Admin/AdminNavbar';
+
 const Dashboard = () => {
     const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
@@ -9,19 +12,8 @@ const Dashboard = () => {
     const toggleProjectDropdown = () => setIsProjectDropdownOpen(!isProjectDropdownOpen);
     const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
 
-    // Icon paths
-    const icons = [i1, i2, i3, i4];  // Ensure icons match the order
-
     return (
         <div className="bg-gray-100 min-h-screen p-6">
-              {/* Dashboard Text */}
-              <div className="flex justify-between items-center mb-16">
-        <h1 className="text-2xl font-medium text-gray-800 flxex">Dashboard</h1>
-        <AdminNavbar 
-                    isAccountDropdownOpen={isAccountDropdownOpen} 
-                    toggleAccountDropdown={toggleAccountDropdown} />
-        
-      </div>
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
                 {/* Dashboard Text */}
@@ -113,6 +105,7 @@ const Dashboard = () => {
 
             {/* Main Content Area */}
             <div className="flex space-x-4 mb-6">
+                {/* Task Divs */}
                 {[
                     { title: "Assigned Task", icon: i1 },
                     { title: "Task Complete", icon: i2 },
@@ -126,9 +119,10 @@ const Dashboard = () => {
                             backgroundImage: `url(${icon})`,
                             backgroundSize: '40px 40px',
                             backgroundRepeat: 'no-repeat',
-                            backgroundPosition: '18px center'
+                            backgroundPosition: '18px center'  // Added margin-left for icons
                         }}
                     >
+                        {/* Text and Number */}
                         <div className="ml-16">
                             <div className="text-gray-800 font-semibold mb-1 text-sm">{title}</div>
                             <div className="text-3xl font-bold">{0}</div>

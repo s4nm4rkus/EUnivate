@@ -19,7 +19,7 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
     localStorage.removeItem('user');
     localStorage.removeItem('token'); // Remove the token if stored separately
     // Redirect to login page
-    navigate('/');
+    navigate('/login  ');
   };
   return (
     <>

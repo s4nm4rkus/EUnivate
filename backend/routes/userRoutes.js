@@ -2,7 +2,9 @@ import express from 'express';
 import { getUsers, createUser, loginUser, forgotPassword, resetPassword } from '../controllers/userController.js';
 import { protect, verifySuperAdmin } from '../middlewares/middleware.js';
 import { ContactEunivate } from '../controllers/contactEunivate.js';
-import { updateUserProfilePicture } from '../controllers/updateProfileController.js'; 
+import { createQuotation } from '../controllers/quotationController.js';
+
+
 const router = express.Router();
 
 router.post('/login', loginUser);
@@ -11,6 +13,10 @@ router.post('/forgot-password', forgotPassword);
 router.post("/reset-password/:token", resetPassword);
 //User Contact Eunivate Request API route
 router.post('/contactEunivate', ContactEunivate);
+
+// quotation route
+router.post('/quotation',createQuotation);
+
 // Protect and restrict access to superadmin route
 router.get('/superadmin', protect, verifySuperAdmin, (req, res) => {
   res.status(200).json({ message: 'Welcome to the SuperAdmin dashboard' });

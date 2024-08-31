@@ -8,7 +8,11 @@ import Products from './view/components/Client/SecondSection/Products.jsx';
 import Partnerships from './view/components/Client/ThirdSection/Partnerships.jsx';
 import Howitworks from './view/components/Client/ThirdSection/Howitworks.jsx';
 import LogoSlides from './view/components/Client/ThirdSection/LogoSlides.jsx';
-
+//QuotationSteps
+import QuotationStep1 from './Client/Dropdowns/QuotationStep1.jsx';
+import QuotationStep2 from './Client/Dropdowns/QuotationStep2.jsx';
+import QuotationStep3 from './Client/Dropdowns/QuotationStep3.jsx';
+import QuotationStep4 from './Client/Dropdowns/QuotationStep4.jsx';
 // Admin
 import SideNav from './view/components/Admin/Dashboard/SideNav.jsx';
 
@@ -27,4 +31,11 @@ export {
 
   // Admin
   SideNav,
+
+  //Quotations
+  QuotationStep1,
+  QuotationStep2,
+  QuotationStep3,
+  QuotationStep4
+
 };

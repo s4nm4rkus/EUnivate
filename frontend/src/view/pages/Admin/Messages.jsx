@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import AdminNavbar from "../../components/Admin/AdminNavbar";
+
 import MessageContent from '../../components/Admin/MessageContent';
 import SidebarMessage from '../../components/Admin/SidebarMessage';
-
+import AdminNavbar from '../../components/Admin/adminNavbar';
 const Messages = () => {
     const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
@@ -20,11 +20,11 @@ const Messages = () => {
                     toggleAccountDropdown={toggleAccountDropdown} 
                 />
             </div>
-            {/* Additional content for Messages page can go here */}
+   
             {/* Main Content */}
             <div className="flex">
-                <SidebarMessage />      {/* Sidebar Component */}
-                <MessageContent />      {/* Message Content Component */}
+                <SidebarMessage />    
+                <MessageContent />     
             </div>
         </div>
     );

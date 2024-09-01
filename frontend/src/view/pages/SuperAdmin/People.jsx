@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../../../admin.css';
-import AdminNavbar from '../../components/Admin/adminNavbar';
+import AdminNavbar from '../../components/SuperAdmin/adminNavbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { User } from '../../../constants/assets';  // Import the default image
@@ -8,33 +8,30 @@ import { User } from '../../../constants/assets';  // Import the default image
 const People = () => {
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
     const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
-    const [currentUser, setCurrentUser] = useState(null);
+    const [currentUser, setCurrentUser] = useState({ firstName: '', lastName: '', role: '', email: '', avatar: '' });
     const [allUsers, setAllUsers] = useState([]);
 
     const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
 
     const handleRoleChange = (newRole) => {
-        if (currentUser) {
-            const updatedUser = { ...currentUser, role: newRole };
-            setCurrentUser(updatedUser);
+        const updatedUser = { ...currentUser, role: newRole };
+        setCurrentUser(updatedUser);
 
-            // Update the current user's role in local storage
-            localStorage.setItem('user', JSON.stringify(updatedUser));
+        // Save the updated user object to local storage
+        localStorage.setItem('user', JSON.stringify(updatedUser));
 
-            // Update all users in local storage
-            const updatedAllUsers = allUsers.map(u => u.email === updatedUser.email ? updatedUser : u);
-            setAllUsers(updatedAllUsers);
-            localStorage.setItem('allUsers', JSON.stringify(updatedAllUsers));
+        // Update all users in local storage
+        const updatedAllUsers = allUsers.map(u => u.email === updatedUser.email ? updatedUser : u);
+        setAllUsers(updatedAllUsers);
+        localStorage.setItem('allUsers', JSON.stringify(updatedAllUsers));
 
-            setIsRoleDropdownOpen(false);
-        }
+        setIsRoleDropdownOpen(false);
     };
 
     useEffect(() => {
         // Retrieve the current user and all users from local storage
         const storedUser = JSON.parse(localStorage.getItem('user'));
         const storedAllUsers = JSON.parse(localStorage.getItem('allUsers')) || [];
-
         if (storedUser) {
             setCurrentUser(storedUser);
         }
@@ -43,11 +40,11 @@ const People = () => {
 
     useEffect(() => {
         // Save current user to all users list if they are not already there
-        if (currentUser && currentUser.email) {
+        if (currentUser.email) {
             const updatedAllUsers = allUsers.some(u => u.email === currentUser.email)
                 ? allUsers.map(u => u.email === currentUser.email ? currentUser : u)
                 : [...allUsers, currentUser];
-
+            
             setAllUsers(updatedAllUsers);
             localStorage.setItem('allUsers', JSON.stringify(updatedAllUsers));
         }
@@ -106,7 +103,7 @@ const People = () => {
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-xl text-gray-500 relative">
-                                    {admin.email === currentUser?.email ? (
+                                    {admin.email === currentUser.email ? (
                                         <>
                                             {admin.role}
                                             <FontAwesomeIcon 
@@ -125,7 +122,7 @@ const People = () => {
                                                         </li>
                                                         <li 
                                                             className="px-4 py-2 text-gray-700 cursor-pointer hover:bg-gray-100"
-                                                            onClick={() => handleRoleChange('Member')}
+                                                            onClick={() => handleRoleChange('Members')}
                                                         >
                                                             Member
                                                         </li>

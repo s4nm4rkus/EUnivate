@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faBell, faUserCircle, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faUserCircle, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 
 const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
@@ -14,13 +14,14 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
     }
   }, []);
 
-  const handleLogout = () => {  
+  const handleLogout = () => {
     // Clear user data from localStorage
     localStorage.removeItem('user');
     localStorage.removeItem('token'); // Remove the token if stored separately
     // Redirect to login page
-    navigate('/login  ');
+    navigate('/login');
   };
+
   return (
     <>
       {/* Search Bar, Notification, and User Profile */}
@@ -75,7 +76,7 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
             className={`absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg ${
               isAccountDropdownOpen ? 'block' : 'hidden'
             }`}
-            style={{ top: '100%' }} 
+            style={{ top: '100%', zIndex: 1000 }} // Ensure dropdown is on top
           >
             <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">
               Profile

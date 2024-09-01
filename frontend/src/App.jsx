@@ -33,13 +33,17 @@ import User from './view/pages/Client/User.jsx';
 
 
 // Admins
-import AdminLayout from './view/components/Admin/AdminLayout';
+import AdminLayout from './view/components/SuperAdmin/AdminLayout';
 
-import Dashboard from './view/pages/Admin/Dashboard';
-import Project from './view/pages/Admin/Project';
-import Task from './view/pages/Admin/Task';
-import People from './view/pages/Admin/People';
-import Messages from './view/pages/Admin/Messages';
+import Dashboard from './view/pages/SuperAdmin/Dashboard';
+import Project from './view/pages/SuperAdmin/Project';
+import Task from './view/pages/SuperAdmin/Task';
+import People from './view/pages/SuperAdmin/People';
+import Messages from './view/pages/SuperAdmin/Messages';
+import Activity from './view/pages/SuperAdmin/Activity';
+import Settings from './view/pages/SuperAdmin/Settings';
+
+
 
 /* Global CSS */
 import './index.css';
@@ -87,7 +91,8 @@ const App = () => {
           <Route path="task" element={<Task />} />
           <Route path="people" element={<People />} />
           <Route path="messages" element={<Messages />} />
-      
+          <Route path="activity" element={<Activity />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
 
         {/* Client */}

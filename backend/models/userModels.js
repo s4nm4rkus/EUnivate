@@ -1,4 +1,4 @@
-// UserSchema that fetch the profile picture of the Admin
+
 import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
@@ -10,6 +10,19 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    username: {
+        type: String,
+        required: true,
+        unique: true,
+        sparse: true, 
+        
+    },
+    
+    phoneNumber: {
+        type: String,
+        required: true,
+    },
+
     email: {
         type: String,
         required: true,
@@ -19,16 +32,18 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    profilePicture: {
+        type: Object, // Changed from String to Object
+        default: {}, // Default to an empty object
+    },
     role: {
         type: String, 
-        enum: ['User', 'Admin', 'Superadmin'], 
+        enum: ['User', 'Guest', 'Members', 'admin', 'Superadmin'], 
         default: 'User'
     },
     resetPasswordToken: String,
     resetPasswordExpire: Date,
-    profilePicture: {
-        type: String,
-        default: '',     },
+
     refreshToken: [String], 
 }, 
 {

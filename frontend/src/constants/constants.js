@@ -10,13 +10,13 @@
 
 // const navLinks = [
 //   {
-//     id: "services", path: "/",
-//     title: "Services",
+//     id: "Home", path: "/",
+//     title: "Home",
 //     hasDropdown: false,
 //   },
 //   {
-//     id: "products",
-//     title: "Products",
+//     id: "Services",
+//     title: "Services",
 //     hasDropdown: true,
 //     subLinks: [
 //       { id: "showcases", title: "Showcases", path: "/showcases" },
@@ -42,7 +42,7 @@
 //     ],
 //     imageUrl: webinar,
 //     description: 'WEBINAR',
-//   },
+//   },s
 //   {
 //     id: "aboutus", path: "/about",
 //     title: "About Us",

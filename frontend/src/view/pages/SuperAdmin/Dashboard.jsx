@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { i1, i2, i3, i4 } from '../../../constants/assets';
 import '../../../admin.css';
-import AdminNavbar from '../../components/Admin/adminNavbar';
+import AdminNavbar from '../../components/SuperAdmin/adminNavbar';
 
 const Dashboard = () => {
     const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
@@ -52,6 +52,7 @@ const Dashboard = () => {
 
             {/* Main Content Area */}
             <div className="flex space-x-4 mb-6">
+                {/* Task Divs */}
                 {[
                     { title: "Assigned Task", icon: i1 },
                     { title: "Task Complete", icon: i2 },
@@ -65,9 +66,10 @@ const Dashboard = () => {
                             backgroundImage: `url(${icon})`,
                             backgroundSize: '40px 40px',
                             backgroundRepeat: 'no-repeat',
-                            backgroundPosition: '18px center'
+                            backgroundPosition: '18px center'  // Added margin-left for icons
                         }}
                     >
+                        {/* Text and Number */}
                         <div className="ml-16">
                             <div className="text-gray-800 font-semibold mb-1 text-sm">{title}</div>
                             <div className="text-3xl font-bold">0</div>
@@ -84,10 +86,12 @@ const Dashboard = () => {
 
             {/* Today Task and Activity Divs */}
             <div className="flex space-x-4 mb-6">
-                <div className="w-3/5 bg-white p-4 border border-gray-300 rounded-lg shadow-sm">
+                <div className="w-3/5 bg-white p-4 border border-gray-300 rounded-lg shadow-sm today-task-div">
                     <p>Content for Today Task goes here...</p>
                 </div>
+                {/* Activity Div */}
                 <div className="w-2/5 h-72 bg-white p-4 border border-gray-300 rounded-lg shadow-sm">
+                    {/* Content for Activity */}
                     <p>Content for Activity goes here...</p>
                 </div>
             </div>
@@ -95,7 +99,7 @@ const Dashboard = () => {
             {/* Ongoing Projects */}
             <div className="w-2/5 flex flex-col">
                 <h2 className="text-medium font-semibold text-gray-800 mb-2">Ongoing Project</h2>
-                <div className="w-full bg-white p-4 border border-gray-300 rounded-lg shadow-sm h-72">
+                <div className="w-full bg-white p-4 border border-gray-300 rounded-lg shadow-sm h-72 ongoing-projects">
                     <p>Content for Ongoing Projects goes here...</p>
                 </div>
             </div>

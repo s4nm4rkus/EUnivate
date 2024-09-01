@@ -3,82 +3,87 @@ import bcrypt from 'bcrypt';
 import { generateToken } from '../utils/jwtUtils.js';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
-
-
+// Get all users
 export const getUsers = async (req, res) => {
   try {
     const users = await User.find({});
     res.status(200).json(users);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching users', error });
+    console.error("Error fetching users:", error);
+    res.status(500).json({ message: 'Error fetching users', error: error.message });
   }
 };
 
-//Create new users
-export const createUser = async (req, res) => {
-  const { firstName, lastName, email, password, role } = req.body;
+      // Create a new user
 
-  try {
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      return res.status(400).json({ message: 'Email already exists' });
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const user = new User({
-      firstName,
-      lastName,
-      email,
-      password: hashedPassword,
-      role: role || 'User', // Default role is 'User' if not provided
-    });
-
-    const createdUser = await user.save();
-    res.status(201).json(createdUser);
-  } catch (error) {
-    console.error("Error details:", error);
-    res.status(500).json({ message: 'Error creating user', error: error.message });
-  }
-};
-
-
-
-  // Login user
-  export const loginUser = async (req, res) => {
-
-  
-    const { email, password } = req.body;
-
-    try {
-      const user = await User.findOne({ email});
-  
-      if (!user) {
-        return res.status(404).json({ message: 'Email not found' });
-      }
-  
-      const passwordCheck = await bcrypt.compare(password, user.password);
-  
-      if (!passwordCheck) {
-        return res.status(400).json({ message: 'Passwords do not match' });
-      }
-  
-      const token = generateToken(user._id);
-      res.status(200).json({
-        message: 'Login successful!',
-        email: user.email,
-        firstName: user.firstName, // Include firstName
-        lastName: user.lastName,   // Include lastName
-        token: token,
-        role: user.role // Ensure this is correctly included
-      });
+      export const createUser = async (req, res) => {
+        const { firstName, lastName, email, username, phoneNumber, password, profilePicture, role  } = req.body;
       
-    } catch (error) {
-      console.error('Error logging in:', error);
-      res.status(500).json({ message: 'Error logging in', error: error.message });
-    }
-  };
+        try {
+          const userExists = await User.findOne({ email });
+          if (userExists) {
+            return res.status(400).json({ message: 'Email already exists' });
+          }
+      
+          const salt = await bcrypt.genSalt(10);
+          const hashedPassword = await bcrypt.hash(password, salt);
+      
+          const user = new User({
+             firstName,
+                  lastName,
+                  username,
+                  phoneNumber,
+                  email,
+                  profilePicture,
+                  password: hashedPassword,
+                  role: role || 'User', // Default role is 'User' if not provided
+                });
+      
+          const createdUser = await user.save();
+          res.status(201).json(createdUser);
+        } catch (error) {
+          console.error("Error details:", error);
+          res.status(500).json({ message: 'Error creating user', error: error.message });
+        }
+      };
+      
+      // Login user
+      export const loginUser = async (req, res) => {
+        const { email, password } = req.body;
+
+        try {
+          const user = await User.findOne({ email });
+
+          if (!user) {
+            return res.status(404).json({ message: 'Email not found' });
+          }
+
+          const passwordCheck = await bcrypt.compare(password, user.password);
+
+          if (!passwordCheck) {
+            return res.status(400).json({ message: 'Passwords do not match' });
+          }
+
+          const token = generateToken(user._id);
+          res.status(200).json({
+            message: 'Login successful!',
+            user: {
+              email: user.email,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              username: user.username,
+              phoneNumber: user.phoneNumber,
+              profilePicture: user.profilePicture,
+              role: user.role,
+            },
+            token: token,
+          });
+          
+        } catch (error) {
+          console.error('Error logging in:', error);
+          res.status(500).json({ message: 'Error logging in', error: error.message });
+        }
+      };
 
   //Forgot-Password Function
 

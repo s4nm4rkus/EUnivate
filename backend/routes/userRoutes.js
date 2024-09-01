@@ -2,9 +2,7 @@
   import { getUsers, createUser, loginUser, forgotPassword, resetPassword } from '../controllers/userController.js';
   import { protect, verifySuperAdmin } from '../middlewares/middleware.js';
   import { ContactEunivate } from '../controllers/contactEunivate.js';
-  import { createQuotation } from '../controllers/quotationController.js';
-
-
+  import { createQuotation } from '../controllers/quotationController.js'
   const router = express.Router();
 
   router.post('/login', loginUser);
@@ -16,6 +14,12 @@
 
   // quotation route
   router.post('/quotation',createQuotation);
+
+  //SuperAdmin Setting Profile
+  // router.get('/profile', protect, getUserProfile);
+  // router.put('/profile', protect, updateUserProfile);
+  // router.put('/change-password', protect, changePassword);
+  // router.post('/enable-2fa', protect, enableTwoFactorAuth);
 
   // Protect and restrict access to superadmin route
   router.get('/superadmin', protect, verifySuperAdmin, (req, res) => {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import '../../../admin.css';
-import AdminNavbar from '../../components/Admin/adminNavbar';
+import AdminNavbar from '../../components/SuperAdmin/adminNavbar';
 
 const Activity = () => {
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);

@@ -31,35 +31,41 @@ const Login = () => {
         },
         body: JSON.stringify({ email, password }),
       });
-
+  
       const data = await res.json();
       console.log(data);
+  
       if (res.ok) {
+        const { firstName, lastName, email, role, username, phoneNumber, profilePicture } = data.user;
+  
         localStorage.setItem('user', JSON.stringify({
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
+          firstName,
+          lastName,
+          username,
+          email,
+          phoneNumber,
+          profilePicture,
           token: data.token,
-          role: data.role,
+          role,
         }));
-
+  
         if (rememberMe) {
           const newCreds = { email, password };
           const updatedCreds = [...savedCredentials.filter((cred) => cred.email !== email), newCreds];
           localStorage.setItem('savedCredentials', JSON.stringify(updatedCreds));
         }
-
-        const role = data.role.toLowerCase();
-        if (role === 'superadmin') {
+  
+        const roleLowerCase = role.toLowerCase(); 
+        if (roleLowerCase === 'superadmin') {
           navigate('/superadmin/dashboard');
-        } else if (role === 'admin') {
+        } else if (roleLowerCase === 'admin') {
           navigate('/admin');
-        } else if (role === 'collaborator') {
+        } else if (roleLowerCase === 'collaborator') {
           navigate('/collaborator-dashboard');
-        } else if (role === 'user') {
+        } else if (roleLowerCase === 'user') {
           navigate('/');
         } else {
-          console.error('Unknown role:', data.role);
+          console.error('Unknown role:', role);
         }
       } else {
         console.error('Login failed:', data.message);
@@ -70,6 +76,7 @@ const Login = () => {
       setError('An error occurred while trying to log in. Please try again later.');
     }
   };
+  
 
   const handleEmailFocus = () => {
     setShowSuggestions(true);

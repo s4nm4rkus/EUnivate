@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
-import MessageContent from '../../components/Admin/MessageContent';
-import SidebarMessage from '../../components/Admin/SidebarMessage';
-import AdminNavbar from '../../components/Admin/adminNavbar';
+import MessageContent from '../../components/SuperAdmin/MessageContent';
+import SidebarMessage from '../../components/SuperAdmin/SidebarMessage';
+import AdminNavbar from '../../components/SuperAdmin/adminNavbar';
 const Messages = () => {
     const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);

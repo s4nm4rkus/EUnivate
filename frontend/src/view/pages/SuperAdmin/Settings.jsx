@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import Profile from './Profile';
-import Notifications from './Notification';
-import Account from './Account';
-import Privacy from './Privacy';
-import Apps from './Apps';
-import AdminNavbar from '../../components/Admin/adminNavbar'; // Import AdminNavbar
+import SettingProfile from "../../components/SuperAdmin/SettingProfile";
+// import Notifications from './Notification';
+// import Account from './Account';
+// import Privacy from './Privacy';
+// import Apps from './Apps';
+import AdminNavbar from '../../components/SuperAdmin/adminNavbar'; // Import AdminNavbar
 
 const Settings = () => {
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
@@ -23,7 +23,7 @@ const Settings = () => {
             </div>
 
             {/* Box with shadow */}
-            <div className="w-full max-w-6xl bg-white shadow-lg rounded-lg overflow-hidden flex mt-4">
+            <div className="w-full max-w-6xl bg-white shadow-lg rounded-lg overflow-hidden flex mt-6">
                 <div className="flex flex-1">
                     {/* Sidebar */}
                     <div className="w-52 p-4 flex flex-col space-y-2">
@@ -47,19 +47,7 @@ const Settings = () => {
                     {/* Main content */}
                     <div className="flex-1 p-4 overflow-y-auto" style={{ scrollBehavior: 'smooth' }}>
                         <section id="profile" className="mb-6">
-                            <Profile />
-                        </section>
-                        <section id="notification" className="mb-6">
-                            <Notifications />
-                        </section>
-                        <section id="account" className="mb-6">
-                            <Account />
-                        </section>
-                        <section id="privacy-policy" className="mb-6">
-                            <Privacy />
-                        </section>
-                        <section id="apps">
-                            <Apps />
+                            <SettingProfile />
                         </section>
                     </div>
                 </div>

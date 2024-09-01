@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faSignOutAlt, faSignInAlt } from '@fortawesome/free-solid-svg-icons'; 
+import { faUser, faSignOutAlt, faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 import { downArrow, menu, close, webinar } from '../../../../constants/assets';
 
 const Navbar = () => {
@@ -9,6 +9,7 @@ const Navbar = () => {
   const [toggle, setToggle] = useState(false);
   const [userName, setUserName] = useState('Sign In');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [profilePicture, setProfilePicture] = useState(null); // State for profile picture
   const [showLogoutBox, setShowLogoutBox] = useState(false);
   const navigate = useNavigate();
 
@@ -16,6 +17,7 @@ const Navbar = () => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
       setUserName(`${user.firstName} ${user.lastName}`);
+      setProfilePicture(user.profilePicture); // Set the profile picture if available
       setIsAuthenticated(true);
     }
   }, []);
@@ -43,7 +45,7 @@ const Navbar = () => {
       description: 'IT Solution',
     },
     {
-      id: "servoces",
+      id: "services",
       title: "Services",
       hasDropdown: true,
       subLinks: [
@@ -78,6 +80,7 @@ const Navbar = () => {
     localStorage.removeItem('user');
     setIsAuthenticated(false);
     setUserName('Sign In'); // Reset userName
+    setProfilePicture(null); // Reset profile picture
     navigate('/');
     window.location.reload();
   };
@@ -155,7 +158,15 @@ const Navbar = () => {
           onClick={handleUserNameClick} 
           className="flex items-center space-x-2 text-gray-700 hover:text-red-500 focus:outline-none"
         >
-          <FontAwesomeIcon icon={faUser} />
+          {profilePicture ? (
+            <img 
+              src={profilePicture.url} // Assuming `profilePicture` contains a `url` field
+              alt="Profile"
+              className="w-8 h-8 rounded-full object-cover"
+            />
+          ) : (
+            <FontAwesomeIcon icon={faUser} />
+          )}
           <span>{userName}</span>
         </button>
         {showLogoutBox && isAuthenticated && (

@@ -1,8 +1,11 @@
   import User from '../models/userModels.js';
+
 import bcrypt from 'bcrypt';
 import { generateToken } from '../utils/jwtUtils.js';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
+
+
 // Get all users
 export const getUsers = async (req, res) => {
   try {
@@ -17,35 +20,49 @@ export const getUsers = async (req, res) => {
       // Create a new user
 
       export const createUser = async (req, res) => {
-        const { firstName, lastName, email, username, phoneNumber, password, profilePicture, role  } = req.body;
-      
+        const { firstName, lastName, username, email, phoneNumber, password, role } = req.body;
+        console.log('Received Password:', password); // Add this line to debug
         try {
-          const userExists = await User.findOne({ email });
-          if (userExists) {
-            return res.status(400).json({ message: 'Email already exists' });
-          }
-      
-          const salt = await bcrypt.genSalt(10);
-          const hashedPassword = await bcrypt.hash(password, salt);
-      
-          const user = new User({
-             firstName,
-                  lastName,
-                  username,
-                  phoneNumber,
-                  email,
-                  profilePicture,
-                  password: hashedPassword,
-                  role: role || 'User', // Default role is 'User' if not provided
-                });
-      
-          const createdUser = await user.save();
-          res.status(201).json(createdUser);
-        } catch (error) {
-          console.error("Error details:", error);
-          res.status(500).json({ message: 'Error creating user', error: error.message });
+            const userExists = await User.findOne({ email });
+            if (userExists) {
+                return res.status(400).json({ message: 'Email already exists' });
+            }
+    
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
+    
+            let profilePictureData = { url: '', publicId: '' };
+        if (req.file && req.file.path) {
+            profilePictureData = {
+                url: req.file.path,
+                publicId: req.file.filename,
+            };
+        } else {
+            // Set a default image URL if no file is uploaded
+            profilePictureData = {
+                url: 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png', // Replace this with your actual default image URL
+                publicId: 'default', // or any identifier you wish
+            };
         }
-      };
+    
+            const user = new User({
+                firstName,
+                lastName,
+                username,
+                phoneNumber,
+                email,
+                password: hashedPassword,
+                profilePicture: profilePictureData,
+                role: role || 'User',
+            });
+    
+            const createdUser = await user.save();
+            res.status(201).json(createdUser);
+        } catch (error) {
+            console.error("Error creating user:", error);
+            res.status(500).json({ message: 'Error creating user', error: error.message });
+        }
+    };
       
       // Login user
       export const loginUser = async (req, res) => {

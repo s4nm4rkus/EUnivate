@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faUserCircle, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 
 const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
@@ -10,7 +10,7 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     if (storedUser) {
-      setUser(storedUser);
+      setUser(storedUser); // Set the user state with the stored user data
     }
   }, []);
 
@@ -39,29 +39,18 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
           />
         </div>
 
-        {/* Notification Icon 
-        <div className="relative">
-          <FontAwesomeIcon 
-            icon={faBell} 
-            className="text-gray-600 text-xl cursor-pointer"
-          />
-     Notification dot 
-          <span className="absolute top-0 right-0 inline-block w-2 h-2 transform translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full"></span>
-        </div> */}
-
         {/* User Profile */}
         <div className="relative flex items-center cursor-pointer" onClick={toggleAccountDropdown}>
-          {user.profilePicture ? (
-            <img
-              src={user.profilePicture}
-              alt="User Profile"
-              className="w-8 h-8 rounded-full"
+          {user.profilePicture.url ? (
+            <img 
+              src={user.profilePicture.url} // Assuming `profilePicture` is a URL
+              alt="Profile"
+              className="w-8 h-8 rounded-full object-cover"
             />
           ) : (
-            <FontAwesomeIcon 
-              icon={faUserCircle} 
-              className="text-3xl text-gray-500"
-            />
+            <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+              <span className="text-white text-sm">{user.firstName.charAt(0)}{user.lastName.charAt(0)}</span>
+            </div>
           )}
           <span className="ml-2 font-medium text-gray-800">
             {user.firstName} {user.lastName}

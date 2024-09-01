@@ -3,10 +3,13 @@
   import { protect, verifySuperAdmin } from '../middlewares/middleware.js';
   import { ContactEunivate } from '../controllers/contactEunivate.js';
   import { createQuotation } from '../controllers/quotationController.js'
+  import upload from '../middlewares/multerMiddleware.js';
   const router = express.Router();
 
   router.post('/login', loginUser);
-  router.post('/', createUser);
+
+  router.post('/', upload.single('profilePicture'), createUser);
+
   router.post('/forgot-password', forgotPassword);
   router.post("/reset-password/:token", resetPassword);
   //User Contact Eunivate Request API route

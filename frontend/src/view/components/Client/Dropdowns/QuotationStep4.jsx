@@ -1,7 +1,38 @@
 import React from 'react';
-import { Step4 } from '../../../../constants/assets'; // Assuming you have this in your assets
+import { Step4 } from '../../../../constants/assets'; 
 
-const QuotationStep4 = ({ submitForm, prevStep }) => {
+const QuotationStep4 = ({ prevStep, formData }) => {
+    // niremove ko yung setForm na data kasi di nya mabasa as function sa sa set Step
+    //nirekta konalang dikasi gumagana yung api dun saquptation from eh 
+    const submitForm = async () => {
+        
+        try {
+            console.log('submitForm triggered');
+            console.log('Submitting form data:', formData); 
+    
+            const response = await fetch('http://localhost:5000/api/users/quotation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+    
+            console.log('Server response:', response); //server response sa network 
+    
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Form Data Submitted Successfully:', result);
+    
+      
+            } else {
+                console.error('Error submitting form:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error:', error); 
+        }
+    };
+
     return (
         <>
             {/* Header */}
@@ -45,7 +76,7 @@ const QuotationStep4 = ({ submitForm, prevStep }) => {
                         Previous step
                     </button>
                     <button
-                        onClick={submitForm} // Call the submitForm function when clicked
+                        onClick={submitForm} 
                         className="px-12 py-3 bg-yellow-500 text-white rounded-lg flex shadow hover:bg-yellow-600 transition duration-300"
                     >
                         Submit

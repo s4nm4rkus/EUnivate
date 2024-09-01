@@ -10,7 +10,7 @@ export const createQuotation = async (req, res) => {
             phone,
             company,
             service,
-            budget,
+            budget, 
             additionalInfo,
         });
 

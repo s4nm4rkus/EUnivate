@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { User } from "../../../constants/assets";
 
 const SettingProfile = () => {
   const [isEmailEditable, setIsEmailEditable] = useState(false);
@@ -7,13 +6,23 @@ const SettingProfile = () => {
   const [isBiodataEditable, setIsBiodataEditable] = useState(false);
 
   const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [biodata, setBiodata] = useState('');
+  const [username, setUsername] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [profilePicture, setProfilePicture] = useState('');
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     if (storedUser) {
       setEmail(storedUser.email || '');
+      setPhoneNumber(storedUser.phoneNumber || '');
       setBiodata(storedUser.role || '');
+      setUsername(storedUser.username || '');
+      setFirstName(storedUser.firstName || '');
+      setLastName(storedUser.lastName || '');
+      setProfilePicture(storedUser.profilePicture || '');
     }
   }, []);
 
@@ -32,13 +41,13 @@ const SettingProfile = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           <img 
-            src={User}
+            src={profilePicture.url || 'default_profile_picture_url'} 
             alt="Profile"
             className="w-20 h-20 rounded-full mr-4" 
           />
           <div className="flex flex-col">
-            <div className="text-lg font-medium">User</div>
-            <p className="text-sm text-gray-600 mt-1">@user</p>
+            <div className="text-lg font-medium">{firstName} {lastName}</div>
+            <p className="text-sm text-gray-600 mt-1">@{username}</p>
           </div>
         </div>
         <button className="px-4 py-2 bg-red-800 text-white rounded hover:bg-red-900">
@@ -78,7 +87,8 @@ const SettingProfile = () => {
               <input
                 id="phone"
                 type="tel"
-                placeholder=""
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
                 className="px-2 py-1 border-b border-gray-300 focus:outline-none focus:border-blue-500"
                 disabled={!isPhoneEditable}
               />

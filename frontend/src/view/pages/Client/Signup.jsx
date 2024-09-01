@@ -17,9 +17,25 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(""); // For displaying errors
   const [success, setSuccess] = useState(""); // For displaying success message
-
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+      // convert image file to base64
+      const setFileToBase64 = (file) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onloadend = () => {
+          setImageBase64(reader.result);
+        };
+      };
+    
+      // receive file from form
+        const handleImage = (e) => {
+        const file = e.target.files[0];
+        setImage(file);
+        setFileToBase64(file);
+      };
+    
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -35,44 +51,55 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     setError(""); // Clear any previous errors
     setSuccess(""); // Clear any previous success message
 
     if (!validatePassword(password)) {
-      setError("Password must be at least 9 characters long and include at least one number and one symbol.");
-      return;
+        setError("Password must be at least 9 characters long and include at least one number and one symbol.");
+        return;
     }
-    
 
+    const formData = new FormData();
+    formData.append('firstName', firstName);
+    formData.append('lastName', lastName);
+    formData.append('username', username);
+    formData.append('email', email);
+    formData.append('phoneNumber', phoneNumber);
+    formData.append('password', password);
+    formData.append('role', role);
+    if (profilePicture) {
+        formData.append('profilePicture', profilePicture); // Append the profile picture
+    }
 
     try {
-      const response = await axios.post("http://localhost:5000/api/users",
-         {
-          firstName,
-          lastName,
-          username,
-          email,
-          phoneNumber,
-          password,
-          profilePicture,
-          role
-          });
-      setSuccess("Account created successfully!"); // Display success message
-      console.log(response.data);
-      // Clear form fields after successful signup
-      setFirstName("");
-      setLastName("");
-      setUsername("");
-      setEmail("");
-      setPassword("");
-      setPhoneNumber("");
-      setProfilePicture(null);
-      navigate("/login");
+        const response = await axios.post("http://localhost:5000/api/users", formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+        setSuccess("Account created successfully!"); // Display success message
+        console.log(response.data);
+
+        // Clear form fields after successful signup
+        setFirstName("");
+        setLastName("");
+        setUsername("");
+        setEmail("");
+        setPassword("");
+        setPhoneNumber("");
+        setProfilePicture(null);
+
+        navigate("/login");
     } catch (err) {
-      setError(err.response?.data?.message || "An error occurred during signup."); // Display error message
-      console.log(err);
+        setError(err.response?.data?.message || "An error occurred during signup."); // Display error message
+        console.log(err);
+    } finally {
+        setLoading(false);
     }
-  };
+};
+
 
   return (
     <div
@@ -155,14 +182,15 @@ const Signup = () => {
           <div className="relative mt-4">
             <FontAwesomeIcon icon={faLock} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
-              type={showPassword ? 'text' : 'password'}
-              name="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              className="w-full p-3 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              required
-            />
+            type={showPassword ? 'text' : 'password'}
+            name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)} // This should update the state
+            placeholder="Password"
+            className="w-full p-3 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            required
+          />
+
             <span
               onClick={togglePasswordVisibility}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"

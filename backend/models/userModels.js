@@ -1,4 +1,3 @@
-
 import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
@@ -15,14 +14,11 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true,
         sparse: true, 
-        
     },
-    
     phoneNumber: {
         type: String,
         required: true,
     },
-
     email: {
         type: String,
         required: true,
@@ -33,8 +29,14 @@ const userSchema = new mongoose.Schema({
         required: true,
     },
     profilePicture: {
-        type: Object, // Changed from String to Object
-        default: {}, // Default to an empty object
+        publicId: {
+            type: String,
+            required: false,
+        },
+        url: {
+            type: String,
+            required: false,
+        }
     },
     role: {
         type: String, 
@@ -43,7 +45,6 @@ const userSchema = new mongoose.Schema({
     },
     resetPasswordToken: String,
     resetPasswordExpire: Date,
-
     refreshToken: [String], 
 }, 
 {

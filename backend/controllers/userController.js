@@ -29,14 +29,14 @@ export const getUsers = async (req, res) => {
                 return res.status(400).json({ message: 'Email already exists' });
             }
     
-            // Hash the password
+            
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
     
-            // If `profilePicture` is not provided, use a default image
+          
             const profilePictureData = profilePicture ? {
-                url: profilePicture, // Directly use the URL passed from the frontend
-                publicId: 'default'  // Cloudinary publicId or some identifier if required
+                url: profilePicture,
+                publicId: 'default'  
             } : {
                 url: 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png', // Default image
                 publicId: 'default'
@@ -49,8 +49,8 @@ export const getUsers = async (req, res) => {
                 phoneNumber,
                 email,
                 password: hashedPassword,
-                profilePicture: profilePictureData, // Store the profile picture data (URL and publicId)
-                role: role || 'User', // Default role is 'User' if not provided
+                profilePicture: profilePictureData, 
+                role: role || 'User', 
             });
     
             const createdUser = await user.save();
@@ -62,10 +62,7 @@ export const getUsers = async (req, res) => {
     };
     
       
-      
-    
-    
-      
+  
 
     //Loginuser
     export const loginUser = async (req, res) => {

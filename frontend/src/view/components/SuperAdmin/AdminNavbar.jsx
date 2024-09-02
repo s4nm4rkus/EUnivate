@@ -41,9 +41,9 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
 
         {/* User Profile */}
         <div className="relative flex items-center cursor-pointer" onClick={toggleAccountDropdown}>
-          {user.profilePicture.url ? (
+          {user.profilePicture ? (
             <img 
-              src={user.profilePicture.url} // Assuming `profilePicture` is a URL
+              src={user.profilePicture} // Assuming `profilePicture` is a URL
               alt="Profile"
               className="w-8 h-8 rounded-full object-cover"
             />

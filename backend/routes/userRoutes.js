@@ -1,5 +1,6 @@
   import express from 'express';
-  import { getUsers, createUser, loginUser, forgotPassword, resetPassword } from '../controllers/userController.js';
+  import { getUsers, createUser, loginUser, forgotPassword, resetPassword} from '../controllers/userController.js';
+  import { updateUser, updateUserPassword } from '../controllers/updateUserInformation.js';
   import { protect, verifySuperAdmin } from '../middlewares/middleware.js';
   import { ContactEunivate } from '../controllers/contactEunivate.js';
   import { createQuotation } from '../controllers/quotationController.js'
@@ -18,11 +19,12 @@
   // quotation route
   router.post('/quotation',createQuotation);
 
-  //SuperAdmin Setting Profile
-  // router.get('/profile', protect, getUserProfile);
-  // router.put('/profile', protect, updateUserProfile);
-  // router.put('/change-password', protect, changePassword);
-  // router.post('/enable-2fa', protect, enableTwoFactorAuth);
+        //SuperAdmin Setting Profile
+      // Route to update user information
+      router.put('/:id', protect, updateUser);
+
+      // Route to update user password
+      router.put('/:id/password', protect, updateUserPassword);
 
   // Protect and restrict access to superadmin route
   router.get('/superadmin', protect, verifySuperAdmin, (req, res) => {

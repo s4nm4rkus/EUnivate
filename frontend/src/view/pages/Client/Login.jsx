@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Loginback } from '../../../constants/assets';
 import { Link, useNavigate } from 'react-router-dom';
-
+import axios from 'axios';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,28 +24,26 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/users/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
+      const response = await axios.post('http://localhost:5000/api/users/login', {
+        email: email,
+        password: password,
       });
   
-      const data = await res.json();
+      const data = response.data;
       console.log(data);
   
-      if (res.ok) {
-        const { firstName, lastName, email, role, username, phoneNumber, profilePicture } = data.user;
+      if (response.status === 200) {
+        const { _id, firstName, lastName, email, role, username, phoneNumber, profilePicture, token } = data;
   
         localStorage.setItem('user', JSON.stringify({
+          _id,
           firstName,
           lastName,
           username,
           email,
           phoneNumber,
           profilePicture,
-          token: data.token,
+          token,
           role,
         }));
   
@@ -76,6 +74,7 @@ const Login = () => {
       setError('An error occurred while trying to log in. Please try again later.');
     }
   };
+  
   
 
   const handleEmailFocus = () => {

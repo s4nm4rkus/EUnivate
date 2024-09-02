@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Loginback } from '../../../constants/assets';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faEnvelope, faLock, faEye, faEyeSlash, faPhone } from '@fortawesome/free-solid-svg-icons';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
   const [firstName, setFirstName] = useState("");
@@ -17,7 +17,7 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(""); // For displaying errors
   const [success, setSuccess] = useState(""); // For displaying success message
-
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
@@ -33,6 +33,24 @@ const Signup = () => {
     setProfilePicture(e.target.files[0]);
   };
 
+  const uploadImageToCloudinary = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'EunivateImage'); // Replace with your actual upload preset
+    formData.append('cloud_name', 'dzxzc7kwb'); // Replace with your actual Cloudinary cloud name
+
+    try {
+      const response = await axios.post(
+        'https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload',
+        formData
+      );
+      return response.data.url; // This is the URL of the uploaded image
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw error;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(""); // Clear any previous errors
@@ -42,23 +60,46 @@ const Signup = () => {
       setError("Password must be at least 9 characters long and include at least one number and one symbol.");
       return;
     }
-    
 
+    let profilePictureUrl = profilePicture;
+
+    // Check if the profile picture is an object (likely a File) and needs to be uploaded
+    if (profilePicture) {
+        try {
+            // Create a form data to upload the file
+            const formData = new FormData();
+            formData.append('file', profilePicture);
+            formData.append('upload_preset', 'EunivateImage'); // Add the upload preset if using Cloudinary
+            formData.append('folder', 'EunivateAssets'); // Optional: specify a folder in Cloudinary
+
+            const uploadResponse = await axios.post(
+                'https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload', 
+                formData
+            );
+
+            profilePictureUrl = uploadResponse.data.secure_url; // Get the uploaded image URL
+        } catch (uploadError) {
+            setError("Failed to upload profile picture. Please try again.");
+            console.error("Error uploading profile picture:", uploadError);
+            return;
+        }
+    }
 
     try {
-      const response = await axios.post("http://localhost:5000/api/users",
-         {
+      const response = await axios.post("http://localhost:5000/api/users", {
           firstName,
           lastName,
           username,
           email,
           phoneNumber,
           password,
-          profilePicture,
+          profilePicture: profilePictureUrl, // Send the URL of the uploaded picture
           role
-          });
+      });
+
       setSuccess("Account created successfully!"); // Display success message
       console.log(response.data);
+
       // Clear form fields after successful signup
       setFirstName("");
       setLastName("");
@@ -67,12 +108,14 @@ const Signup = () => {
       setPassword("");
       setPhoneNumber("");
       setProfilePicture(null);
+
       navigate("/login");
     } catch (err) {
       setError(err.response?.data?.message || "An error occurred during signup."); // Display error message
       console.log(err);
     }
-  };
+};
+
 
   return (
     <div
@@ -155,14 +198,15 @@ const Signup = () => {
           <div className="relative mt-4">
             <FontAwesomeIcon icon={faLock} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
-              type={showPassword ? 'text' : 'password'}
-              name="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              className="w-full p-3 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              required
-            />
+            type={showPassword ? 'text' : 'password'}
+            name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)} // This should update the state
+            placeholder="Password"
+            className="w-full p-3 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            required
+          />
+
             <span
               onClick={togglePasswordVisibility}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
@@ -184,8 +228,9 @@ const Signup = () => {
           <button
             type="submit"
             className="w-full bg-yellow-500 text-white p-3 rounded-lg shadow hover:bg-yellow-600 transition duration-300 mt-6"
+            disabled={loading}
           >
-            Sign Up
+            {loading ? 'Creating account...' : 'Sign Up'}
           </button>
         </form>
 
@@ -198,4 +243,3 @@ const Signup = () => {
 };
 
 export default Signup;
-	

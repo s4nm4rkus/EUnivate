@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FaCalendar, FaPaperclip, FaPlus, FaTimes, FaCheckCircle } from 'react-icons/fa';
-import AdminNavbar from '../../components/SuperAdmin/adminNavbar';
+import AdminNavbar from '../../components/SuperAdmin/AdminNavbar';
 
 const Project = () => {
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);

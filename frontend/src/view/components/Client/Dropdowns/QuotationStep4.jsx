@@ -2,8 +2,7 @@ import React from 'react';
 import { Step4 } from '../../../../constants/assets'; 
 
 const QuotationStep4 = ({ prevStep, formData }) => {
-    // niremove ko yung setForm na data kasi di nya mabasa as function sa sa set Step
-    //nirekta konalang dikasi gumagana yung api dun saquptation from eh 
+   
     const submitForm = async () => {
         
         try {

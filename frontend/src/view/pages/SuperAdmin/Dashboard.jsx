@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { i1, i2, i3, i4 } from '../../../constants/assets';
 import '../../../admin.css';
-import AdminNavbar from '../../components/SuperAdmin/adminNavbar';
+import AdminNavbar from '../../components/SuperAdmin/AdminNavbar';
 
 const Dashboard = () => {
     const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);

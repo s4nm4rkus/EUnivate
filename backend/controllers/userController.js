@@ -21,30 +21,26 @@ export const getUsers = async (req, res) => {
       // Create a new user
 
       export const createUser = async (req, res) => {
-        const { firstName, lastName, username, email, phoneNumber, password, role } = req.body;
-        console.log('Received Password:', password); // Add this line to debug
+        const { firstName, lastName, username, email, phoneNumber, password, role, profilePicture } = req.body;
+        
         try {
             const userExists = await User.findOne({ email });
             if (userExists) {
                 return res.status(400).json({ message: 'Email already exists' });
             }
     
+            // Hash the password
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
     
-            let profilePictureData = { url: '', publicId: '' };
-        if (req.file && req.file.path) {
-            profilePictureData = {
-                url: req.file.path,
-                publicId: req.file.filename,
+            // If `profilePicture` is not provided, use a default image
+            const profilePictureData = profilePicture ? {
+                url: profilePicture, // Directly use the URL passed from the frontend
+                publicId: 'default'  // Cloudinary publicId or some identifier if required
+            } : {
+                url: 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png', // Default image
+                publicId: 'default'
             };
-        } else {
-            // Set a default image URL if no file is uploaded
-            profilePictureData = {
-                url: 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png', // Replace this with your actual default image URL
-                publicId: 'default', // or any identifier you wish
-            };
-        }
     
             const user = new User({
                 firstName,
@@ -53,8 +49,8 @@ export const getUsers = async (req, res) => {
                 phoneNumber,
                 email,
                 password: hashedPassword,
-                profilePicture: profilePictureData,
-                role: role || 'User',
+                profilePicture: profilePictureData, // Store the profile picture data (URL and publicId)
+                role: role || 'User', // Default role is 'User' if not provided
             });
     
             const createdUser = await user.save();
@@ -64,6 +60,11 @@ export const getUsers = async (req, res) => {
             res.status(500).json({ message: 'Error creating user', error: error.message });
         }
     };
+    
+      
+      
+    
+    
       
 
     //Loginuser

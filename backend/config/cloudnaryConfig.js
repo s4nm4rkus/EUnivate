@@ -23,3 +23,4 @@ const uploadToCloudinary = async (path, folder = 'EunivateAssets') => {
 };
 
 export { cloudinary, uploadToCloudinary };
+

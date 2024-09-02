@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Loginback } from '../../../constants/assets';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faEnvelope, faLock, faEye, faEyeSlash, faPhone } from '@fortawesome/free-solid-svg-icons';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
   const [firstName, setFirstName] = useState("");
@@ -20,22 +20,6 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-      // convert image file to base64
-      const setFileToBase64 = (file) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onloadend = () => {
-          setImageBase64(reader.result);
-        };
-      };
-    
-      // receive file from form
-        const handleImage = (e) => {
-        const file = e.target.files[0];
-        setImage(file);
-        setFileToBase64(file);
-      };
-    
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -49,54 +33,86 @@ const Signup = () => {
     setProfilePicture(e.target.files[0]);
   };
 
+  const uploadImageToCloudinary = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'EunivateImage'); // Replace with your actual upload preset
+    formData.append('cloud_name', 'dzxzc7kwb'); // Replace with your actual Cloudinary cloud name
+
+    try {
+      const response = await axios.post(
+        'https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload',
+        formData
+      );
+      return response.data.url; // This is the URL of the uploaded image
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw error;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError(""); // Clear any previous errors
     setSuccess(""); // Clear any previous success message
 
     if (!validatePassword(password)) {
-        setError("Password must be at least 9 characters long and include at least one number and one symbol.");
-        return;
+      setError("Password must be at least 9 characters long and include at least one number and one symbol.");
+      return;
     }
 
-    const formData = new FormData();
-    formData.append('firstName', firstName);
-    formData.append('lastName', lastName);
-    formData.append('username', username);
-    formData.append('email', email);
-    formData.append('phoneNumber', phoneNumber);
-    formData.append('password', password);
-    formData.append('role', role);
+    let profilePictureUrl = profilePicture;
+
+    // Check if the profile picture is an object (likely a File) and needs to be uploaded
     if (profilePicture) {
-        formData.append('profilePicture', profilePicture); // Append the profile picture
+        try {
+            // Create a form data to upload the file
+            const formData = new FormData();
+            formData.append('file', profilePicture);
+            formData.append('upload_preset', 'EunivateImage'); // Add the upload preset if using Cloudinary
+            formData.append('folder', 'EunivateAssets'); // Optional: specify a folder in Cloudinary
+
+            const uploadResponse = await axios.post(
+                'https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload', 
+                formData
+            );
+
+            profilePictureUrl = uploadResponse.data.secure_url; // Get the uploaded image URL
+        } catch (uploadError) {
+            setError("Failed to upload profile picture. Please try again.");
+            console.error("Error uploading profile picture:", uploadError);
+            return;
+        }
     }
 
     try {
-        const response = await axios.post("http://localhost:5000/api/users", formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        });
+      const response = await axios.post("http://localhost:5000/api/users", {
+          firstName,
+          lastName,
+          username,
+          email,
+          phoneNumber,
+          password,
+          profilePicture: profilePictureUrl, // Send the URL of the uploaded picture
+          role
+      });
 
-        setSuccess("Account created successfully!"); // Display success message
-        console.log(response.data);
+      setSuccess("Account created successfully!"); // Display success message
+      console.log(response.data);
 
-        // Clear form fields after successful signup
-        setFirstName("");
-        setLastName("");
-        setUsername("");
-        setEmail("");
-        setPassword("");
-        setPhoneNumber("");
-        setProfilePicture(null);
+      // Clear form fields after successful signup
+      setFirstName("");
+      setLastName("");
+      setUsername("");
+      setEmail("");
+      setPassword("");
+      setPhoneNumber("");
+      setProfilePicture(null);
 
-        navigate("/login");
+      navigate("/login");
     } catch (err) {
-        setError(err.response?.data?.message || "An error occurred during signup."); // Display error message
-        console.log(err);
-    } finally {
-        setLoading(false);
+      setError(err.response?.data?.message || "An error occurred during signup."); // Display error message
+      console.log(err);
     }
 };
 
@@ -212,8 +228,9 @@ const Signup = () => {
           <button
             type="submit"
             className="w-full bg-yellow-500 text-white p-3 rounded-lg shadow hover:bg-yellow-600 transition duration-300 mt-6"
+            disabled={loading}
           >
-            Sign Up
+            {loading ? 'Creating account...' : 'Sign Up'}
           </button>
         </form>
 
@@ -226,4 +243,3 @@ const Signup = () => {
 };
 
 export default Signup;
-	

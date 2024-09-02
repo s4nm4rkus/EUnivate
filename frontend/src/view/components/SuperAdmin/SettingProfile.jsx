@@ -115,7 +115,9 @@ const SettingProfile = () => {
         }
       );
       localStorage.setItem('user', JSON.stringify(response.data)); // Update local storage
-      toggleEditProfileModal(); // Close the modal
+      const event = new Event('profileUpdated');
+      window.dispatchEvent(event);
+      toggleEditProfileModal();  // Close the modal
     } catch (error) {
       console.error('Error updating profile', error);
     }

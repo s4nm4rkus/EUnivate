@@ -6,6 +6,7 @@ import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 
 
+
 // Get all users
 export const getUsers = async (req, res) => {
   try {
@@ -20,30 +21,26 @@ export const getUsers = async (req, res) => {
       // Create a new user
 
       export const createUser = async (req, res) => {
-        const { firstName, lastName, username, email, phoneNumber, password, role } = req.body;
-        console.log('Received Password:', password); // Add this line to debug
+        const { firstName, lastName, username, email, phoneNumber, password, role, profilePicture } = req.body;
+        
         try {
             const userExists = await User.findOne({ email });
             if (userExists) {
                 return res.status(400).json({ message: 'Email already exists' });
             }
     
+            // Hash the password
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
     
-            let profilePictureData = { url: '', publicId: '' };
-        if (req.file && req.file.path) {
-            profilePictureData = {
-                url: req.file.path,
-                publicId: req.file.filename,
+            // If `profilePicture` is not provided, use a default image
+            const profilePictureData = profilePicture ? {
+                url: profilePicture, // Directly use the URL passed from the frontend
+                publicId: 'default'  // Cloudinary publicId or some identifier if required
+            } : {
+                url: 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png', // Default image
+                publicId: 'default'
             };
-        } else {
-            // Set a default image URL if no file is uploaded
-            profilePictureData = {
-                url: 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png', // Replace this with your actual default image URL
-                publicId: 'default', // or any identifier you wish
-            };
-        }
     
             const user = new User({
                 firstName,
@@ -52,8 +49,8 @@ export const getUsers = async (req, res) => {
                 phoneNumber,
                 email,
                 password: hashedPassword,
-                profilePicture: profilePictureData,
-                role: role || 'User',
+                profilePicture: profilePictureData, // Store the profile picture data (URL and publicId)
+                role: role || 'User', // Default role is 'User' if not provided
             });
     
             const createdUser = await user.save();
@@ -63,45 +60,52 @@ export const getUsers = async (req, res) => {
             res.status(500).json({ message: 'Error creating user', error: error.message });
         }
     };
+    
       
-      // Login user
-      export const loginUser = async (req, res) => {
-        const { email, password } = req.body;
+      
+    
+    
+      
 
-        try {
-          const user = await User.findOne({ email });
-
-          if (!user) {
-            return res.status(404).json({ message: 'Email not found' });
-          }
-
-          const passwordCheck = await bcrypt.compare(password, user.password);
-
-          if (!passwordCheck) {
-            return res.status(400).json({ message: 'Passwords do not match' });
-          }
-
-          const token = generateToken(user._id);
-          res.status(200).json({
-            message: 'Login successful!',
-            user: {
-              email: user.email,
-              firstName: user.firstName,
-              lastName: user.lastName,
-              username: user.username,
-              phoneNumber: user.phoneNumber,
-              profilePicture: user.profilePicture,
-              role: user.role,
-            },
-            token: token,
-          });
-          
-        } catch (error) {
-          console.error('Error logging in:', error);
-          res.status(500).json({ message: 'Error logging in', error: error.message });
+    //Loginuser
+    export const loginUser = async (req, res) => {
+      const { email, password } = req.body;
+    
+      try {
+        // Check if the user exists
+        const user = await User.findOne({ email });
+    
+        if (!user) {
+          return res.status(400).json({ message: 'Invalid email or password' });
         }
-      };
-
+    
+        // Check if the password matches
+        const isMatch = await bcrypt.compare(password, user.password);
+    
+        if (!isMatch) {
+          return res.status(400).json({ message: 'Invalid email or password' });
+        }
+    
+        // Generate a JWT token
+        const token = generateToken(user._id);
+    
+        // Return the user details along with the token
+        res.status(200).json({
+          _id: user._id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          username: user.username,
+          email: user.email,
+          phoneNumber: user.phoneNumber,
+          profilePicture: user.profilePicture,
+          role: user.role,
+          token, // Returning the generated JWT token
+        });
+      } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+      }
+    };
+    
   //Forgot-Password Function
 
   export const forgotPassword = async (req, res) => {
@@ -192,7 +196,6 @@ export const getUsers = async (req, res) => {
     }
   };
   
-
 
 // Test connection
 export const testConnection = (req, res) => {

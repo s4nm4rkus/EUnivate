@@ -14,7 +14,7 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const defaultProfilePicture = 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'; // Replace with your actual default image URL
+    const defaultProfilePicture = 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'; 
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
       setUserName(`${user.firstName} ${user.lastName}`);

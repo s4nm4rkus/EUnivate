@@ -4,7 +4,7 @@
 ## Description
 EUnivate is a web application designed to connect users with university experts and professionals. Please note that this project is currently under development. Follow the instructions below to set up the project locally on your machine.
 
-##Getting Started
+## Getting Started
 Prerequisites
 Before setting up the EUnivate web app, make sure you have the following software installed:
     - Node.js (for running JavaScript outside the browser and managing packages)
@@ -36,9 +36,9 @@ Backend Setup
 
 2. Install Backend Dependencies:
     - Make sure you have a package.json file in the backend directory. This file contains all the dependencies required to run the backend server.
-![image](https://github.com/user-attachments/assets/81055d05-b4c7-474d-9b67-d0810c0ddf13)
     - Install the dependencies by running:
       npm install
+![image](https://github.com/user-attachments/assets/81055d05-b4c7-474d-9b67-d0810c0ddf13)
 
 3. Run the Backend Server:
     - Start the backend server with the following command:
@@ -46,7 +46,7 @@ Backend Setup
     - If everything is set up correctly, the server should start without errors. You should see output similar to this in your terminal:
 ![image](https://github.com/user-attachments/assets/a7d294f5-6f02-4b6d-b3a9-5187b4330541)
 
-##Troubleshooting
+## Troubleshooting
 If you encounter any errors during the setup process, please reach out to us on Discord for support. Make sure to provide detailed information about the issue so we can assist you effectively.
 
 

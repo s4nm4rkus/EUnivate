@@ -1,8 +1,9 @@
 # EUnivate
+### Currently under development.
 ![image](https://github.com/user-attachments/assets/4f61ddeb-ce1f-4bbb-9879-7b91b70f4747)
 
 ## Description
-EUnivate is a web application designed to connect users with university experts and professionals. Please note that this project is currently under development. Follow the instructions below to set up the project locally on your machine.
+EUnivate is a web application designed to connect users with university experts and professionals. Follow the instructions below to set up the project locally on your machine.
 
 ## Tech Stack
 The developers are using the MERN stack for this project, which includes:

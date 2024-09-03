@@ -26,7 +26,7 @@ import MainPage from './view/pages/Client/MainPage.jsx';
 import Auth from './view/hooks/Auth.jsx';
 import SuperAdminRoute from './view/hooks/SuperadminAuth.jsx';
 import ProjectmanagementAuth from './view/hooks/AuthProjectmanagement.jsx'
-
+import Verify2FA from './view/hooks/Verify2FA.JSX';
 //Client
 import User from './view/pages/Client/User.jsx';
 
@@ -75,7 +75,7 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot" element={<Forgotpassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-
+        <Route path="/verify-2fa/:token" element={<Verify2FA />} />
 
         {/* Admin Routes */}
         <Route

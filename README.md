@@ -4,6 +4,14 @@
 ## Description
 EUnivate is a web application designed to connect users with university experts and professionals. Please note that this project is currently under development. Follow the instructions below to set up the project locally on your machine.
 
+## Tech Stack
+The developers are using the MERN stack for this project, which includes:
+
+MongoDB: A NoSQL database for storing data.
+Express.js: A web application framework for Node.js.
+React.js: A JavaScript library for building user interfaces.
+Node.js: A JavaScript runtime environment that allows for server-side scripting.
+
 ## Getting Started
 Prerequisites:
 
@@ -13,7 +21,7 @@ Before setting up the EUnivate web app, make sure you have the following softwar
     - npm (Node Package Manager, comes with Node.js)
     - Visual Studio Code (or any code editor of your choice)
 
-Frontend Setup
+## Frontend Setup
 1. Navigate to the Frontend Directory:
     - Open your terminal in Visual Studio Code or your preferred code editor.
     - Change to the frontend directory of the project by running:
@@ -29,7 +37,7 @@ Frontend Setup
       npm start
     - After successful installation, the frontend should automatically open in your default web browser at http://localhost:5173. If it doesn't, you can manually open your browser and go to that URL.
 
-Backend Setup
+## Backend Setup
 1. Navigate to the Backend Directory:
     - Open a new terminal window or tab in Visual Studio Code.
     - Change to the backend directory of the project by running:

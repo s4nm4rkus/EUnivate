@@ -22,7 +22,8 @@ const SettingProfile = () => {
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState(""); 
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const defaultProfilePictureUrl = 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png';
 
   const validatePassword = (password) => {
@@ -34,21 +35,21 @@ const SettingProfile = () => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
 
     if (storedUser) {
-        setEmail(storedUser.email || '');
-        setPhoneNumber(storedUser.phoneNumber || '');
-        setBiodata(storedUser.role || '');
-        setUsername(storedUser.username || '');
-        setFirstName(storedUser.firstName || '');
-        setLastName(storedUser.lastName || '');
+      setEmail(storedUser.email || '');
+      setPhoneNumber(storedUser.phoneNumber || '');
+      setBiodata(storedUser.role || '');
+      setUsername(storedUser.username || '');
+      setFirstName(storedUser.firstName || '');
+      setLastName(storedUser.lastName || '');
 
-        // Handle the profile picture logic
-        if (storedUser.profilePicture && storedUser.profilePicture.url) {
-            setProfilePicture(storedUser.profilePicture.url);
-        } else if (storedUser.profilePicture && typeof storedUser.profilePicture === 'string') {
-            setProfilePicture(storedUser.profilePicture);
-        } else {
-            setProfilePicture(defaultProfilePictureUrl);
-        }
+      // Handle the profile picture logic
+      if (storedUser.profilePicture && storedUser.profilePicture.url) {
+        setProfilePicture(storedUser.profilePicture.url);
+      } else if (storedUser.profilePicture && typeof storedUser.profilePicture === 'string') {
+        setProfilePicture(storedUser.profilePicture);
+      } else {
+        setProfilePicture(defaultProfilePictureUrl);
+      }
     }
   }, []);
 
@@ -76,7 +77,6 @@ const SettingProfile = () => {
   };
 
   const handleSaveProfile = async (shouldCloseModal = true) => {
-    
     const uploadImageToCloudinary = async (file) => {
       const formData = new FormData();
       formData.append('file', file);
@@ -141,49 +141,61 @@ const SettingProfile = () => {
 
       // Conditionally close the modal based on the parameter
       if (shouldCloseModal) {
-        toggleEditProfileModal(); 
+        toggleEditProfileModal();
       }
-
     } catch (error) {
       console.error('Error updating profile', error);
     }
   };
 
-  const handleChangePassword = async () => {
+  
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+  
     if (!validatePassword(newPassword)) {
       setError("Password must be at least 9 characters long and include at least one number and one symbol.");
       return;
     }
-
-    if (newPassword === confirmPassword) {
-        try {
-            const storedUser = JSON.parse(localStorage.getItem('user')); // Retrieve the stored user data
-            if (!storedUser || !storedUser._id) {
-                console.error('User is not logged in or user ID is missing.');
-                return;
-            }
-
-            await axios.put(
-                `http://localhost:5000/api/users/${storedUser._id}/password`,
-                {
-                    newPassword,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`, // Include the token in the request
-                    },
-                }
-            );
-
-            toggleChangePasswordModal(); // Close the modal
-        } catch (error) {
-            console.error('Error changing password', error);
-        }
-    } else {
-        setError('Passwords do not match');
+  
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
     }
-};
-
+  
+    try {
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      if (!storedUser || !storedUser._id) {
+        setError('User not logged in or user ID is missing.');
+        return;
+      }
+  
+      const response = await axios.put(
+        `http://localhost:5000/api/users/${storedUser._id}/password`,
+        { newPassword },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+  
+      if (response.status === 200) {
+        setSuccess("Password changed successfully!");
+        setTimeout(() => {
+          setShowChangePasswordModal(false);
+          setNewPassword('');
+          setConfirmPassword('');
+          setError('');
+          setSuccess('');
+        }, 3000);
+      } else {
+        setError(response.data.message || 'Something went wrong');
+      }
+    } catch (err) {
+      setError('An error occurred');
+    }
+  };
+  
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -407,6 +419,8 @@ const SettingProfile = () => {
           <div className="bg-white rounded-lg p-8 shadow-lg w-96">
             <h2 className="text-xl font-bold mb-4">Change Password</h2>
             <div className="space-y-4">
+              {error && <p className="text-red-600">{error}</p>}
+              {success && <p className="text-green-600">{success}</p>}
               <div>
                 <label
                   htmlFor="newPassword"

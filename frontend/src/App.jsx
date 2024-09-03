@@ -42,7 +42,7 @@ import People from './view/pages/SuperAdmin/People';
 import Messages from './view/pages/SuperAdmin/Messages';
 import Activity from './view/pages/SuperAdmin/Activity';
 import Settings from './view/pages/SuperAdmin/Settings';
-
+import ProjectDetails from './view/pages/SuperAdmin/ProjectDetails'; 
 
 
 /* Global CSS */
@@ -88,6 +88,7 @@ const App = () => {
         >
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="project" element={<Project />} />
+          <Route path="projects/:id" element={<ProjectDetails />} /> {/* New route for project details */}
           <Route path="task" element={<Task />} />
           <Route path="people" element={<People />} />
           <Route path="messages" element={<Messages />} />

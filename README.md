@@ -5,7 +5,7 @@
 EUnivate is a web application designed to connect users with university experts and professionals. Please note that this project is currently under development. Follow the instructions below to set up the project locally on your machine.
 
 ## Getting Started
-Prerequisites
+Prerequisites:
 Before setting up the EUnivate web app, make sure you have the following software installed:
     - Node.js (for running JavaScript outside the browser and managing packages)
     - npm (Node Package Manager, comes with Node.js)

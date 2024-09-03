@@ -6,7 +6,6 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 const SettingProfile = () => {
   const [isEmailEditable, setIsEmailEditable] = useState(false);
   const [isPhoneEditable, setIsPhoneEditable] = useState(false);
-  const [isBiodataEditable, setIsBiodataEditable] = useState(false);
 
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -23,8 +22,13 @@ const SettingProfile = () => {
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState(""); 
+  const defaultProfilePictureUrl = 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png';
 
-  const defaultProfilePictureUrl = 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'; // Replace with your actual default image URL
+  const validatePassword = (password) => {
+    const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{9,}$/;
+    return passwordRegex.test(password);
+  };
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -48,13 +52,13 @@ const SettingProfile = () => {
     }
   }, []);
 
-  const handleEditClick = (field) => {
+  const handleEditClick = async (field) => {
     if (field === 'email') {
       setIsEmailEditable((prevState) => !prevState);
+      if (isEmailEditable) await handleSaveProfile(false); // Modal should not close
     } else if (field === 'phone') {
       setIsPhoneEditable((prevState) => !prevState);
-    } else if (field === 'biodata') {
-      setIsBiodataEditable((prevState) => !prevState);
+      if (isPhoneEditable) await handleSaveProfile(false); // Modal should not close
     }
   };
 
@@ -71,7 +75,8 @@ const SettingProfile = () => {
     setProfilePicture(file);
   };
 
-  const handleSaveProfile = async () => {
+  const handleSaveProfile = async (shouldCloseModal = true) => {
+    
     const uploadImageToCloudinary = async (file) => {
       const formData = new FormData();
       formData.append('file', file);
@@ -117,6 +122,7 @@ const SettingProfile = () => {
       phoneNumber,
       username,
       profilePicture: profilePictureUrl,
+      role: biodata, // Add the biodata (role) to be updated
     };
 
     try {
@@ -130,41 +136,53 @@ const SettingProfile = () => {
         }
       );
       localStorage.setItem('user', JSON.stringify(response.data)); // Update local storage
-      toggleEditProfileModal(); // Close the modal
+      setIsEmailEditable(false);
+      setIsPhoneEditable(false);
+
+      // Conditionally close the modal based on the parameter
+      if (shouldCloseModal) {
+        toggleEditProfileModal(); 
+      }
+
     } catch (error) {
       console.error('Error updating profile', error);
     }
   };
 
   const handleChangePassword = async () => {
-    if (newPassword === confirmPassword) {
-      try {
-        const storedUser = JSON.parse(localStorage.getItem('user')); // Retrieve the stored user data
-        if (!storedUser || !storedUser._id) {
-          console.error('User is not logged in or user ID is missing.');
-          return;
-        }
-
-        await axios.put(
-          `http://localhost:5000/api/users/${storedUser._id}/password`,
-          {
-            newPassword,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`, // Include the token in the request
-            },
-          }
-        );
-
-        toggleChangePasswordModal(); // Close the modal
-      } catch (error) {
-        console.error('Error changing password', error);
-      }
-    } else {
-      console.error('Passwords do not match');
+    if (!validatePassword(newPassword)) {
+      setError("Password must be at least 9 characters long and include at least one number and one symbol.");
+      return;
     }
-  };
+
+    if (newPassword === confirmPassword) {
+        try {
+            const storedUser = JSON.parse(localStorage.getItem('user')); // Retrieve the stored user data
+            if (!storedUser || !storedUser._id) {
+                console.error('User is not logged in or user ID is missing.');
+                return;
+            }
+
+            await axios.put(
+                `http://localhost:5000/api/users/${storedUser._id}/password`,
+                {
+                    newPassword,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`, // Include the token in the request
+                    },
+                }
+            );
+
+            toggleChangePasswordModal(); // Close the modal
+        } catch (error) {
+            console.error('Error changing password', error);
+        }
+    } else {
+        setError('Passwords do not match');
+    }
+};
 
   return (
     <div className="space-y-4">
@@ -255,16 +273,10 @@ const SettingProfile = () => {
                 type="text"
                 value={biodata}
                 onChange={(e) => setBiodata(e.target.value)}
-                className="px-2 py-1 border-b border-gray-300 focus:outline-none focus:border-blue-500"
-                disabled={!isBiodataEditable}
+                className="px-2 py-1 border-none border-gray-300 focus:outline-none focus:border-blue-500"
+                disabled
               />
             </div>
-            <button
-              className="ml-2 px-4 py-1 border border-blue-500 text-blue-500 bg-transparent rounded hover:bg-blue-100 hover:text-blue-700"
-              onClick={() => handleEditClick('biodata')}
-            >
-              {isBiodataEditable ? 'Save' : 'Edit'}
-            </button>
           </div>
         </div>
       </div>
@@ -379,7 +391,7 @@ const SettingProfile = () => {
                 Cancel
               </button>
               <button
-                onClick={handleSaveProfile} // Update this line to save the profile changes
+                onClick={() => handleSaveProfile(true)} // Save the profile changes and close the modal
                 className="ml-3 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
               >
                 Save
@@ -456,7 +468,7 @@ const SettingProfile = () => {
                 Cancel
               </button>
               <button
-                onClick={handleChangePassword} // Update this line to save the password changes
+                onClick={handleChangePassword} // Save the password changes
                 className="ml-3 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
               >
                 Save

@@ -7,10 +7,10 @@ EUnivate is a web application designed to connect users with university experts 
 ## Tech Stack
 The developers are using the MERN stack for this project, which includes:
 
-MongoDB: A NoSQL database for storing data.
-Express.js: A web application framework for Node.js.
-React.js: A JavaScript library for building user interfaces.
-Node.js: A JavaScript runtime environment that allows for server-side scripting.
+- MongoDB: A NoSQL database for storing data.
+- Express.js: A web application framework for Node.js.
+- React.js: A JavaScript library for building user interfaces.
+- Node.js: A JavaScript runtime environment that allows for server-side scripting.
 
 ## Getting Started
 Prerequisites:

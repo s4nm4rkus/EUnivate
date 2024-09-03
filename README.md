@@ -51,4 +51,6 @@ Backend Setup
 ## Troubleshooting
 If you encounter any errors during the setup process, please reach out to us on Discord for support. Make sure to provide detailed information about the issue so we can assist you effectively.
 
+Our discord link: https://discord.gg/mTRFNCGPkX
+
 

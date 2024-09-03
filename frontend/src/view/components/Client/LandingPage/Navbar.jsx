@@ -14,10 +14,11 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const defaultProfilePicture = 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'; 
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
       setUserName(`${user.firstName} ${user.lastName}`);
-      setProfilePicture(user.profilePicture); // Set the profile picture if available
+      setProfilePicture(user.profilePicture ? user.profilePicture.url || user.profilePicture : defaultProfilePicture); 
       setIsAuthenticated(true);
     }
   }, []);
@@ -97,6 +98,23 @@ const Navbar = () => {
     }
   };
 
+  useEffect(() => {
+    const handleProfileUpdate = () => {
+      const updatedUser = JSON.parse(localStorage.getItem('user'));
+      if (updatedUser) {
+        setUserName(`${updatedUser.firstName} ${updatedUser.lastName}`);
+        setProfilePicture(updatedUser.profilePicture); // Update profile picture
+        setIsAuthenticated(true);
+      }
+    };
+  
+    window.addEventListener('profileUpdated', handleProfileUpdate);
+  
+    return () => {
+      window.removeEventListener('profileUpdated', handleProfileUpdate);
+    };
+  }, []);
+  
   return (
     <nav className="w-full flex justify-between items-center py-4 bg-white px-4 sm:px-8 relative">
       <div className="flex items-center space-x-2 sm:space-x-10 cursor-pointer" onClick={handleLogoClick}>
@@ -160,7 +178,7 @@ const Navbar = () => {
         >
           {profilePicture ? (
             <img 
-              src={profilePicture.url} // Assuming `profilePicture` contains a `url` field
+              src={profilePicture} 
               alt="Profile"
               className="w-8 h-8 rounded-full object-cover"
             />

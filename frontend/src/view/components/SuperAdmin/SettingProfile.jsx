@@ -8,7 +8,7 @@ const SettingProfile = () => {
   const [isPhoneEditable, setIsPhoneEditable] = useState(false);
 
   const [email, setEmail] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');         
   const [biodata, setBiodata] = useState('');
   const [username, setUsername] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -24,6 +24,7 @@ const SettingProfile = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [is2FAEnabled, setIs2FAEnabled] = useState(false); 
   const defaultProfilePictureUrl = 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png';
 
   const validatePassword = (password) => {
@@ -195,7 +196,38 @@ const SettingProfile = () => {
       setError('An error occurred');
     }
   };
+
+
+  //HANDLE 2FA
+  const handleEnableTwoFactorAuth = async () => {
+    try {     
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      if (!storedUser || !storedUser._id) {
+        setError('User not logged in or user ID is missing.');
+        return;
+      }
   
+      const response = await axios.post('http://localhost:5000/api/users/enable-2fa', {
+        userId: storedUser._id,
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+  
+      if (response.status === 200) {
+        alert('Verification email sent. Please check your inbox.');
+        setIs2FAEnabled(true);
+        localStorage.setItem('twoFASent', 'true');
+      } else {
+        alert(response.data.message || 'Something went wrong');
+      }
+    } catch (err) {
+      alert('An error occurred while enabling Two-Factor Authentication.');
+      console.error('Error enabling 2FA:', err);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -322,8 +354,12 @@ const SettingProfile = () => {
           code from your mobile phone in order to sign in.
         </p>
         <div className="mt-3 flex">
-          <button className="px-4 py-2 bg-red-800 text-white rounded hover:bg-red-900">
-            Enable Two-Factor Auth
+          <button 
+            onClick={handleEnableTwoFactorAuth}
+            className="px-4 py-2 bg-red-800 text-white rounded hover:bg-red-900"
+            disabled={is2FAEnabled} 
+          >
+            {is2FAEnabled ? '2FA Enabled' : 'Enable Two-Factor Auth'}
           </button>
         </div>
       </div>

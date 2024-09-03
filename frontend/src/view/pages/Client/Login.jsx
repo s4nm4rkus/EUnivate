@@ -25,64 +25,66 @@ const Login = () => {
   const handleLogin = async () => {
     try {
       const response = await axios.post('http://localhost:5000/api/users/login', {
-        email: email,
-        password: password,
+        email,
+        password,
       });
-  
+
       const data = response.data;
-      console.log(data);
-  
+
       if (response.status === 200) {
-        const { _id, firstName, lastName, email, role, username, phoneNumber, profilePicture, token } = data;
-  
-        localStorage.setItem('user', JSON.stringify({
-          _id,
-          firstName,
-          lastName,
-          username,
-          email,
-          phoneNumber,
-          profilePicture,
-          token,
-          role,
-        }));
-  
-        if (rememberMe) {
-          const newCreds = { email, password };
-          const updatedCreds = [...savedCredentials.filter((cred) => cred.email !== email), newCreds];
-          localStorage.setItem('savedCredentials', JSON.stringify(updatedCreds));
-        }
-  
-        const roleLowerCase = role.toLowerCase(); 
-        if (roleLowerCase === 'superadmin') {
-          navigate('/superadmin/dashboard');
-        } else if (roleLowerCase === 'admin') {
-          navigate('/admin');
-        } else if (roleLowerCase === 'collaborator') {
-          navigate('/collaborator-dashboard');
-        } else if (roleLowerCase === 'user') {
-          navigate('/');
+        if (data.twoFactorEnabled) {
+          // Redirect to a 2FA verification page
+          navigate(`/verify-2fa/${data._id}`);
         } else {
-          console.error('Unknown role:', role);
+          // Store user information in local storage
+          const { _id, firstName, lastName, email, role, username, phoneNumber, profilePicture, twoFactorEnabled, token } = data;
+  
+          localStorage.setItem('user', JSON.stringify({
+            _id,
+            firstName,
+            lastName,
+            username,
+            email,
+            phoneNumber,
+            profilePicture,
+            twoFactorEnabled,
+            token,
+            role,
+          }));
+
+          // Handle "Remember Me" functionality
+          if (rememberMe) {
+            const newCreds = { email, password };
+            const updatedCreds = [...savedCredentials.filter((cred) => cred.email !== email), newCreds];
+            localStorage.setItem('savedCredentials', JSON.stringify(updatedCreds));
+          }
+
+          // Redirect based on user role
+          const roleLowerCase = role.toLowerCase(); 
+          if (roleLowerCase === 'superadmin') {
+            navigate('/superadmin/dashboard');
+          } else if (roleLowerCase === 'admin') {
+            navigate('/admin');
+          } else if (roleLowerCase === 'collaborator') {
+            navigate('/collaborator-dashboard');
+          } else if (roleLowerCase === 'user') {
+            navigate('/');
+          } else {
+            console.error('Unknown role:', role);
+          }
         }
-      } else {
-        console.error('Login failed:', data.message);
-        setError(data.message);
       }
     } catch (error) {
-      
       if (error.response && error.response.status === 400) {
-      setError('Invalid email or password.');
-    } else if (error.response && error.response.status === 404) {
-      setError('Email not found.');
-    } else {
-      setError('An error occurred while trying to log in. Please try again later.');
+        setError('Invalid email or password.');
+      } else if (error.response && error.response.status === 404) {
+        setError('Email not found.');
+      } else {
+        setError('An error occurred while trying to log in. Please try again later.');
+      }
+      console.error('Error logging in:', error);
     }
-    console.error('Error logging in:', error);
-  }
-};
-  
-  
+  };
 
   const handleEmailFocus = () => {
     setShowSuggestions(true);

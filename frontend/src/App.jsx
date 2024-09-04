@@ -27,6 +27,7 @@ import Auth from './view/hooks/Auth.jsx';
 import SuperAdminRoute from './view/hooks/SuperadminAuth.jsx';
 import ProjectmanagementAuth from './view/hooks/AuthProjectmanagement.jsx'
 import Verify2FA from './view/hooks/Verify2FA.JSX';
+import Verify2FAPending from './view/hooks/Verify2faPending.jsx';
 //Client
 import User from './view/pages/Client/User.jsx';
 
@@ -76,6 +77,7 @@ const App = () => {
         <Route path="/forgot" element={<Forgotpassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/verify-2fa/:token" element={<Verify2FA />} />
+        <Route path = "/verify-2fa-pending" element ={<Verify2FAPending /> } />
 
         {/* Admin Routes */}
         <Route

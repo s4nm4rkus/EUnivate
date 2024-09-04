@@ -1,44 +1,34 @@
-      import express from 'express';
-      import { getUsers, createUser, loginUser, forgotPassword, resetPassword} from '../controllers/userController.js';
-      import { updateUser, updateUserPassword } from '../controllers/updateUserInformation.js';
-      import { protect, verifySuperAdmin } from '../middlewares/middleware.js';
-      import { ContactEunivate } from '../controllers/contactEunivate.js';
-      import { createQuotation } from '../controllers/quotationController.js'
-      import { enableTwoFactorAuth, verifyOtpFor2FA, disableTwoFactorAuth  } from '../controllers/adminAuthentication.js';
-      import upload from '../middlewares/multerMiddleware.js';
-      const router = express.Router();
+import express from 'express';
+import { getUsers, createUser } from '../controllers/userController.js';
+import { loginUser, forgotPassword, resetPassword } from '../controllers/authController.js';
+import {verifyLoginOtp, verifyTwoFactorAuth  } from '../controllers/adminAuthentication.js';
+import { refreshToken } from '../utils/jwtUtils.js';
+import { protect, verifySuperAdmin } from '../middlewares/middleware.js';
+import { updateUser, updateUserPassword } from '../controllers/updateUserInformation.js';
+import upload from '../middlewares/multerMiddleware.js';
 
-       router.post('/login', loginUser);
+const router = express.Router();
 
-      router.post('/', upload.single('profilePicture'), createUser);
+// User Authentication Routes
+router.post('/login', loginUser);
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password/:token', resetPassword);
+router.post('/verify-otp', verifyTwoFactorAuth);  
+router.post('/verify-login-otp',  verifyLoginOtp);  
+router.post('/refresh-token', refreshToken);
 
-      router.post('/forgot-password', forgotPassword);
-      router.post("/reset-password/:token", resetPassword);
-
-      router.post('/enable-2fa', enableTwoFactorAuth);
-      router.get('/:id/verify-2fa', verifyOtpFor2FA);
-      router.post('/disable-2fa', disableTwoFactorAuth);
-      //User Contact Eunivate Request API route
-      router.post('/contactEunivate', ContactEunivate);
-      // quotation route
-      router.post('/quotation',createQuotation);
+// User Management Routes
+router.get('/', protect, getUsers);  // Protect this route to require authentication
+router.post('/', upload.single('profilePicture'), createUser);
 
 
-      //SuperAdmin Setting Profile
+// User Update Routes
+router.put('/:id', updateUser);
+router.put('/:id/password', updateUserPassword);
 
-      // Route to update user information
-      router.put('/:id', updateUser);
-      // Route to update user password
-      router.put('/:id/password', updateUserPassword)
-      // Route to enable two-factor authentication
+// SuperAdmin Route (Protected)
+router.get('/superadmin', protect, verifySuperAdmin, (req, res) => {
+  res.status(200).json({ message: 'Welcome to the SuperAdmin dashboard' });
+});
 
-
-  // Protect and restrict access to superadmin route
-  router.get('/superadmin', protect, verifySuperAdmin, (req, res) => {
-    res.status(200).json({ message: 'Welcome to the SuperAdmin dashboard' });
-  });
-
-
-  router.get('/', protect, getUsers);  // Protect this route to require authentication
-
-  export default router;
+export default router;

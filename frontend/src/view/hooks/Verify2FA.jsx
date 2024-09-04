@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const Verify2FA = () => {
-  const { id } = useParams(); // Extract the id from the URL parameters
+  const { token } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -12,27 +12,42 @@ const Verify2FA = () => {
   const handleVerify2FA = async () => {
     setLoading(true);
     try {
-     
-      const response = await axios.get(`http://localhost:5000/api/users/${id}/verify-2fa`);
+      const response = await axios.get(`http://localhost:5000/api/users/verify-2fa/${token}`);
 
       if (response.status === 200) {
         setSuccess('Two-Factor Authentication enabled successfully!');
         setTimeout(() => {
-          navigate('/login'); 
+          navigate('/login');
         }, 2000);
       } else {
         setError(response.data.message || 'Something went wrong');
       }
     } catch (error) {
-      setError('An error occurred while verifying Two-Factor Authentication.');
+      if (error.response) {
+        if (error.response.status === 400) {
+          setError('Invalid token. Please request a new verification link.');
+        } else if (error.response.status === 401) {
+          setError('Token has expired. Please request a new verification link.');
+        } else {
+          setError('An error occurred while verifying Two-Factor Authentication. Please try again later.');
+        }
+      } else if (error.request) {
+        setError('No response from server. Please check your network connection.');
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    handleVerify2FA();
-  }, []); // Run the verification when the component mounts
+    if (token) {
+      handleVerify2FA();
+    } else {
+      setError('Invalid verification token.');
+    }
+  }, [token]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Loginback } from '../../../constants/assets';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,7 +14,6 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Load saved emails from localStorage
     const savedCreds = JSON.parse(localStorage.getItem('savedCredentials')) || [];
     setSavedCredentials(savedCreds);
   }, []);
@@ -32,13 +32,20 @@ const Login = () => {
       const data = response.data;
 
       if (response.status === 200) {
+        // Check if OTP is required
         if (data.twoFactorEnabled) {
-          // Redirect to a 2FA verification page
-          navigate(`/verify-2fa/${data._id}`);
+          // Store user information locally without tokens
+          localStorage.setItem('user', JSON.stringify({
+            userId: data._id,
+            email: data.email,
+          }));
+
+          // Redirect to OTP verification page
+          navigate('/verify-2fa-pending');
         } else {
-          // Store user information in local storage
-          const { _id, firstName, lastName, email, role, username, phoneNumber, profilePicture, twoFactorEnabled, token } = data;
-  
+          // Store user information in local storage including tokens
+          const { _id, firstName, lastName, email, role, username, phoneNumber, profilePicture, accessToken, refreshToken } = data;
+
           localStorage.setItem('user', JSON.stringify({
             _id,
             firstName,
@@ -47,9 +54,9 @@ const Login = () => {
             email,
             phoneNumber,
             profilePicture,
-            twoFactorEnabled,
-            token,
             role,
+            accessToken,
+            refreshToken,
           }));
 
           // Handle "Remember Me" functionality
@@ -111,22 +118,21 @@ const Login = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             onFocus={handleEmailFocus}
-            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)} // Delay to allow click on suggestion
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)} 
           />
          {showSuggestions && (
-  <ul className="absolute bg-white rounded-md mt-1 w-full max-h-40 overflow-y-auto z-10 shadow-md">
-    {savedCredentials.map((cred, index) => (
-      <li
-        key={index}
-        className="p-2 cursor-pointer hover:bg-gray-100"
-        onClick={() => handleEmailSelect(cred.email)}
-      >
-        {cred.email}
-      </li>
-    ))}
-  </ul>
-)}
-
+          <ul className="absolute bg-white rounded-md mt-1 w-full max-h-40 overflow-y-auto z-10 shadow-md">
+            {savedCredentials.map((cred, index) => (
+              <li
+                key={index}
+                className="p-2 cursor-pointer hover:bg-gray-100"
+                onClick={() => handleEmailSelect(cred.email)}
+              >
+                {cred.email}
+              </li>
+            ))}
+          </ul>
+         )}
         </div>
         <div className="mb-4 relative">
           <label className="block text-gray-700 text-sm font-semibold mb-2">Password</label>

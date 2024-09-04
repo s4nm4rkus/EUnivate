@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const Verify2FA = () => {
-  const { token } = useParams();
+  const { id } = useParams(); // Extract the id from the URL parameters
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -12,12 +12,13 @@ const Verify2FA = () => {
   const handleVerify2FA = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:5000/api/users/verify-2fa/${token}`);
+     
+      const response = await axios.get(`http://localhost:5000/api/users/${id}/verify-2fa`);
 
       if (response.status === 200) {
         setSuccess('Two-Factor Authentication enabled successfully!');
         setTimeout(() => {
-          navigate('/login'); // Redirect to login page after successful verification
+          navigate('/login'); 
         }, 2000);
       } else {
         setError(response.data.message || 'Something went wrong');
@@ -31,7 +32,7 @@ const Verify2FA = () => {
 
   useEffect(() => {
     handleVerify2FA();
-  }, []);
+  }, []); // Run the verification when the component mounts
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">

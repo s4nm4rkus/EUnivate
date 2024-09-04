@@ -47,11 +47,11 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    twoFactorToken: {
-        type: String,
+    otp: {
+        type: String,  
     },
-    twoFactorTokenExpire: {
-        type: Date,
+    otpExpire: {
+        type: Date,  
     },
     resetPasswordToken: String,
     resetPasswordExpire: Date,

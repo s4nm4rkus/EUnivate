@@ -4,7 +4,7 @@
       import { protect, verifySuperAdmin } from '../middlewares/middleware.js';
       import { ContactEunivate } from '../controllers/contactEunivate.js';
       import { createQuotation } from '../controllers/quotationController.js'
-      import { enableTwoFactorAuth, verifyTwoFactorAuth, disableTwoFactorAuth  } from '../controllers/adminAuthentication.js';
+      import { enableTwoFactorAuth, verifyOtpFor2FA, disableTwoFactorAuth  } from '../controllers/adminAuthentication.js';
       import upload from '../middlewares/multerMiddleware.js';
       const router = express.Router();
 
@@ -16,7 +16,7 @@
       router.post("/reset-password/:token", resetPassword);
 
       router.post('/enable-2fa', enableTwoFactorAuth);
-      router.get('/verify-2fa/:token', verifyTwoFactorAuth);
+      router.get('/:id/verify-2fa', verifyOtpFor2FA);
       router.post('/disable-2fa', disableTwoFactorAuth);
       //User Contact Eunivate Request API route
       router.post('/contactEunivate', ContactEunivate);

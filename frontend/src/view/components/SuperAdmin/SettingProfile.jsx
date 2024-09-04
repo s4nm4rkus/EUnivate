@@ -20,18 +20,21 @@ const SettingProfile = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otp, setOtp] = useState('');
+
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [is2FAEnabled, setIs2FAEnabled] = useState(false); 
+  const [is2FAEnabled, setIs2FAEnabled] = useState(false);
   const defaultProfilePictureUrl = 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png';
 
   const validatePassword = (password) => {
     const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{9,}$/;
     return passwordRegex.test(password);
   };
-
+  
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
 
@@ -52,6 +55,28 @@ const SettingProfile = () => {
         setProfilePicture(defaultProfilePictureUrl);
       }
     }
+
+    const check2FAStatus = async () => {
+      try {
+        if (storedUser && storedUser._id) {
+          const response = await axios.get(`http://localhost:5000/api/users/${storedUser._id}/verify-2fa`);
+
+
+          console.log('Response from 2FA status check:', response.data.twoFactorEnabled);
+
+          setIs2FAEnabled(response.data.twoFactorEnabled);
+
+          storedUser.twoFactorEnabled = response.data.twoFactorEnabled;
+          localStorage.setItem('user', JSON.stringify(storedUser));
+
+          console.log('Updated local storage with 2FA status:', storedUser.twoFactorEnabled);
+        }
+      } catch (error) {
+        console.error('Error checking 2FA status:', error);
+      }
+    };
+
+    check2FAStatus();
   }, []);
 
   const handleEditClick = async (field) => {
@@ -149,7 +174,6 @@ const SettingProfile = () => {
     }
   };
 
-  
   const handleChangePassword = async (e) => {
     e.preventDefault();
   
@@ -197,34 +221,66 @@ const SettingProfile = () => {
     }
   };
 
-
   //HANDLE 2FA
   const handleEnableTwoFactorAuth = async () => {
-    try {     
+    try {
       const storedUser = JSON.parse(localStorage.getItem('user'));
-      if (!storedUser || !storedUser._id) {
-        setError('User not logged in or user ID is missing.');
-        return;
-      }
-  
       const response = await axios.post('http://localhost:5000/api/users/enable-2fa', {
         userId: storedUser._id,
-      }, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+      });
+
+      if (response.status === 200) {
+        setSuccess('OTP sent. Please check your inbox.');
+        setShowOtpModal(true); // Show the OTP modal
+      } else {
+        setError(response.data.message || 'Something went wrong');
+      }
+    } catch (err) {
+      setError('An error occurred while enabling Two-Factor Authentication.');
+      console.error('Error enabling 2FA:', err);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    try {
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      const response = await axios.get(`http://localhost:5000/api/users/${storedUser._id}/verify-2fa`, {
+        params: {
+          otp: otp, // Pass OTP here as a query parameter
         },
       });
   
       if (response.status === 200) {
-        alert('Verification email sent. Please check your inbox.');
-        setIs2FAEnabled(true);
-        localStorage.setItem('twoFASent', 'true');
+        setSuccess('Two-Factor Authentication enabled successfully!');
+        setIs2FAEnabled(true); // Update UI to reflect 2FA is enabled
+        setShowOtpModal(false); // Hide OTP modal
       } else {
-        alert(response.data.message || 'Something went wrong');
+        setError(response.data.message || 'Invalid OTP');
       }
     } catch (err) {
-      alert('An error occurred while enabling Two-Factor Authentication.');
-      console.error('Error enabling 2FA:', err);
+      setError('An error occurred while verifying OTP.');
+      console.error('Error verifying OTP:', err);
+    }
+  };
+
+  const handleDisableTwoFactorAuth = async () => {
+    try {
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      const response = await axios.post('http://localhost:5000/api/users/disable-2fa', {
+        userId: storedUser._id,
+      });
+
+      if (response.status === 200) {
+        setSuccess('Two-Factor Authentication disabled successfully.');
+        setIs2FAEnabled(false);
+        storedUser.twoFactorEnabled = false;
+        localStorage.setItem('user', JSON.stringify(storedUser));
+      } else {
+        setError(response.data.message || 'Something went wrong');
+      }
+    } catch (err) {
+      setError('An error occurred while disabling Two-Factor Authentication.');
+      console.error('Error disabling 2FA:', err);
     }
   };
 
@@ -354,13 +410,19 @@ const SettingProfile = () => {
           code from your mobile phone in order to sign in.
         </p>
         <div className="mt-3 flex">
-          <button 
-            onClick={handleEnableTwoFactorAuth}
-            className="px-4 py-2 bg-red-800 text-white rounded hover:bg-red-900"
-            disabled={is2FAEnabled} 
-          >
-            {is2FAEnabled ? '2FA Enabled' : 'Enable Two-Factor Auth'}
-          </button>
+          {is2FAEnabled ? (
+            <button
+              onClick={handleDisableTwoFactorAuth}
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+              Disable Two-Factor Auth
+            </button>
+          ) : (
+            <button
+              onClick={handleEnableTwoFactorAuth}
+              className="px-4 py-2 bg-red-800 text-white rounded hover:bg-red-900">
+              Enable Two-Factor Auth
+            </button>
+          )}
         </div>
       </div>
 
@@ -443,6 +505,35 @@ const SettingProfile = () => {
                 className="ml-3 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
               >
                 Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* OTP Modal */}
+      {showOtpModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
+          <div className="bg-white rounded-lg p-8 shadow-lg w-96">
+            <h2 className="text-xl font-bold mb-4 text-center">Enter OTP</h2>
+            <p className="text-gray-600 text-center mb-4">
+              Please enter the OTP sent to your email to enable Two-Factor Authentication.
+            </p>
+            <div className="flex justify-center">
+              <input
+                type="text"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                className="border border-gray-300 rounded-lg px-4 py-2 text-center text-lg"
+                maxLength={6}
+              />
+            </div>
+            <div className="mt-6 flex justify-center">
+              <button
+                onClick={handleVerifyOtp}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Verify OTP
               </button>
             </div>
           </div>

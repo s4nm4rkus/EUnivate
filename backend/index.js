@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
 import cors from 'cors';
-import messageRoutes from './routes/chatMessageRoutes.js';
+import chatMessageRoutes from './routes/chatMessageRoutes.js'; // Ensure this path is correct
 
 dotenv.config();
 connectDB();
@@ -15,8 +15,8 @@ app.use(express.json());
 // Use user routes
 app.use('/api/users', userRoutes);
 
-// Message routes
-app.use('/api/chatMessages', messageRoutes);
+// Chat message routes
+app.use('/api/messages', chatMessageRoutes); // Ensure this path is correct
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -27,11 +27,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-
 app.get('/', (req, res) => {
   res.send('Welcome to the API');
 });
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-

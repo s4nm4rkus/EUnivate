@@ -1,3 +1,4 @@
+// backend/controllers/userChatMessageController.js
 import Message from '../models/chatMessageModel.js';
 
 export const getMessages = async (req, res) => {
@@ -10,12 +11,28 @@ export const getMessages = async (req, res) => {
 };
 
 export const sendMessage = async (req, res) => {
-  const { content, sender, file, time } = req.body;
   try {
-    const message = new Message({ content, sender, file, time });
-    await message.save();
-    res.status(201).json(message);
+    const { content, sender, file, time } = req.body;
+
+    // Create a new message instance
+    const newMessage = new Message({
+      content,
+      sender,
+      file: {
+        name: file?.name || '', // Ensure file properties are handled correctly
+        type: file?.type || '',
+        url: file?.url || ''
+      },
+      time
+    });
+
+    // Save the message to the database
+    await newMessage.save();
+
+    // Send response with the saved message
+    res.status(201).json(newMessage);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error('Error saving message:', error);
+    res.status(500).json({ error: 'Failed to save message' });
   }
 };

@@ -3,8 +3,10 @@ import { getMessages, sendMessage } from '../controllers/userChatMessageControll
 
 const router = express.Router();
 
-router.route('/')
-  .get(getMessages)
-  .post(sendMessage);
+// Route to get all messages
+router.get('/', getMessages); // Use the async handler directly
+
+// Route to send a new message
+router.post('/', sendMessage); // Use the async handler directly
 
 export default router;

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const messageSchema = new mongoose.Schema({
+const chatMessageSchema = new mongoose.Schema({
   content: {
     type: String,
     required: true,
@@ -10,9 +10,9 @@ const messageSchema = new mongoose.Schema({
     avatar: { type: String }, // optional avatar URL for sender
   },
   file: {
-    name: String,
-    type: String,
-    url: String,
+    name: { type: String, default: '' }, // file name
+    type: { type: String, default: '' }, // file type
+    url: { type: String, default: '' },  // file URL
   },
   time: {
     type: String,
@@ -20,6 +20,6 @@ const messageSchema = new mongoose.Schema({
   },
 });
 
-const Message = mongoose.model('Message', messageSchema);
+const ChatMessage = mongoose.model('ChatMessage', chatMessageSchema); // This should match the collection name
 
-export default Message;
+export default ChatMessage;

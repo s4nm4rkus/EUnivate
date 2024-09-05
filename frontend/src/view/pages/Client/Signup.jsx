@@ -86,21 +86,21 @@ const Signup = () => {
         role
       });
 
-      const userData = response.data;
+      const user = response.data;
 
-      if (userData._id && userData.accessToken) {
+      if (user._id && userData.accessToken) {
         // Store user data in localStorage
         localStorage.setItem('user', JSON.stringify({
-          _id: userData._id,
-          email: userData.email,
-          phoneNumber: userData.phoneNumber,
-          firstName: userData.firstName,
-          lastName: userData.lastName,
-          password: userData.password,
-          profilePicture: userData.profilePicture,
-          username: userData.username,
-          role: userData.role,
-          token: userData.accessToken, // Store the access token
+          _id: user._id,
+          email: user.email,
+          phoneNumber: user.phoneNumber,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          password: user.password,
+          profilePicture: user.profilePicture,
+          username: user.username,
+          role: user.role,
+          token: user.accessToken, // Store the access token
         }));
 
         // Redirect to OTP verification page

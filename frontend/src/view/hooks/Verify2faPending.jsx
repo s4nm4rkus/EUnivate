@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const Verify2FAPending = () => {
-  const [otp, setOtp] = useState(['', '', '', '',]);
+  const [otp, setOtp] = useState(['', '', '', '']);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [storedUser, setStoredUser] = useState(null);
@@ -26,55 +26,92 @@ const Verify2FAPending = () => {
       setOtp(newOtp);
 
       if (value && index < otp.length - 1) {
+        // Move to the next input if a digit is entered
         document.getElementById(`otp-input-${index + 1}`).focus();
+      } else if (!value && index > 0) {
+        // Move to the previous input if the value is cleared
+        document.getElementById(`otp-input-${index - 1}`).focus();
       }
     }
   };
 
-  const handleVerifyOtp = async () => {
-    if (!storedUser) {
-      setError('User data not found. Please log in again.');
-      return;
-    }
-
-    const otpCode = otp.join('');
-
-    if (otpCode.length < 4) {
-      setError('Please enter the complete OTP.');
-      return;
-    }
-
-    try {
-      const response = await axios.post('http://localhost:5000/api/users/verify-otp', {
-        userId: storedUser._id,
-        otp: otpCode,
-      });
-
-      if (response.status === 200) {
-        setSuccess('OTP verified successfully!');
-
-        // Navigate based on user role after 2 seconds
-        setTimeout(() => {
-          const roleLowerCase = storedUser.role.toLowerCase();
-          if (roleLowerCase === 'superadmin') {
-            navigate('/superadmin/dashboard');
-          } else if (roleLowerCase === 'admin') {
-            navigate('/admin');
-          } else if (roleLowerCase === 'collaborator') {
-            navigate('/collaborator-dashboard');
-          } else if (roleLowerCase === 'user') {
-            navigate('/');
+      const handleVerifyOtp = async () => {
+        if (!storedUser) {
+          setError('User data not found. Please log in again.');
+          return;
+        }
+      
+        const otpCode = otp.join('');
+      
+        if (otpCode.length < 4) {
+          setError('Please enter the complete OTP.');
+          return;
+        }
+      
+        try {
+          const response = await axios.post('http://localhost:5000/api/users/verify-otp', {
+            userId: storedUser.userId, // This should be 'userId'
+            otp: otpCode,
+          });
+      
+          if (response.status === 200) {
+            setSuccess('OTP verified successfully!');
+      
+            // Store access token and refresh token in local storage
+            const {
+              _id,
+              firstName,
+              lastName,
+              email,
+              role,
+              username,
+              phoneNumber,
+              profilePicture,
+              accessToken,
+              refreshToken,
+            } = response.data;
+      
+            localStorage.setItem('user', JSON.stringify({
+              _id,
+              firstName,
+              lastName,
+              username,
+              email,
+              phoneNumber,
+              profilePicture,
+              role,
+              accessToken,
+              refreshToken,
+            }));
+      
+            // Redirect based on user role after 2 seconds
+            setTimeout(() => {
+              if (role) {
+                const roleLowerCase = role.toLowerCase();
+                if (roleLowerCase === 'superadmin') {
+                  navigate('/superadmin/dashboard');
+                } else if (roleLowerCase === 'admin') {
+                  navigate('/admin');
+                } else if (roleLowerCase === 'collaborator') {
+                  navigate('/collaborator-dashboard');
+                } else if (roleLowerCase === 'ser') {
+                  navigate('/');
+                } else {
+                  console.error('Unknown role:', role);
+                  navigate('/');
+                }
+              } else {
+                console.error('Role is not defined.');
+                navigate('/login'); // Redirect to login if role is undefined
+              }
+            }, 2000);
           } else {
-            console.error('Unknown role:', storedUser.role);
+            setError('Invalid OTP. Please try again.');
           }
-        }, 2000);
-      } else {
-        setError('Invalid OTP. Please try again.');
-      }
-    } catch (err) {
-      setError('Failed to verify OTP. Please try again later.');
-    }
-  };
+        } catch (err) {
+          setError('Failed to verify OTP. Please try again later.');
+        }
+      };
 
   const handleResendOtp = async () => {
     if (!storedUser) {

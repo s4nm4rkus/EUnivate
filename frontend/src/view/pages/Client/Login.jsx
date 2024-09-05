@@ -93,6 +93,7 @@ const Login = () => {
     }
   };
 
+  
   const handleEmailFocus = () => {
     setShowSuggestions(true);
   };

@@ -1,7 +1,7 @@
 import express from 'express';
 import { getUsers, createUser } from '../controllers/userController.js';
 import { loginUser, forgotPassword, resetPassword } from '../controllers/authController.js';
-import {verifyLoginOtp, verifyTwoFactorAuth  } from '../controllers/adminAuthentication.js';
+import {verifyLoginOtp, verifyTwoFactorAuth, resendOtp } from '../controllers/adminAuthentication.js';
 import { refreshToken } from '../utils/jwtUtils.js';
 import { protect, verifySuperAdmin } from '../middlewares/middleware.js';
 import { updateUser, updateUserPassword } from '../controllers/updateUserInformation.js';
@@ -15,6 +15,7 @@ router.post('/forgot-password', forgotPassword);
 router.post('/reset-password/:token', resetPassword);
 router.post('/verify-otp', verifyTwoFactorAuth);  
 router.post('/verify-login-otp',  verifyLoginOtp);  
+router.post('/resend-otp',  resendOtp);  
 router.post('/refresh-token', refreshToken);
 
 // User Management Routes

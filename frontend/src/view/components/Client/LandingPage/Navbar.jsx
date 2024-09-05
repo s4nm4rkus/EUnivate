@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faSignOutAlt, faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 import { downArrow, menu, close, webinar } from '../../../../constants/assets';
-
+import axios from 'axios';
 const Navbar = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [toggle, setToggle] = useState(false);
@@ -85,6 +85,9 @@ const Navbar = () => {
     navigate('/');
     window.location.reload();
   };
+  
+
+
 
   const handleLogin = () => {
     navigate('/login'); // Directly navigate to the login page

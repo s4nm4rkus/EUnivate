@@ -4,7 +4,6 @@ import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import { generateAccessToken, generateRefreshToken } from '../utils/jwtUtils.js';
 
-
 // Generate an OTP for 2FA with numbers only
 const generateNumericOtp = (length) => {
   let otp = '';
@@ -14,66 +13,64 @@ const generateNumericOtp = (length) => {
   return otp;
 };
 
-
 // User Login
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-      const user = await User.findOne({ email });
+    const user = await User.findOne({ email });
 
-      if (!user) {
-          return res.status(400).json({ message: 'Email not found' });
-      }
+    if (!user) {
+      return res.status(400).json({ message: 'Email not found' });
+    }
 
-      const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
 
-      if (!isMatch) {
-          return res.status(400).json({ message: 'Invalid email or password' });
-      }
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid email or password' });
+    }
 
-  
-        // Generate an OTP for 2FA
+    // Generate an OTP for 2FA
+    const twoFactorToken = generateNumericOtp(4);
+    user.twoFactorToken = twoFactorToken;
+    user.twoFactorTokenExpire = Date.now() + 60 * 1000; // OTP valid for 1 minute
 
-      const twoFactorToken = generateNumericOtp(4); 
-      user.twoFactorToken = twoFactorToken;
-      user.twoFactorTokenExpire = Date.now() +  60 * 1000; 
+    user.twoFactorEnabled = true;
+    await user.save();
 
+    const accessToken = generateAccessToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
 
-      await user.save();
+    user.refreshToken.push(refreshToken);
+    await user.save();
 
-      const accessToken = generateAccessToken(user._id);
-      const refreshToken = generateRefreshToken(user._id);
-  
-      user.refreshToken.push(refreshToken);
-      await user.save();
+    // Send OTP email
+    const message = `Your login OTP code is ${twoFactorToken}`;
+    await sendEmail({
+      email: user.email,
+      subject: 'Login Verification OTP',
+      message,
+    });
 
-      // Send OTP email
-      const message = `Your login OTP code is ${twoFactorToken}`;
-      await sendEmail({
-        email: user.email,
-        subject: 'Login Verification OTP',
-        message,
-      });
-  
-      res.status(200).json({
-          _id: user._id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          username: user.username,
-          email: user.email,
-          phoneNumber: user.phoneNumber,
-          profilePicture: user.profilePicture,
-          role: user.role,
-          twoFactorEnabled: user.twoFactorEnabled,
-          token: accessToken,  // Pass the access token here
-          refreshToken,
-      });
+    res.status(200).json({
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      username: user.username,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      profilePicture: user.profilePicture,
+      role: user.role,
+      twoFactorEnabled: user.twoFactorEnabled,
+      token: accessToken,  // Pass the access token here
+      refreshToken,
+    });
   } catch (error) {
-      console.error('Error during login:', error);
-      res.status(500).json({ message: 'Server error', error });
+    console.error('Error during login:', error);
+    res.status(500).json({ message: 'Server error', error });
   }
 };
+
 // Forgot Password
 export const forgotPassword = async (req, res) => {
   const { email } = req.body;

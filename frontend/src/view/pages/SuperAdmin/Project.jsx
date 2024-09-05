@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { FaCalendar, FaPaperclip, FaPlus, FaTimes, FaCheckCircle } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaCalendar, FaPaperclip, FaPlus, FaTimes, FaCheckCircle, FaTrash } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import AdminNavbar from '../../components/SuperAdmin/adminNavbar';
 
 const Project = () => {
@@ -11,6 +12,14 @@ const Project = () => {
     const [team, setTeam] = useState('');
     const [projects, setProjects] = useState([]); // State for managing the list of projects
     const [error, setError] = useState(''); // State to manage error messages
+
+    const navigate = useNavigate(); // Initialize useNavigate
+
+    useEffect(() => {
+        // Load projects from local storage when component mounts
+        const storedProjects = JSON.parse(localStorage.getItem('projects')) || [];
+        setProjects(storedProjects);
+    }, []);
 
     const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
 
@@ -44,20 +53,37 @@ const Project = () => {
         return `${month}-${day}-${year}`;
     };
 
+    // This part remains the same in your Project component
     const handleCreateProject = () => {
-        // Validation: Ensure all fields are filled
         if (!imagePreview || !projectName || !team) {
             setError('Please fill out all fields including image, project name, and team.');
             return;
         }
-
+    
         const newProject = {
             name: projectName,
             image: imagePreview,
             date: formatDate(new Date()),
+            progress: 5 // Set a default progress value, adjust as needed
         };
-        setProjects([...projects, newProject]);
+    
+        const updatedProjects = [...projects, newProject];
+        setProjects(updatedProjects);
+        localStorage.setItem('projects', JSON.stringify(updatedProjects));
+    
         closeModal();
+    };
+    
+
+const handleDeleteProject = (index) => {
+    const updatedProjects = projects.filter((_, i) => i !== index);
+    setProjects(updatedProjects);
+    localStorage.setItem('projects', JSON.stringify(updatedProjects));
+};
+
+
+    const handleProjectClick = (project) => {
+        navigate(`/superadmin/projects/${project.name}`, { state: { project } });
     };
 
     return (
@@ -156,7 +182,11 @@ const Project = () => {
             {/* Display Projects */}
             <div className="mt-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {projects.map((project, index) => (
-                    <div key={index} className="bg-white p-4 rounded-md shadow-md border border-gray-200 mt-4">
+                    <div 
+                        key={index} 
+                        className="bg-white p-4 rounded-md shadow-md border border-gray-200 mt-4 relative cursor-pointer"
+                        onClick={() => handleProjectClick(project)}
+                    >
                         {project.image && (
                             <img 
                                 src={project.image} 
@@ -172,6 +202,17 @@ const Project = () => {
                             <p className="ml-2">0</p>
                             <FaCheckCircle className="ml-5" />
                             <p className="ml-2">0</p>
+                            {/* Delete Button */}
+                            <button 
+                                onClick={(e) => {
+                                    e.stopPropagation(); // Prevent event from bubbling up
+                                    handleDeleteProject(index);
+                                }} 
+                                className="absolute bottom-14 right-6 bg-red-600 text-white p-3 rounded-full shadow hover:bg-red-700"
+                            title="Delete Project"
+                        >
+                            <FaTrash size={20} />
+                        </button>
                         </div>
                         {/* Progress Bar with Percentage */}
                         <div className="flex items-center mt-4">
@@ -180,6 +221,7 @@ const Project = () => {
                             </div>
                             <p className="ml-2 text-gray-500">5%</p> {/* Percentage value with margin */}
                         </div>
+
                     </div>
                 ))}
             </div>

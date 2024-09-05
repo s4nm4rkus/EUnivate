@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Loginback } from '../../../constants/assets';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faEnvelope, faLock, faEye, faEyeSlash, faPhone } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faEnvelope, faLock, faEye, faEyeSlash, faPhone, faImage } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
@@ -211,13 +211,19 @@ const Signup = () => {
           </div>
 
           <div className="relative mt-4">
-            <input
-              type="file"
-              name="profilePicture"
-              accept="image/*"
-              onChange={handleProfilePictureChange}
-              className="w-full p-3 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
+          <FontAwesomeIcon icon={faImage} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <label htmlFor="profilePicture" className="cursor-pointer w-52 flex items-center p-3 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <span className="text-gray-500">Upload Profile Picture</span>
+                <input
+                  id="profilePicture"
+                  type="file"
+                  name="profilePicture"
+                  accept="image/*"
+                  onChange={handleProfilePictureChange}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                
+             </label>
           </div>
 
           <button

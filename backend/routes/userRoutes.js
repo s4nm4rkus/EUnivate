@@ -4,6 +4,7 @@ import { loginUser, forgotPassword, resetPassword } from '../controllers/authCon
 import {verifyLoginOtp, verifyTwoFactorAuth, resendOtp } from '../controllers/adminAuthentication.js';
 import { refreshToken } from '../utils/jwtUtils.js';
 import { protect, verifySuperAdmin } from '../middlewares/middleware.js';
+import { ContactEunivate } from '../controllers/contactEunivate.js';
 import { updateUser, updateUserPassword } from '../controllers/updateUserInformation.js';
 import upload from '../middlewares/multerMiddleware.js';
 
@@ -18,6 +19,8 @@ router.post('/verify-login-otp',  verifyLoginOtp);
 router.post('/resend-otp',  resendOtp);  
 router.post('/refresh-token', refreshToken);
 
+//User Messages Related
+router.post('/contactEunivate',ContactEunivate )
 // User Management Routes
 router.get('/', protect, getUsers);  // Protect this route to require authentication
 router.post('/', upload.single('profilePicture'), createUser);

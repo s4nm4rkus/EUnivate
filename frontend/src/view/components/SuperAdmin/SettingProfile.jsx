@@ -6,6 +6,7 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 const SettingProfile = () => {
   const [isEmailEditable, setIsEmailEditable] = useState(false);
   const [isPhoneEditable, setIsPhoneEditable] = useState(false);
+  const [isBiodataEditable, setIsBiodataEditable] = useState(false);
 
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');         
@@ -34,11 +35,11 @@ const SettingProfile = () => {
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
-
+    const storedBiodata = localStorage.getItem('biodata');
     if (storedUser) {
       setEmail(storedUser.email || '');
       setPhoneNumber(storedUser.phoneNumber || '');
-      setBiodata(storedUser.role || '');
+      setBiodata(storedBiodata || ''); 
       setUsername(storedUser.username || '');
       setFirstName(storedUser.firstName || '');
       setLastName(storedUser.lastName || '');
@@ -61,6 +62,9 @@ const SettingProfile = () => {
     } else if (field === 'phone') {
       setIsPhoneEditable((prevState) => !prevState);
       if (isPhoneEditable) await handleSaveProfile(false); // Modal should not close
+    } else if (field === 'biodata') {
+      setIsBiodataEditable((prevState) => !prevState);
+      if (isBiodataEditable) await handleSaveProfile(false); // Modal should not close
     }
   };
 
@@ -136,9 +140,11 @@ const SettingProfile = () => {
           },
         }
       );
-      localStorage.setItem('user', JSON.stringify(response.data)); // Update local storage
+      localStorage.setItem('user', JSON.stringify(response.data));
+      localStorage.setItem('biodata', biodata);
       setIsEmailEditable(false);
       setIsPhoneEditable(false);
+      setIsBiodataEditable(false);
 
       // Conditionally close the modal based on the parameter
       if (shouldCloseModal) {
@@ -285,22 +291,27 @@ const SettingProfile = () => {
                 type="text"
                 value={biodata}
                 onChange={(e) => setBiodata(e.target.value)}
-                className="px-2 py-1 border-none border-gray-300 focus:outline-none focus:border-blue-500"
-                disabled
+                className="px-2 py-1 border-b border-gray-300 focus:outline-none focus:border-blue-500"
+                disabled={!isBiodataEditable}
               />
             </div>
+            <button
+              className="ml-2 px-4 py-1 border border-blue-500 text-blue-500 bg-transparent rounded hover:bg-blue-100 hover:text-blue-700"
+              onClick={() => handleEditClick('biodata')}
+            >
+              {isBiodataEditable ? 'Save' : 'Edit'}
+            </button>
           </div>
         </div>
       </div>
 
       <div className="mt-12">
         <h4 className="text-2xl font-bold text-gray-900">
-          Password & Authentication
+          Change your Password
         </h4>
         <p className="mt-2 text-gray-600">
           You can change your password periodically to increase the security of
-          your account. Make sure you remember your current password to prove
-          that the person who changed the password was actually you.
+          your account. 
         </p>
         <div className="mt-3 flex">
           <button

@@ -3,6 +3,7 @@ import AdminNavbar from "../../components/Admin/AdminNavbar";
 import MessageContent from '../../components/Admin/MessageContent';
 import SidebarMessage from '../../components/Admin/SidebarMessage';
 
+
 const Messages = () => {
     const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
@@ -11,20 +12,20 @@ const Messages = () => {
     const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
 
     return (
-        <div className="bg-gray-100 min-h-screen p-6">
+        <div className="bg-gray-100 min-h-screen p-4">  {/* Reduced padding for the main container */}
             {/* Dashboard Text */}
-            <div className="flex justify-between items-center mb-16">
-                <h1 className="text-2xl font-medium text-gray-800">Messages</h1>
+            <div className="flex justify-between items-center mb-12">  {/* Reduced bottom margin */}
+                <h1 className="text-xl font-medium text-gray-800">Messages</h1>  {/* Decreased font size */}
                 <AdminNavbar 
                     isAccountDropdownOpen={isAccountDropdownOpen} 
                     toggleAccountDropdown={toggleAccountDropdown} 
                 />
             </div>
-            {/* Additional content for Messages page can go here */}
+
             {/* Main Content */}
-            <div className="flex">
-                <SidebarMessage />      {/* Sidebar Component */}
-                <MessageContent />      {/* Message Content Component */}
+            <div className="flex space-x-2">  {/* Reduced spacing between Sidebar and Message Content */}
+                <SidebarMessage />  {/* Sidebar Component */}
+                <MessageContent />  {/* Message Content Component */}
             </div>
         </div>
     );

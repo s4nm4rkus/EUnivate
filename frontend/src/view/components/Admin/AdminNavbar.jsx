@@ -19,12 +19,13 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
     localStorage.removeItem('user');
     localStorage.removeItem('token'); // Remove the token if stored separately
     // Redirect to login page
-    navigate('/login  ');
+    navigate('/login');
   };
+
   return (
     <>
-      {/* Search Bar, Notification, and User Profile */}
-      <div className="flex items-center space-x-9">
+      {/* Admin Navbar */}
+      <div className="flex items-center space-x-9 p-0" style={{ transform: 'translateX(1px)' }}>
         {/* Search Bar with Icon */}
         <div className="relative">
           <input
@@ -37,16 +38,6 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
             className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
           />
         </div>
-{/* 
-     Notification Icon 
-        <div className="relative">
-          <FontAwesomeIcon 
-            icon={faBell} 
-            className="text-gray-600 text-xl cursor-pointer"
-          />
-          {/* Notification dot 
-          <span className="absolute top-0 right-0 inline-block w-2 h-2 transform translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full"></span>
-        </div> */}
 
         {/* User Profile */}
         <div className="relative flex items-center cursor-pointer" onClick={toggleAccountDropdown}>

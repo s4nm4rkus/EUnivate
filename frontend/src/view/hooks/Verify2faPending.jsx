@@ -7,6 +7,7 @@ const Verify2FAPending = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [storedUser, setStoredUser] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,7 +37,10 @@ const Verify2FAPending = () => {
   };
 
       const handleVerifyOtp = async () => {
-        if (!storedUser) {
+        setLoading(true);
+        const userId = storedUser.userId || storedUser._id;
+
+        if (!userId) {
           setError('User data not found. Please log in again.');
           return;
         }
@@ -50,7 +54,7 @@ const Verify2FAPending = () => {
       
         try {
           const response = await axios.post('http://localhost:5000/api/users/verify-otp', {
-            userId: storedUser.userId, // This should be 'userId'
+            userId,
             otp: otpCode,
           });
       
@@ -69,6 +73,7 @@ const Verify2FAPending = () => {
               profilePicture,
               accessToken,
               refreshToken,
+              twoFactorToken,
             } = response.data;
       
             localStorage.setItem('user', JSON.stringify({
@@ -82,6 +87,7 @@ const Verify2FAPending = () => {
               role,
               accessToken,
               refreshToken,
+              twoFactorToken,
             }));
       
             // Redirect based on user role after 2 seconds
@@ -109,6 +115,7 @@ const Verify2FAPending = () => {
             setError('Invalid OTP. Please try again.');
           }
         } catch (err) {
+          setLoading(false);
           setError('Failed to verify OTP. Please try again later.');
         }
       };
@@ -157,8 +164,9 @@ const Verify2FAPending = () => {
         <button
           onClick={handleVerifyOtp}
           className="w-full bg-red-800 text-white py-2 rounded-lg shadow hover:bg-red-600 transition duration-300"
+          disabled={loading} 
         >
-          Confirm
+          {loading ? 'Confirming...' : 'Confirm'}
         </button>
 
         <p className="text-center mt-4 text-gray-600">

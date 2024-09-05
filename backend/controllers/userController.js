@@ -102,6 +102,7 @@ export const createUser = async (req, res) => {
       phoneNumber: createdUser.phoneNumber,
       profilePicture: createdUser.profilePicture,
       role: createdUser.role,
+      twoFactorToken: createdUser.twoFactorToken,
       accessToken,
       refreshToken
     });

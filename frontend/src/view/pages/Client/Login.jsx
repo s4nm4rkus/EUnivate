@@ -11,6 +11,7 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [savedCredentials, setSavedCredentials] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [loading, setloading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,6 +24,7 @@ const Login = () => {
   };
 
   const handleLogin = async () => {
+    setloading(true);
     try {
       const response = await axios.post('http://localhost:5000/api/users/login', {
         email,
@@ -44,7 +46,7 @@ const Login = () => {
           navigate('/verify-2fa-pending');
         } else {
           // Store user information in local storage including tokens
-          const { _id, firstName, lastName, email, role, username, phoneNumber, profilePicture, accessToken, refreshToken } = data;
+          const { _id, firstName, lastName, email, role, username, phoneNumber, profilePicture, accessToken, refreshToken, twoFactorToken } = data;
 
           localStorage.setItem('user', JSON.stringify({
             _id,
@@ -55,6 +57,7 @@ const Login = () => {
             phoneNumber,
             profilePicture,
             role,
+            twoFactorToken,
             accessToken,
             refreshToken,
           }));
@@ -82,6 +85,7 @@ const Login = () => {
         }
       }
     } catch (error) {
+      setloading(false);
       if (error.response && error.response.status === 400) {
         setError('Invalid email or password.');
       } else if (error.response && error.response.status === 404) {
@@ -161,9 +165,14 @@ const Login = () => {
           </div>
           <Link to="/forgot" className="text-sm text-red-600 hover:underline">Forgot Password?</Link>
         </div>
-        <button className="w-full bg-yellow-500 text-white p-3 rounded-lg shadow hover:bg-yellow-600 transition duration-300" onClick={handleLogin}>
-          Login
-        </button>
+        <button
+            type="submit"
+            className="w-full bg-yellow-500 text-white p-3 rounded-lg shadow hover:bg-yellow-600 transition duration-300 mt-6"
+            onClick={handleLogin}
+            disabled={loading}
+          >
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
         <div className="text-center mt-6 text-gray-700">
           <p>
             Don’t have an account? <Link to="/signup" className="text-red-600 hover:underline">SIGN UP</Link>

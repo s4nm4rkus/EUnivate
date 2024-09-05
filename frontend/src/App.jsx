@@ -26,11 +26,9 @@ import MainPage from './view/pages/Client/MainPage.jsx';
 import Auth from './view/hooks/Auth.jsx';
 import SuperAdminRoute from './view/hooks/SuperadminAuth.jsx';
 import ProjectmanagementAuth from './view/hooks/AuthProjectmanagement.jsx';
-// import PrivateOTP from './view/hooks/PrivateOTP.jsx';
 import Verify2FAPending from './view/hooks/Verify2faPending.jsx';
 
-// Client
-import User from './view/pages/Client/User.jsx';
+
 
 // Admins
 import AdminLayout from './view/components/SuperAdmin/AdminLayout';
@@ -88,10 +86,6 @@ const App = () => {
           <Route path="activity" element={<Activity />} />
           <Route path="settings" element={<Settings />} />
         </Route>
-
-        {/* Client */}
-        <Route path="/user" element={<User />} />
-        <Route path="/main" element={<MainPage />} />
       </Routes>
     </Router>
   );

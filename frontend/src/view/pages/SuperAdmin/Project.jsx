@@ -53,7 +53,6 @@ const Project = () => {
         return `${month}-${day}-${year}`;
     };
 
-    // This part remains the same in your Project component
     const handleCreateProject = () => {
         if (!imagePreview || !projectName || !team) {
             setError('Please fill out all fields including image, project name, and team.');
@@ -67,9 +66,13 @@ const Project = () => {
             progress: 5 // Set a default progress value, adjust as needed
         };
     
+        // Save the new project
         const updatedProjects = [...projects, newProject];
         setProjects(updatedProjects);
         localStorage.setItem('projects', JSON.stringify(updatedProjects));
+    
+        // Initialize an empty Kanban board for the new project
+        localStorage.setItem(`kanban-${projectName}`, JSON.stringify([]));
     
         closeModal();
     };

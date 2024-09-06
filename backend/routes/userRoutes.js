@@ -1,11 +1,12 @@
 import express from 'express';
-import { getUsers, createUser } from '../controllers/userController.js';
+import {createUser } from '../controllers/userController.js';
 import { loginUser, forgotPassword, resetPassword } from '../controllers/authController.js';
 import {verifyLoginOtp, verifyTwoFactorAuth, resendOtp } from '../controllers/adminAuthentication.js';
 import { refreshToken } from '../utils/jwtUtils.js';
 import { protect, verifySuperAdmin } from '../middlewares/middleware.js';
 import { ContactEunivate } from '../controllers/contactEunivate.js';
 import { updateUser, updateUserPassword } from '../controllers/updateUserInformation.js';
+import { inviteUsers, updateUserRole, getUsers} from '../controllers/peopleController.js';
 import upload from '../middlewares/multerMiddleware.js';
 
 const router = express.Router();
@@ -22,8 +23,11 @@ router.post('/refresh-token', refreshToken);
 //User Messages Related
 router.post('/contactEunivate',ContactEunivate )
 // User Management Routes
-router.get('/', protect, getUsers);  // Protect this route to require authentication
+router.get('/', getUsers); 
+router.post('/signup', createUser);  
 router.post('/', upload.single('profilePicture'), createUser);
+router.post('/invite', inviteUsers);  
+router.put('/:userId/role', updateUserRole); 
 
 
 // User Update Routes

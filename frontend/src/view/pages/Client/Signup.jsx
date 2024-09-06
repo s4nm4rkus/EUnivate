@@ -35,15 +35,15 @@ const Signup = () => {
   const uploadImageToCloudinary = async (file) => {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('upload_preset', 'EunivateImage'); // Replace with your actual upload preset
-    formData.append('cloud_name', 'dzxzc7kwb'); // Replace with your actual Cloudinary cloud name
+    formData.append('upload_preset', 'EunivateImage'); 
+    formData.append('cloud_name', 'dzxzc7kwb'); 
 
     try {
       const response = await axios.post(
         'https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload',
         formData
       );
-      return response.data.url; // This is the URL of the uploaded image
+      return response.data.url; // URL of the uploaded image
     } catch (error) {
       console.error('Error uploading image:', error);
       throw error;
@@ -52,7 +52,7 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // Clear any previous errors
+    setError(""); // Clear previous errors
     setLoading(true);
 
     if (!validatePassword(password)) {
@@ -63,7 +63,6 @@ const Signup = () => {
 
     let profilePictureUrl = profilePicture;
 
-    // Check if the profile picture is an object (likely a File) and needs to be uploaded
     if (profilePicture) {
       try {
         profilePictureUrl = await uploadImageToCloudinary(profilePicture);
@@ -75,40 +74,36 @@ const Signup = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/api/users", {
+      const response = await axios.post("http://localhost:5000/api/users/signup", {
         firstName,
         lastName,
         username,
         email,
         phoneNumber,
         password,
-        profilePicture: profilePictureUrl, // Send the URL of the uploaded picture
+        profilePicture: profilePictureUrl,
         role
       });
 
       const userData = response.data;
 
       if (userData._id && userData.accessToken) {
-        // Store user data in localStorage
         localStorage.setItem('user', JSON.stringify({
           _id: userData._id,
           email: userData.email,
           phoneNumber: userData.phoneNumber,
           firstName: userData.firstName,
           lastName: userData.lastName,
-          password: userData.password,
           profilePicture: userData.profilePicture,
           username: userData.username,
-          role: userData.role,          
-          token: userData.accessToken, // Store the access token
+          role: userData.role,
+          token: userData.accessToken,
         }));
 
-        // Redirect to OTP verification page
-        console.log('Redirecting to OTP verification page');
         navigate("/verify-2fa-pending");
       }
     } catch (err) {
-      setError(err.response?.data?.message || "An error occurred during signup."); // Display error message
+      setError(err.response?.data?.message || "An error occurred during signup.");
     } finally {
       setLoading(false);
     }
@@ -211,19 +206,18 @@ const Signup = () => {
           </div>
 
           <div className="relative mt-4">
-          <FontAwesomeIcon icon={faImage} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          <label htmlFor="profilePicture" className="cursor-pointer w-52 flex items-center p-3 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <span className="text-gray-500">Upload Profile Picture</span>
-                <input
-                  id="profilePicture"
-                  type="file"
-                  name="profilePicture"
-                  accept="image/*"
-                  onChange={handleProfilePictureChange}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                />
-                
-             </label>
+            <FontAwesomeIcon icon={faImage} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <label htmlFor="profilePicture" className="cursor-pointer w-52 flex items-center p-3 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <span className="text-gray-500">Upload Profile Picture</span>
+              <input
+                id="profilePicture"
+                type="file"
+                name="profilePicture"
+                accept="image/*"
+                onChange={handleProfilePictureChange}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              />
+            </label>
           </div>
 
           <button

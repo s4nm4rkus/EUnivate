@@ -38,8 +38,8 @@ export const loginUser = async (req, res) => {
     user.twoFactorEnabled = true;
     await user.save();
 
-    const accessToken = generateAccessToken(user._id);
-    const refreshToken = generateRefreshToken(user._id);
+      const accessToken = generateAccessToken(user._id);
+      const refreshToken = generateRefreshToken(user._id);
 
     user.refreshToken.push(refreshToken);
     await user.save();

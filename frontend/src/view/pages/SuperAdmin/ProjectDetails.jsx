@@ -1,19 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import '../../../admin.css';
 import AdminNavbar from '../../components/SuperAdmin/adminNavbar';
-import Kanban from './Kanban'; // Make sure to import Kanban component
-import List from './List'; // Make sure to import List component
-import Calendar from './Calendar'; // Make sure to import Calendar component
-import GanttChart from './GanttChart'; // Import the GanttChart component
-import RaciMatrix from './RaciMatrix'; // Import the RaciMatrix component
+import Kanban from './Kanban';
+import List from './List';
+import Calendar from './Calendar';
+import GanttChart from './GanttChart';
+import RaciMatrix from './RaciMatrix';
 
 const ProjectDetails = () => {
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
-    const [selectedView, setSelectedView] = useState('Kanban'); // Set default view to Kanban
-    const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
-    const [addText, setAddText] = useState(''); // State for additional text
-    const modalRef = useRef(null); // Ref for the modal box
+    const [selectedView, setSelectedView] = useState('Kanban');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [addText, setAddText] = useState('');
+    const modalRef = useRef(null);
     const location = useLocation();
     const navigate = useNavigate();
     const project = location.state?.project || {};
@@ -32,25 +31,23 @@ const ProjectDetails = () => {
         setIsModalOpen(false);
     };
 
-    // Handle button text update and view change
     const handleButtonTextUpdate = (text) => {
         setAddText(text);
         handleCloseModal();
         if (text === 'Gantt Chart') {
-            setSelectedView('GanttChart'); // Update the view to GanttChart
+            setSelectedView('GanttChart');
         } else if (text === 'RACI Matrix') {
-            setSelectedView('RaciMatrix'); // Update the view to RaciMatrix
+            setSelectedView('RaciMatrix');
         }
     };
 
-    // Close modal if click is outside the modal box
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (modalRef.current && !modalRef.current.contains(event.target)) {
                 handleCloseModal();
             }
         };
-        
+
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
@@ -66,9 +63,7 @@ const ProjectDetails = () => {
             </div>
 
             <div className="bg-white p-4 rounded-md shadow-md border border-gray-200">
-                {/* Flex container for the image and details */}
                 <div className="flex items-start space-x-4">
-                    {/* Display Image */}
                     {project.image && (
                         <div className="w-24 h-24 flex-shrink-0">
                             <img 
@@ -79,12 +74,10 @@ const ProjectDetails = () => {
                         </div>
                     )}
 
-                    {/* Flex container for the details */}
                     <div className="flex flex-col flex-grow">
-                        {/* Navigation Links */}
                         <div className="flex items-center space-x-4 mb-5">
                             <button
-                                onClick={() => navigate(-1)} // Go back to the previous page
+                                onClick={() => navigate(-1)}
                                 className="text-gray-500 hover:underline"
                             >
                                 Project
@@ -93,10 +86,8 @@ const ProjectDetails = () => {
                             <span className="text-gray-500">Detail</span>
                         </div>
 
-                        {/* Project Name with .App */}
                         <h2 className="text-3xl font-semibold mt-[-1rem]">{project.name}.App</h2>
 
-                        {/* Clickable Text Buttons in a Row */}
                         <div className="flex items-center space-x-4 mt-4">
                             <button
                                 onClick={() => handleViewChange('Kanban')}
@@ -118,15 +109,13 @@ const ProjectDetails = () => {
                                 Calendar
                             </button>
 
-                            {/* Button and additional text container */}
                             <div className="flex items-center space-x-2">
                                 <button
-                                    onClick={handleAddClick} // Open the modal
+                                    onClick={handleAddClick}
                                     className="text-black hover:text-gray-700"
                                 >
                                     + Add
                                 </button>
-                                {/* Display additional text to the right of the + Add button */}
                                 {addText && (
                                     <span className="text-black font-bold">
                                         {addText}
@@ -138,16 +127,14 @@ const ProjectDetails = () => {
                 </div>
             </div>
 
-            {/* Conditional rendering based on selectedView */}
-            <div className="mt-6 bg-white p-4 rounded-md shadow-md border border-gray-200">
-                {selectedView === 'Kanban' && <Kanban />}
+            <div className="mt-6  border-gray-200">
+                {selectedView === 'Kanban' && <Kanban projectName={project.name} />}
                 {selectedView === 'List' && <List />}
-                {selectedView === 'Calendar' && <Calendar />}
-                {selectedView === 'GanttChart' && <GanttChart />} {/* Display GanttChart component */}
-                {selectedView === 'RaciMatrix' && <RaciMatrix />} {/* Display RaciMatrix component */}
+                {selectedView === 'Calendar' && <Calendar project={project} />}
+                {selectedView === 'GanttChart' && <GanttChart />}
+                {selectedView === 'RaciMatrix' && <RaciMatrix />}
             </div>
 
-            {/* Modal Box */}
             {isModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-500 bg-opacity-50">
                     <div

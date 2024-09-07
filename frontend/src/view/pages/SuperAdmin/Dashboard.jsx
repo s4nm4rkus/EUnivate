@@ -1,11 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { i1, i2, i3, i4 } from '../../../constants/assets';
+import { FaCalendarAlt } from 'react-icons/fa'; // Import calendar icon
 import '../../../admin.css';
 import AdminNavbar from '../../components/SuperAdmin/AdminNavbar';
 
 const Dashboard = () => {
     const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
+    const [projectCount, setProjectCount] = useState(0);
+    const [projects, setProjects] = useState([]); // State to manage the list of projects
+
+    useEffect(() => {
+        // Fetch project count and list from local storage
+        const storedProjects = JSON.parse(localStorage.getItem('projects')) || [];
+        setProjects(storedProjects);
+        setProjectCount(storedProjects.length);
+    }, []);
 
     const toggleProjectDropdown = () => setIsProjectDropdownOpen(!isProjectDropdownOpen);
     const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
@@ -25,12 +35,13 @@ const Dashboard = () => {
             <div className="relative mb-6">
                 <button
                     onClick={toggleProjectDropdown}
-                    className="flex items-center h-7 w-40 px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-800 shadow-sm"
+                    className="relative flex items-center h-12 w-56 px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-800 shadow-sm"
                 >
-                    <span className="mr-16 text-sm font-medium">Projects</span>
+                    <span className="text-sm font-medium">Projects</span>
+                    {/* Icon positioned at the right end */}
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className={`w-5 h-5 transform transition-transform duration-300 ${isProjectDropdownOpen ? 'rotate-180' : 'rotate-0'}`}
+                        className={`absolute right-4 w-5 h-5 transform transition-transform duration-300 ${isProjectDropdownOpen ? 'rotate-180' : 'rotate-0'}`}
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
@@ -42,11 +53,20 @@ const Dashboard = () => {
                     </svg>
                 </button>
                 {/* Project Dropdown Menu */}
-                <div className={`absolute left-0 mt-2 w-54 bg-white border border-gray-300 rounded-lg shadow-lg ${isProjectDropdownOpen ? 'block' : 'hidden'}`}>
-                    <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Bookum App</a>
-                    <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">SWYFT</a>
-                    <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Sunstone</a>
-                    <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Kobil</a>
+                <div className={`absolute left-0 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg ${isProjectDropdownOpen ? 'block' : 'hidden'}`}>
+                    {projects.length > 0 ? (
+                        projects.map((project, index) => (
+                            <a
+                                key={index}
+                                href={`/project/${project.id}`} // Assuming each project has a unique ID and you use it for navigation
+                                className="block px-6 py-3 text-gray-800 hover:bg-gray-100"
+                            >
+                                {project.name}
+                            </a>
+                        ))
+                    ) : (
+                        <p className="px-6 py-3 text-gray-500">No projects available</p>
+                    )}
                 </div>
             </div>
 
@@ -54,11 +74,11 @@ const Dashboard = () => {
             <div className="flex space-x-4 mb-6">
                 {/* Task Divs */}
                 {[
-                    { title: "Assigned Task", icon: i1 },
+                    { title: "Assigned Task", icon: i1, count: projectCount },
                     { title: "Task Complete", icon: i2 },
                     { title: "Objective Complete", icon: i3 },
                     { title: "Project Complete", icon: i4 }
-                ].map(({ title, icon }, index) => (
+                ].map(({ title, icon, count }, index) => (
                     <div
                         key={index}
                         className="flex-1 bg-white p-4 border border-gray-300 rounded-lg shadow-sm flex items-center"
@@ -66,13 +86,13 @@ const Dashboard = () => {
                             backgroundImage: `url(${icon})`,
                             backgroundSize: '40px 40px',
                             backgroundRepeat: 'no-repeat',
-                            backgroundPosition: '18px center'  // Added margin-left for icons
+                            backgroundPosition: '18px center'
                         }}
                     >
                         {/* Text and Number */}
                         <div className="ml-16">
                             <div className="text-gray-800 font-semibold mb-1 text-sm">{title}</div>
-                            <div className="text-3xl font-bold">0</div>
+                            <div className="text-3xl font-bold">{count || 0}</div>
                         </div>
                     </div>
                 ))}
@@ -91,16 +111,36 @@ const Dashboard = () => {
                 </div>
                 {/* Activity Div */}
                 <div className="w-2/5 h-72 bg-white p-4 border border-gray-300 rounded-lg shadow-sm">
-                    {/* Content for Activity */}
                     <p>Content for Activity goes here...</p>
                 </div>
             </div>
 
             {/* Ongoing Projects */}
-            <div className="w-2/5 flex flex-col">
-                <h2 className="text-medium font-semibold text-gray-800 mb-2">Ongoing Project</h2>
-                <div className="w-full bg-white p-4 border border-gray-300 rounded-lg shadow-sm h-72 ongoing-projects">
-                    <p>Content for Ongoing Projects goes here...</p>
+            <div className=" flex flex-col">
+                <h2 className="text-medium font-semibold text-gray-800 mb-2">Ongoing Projects</h2>
+                <div className=" ongoing-projects">
+                    {projects.length > 0 ? (
+                        projects.map((project, index) => (
+                            <div key={index} className="bg-white p-4 border border-gray-200 rounded-md shadow-md mb-4 flex items-center space-x-4">
+                                {project.image && (
+                                    <img
+                                        src={project.image}
+                                        alt={project.name}
+                                        className="w-16 h-16 object-cover rounded-md"
+                                    />
+                                )}
+                                <div>
+                                    <p className="text-gray-800 font-semibold">{project.name}.App</p>
+                                    <div className="flex items-center space-x-2 text-gray-500">
+                                        <FaCalendarAlt className="w-4 h-4" />
+                                        <p>{project.date}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-gray-500">No ongoing projects</p>
+                    )}
                 </div>
             </div>
         </div>

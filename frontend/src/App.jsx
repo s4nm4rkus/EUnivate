@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"; 
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; 
 
 /* Client Pages */
 import LandingPage from './view/pages/Client/MainPage';
@@ -24,20 +24,18 @@ import MainPage from './view/pages/Client/MainPage.jsx';
 import CompleteQuotation from './view/pages/Client/CompleteQuotation.jsx';
 import VerifyEmailQuotationSent from './view/pages/Client/VerifyEmailQuotationSent.jsx';
 
-// import Servicespage from './view/pages/Client/Servicespage.jsx';
-//Hooks
+
+
+// Hooks (for authentication and role-based routing)
 import Auth from './view/hooks/Auth.jsx';
 import SuperAdminRoute from './view/hooks/SuperadminAuth.jsx';
-import ProjectmanagementAuth from './view/hooks/AuthProjectmanagement.jsx'
-
-//Client
-import User from './view/pages/Client/User.jsx';
+import ProjectmanagementAuth from './view/hooks/AuthProjectmanagement.jsx';
+import Verify2FAPending from './view/hooks/Verify2faPending.jsx';
 
 
 
 // Admins
 import AdminLayout from './view/components/SuperAdmin/AdminLayout';
-
 import Dashboard from './view/pages/SuperAdmin/Dashboard';
 import Project from './view/pages/SuperAdmin/Project';
 import Task from './view/pages/SuperAdmin/Task';
@@ -45,30 +43,27 @@ import People from './view/pages/SuperAdmin/People';
 import Messages from './view/pages/SuperAdmin/Messages';
 import Activity from './view/pages/SuperAdmin/Activity';
 import Settings from './view/pages/SuperAdmin/Settings';
-
+import ProjectDetails from './view/pages/SuperAdmin/ProjectDetails'; 
 
 
 /* Global CSS */
 import './index.css';
 import './admin.css';
 
-
-
-
 const App = () => {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        {/* <Route path="/services" element={<Servicespage />} /> */}
         <Route path="/cta" element={<CTA />} />
         <Route path="/about" element={<About />} />
+        <Route path="/main" element={<MainPage />} />
         <Route path="/advantage" element={<Advantage />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/our-team" element={<OurTeam />} />
         <Route path="/eu-store" element={<EuStore />} />
         <Route path="/mission" element={<Mission />} />
-        <Route path="/events" element={<Events />} />x
+        <Route path="/events" element={<Events />} />
         <Route path="/quotation" element={<Auth><Quotation /></Auth>}/>
         <Route path="/showcases" element={<Showcases />} />
         <Route path="/challenges" element={<Challenges />} />
@@ -82,10 +77,12 @@ const App = () => {
         <Route path="/email/quotation/verification-sent" element = { <VerifyEmailQuotationSent />}/>
         <Route path="/quotation-complete" component={CompleteQuotation} />
 
+                <Route path="/verify-2fa-pending" element={<Verify2FAPending />} />
+        {/* <Route path="/verify-2fa-pending" element={<PrivateOTP><Verify2FAPending /></PrivateOTP>} /> */}
 
         {/* Admin Routes */}
         <Route
-          path="/superadmin"
+          path="/superadmin/*"
           element={
             <SuperAdminRoute>
               <AdminLayout />
@@ -94,16 +91,13 @@ const App = () => {
         >
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="project" element={<Project />} />
+          <Route path="projects/:id" element={<ProjectDetails />} /> {/* New route for project details */}
           <Route path="task" element={<Task />} />
           <Route path="people" element={<People />} />
           <Route path="messages" element={<Messages />} />
           <Route path="activity" element={<Activity />} />
           <Route path="settings" element={<Settings />} />
         </Route>
-
-        {/* Client */}
-        <Route path="/user" element={<User />} />
-        <Route path="/main" element={<MainPage />} />
       </Routes>
     </Router>
   );

@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Loginback } from '../../../constants/assets';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faEnvelope, faLock, faEye, faEyeSlash, faPhone } from '@fortawesome/free-solid-svg-icons';
-import {useNavigate} from 'react-router-dom';
+import { faUser, faEnvelope, faLock, faEye, faEyeSlash, faPhone, faImage } from '@fortawesome/free-solid-svg-icons';
+import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
   const [firstName, setFirstName] = useState("");
@@ -16,26 +16,9 @@ const Signup = () => {
   const [role, setRole] = useState("User"); // Default role
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(""); // For displaying errors
-  const [success, setSuccess] = useState(""); // For displaying success message
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-      // convert image file to base64
-      const setFileToBase64 = (file) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onloadend = () => {
-          setImageBase64(reader.result);
-        };
-      };
-    
-      // receive file from form
-        const handleImage = (e) => {
-        const file = e.target.files[0];
-        setImage(file);
-        setFileToBase64(file);
-      };
-    
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -49,57 +32,82 @@ const Signup = () => {
     setProfilePicture(e.target.files[0]);
   };
 
+  const uploadImageToCloudinary = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'EunivateImage'); 
+    formData.append('cloud_name', 'dzxzc7kwb'); 
+
+    try {
+      const response = await axios.post(
+        'https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload',
+        formData
+      );
+      return response.data.url; // URL of the uploaded image
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw error;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(""); // Clear previous errors
     setLoading(true);
-    setError(""); // Clear any previous errors
-    setSuccess(""); // Clear any previous success message
 
     if (!validatePassword(password)) {
-        setError("Password must be at least 9 characters long and include at least one number and one symbol.");
-        return;
+      setError("Password must be at least 9 characters long and include at least one number and one symbol.");
+      setLoading(false);
+      return;
     }
 
-    const formData = new FormData();
-    formData.append('firstName', firstName);
-    formData.append('lastName', lastName);
-    formData.append('username', username);
-    formData.append('email', email);
-    formData.append('phoneNumber', phoneNumber);
-    formData.append('password', password);
-    formData.append('role', role);
+    let profilePictureUrl = profilePicture;
+
     if (profilePicture) {
-        formData.append('profilePicture', profilePicture); // Append the profile picture
+      try {
+        profilePictureUrl = await uploadImageToCloudinary(profilePicture);
+      } catch (uploadError) {
+        setError("Failed to upload profile picture. Please try again.");
+        setLoading(false);
+        return;
+      }
     }
 
     try {
-        const response = await axios.post("http://localhost:5000/api/users", formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        });
+      const response = await axios.post("http://localhost:5000/api/users/signup", {
+        firstName,
+        lastName,
+        username,
+        email,
+        phoneNumber,
+        password,
+        profilePicture: profilePictureUrl,
+        role
+      });
 
-        setSuccess("Account created successfully!"); // Display success message
-        console.log(response.data);
+      const userData = response.data;
 
-        // Clear form fields after successful signup
-        setFirstName("");
-        setLastName("");
-        setUsername("");
-        setEmail("");
-        setPassword("");
-        setPhoneNumber("");
-        setProfilePicture(null);
+      if (userData._id && userData.accessToken) {
+        localStorage.setItem('user', JSON.stringify({
+          _id: userData._id,
+          email: userData.email,
+          phoneNumber: userData.phoneNumber,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          profilePicture: userData.profilePicture,
+          username: userData.username,
+          role: userData.role,
+          token: userData.accessToken,
+        }));
 
-        navigate("/login");
+        navigate("/verify-2fa-pending");
+      }
     } catch (err) {
-        setError(err.response?.data?.message || "An error occurred during signup."); // Display error message
-        console.log(err);
+      setError(err.response?.data?.message || "An error occurred during signup.");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
-
+  };
 
   return (
     <div
@@ -110,7 +118,6 @@ const Signup = () => {
         <h2 className="text-3xl font-bold text-center mb-6">Create Account</h2>
 
         {error && <p className="text-red-600 mb-4">{error}</p>}
-        {success && <p className="text-green-600 mb-4">{success}</p>}
 
         <form onSubmit={handleSubmit} encType="multipart/form-data">
           <div className="grid grid-cols-2 gap-4">
@@ -182,15 +189,14 @@ const Signup = () => {
           <div className="relative mt-4">
             <FontAwesomeIcon icon={faLock} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
-            type={showPassword ? 'text' : 'password'}
-            name="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)} // This should update the state
-            placeholder="Password"
-            className="w-full p-3 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            required
-          />
-
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              className="w-full p-3 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
+            />
             <span
               onClick={togglePasswordVisibility}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
@@ -200,20 +206,26 @@ const Signup = () => {
           </div>
 
           <div className="relative mt-4">
-            <input
-              type="file"
-              name="profilePicture"
-              accept="image/*"
-              onChange={handleProfilePictureChange}
-              className="w-full p-3 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
+            <FontAwesomeIcon icon={faImage} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <label htmlFor="profilePicture" className="cursor-pointer w-52 flex items-center p-3 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <span className="text-gray-500">Upload Profile Picture</span>
+              <input
+                id="profilePicture"
+                type="file"
+                name="profilePicture"
+                accept="image/*"
+                onChange={handleProfilePictureChange}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              />
+            </label>
           </div>
 
           <button
             type="submit"
             className="w-full bg-yellow-500 text-white p-3 rounded-lg shadow hover:bg-yellow-600 transition duration-300 mt-6"
+            disabled={loading}
           >
-            Sign Up
+            {loading ? 'Creating account...' : 'Sign Up'}
           </button>
         </form>
 
@@ -226,4 +238,3 @@ const Signup = () => {
 };
 
 export default Signup;
-	

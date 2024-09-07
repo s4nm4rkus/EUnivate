@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { FaCalendar, FaPaperclip, FaPlus, FaTimes, FaCheckCircle } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaCalendar, FaPaperclip, FaPlus, FaTimes, FaCheckCircle, FaTrash } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import AdminNavbar from '../../components/SuperAdmin/AdminNavbar';
 
 const Project = () => {
@@ -12,6 +13,17 @@ const Project = () => {
     const [projects, setProjects] = useState([]); // State for managing the list of projects
     const [error, setError] = useState(''); // State to manage error messages
 
+    const navigate = useNavigate(); // Initialize useNavigate
+
+    useEffect(() => {
+        const storedProjects = JSON.parse(localStorage.getItem('projects')) || [];
+        const updatedProjects = storedProjects.map(project => {
+          const tasks = JSON.parse(localStorage.getItem(`kanban-${project.name}`)) || [];
+          return { ...project, imageCount: countTasksWithImages(tasks) };
+        });
+        setProjects(updatedProjects);
+      }, []);
+      
     const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
 
     const openModal = () => setIsModalOpen(true);
@@ -23,6 +35,11 @@ const Project = () => {
         setTeam('');
         setError(''); // Clear any errors when the modal is closed
     };
+
+    const countTasksWithImages = (tasks) => {
+        return tasks.filter(task => task.image1 || task.image2).length;
+      };
+      
 
     const handleImageChange = (event) => {
         const file = event.target.files[0];
@@ -45,19 +62,39 @@ const Project = () => {
     };
 
     const handleCreateProject = () => {
-        // Validation: Ensure all fields are filled
         if (!imagePreview || !projectName || !team) {
             setError('Please fill out all fields including image, project name, and team.');
             return;
         }
-
+    
         const newProject = {
             name: projectName,
             image: imagePreview,
             date: formatDate(new Date()),
+            progress: 5 // Set a default progress value, adjust as needed
         };
-        setProjects([...projects, newProject]);
+    
+        // Save the new project
+        const updatedProjects = [...projects, newProject];
+        setProjects(updatedProjects);
+        localStorage.setItem('projects', JSON.stringify(updatedProjects));
+    
+        // Initialize an empty Kanban board for the new project
+        localStorage.setItem(`kanban-${projectName}`, JSON.stringify([]));
+    
         closeModal();
+    };
+    
+
+const handleDeleteProject = (index) => {
+    const updatedProjects = projects.filter((_, i) => i !== index);
+    setProjects(updatedProjects);
+    localStorage.setItem('projects', JSON.stringify(updatedProjects));
+};
+
+
+    const handleProjectClick = (project) => {
+        navigate(`/superadmin/projects/${project.name}`, { state: { project } });
     };
 
     return (
@@ -155,34 +192,51 @@ const Project = () => {
 
             {/* Display Projects */}
             <div className="mt-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {projects.map((project, index) => (
-                    <div key={index} className="bg-white p-4 rounded-md shadow-md border border-gray-200 mt-4">
-                        {project.image && (
-                            <img 
-                                src={project.image} 
-                                alt={project.name} 
-                                className="w-full h-32 object-cover rounded-md"
-                            />
-                        )}
-                        <h3 className="text-lg font-semibold mt-2">{project.name}</h3>
-                        <div className="flex items-center text-gray-500 mt-2">
-                            <FaCalendar className="mr-2" />
-                            <p>{project.date}</p>
-                            <FaPaperclip className="ml-5" />
-                            <p className="ml-2">0</p>
-                            <FaCheckCircle className="ml-5" />
-                            <p className="ml-2">0</p>
-                        </div>
-                        {/* Progress Bar with Percentage */}
-                        <div className="flex items-center mt-4">
-                            <div className="w-full bg-gray-200 rounded-full h-2 relative">
-                                <div className="bg-green-500 h-2 rounded-full" style={{ width: '5%' }}></div> {/* Progress bar with 5% width */}
-                            </div>
-                            <p className="ml-2 text-gray-500">5%</p> {/* Percentage value with margin */}
-                        </div>
-                    </div>
-                ))}
-            </div>
+  {projects.map((project, index) => (
+    <div
+      key={index}
+      className="bg-white p-4 rounded-md shadow-md border border-gray-200 mt-4 relative cursor-pointer"
+      onClick={() => handleProjectClick(project)}
+    >
+      {project.image && (
+        <img
+          src={project.image}
+          alt={project.name}
+          className="w-full h-32 object-cover rounded-md"
+        />
+      )}
+      <h3 className="text-lg font-semibold mt-2">{project.name}</h3>
+      <div className="flex items-center text-gray-500 mt-2">
+        <FaCalendar className="mr-2" />
+        <p>{project.date}</p>
+        <FaPaperclip className="ml-5" />
+        <p className="ml-2">{project.imageCount}</p> {/* Display count of tasks with images */}
+        <FaCheckCircle className="ml-5" />
+        <p className="ml-2">0</p>
+        <button
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent event from bubbling up
+            handleDeleteProject(index);
+          }}
+          className="absolute bottom-14 right-6 bg-red-600 text-white p-3 rounded-full shadow hover:bg-red-700"
+          title="Delete Project"
+        >
+          <FaTrash size={20} />
+        </button>
+      </div>
+      <div className="flex items-center mt-4">
+        <div className="w-full bg-gray-200 rounded-full h-2 relative">
+          <div
+            className="bg-green-500 h-2 rounded-full"
+            style={{ width: '5%' }} // Adjust this as needed
+          ></div>
+        </div>
+        <p className="ml-2 text-gray-500">5%</p>
+      </div>
+    </div>
+  ))}
+</div>
+
         </div>
     );
 };

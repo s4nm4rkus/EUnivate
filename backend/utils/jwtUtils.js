@@ -35,9 +35,6 @@ export const protect = async(req, res, next) => {
             .json({message: 'Not authorized, no token'});
     }
 };
-
-import User from '../models/userModels.js';
-
 // Generate Access Token
 export const generateAccessToken = (id) => {
   return jwt.sign({ _id: id  }, process.env.JWT_SECRET, { expiresIn: '1h' });

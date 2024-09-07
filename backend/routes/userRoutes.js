@@ -2,8 +2,10 @@
   import { getUsers, createUser, loginUser, forgotPassword, resetPassword } from '../controllers/userController.js';
   import { protect, verifySuperAdmin } from '../middlewares/middleware.js';
   import { ContactEunivate } from '../controllers/contactEunivate.js';
-  import { createQuotation } from '../controllers/quotationController.js'
+  import { createQuotation, confirmQuotationEmail, checkVerificationStatus } from '../controllers/quotationController.js'
   import upload from '../middlewares/multerMiddleware.js';
+import quotationTokenModel from '../models/quotationTokenModel.js';
+import Quotation from '../models/quotationModel.js';
 
 
 
@@ -20,6 +22,10 @@
 
   // quotation route
   router.post('/quotation',createQuotation);
+  router.get('/quotation/confirm/:quotationToken', confirmQuotationEmail);
+  router.get('/quotations/:id/status', checkVerificationStatus);
+
+
 
   //SuperAdmin Setting Profile
   // router.get('/profile', protect, getUserProfile);

@@ -21,6 +21,9 @@ import Forgotpassword from './view/pages/Client/Forgotpassword.jsx';
 import ResetPassword from './view/pages/Client/Resetpassword.jsx';
 import CTA from "./view/components/Client/LastSection/CTA.jsx";
 import MainPage from './view/pages/Client/MainPage.jsx';
+import CompleteQuotation from './view/pages/Client/CompleteQuotation.jsx';
+import VerifyEmailQuotationSent from './view/pages/Client/VerifyEmailQuotationSent.jsx';
+
 // import Servicespage from './view/pages/Client/Servicespage.jsx';
 //Hooks
 import Auth from './view/hooks/Auth.jsx';
@@ -75,6 +78,9 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot" element={<Forgotpassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/quotation-complete" element = { <CompleteQuotation />}/>
+        <Route path="/email/quotation/verification-sent" element = { <VerifyEmailQuotationSent />}/>
+        <Route path="/quotation-complete" component={CompleteQuotation} />
 
 
         {/* Admin Routes */}

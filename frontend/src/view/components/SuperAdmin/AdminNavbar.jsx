@@ -4,7 +4,7 @@ import { faSearch, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 
 const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
-  const [user, setUser] = useState({ firstName: '', lastName: '', profilePicture: '' });
+  const [user, setUser] = useState({ firstName: '', lastName: '', profilePicture: { url: ''} });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,7 +41,7 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
 
         {/* User Profile */}
         <div className="relative flex items-center cursor-pointer" onClick={toggleAccountDropdown}>
-          {user.profilePicture.url ? (
+          {user.profilePicture && user.profilePicture.url ? (
             <img 
               src={user.profilePicture.url} // Assuming `profilePicture` is a URL
               alt="Profile"

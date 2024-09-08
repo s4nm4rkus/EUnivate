@@ -27,10 +27,17 @@ import Auth from './view/hooks/Auth.jsx';
 import SuperAdminRoute from './view/hooks/SuperadminAuth.jsx';
 import ProjectmanagementAuth from './view/hooks/AuthProjectmanagement.jsx';
 import Verify2FAPending from './view/hooks/Verify2faPending.jsx';
+import AdminAuth from './view/hooks/AdminAuth.jsx';
+//Admin
+import AdminDashboard from './view/pages/Admin/AdminDashboard.jsx';
+import AdminAddProduct from './view/components/Admin/AdminAddProduct.jsx';
+import Product from './view/pages/Admin/Product.jsx';
+import Projects from './view/pages/Admin/Projects.jsx'
+import AdminAddProject from './view/components/Admin/AdminAddProject.jsx';
+import AdminAddEvents from './view/components/Admin/AdminAddEvents.jsx';
+import EventsAdmin from './view/pages/Admin/EventsAdmin.jsx';
 
-
-
-// Admins
+//Super Admin
 import AdminLayout from './view/components/SuperAdmin/AdminLayout';
 import Dashboard from './view/pages/SuperAdmin/Dashboard';
 import Project from './view/pages/SuperAdmin/Project';
@@ -45,6 +52,7 @@ import ProjectDetails from './view/pages/SuperAdmin/ProjectDetails';
 /* Global CSS */
 import './index.css';
 import './admin.css';
+
 
 const App = () => {
   return (
@@ -69,10 +77,26 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot" element={<Forgotpassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-                <Route path="/verify-2fa-pending" element={<Verify2FAPending />} />
-        {/* <Route path="/verify-2fa-pending" element={<PrivateOTP><Verify2FAPending /></PrivateOTP>} /> */}
+        <Route path="/verify-2fa-pending" element={<Verify2FAPending />} />
 
         {/* Admin Routes */}
+        <Route path="/admin" element={<AdminAuth><AdminDashboard /></AdminAuth>} />
+      <Route path="/admin-addproducts" element={<AdminAuth><AdminAddProduct /></AdminAuth>} />
+      <Route path="/products" element={<AdminAuth><Product /></AdminAuth>} />
+      <Route path="/admin-addprojects" element={<AdminAuth><AdminAddProject /></AdminAuth>} />
+      <Route path="/projects" element={<AdminAuth><Projects /></AdminAuth>} />
+      <Route path="/admin-addevents" element={<AdminAuth><AdminAddEvents /></AdminAuth>} />
+      <Route path="/events-admin" element={<AdminAuth><EventsAdmin /></AdminAuth>} />
+        
+
+
+
+
+        {/*
+              <Route path="/admin-container" element={<AdminContainer />} />
+        <Route path="/verify-2fa-pending" element={<PrivateOTP><Verify2FAPending /></PrivateOTP>} /> */}
+
+        {/* Super Admin Routes */}
         <Route
           path="/superadmin/*"
           element={
@@ -83,7 +107,7 @@ const App = () => {
         >
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="project" element={<Project />} />
-          <Route path="projects/:id" element={<ProjectDetails />} /> {/* New route for project details */}
+          <Route path="projects/:id" element={<ProjectDetails />} />
           <Route path="task" element={<Task />} />
           <Route path="people" element={<People />} />
           <Route path="messages" element={<Messages />} />

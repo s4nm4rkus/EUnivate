@@ -13,7 +13,6 @@ import express from 'express';
   import { ContactEunivate } from '../controllers/contactEunivate.js';
   import { updateUser, updateUserPassword } from '../controllers/updateUserInformation.js';
   import { inviteUsers, updateUserRole, getUsers} from '../controllers/peopleController.js';
-  import upload from '../middlewares/multerMiddleware.js';
 
 const router = express.Router();
 

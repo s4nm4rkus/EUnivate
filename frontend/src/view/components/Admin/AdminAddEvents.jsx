@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { Box, Button, TextField, Typography } from '@mui/material';
-import { PhotoCamera } from '@mui/icons-material';
 
 const AdminAddEvents = () => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -12,125 +10,66 @@ const AdminAddEvents = () => {
   };
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        p: 4,
-        borderRadius: '12px',
-        backgroundColor: 'white',
-        boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
-        maxWidth: '600px',
-        margin: 'auto',
-        mt: 6,
-      }}
-    >
+    <div className="flex flex-col items-center justify-center p-8 rounded-lg bg-white shadow-lg max-w-lg mx-auto mt-12">
       {/* Upload Image Section */}
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          mb: 4,
-          position: 'relative',
-        }}
-      >
+      <div className="flex flex-col items-center mb-8 relative">
         <input
           accept="image/*"
-          style={{ display: 'none' }}
+          className="hidden"
           id="upload-image"
           type="file"
           onChange={handleImageChange}
         />
-        <label htmlFor="upload-image">
-          <Box
-            sx={{
-              width: 120,
-              height: 120,
-              borderRadius: '50%',
-              backgroundColor: '#f0f0f0',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              mb: 2,
-              cursor: 'pointer',
-              overflow: 'hidden',
-            }}
-          >
+        <label htmlFor="upload-image" className="cursor-pointer">
+          <div className="w-30 h-30 rounded-full bg-gray-200 flex justify-center items-center mb-4 overflow-hidden">
             {selectedImage ? (
               <img
                 src={selectedImage}
                 alt="Selected"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                className="w-full h-full object-cover"
               />
             ) : (
-              <PhotoCamera sx={{ fontSize: 50, color: '#888888' }} />
+              <span className="text-4xl text-gray-500">📷</span>
             )}
-          </Box>
+          </div>
         </label>
-        <Typography color="primary" sx={{ cursor: 'pointer', color: '#0000FF' }}>
-          Upload Cover Photo
-        </Typography>
-      </Box>
+        <p className="text-blue-600 cursor-pointer">Upload Cover Photo</p>
+      </div>
 
       {/* Form Fields */}
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 2,
-          width: '100%',
-          mb: 4,
-        }}
-      >
-        <TextField
-          label="Event Name"
-          variant="outlined"
-          fullWidth
-          sx={{ backgroundColor: '#f5f5f5' }}
+      <div className="grid grid-cols-2 gap-4 w-full mb-8">
+        <input
+          type="text"
+          placeholder="Event Name"
+          className="p-2 rounded-md border border-gray-300 bg-gray-100"
         />
-        <TextField
-          label="Time"
-          variant="outlined"
-          fullWidth
-          sx={{ backgroundColor: '#f5f5f5' }}
+        <input
+          type="text"
+          placeholder="Time"
+          className="p-2 rounded-md border border-gray-300 bg-gray-100"
         />
-        <TextField
-          label="Date"
-          variant="outlined"
-          fullWidth
-          sx={{ backgroundColor: '#f5f5f5' }}
+        <input
+          type="text"
+          placeholder="Date"
+          className="p-2 rounded-md border border-gray-300 bg-gray-100"
         />
-        <TextField
-          label="Address"
-          variant="outlined"
-          fullWidth
-          sx={{ backgroundColor: '#f5f5f5' }}
+        <input
+          type="text"
+          placeholder="Address"
+          className="p-2 rounded-md border border-gray-300 bg-gray-100"
         />
-        <TextField
-          label="Contact Number"
-          variant="outlined"
-          fullWidth
-          sx={{ gridColumn: 'span 2', backgroundColor: '#f5f5f5' }}
+        <input
+          type="text"
+          placeholder="Contact Number"
+          className="col-span-2 p-2 rounded-md border border-gray-300 bg-gray-100"
         />
-      </Box>
+      </div>
 
       {/* Add Now Button */}
-      <Button
-        variant="contained"
-        color="error"
-        sx={{
-          width: '200px',
-          height: '50px',
-          borderRadius: '25px',
-          backgroundColor: '#8B0000',
-        }}
-      >
+      <button className="w-48 h-12 rounded-full bg-red-800 text-white">
         Add Now
-      </Button>
-    </Box>
+      </button>
+    </div>
   );
 };
 

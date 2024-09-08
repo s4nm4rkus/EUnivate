@@ -20,6 +20,7 @@
     "multer-storage-cloudinary": "^4.0.0",
     "nodemailer": "^6.9.14",
     "react-big-calendar": "^1.13.4",
+    "react-gantt-chart": "^0.3.0-rc.11",
     "react-modal": "^3.16.1",
     "react-tooltip": "^5.28.0"
   },

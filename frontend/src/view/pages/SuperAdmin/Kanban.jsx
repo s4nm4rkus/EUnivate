@@ -36,10 +36,9 @@ const Kanban = () => {
     const newTaskWithId = { ...newTask, id: Date.now() }; // Using timestamp as a unique ID
     const updatedTasks = [...tasks, newTaskWithId];
     setTasks(updatedTasks);
-    localStorage.setItem(`kanban-${projectName}`, JSON.stringify(updatedTasks)); // Save tasks to local storage
+    localStorage.setItem(`kanban-${projectName}`, JSON.stringify(updatedTasks));
     handleCloseModal();
   };
-  
 
   const handleStatusChange = (task, newStatus) => {
     const statusToSet = newStatus === 'Pending' ? 'Document' : newStatus;
@@ -142,20 +141,20 @@ const Kanban = () => {
                 <p className="mt-2">{task.objective}</p>
                 <div className={`flex flex-col items-center gap-4 mt-2`}>
                   {task.image1 && (
-    <img
-      src={task.image1}
-      alt="Task 1"
-      className={`object-cover rounded border border-gray-300 w-full md:w-4/4 lg:w-1/10 h-auto`}
-      style={{ maxHeight: '200px' }}
-    />
-  )}
-  {task.image2 && (
-    <img
-      src={task.image2}
-      alt="Task 2"
-      className={`object-cover rounded border border-gray-300 w-full md:w-4/4 lg:w-1/10 h-auto`}
-      style={{ maxHeight: '200px' }}
-    />
+                    <img
+                      src={task.image1}
+                      alt="Task 1"
+                      className={`object-cover rounded border border-gray-300 w-full md:w-4/4 lg:w-1/10 h-auto`}
+                      style={{ maxHeight: '200px' }}
+                    />
+                  )}
+                  {task.image2 && (
+                    <img
+                      src={task.image2}
+                      alt="Task 2"
+                      className={`object-cover rounded border border-gray-300 w-full md:w-4/4 lg:w-1/10 h-auto`}
+                      style={{ maxHeight: '200px' }}
+                    />
                   )}
                 </div>
                 <div className="p-2 mt-2 flex items-center">

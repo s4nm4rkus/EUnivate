@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../../../admin.css';
-import AdminNavbar from '../../components/SuperAdmin/adminNavbar';
+import AdminNavbar from '../../components/SuperAdmin/AdminNavbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { User } from '../../../constants/assets';

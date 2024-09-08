@@ -3,6 +3,7 @@
   import connectDB from './config/db.js';
   import userRoutes from './routes/userRoutes.js';
   import cors from 'cors';
+  import { confirmQuotationEmail } from './controllers/quotationController.js'; // Adjust the path as needed
   
 dotenv.config();
 connectDB();
@@ -13,6 +14,12 @@ app.use(express.json());
 
 // Use user routes
 app.use('/api/users', userRoutes);
+app.get('/api/users/quotation/confirm/', confirmQuotationEmail);
+
+app.get('/quotation-complete', (req, res) => {
+  // res.send('Quotation verification complete');
+  res.redirect('http://localhost:5173/quotation-complete');
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -22,7 +29,6 @@ app.use((err, req, res, next) => {
     error: process.env.NODE_ENV === 'production' ? {} : err.message, // Hide detailed error messages in production
   });
 });
-
 
 app.get('/', (req, res) => {
   res.send('Welcome to the API');

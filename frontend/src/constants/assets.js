@@ -95,6 +95,10 @@ import prof4 from '../assets/prof4.jpg';
 
 //Quotation Step4
 import Step4 from '../assets/Step4-quotation.svg';
+import waitingverification from '../assets/verifying.gif';
+import emailsent from '../assets/emailsent.png';
+import submitquotation from '../assets/submitquotation.png';
+
 
 //Login Back
 import Loginback from '../assets/loginback.png';
@@ -300,6 +304,9 @@ export {
       
       //Quotation Step4
       Step4,
+      waitingverification,
+      emailsent,
+      submitquotation,
 
             //Quotation Step4
             Loginback

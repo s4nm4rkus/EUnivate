@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import AdminNavbar from '../../components/SuperAdmin/adminNavbar';
+import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx';
 import Kanban from './Kanban';
 import List from './List';
 import Calendar from './Calendar';

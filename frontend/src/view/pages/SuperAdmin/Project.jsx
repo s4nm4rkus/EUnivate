@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaCalendar, FaPaperclip, FaPlus, FaTimes, FaCheckCircle, FaTrash } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import AdminNavbar from '../../components/SuperAdmin/adminNavbar';
+import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx';
 
 const Project = () => {
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
@@ -16,11 +16,14 @@ const Project = () => {
     const navigate = useNavigate(); // Initialize useNavigate
 
     useEffect(() => {
-        // Load projects from local storage when component mounts
         const storedProjects = JSON.parse(localStorage.getItem('projects')) || [];
-        setProjects(storedProjects);
-    }, []);
-
+        const updatedProjects = storedProjects.map(project => {
+          const tasks = JSON.parse(localStorage.getItem(`kanban-${project.name}`)) || [];
+          return { ...project, imageCount: countTasksWithImages(tasks) };
+        });
+        setProjects(updatedProjects);
+      }, []);
+      
     const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
 
     const openModal = () => setIsModalOpen(true);
@@ -32,6 +35,11 @@ const Project = () => {
         setTeam('');
         setError(''); // Clear any errors when the modal is closed
     };
+
+    const countTasksWithImages = (tasks) => {
+        return tasks.filter(task => task.image1 || task.image2).length;
+      };
+      
 
     const handleImageChange = (event) => {
         const file = event.target.files[0];
@@ -184,50 +192,51 @@ const handleDeleteProject = (index) => {
 
             {/* Display Projects */}
             <div className="mt-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {projects.map((project, index) => (
-                    <div 
-                        key={index} 
-                        className="bg-white p-4 rounded-md shadow-md border border-gray-200 mt-4 relative cursor-pointer"
-                        onClick={() => handleProjectClick(project)}
-                    >
-                        {project.image && (
-                            <img 
-                                src={project.image} 
-                                alt={project.name} 
-                                className="w-full h-32 object-cover rounded-md"
-                            />
-                        )}
-                        <h3 className="text-lg font-semibold mt-2">{project.name}</h3>
-                        <div className="flex items-center text-gray-500 mt-2">
-                            <FaCalendar className="mr-2" />
-                            <p>{project.date}</p>
-                            <FaPaperclip className="ml-5" />
-                            <p className="ml-2">0</p>
-                            <FaCheckCircle className="ml-5" />
-                            <p className="ml-2">0</p>
-                            {/* Delete Button */}
-                            <button 
-                                onClick={(e) => {
-                                    e.stopPropagation(); // Prevent event from bubbling up
-                                    handleDeleteProject(index);
-                                }} 
-                                className="absolute bottom-14 right-6 bg-red-600 text-white p-3 rounded-full shadow hover:bg-red-700"
-                            title="Delete Project"
-                        >
-                            <FaTrash size={20} />
-                        </button>
-                        </div>
-                        {/* Progress Bar with Percentage */}
-                        <div className="flex items-center mt-4">
-                            <div className="w-full bg-gray-200 rounded-full h-2 relative">
-                                <div className="bg-green-500 h-2 rounded-full" style={{ width: '5%' }}></div> {/* Progress bar with 5% width */}
-                            </div>
-                            <p className="ml-2 text-gray-500">5%</p> {/* Percentage value with margin */}
-                        </div>
+  {projects.map((project, index) => (
+    <div
+      key={index}
+      className="bg-white p-4 rounded-md shadow-md border border-gray-200 mt-4 relative cursor-pointer"
+      onClick={() => handleProjectClick(project)}
+    >
+      {project.image && (
+        <img
+          src={project.image}
+          alt={project.name}
+          className="w-full h-32 object-cover rounded-md"
+        />
+      )}
+      <h3 className="text-lg font-semibold mt-2">{project.name}</h3>
+      <div className="flex items-center text-gray-500 mt-2">
+        <FaCalendar className="mr-2" />
+        <p>{project.date}</p>
+        <FaPaperclip className="ml-5" />
+        <p className="ml-2">{project.imageCount}</p> {/* Display count of tasks with images */}
+        <FaCheckCircle className="ml-5" />
+        <p className="ml-2">0</p>
+        <button
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent event from bubbling up
+            handleDeleteProject(index);
+          }}
+          className="absolute bottom-14 right-6 bg-red-600 text-white p-3 rounded-full shadow hover:bg-red-700"
+          title="Delete Project"
+        >
+          <FaTrash size={20} />
+        </button>
+      </div>
+      <div className="flex items-center mt-4">
+        <div className="w-full bg-gray-200 rounded-full h-2 relative">
+          <div
+            className="bg-green-500 h-2 rounded-full"
+            style={{ width: '5%' }} // Adjust this as needed
+          ></div>
+        </div>
+        <p className="ml-2 text-gray-500">5%</p>
+      </div>
+    </div>
+  ))}
+</div>
 
-                    </div>
-                ))}
-            </div>
         </div>
     );
 };

@@ -4,7 +4,7 @@ import { faSearch, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 
 const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
-  const [user, setUser] = useState({ firstName: '', lastName: '', profilePicture: '' });
+  const [user, setUser] = useState({ firstName: '', lastName: '', profilePicture: { url: ''} });
   const navigate = useNavigate();
   const defaultProfilePicture = '/mnt/data/image.png'; // Use your actual path or URL here
 

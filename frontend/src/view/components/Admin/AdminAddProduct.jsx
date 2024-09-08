@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { Box, Button, TextField, Typography, RadioGroup, FormControlLabel, Radio } from '@mui/material';
-import { PhotoCamera } from '@mui/icons-material';
 
 const AdminAddProduct = () => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -12,206 +10,92 @@ const AdminAddProduct = () => {
   };
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        p: 4,
-        borderRadius: '12px',
-        backgroundColor: 'white',
-        boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
-        maxWidth: '600px',
-        margin: 'auto',
-        mt: 6,
-      }}
-    >
+    <div className="flex flex-col items-center justify-center p-8 rounded-lg bg-white shadow-lg max-w-lg mx-auto mt-12">
       {/* Upload Image Section */}
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          mb: 4,
-          position: 'relative',
-        }}
-      >
+      <div className="flex flex-col items-center mb-8 relative">
         <input
           accept="image/*"
-          style={{ display: 'none' }}
+          className="hidden"
           id="upload-image"
           type="file"
           onChange={handleImageChange}
         />
-        <label htmlFor="upload-image">
-          <Box
-            sx={{
-              width: 120,
-              height: 120,
-              borderRadius: '50%',
-              backgroundColor: '#f0f0f0',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              mb: 2,
-              cursor: 'pointer',
-              overflow: 'hidden',
-            }}
-          >
+        <label htmlFor="upload-image" className="cursor-pointer">
+          <div className="w-30 h-30 rounded-full bg-gray-200 flex justify-center items-center mb-4 overflow-hidden">
             {selectedImage ? (
               <img
                 src={selectedImage}
                 alt="Selected"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                className="w-full h-full object-cover"
               />
             ) : (
-              <PhotoCamera sx={{ fontSize: 50, color: '#888888' }} />
+              <span className="text-4xl text-gray-500">📷</span>
             )}
-          </Box>
+          </div>
         </label>
-        <Typography color="primary" sx={{ cursor: 'pointer', color: '#8B0000' }}>
-          Upload Image
-        </Typography>
-      </Box>
+        <p className="text-red-700 cursor-pointer">Upload Image</p>
+      </div>
 
       {/* Form Fields */}
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'stretch',
-          width: '100%',
-          mb: 4,
-        }}
-      >
-        <TextField
-          label="Product Name"
-          variant="outlined"
-          fullWidth
-          sx={{ mb: 2, backgroundColor: '#f5f5f5' }}
+      <div className="flex flex-col w-full mb-8">
+        <input
+          type="text"
+          placeholder="Product Name"
+          className="p-2 mb-4 rounded-md border border-gray-300 bg-gray-100"
         />
-        <TextField
-          label="Description"
-          variant="outlined"
-          fullWidth
-          multiline
-          minRows={4}
-          sx={{ backgroundColor: '#f5f5f5' }}
+        <textarea
+          placeholder="Description"
+          className="p-2 rounded-md border border-gray-300 bg-gray-100"
+          rows="4"
         />
-      </Box>
+      </div>
 
       {/* Availability Section */}
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          width: '100%',
-          mb: 4,
-        }}
-      >
-        <Typography variant="subtitle1" sx={{ mb: 1 }}>
-          Availability
-        </Typography>
-        <RadioGroup row defaultValue="Available" sx={{ justifyContent: 'flex-start' }}>
-          <FormControlLabel
-            value="Available"
-            control={<Radio />}
-            label="Available"
-            sx={{
-              '& .MuiSvgIcon-root': {
-                display: 'none', // Hide the default radio button icon
-              },
-              '& .MuiFormControlLabel-label': {
-                color: '#008080',
-                backgroundColor: '#E0F2F1',
-                borderRadius: '12px',
-                padding: '8px 16px',
-                border: '2px solid #008080',
-                fontWeight: 'bold',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  backgroundColor: '#D1ECEA',
-                },
-              },
-              '&.Mui-checked .MuiFormControlLabel-label': {
-                color: 'white',
-                backgroundColor: '#008080',
-                border: '2px solid #008080',
-              },
-            }}
-          />
-          <FormControlLabel
-            value="Pending"
-            control={<Radio />}
-            label="Pending"
-            sx={{
-              '& .MuiSvgIcon-root': {
-                display: 'none', // Hide the default radio button icon
-              },
-              '& .MuiFormControlLabel-label': {
-                color: '#FFA500',
-                backgroundColor: '#FFF3E0',
-                borderRadius: '12px',
-                padding: '8px 16px',
-                border: '2px solid #FFA500',
-                fontWeight: 'bold',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  backgroundColor: '#FFE5B4',
-                },
-              },
-              '&.Mui-checked .MuiFormControlLabel-label': {
-                color: 'white',
-                backgroundColor: '#FFA500',
-                border: '2px solid #FFA500',
-              },
-            }}
-          />
-          <FormControlLabel
-            value="NotAvailable"
-            control={<Radio />}
-            label="Not Available"
-            sx={{
-              '& .MuiSvgIcon-root': {
-                display: 'none', // Hide the default radio button icon
-              },
-              '& .MuiFormControlLabel-label': {
-                color: '#808080',
-                backgroundColor: '#ECEFF1',
-                borderRadius: '12px',
-                padding: '8px 16px',
-                border: '2px solid #808080',
-                fontWeight: 'bold',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  backgroundColor: '#D3D3D3',
-                },
-              },
-              '&.Mui-checked .MuiFormControlLabel-label': {
-                color: 'white',
-                backgroundColor: '#808080',
-                border: '2px solid #808080',
-              },
-            }}
-          />
-        </RadioGroup>
-      </Box>
+      <div className="flex flex-col w-full mb-8">
+        <p className="mb-2 text-lg">Availability</p>
+        <div className="flex space-x-4">
+          <label className="flex items-center cursor-pointer">
+            <input
+              type="radio"
+              name="availability"
+              value="Available"
+              className="hidden peer"
+              defaultChecked
+            />
+            <span className="peer-checked:bg-teal-600 peer-checked:text-white peer-checked:border-teal-600 bg-teal-100 text-teal-700 border-2 border-teal-600 rounded-full px-4 py-2 font-bold transition-all">
+              Available
+            </span>
+          </label>
+          <label className="flex items-center cursor-pointer">
+            <input
+              type="radio"
+              name="availability"
+              value="Pending"
+              className="hidden peer"
+            />
+            <span className="peer-checked:bg-orange-500 peer-checked:text-white peer-checked:border-orange-500 bg-orange-100 text-orange-600 border-2 border-orange-500 rounded-full px-4 py-2 font-bold transition-all">
+              Pending
+            </span>
+          </label>
+          <label className="flex items-center cursor-pointer">
+            <input
+              type="radio"
+              name="availability"
+              value="NotAvailable"
+              className="hidden peer"
+            />
+            <span className="peer-checked:bg-gray-500 peer-checked:text-white peer-checked:border-gray-500 bg-gray-200 text-gray-600 border-2 border-gray-500 rounded-full px-4 py-2 font-bold transition-all">
+              Not Available
+            </span>
+          </label>
+        </div>
+      </div>
 
       {/* Save Button */}
-      <Button
-        variant="contained"
-        color="error"
-        sx={{
-          width: '200px',
-          height: '50px',
-          borderRadius: '25px',
-          backgroundColor: '#8B0000',
-        }}
-      >
+      <button className="w-48 h-12 rounded-full bg-red-800 text-white">
         Save
-      </Button>
-    </Box>
+      </button>
+    </div>
   );
 };
 

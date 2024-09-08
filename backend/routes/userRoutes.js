@@ -7,6 +7,7 @@ import { protect, verifySuperAdmin } from '../middlewares/middleware.js';
 import { ContactEunivate } from '../controllers/contactEunivate.js';
 import { updateUser, updateUserPassword } from '../controllers/updateUserInformation.js';
 import { inviteUsers, updateUserRole, getUsers} from '../controllers/peopleController.js';
+// import { getEmails } from '../controllers/emailController.js';
 import upload from '../middlewares/multerMiddleware.js';
 
 const router = express.Router();
@@ -22,6 +23,7 @@ router.post('/refresh-token', refreshToken);
 
 //User Messages Related
 router.post('/contactEunivate',ContactEunivate )
+// router.get('/emails', getEmails); 
 // User Management Routes
 router.get('/', getUsers); 
 router.post('/signup', createUser);  

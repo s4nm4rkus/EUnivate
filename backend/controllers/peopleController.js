@@ -14,9 +14,10 @@ export const getUsers = async (req, res) => {
 // Invite users
 export const inviteUsers = async (req, res) => {
     try {
-        const { emails, role } = req.body;
-        console.log(`Inviting users with role: ${role}, emails: ${emails}`);
-        const emailArray = emails.split(',').map(email => email.trim()).filter(email => email); // Split and remove empty emails
+        const { emails } = req.body;
+
+        console.log(`Inviting users with emails: ${emails}`);
+        const emailArray = emails.split(',').map(email => email.trim()).filter(email => email); 
 
         if (emailArray.length === 0) {
             console.warn('No valid email addresses provided');
@@ -25,32 +26,31 @@ export const inviteUsers = async (req, res) => {
 
         console.log(`Processed email array: ${emailArray}`);
 
-        const newUsers = emailArray.map(email => ({
-            email,
-            role,
-            firstName: 'First',
-            lastName: 'Last',
-        }));
 
-        const createdUsers = await User.insertMany(newUsers);
-        console.log(`Created ${createdUsers.length} users`);
+        await Promise.all(
+            emailArray.map(async (email) => {
+                try {
+                    console.log(`Sending email to ${email}`);
+                    await sendEmail({
+                        email: email, 
+                        subject: 'Invitation to become an Collaborator',
+                        message: `You have been invited to become an Collaborator in our system please wait to change your role of the admin to proceed with your login page.`, 
+                    });
+                    console.log(`Email sent to ${email}`);
+                } catch (error) {
+                    console.error(`Failed to send email to ${email}:`, error.message);
+                }
+            })
+        );
 
-        // Send invitation emails
-        createdUsers.forEach(user => {
-            console.log(`Sending email to ${user.email}`);
-            sendEmail({
-                to: user.email,
-                subject: 'You have been invited',
-                text: `You have been invited as a ${role}. Please check the details and proceed.`,
-            });
-        });
-
-        res.status(201).json({ message: 'Users invited successfully', users: createdUsers });
+        res.status(200).json({ message: 'Invitation emails sent successfully' });
     } catch (error) {
         console.error('Error inviting users:', error.message);
-        res.status(500).json({ message: 'Error inviting users', error });
+        res.status(500).json({ message: 'Error inviting users', error: error.message });
     }
 };
+
+
 
 // Update user role
 export const updateUserRole = async (req, res) => {
@@ -69,9 +69,14 @@ export const updateUserRole = async (req, res) => {
 
         console.log(`Updated user role for ${user.email} to ${role}`);
 
-   
-     
-        res.status(200).json({ message: 'Role updated successfully', user });
+        // Send an email to the user notifying them of the role change
+        await sendEmail({
+            email: user.email,  // Using 'email' to match the sendEmail function
+            subject: 'Your account role has been changed',
+            message: `Your account role has been changed to ${role}. Please log in again.`, // Using 'message' to match the sendEmail function
+        });
+
+        res.status(200).json({ message: 'Role updated successfully and email sent', user });
     } catch (error) {
         console.error('Error updating role:', error.message);
         res.status(500).json({ message: 'Error updating role', error });

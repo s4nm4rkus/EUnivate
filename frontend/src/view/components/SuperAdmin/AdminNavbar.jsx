@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
@@ -7,20 +7,39 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
   const [user, setUser] = useState({ firstName: '', lastName: '', profilePicture: { url: ''} });
   const navigate = useNavigate();
   const defaultProfilePicture = '/mnt/data/image.png'; // Use your actual path or URL here
+  const dropdownRef = useRef();
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     if (storedUser) {
       setUser(storedUser); // Set the user state with the stored user data
     }
-  }, []);
+
+    // Close dropdown when clicking outside
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        if (isAccountDropdownOpen) {
+          toggleAccountDropdown(); // Close the dropdown if it is open
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isAccountDropdownOpen]);
 
   const handleLogout = () => {
-    // Clear user data from localStorage
+
     localStorage.removeItem('user');
     localStorage.removeItem('token'); // Remove the token if stored separately
-    // Redirect to login page
+
     navigate('/login');
+  };
+
+  const handleProfileClick = () => {
+    navigate('/superadmin/settings'); 
   };
 
   return (
@@ -41,7 +60,7 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
         </div>
 
         {/* User Profile */}
-        <div className="relative flex items-center cursor-pointer" onClick={toggleAccountDropdown}>
+        <div ref={dropdownRef} className="relative flex items-center cursor-pointer" onClick={toggleAccountDropdown}>
           {user.profilePicture ? (
             <img 
               src={user.profilePicture.url || user.profilePicture} // Check for both structure cases
@@ -68,9 +87,13 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
             className={`absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg ${
               isAccountDropdownOpen ? 'block' : 'hidden'
             }`}
-            style={{ top: '100%', zIndex: 1000 }} // Ensure dropdown is on top
+            style={{ top: '100%', zIndex: 1000 }} 
           >
-            <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+            <a
+              href="#"
+              className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
+              onClick={handleProfileClick}
+            >
               Profile
             </a>
             <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100" onClick={handleLogout}>

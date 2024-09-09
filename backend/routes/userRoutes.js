@@ -2,8 +2,8 @@ import express from 'express';
 
   import { createQuotation, confirmQuotationEmail, checkVerificationStatus } from '../controllers/quotationController.js'
   import upload from '../middlewares/multerMiddleware.js';
-  import quotationTokenModel from '../models/quotationTokenModel.js';
-  import Quotation from '../models/quotationModel.js';
+  // import quotationTokenModel from '../models/quotationTokenModel.js';
+  // import Quotation from '../models/quotationModel.js';
 
   import {createUser } from '../controllers/userController.js';
   import { loginUser, forgotPassword, resetPassword } from '../controllers/authController.js';
@@ -13,6 +13,7 @@ import express from 'express';
   import { ContactEunivate } from '../controllers/contactEunivate.js';
   import { updateUser, updateUserPassword } from '../controllers/updateUserInformation.js';
   import { inviteUsers, updateUserRole, getUsers} from '../controllers/peopleController.js';
+  import {authenticateUser, listEmails, sendEmail} from '../Services/gmailController.js'
 
 const router = express.Router();
 
@@ -27,7 +28,12 @@ router.post('/refresh-token', refreshToken);
 
 //User Messages Related
 router.post('/contactEunivate',ContactEunivate )
-// router.get('/emails', getEmails); 
+
+// Gmail related
+router.get('/auth', authenticateUser);
+router.get('/emails', listEmails);
+router.post('/send-email', sendEmail);
+
 // User Management Routes
 router.get('/', getUsers); 
 router.post('/signup', createUser);  

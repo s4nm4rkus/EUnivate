@@ -15,8 +15,6 @@ const GanttChart = () => {
     }
   }, [projectName]);
 
-  const getCurrentYear = () => new Date().getFullYear();
-
   const months = [
     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
@@ -75,6 +73,21 @@ const GanttChart = () => {
   const allStatuses = ['Document', 'Todo', 'Ongoing', 'Done', 'Backlogs'];
 
   const SMALL_TEXT_THRESHOLD = 10; // percentage width
+  const MAX_TASK_HEIGHT = 4; // maximum height of each task pin in rem
+  const TASK_SPACING = 1; // spacing between tasks in rem
+
+  // Group tasks by status for vertical stacking
+  const groupedTasks = allStatuses.map((status) => {
+    const filteredTasks = tasks.filter(task => (status === 'Document' && task.status === 'Pending') || task.status === status);
+    const totalHeight = filteredTasks.length * (MAX_TASK_HEIGHT + TASK_SPACING);
+    const shrinkFactor = totalHeight > MAX_TASK_HEIGHT * 5 ? (MAX_TASK_HEIGHT * 5) / totalHeight : 1;
+
+    return {
+      status,
+      tasks: filteredTasks,
+      shrinkFactor,
+    };
+  });
 
   return (
     <div className="p-4 sm:p-8 bg-white shadow-lg rounded-lg overflow-x-auto">
@@ -90,57 +103,66 @@ const GanttChart = () => {
         </div>
         {/* Gantt chart rows */}
         <div className="overflow-x-auto">
-          {allStatuses.map((status) => (
-            <div key={status} className="flex items-start border-b border-gray-300 mt-16">
+          {groupedTasks.map(({ status, tasks, shrinkFactor }) => (
+            <div
+              key={status}
+              className="flex items-start border-b border-gray-300 mt-16"
+              style={{
+                minHeight: `${tasks.length * (MAX_TASK_HEIGHT + TASK_SPACING) * shrinkFactor}rem`,
+              }}
+            >
               <div className="w-28 min-w-[7rem] border-r border-gray-300 p-2 flex items-start -ml-20">
                 <div className="transform rotate-90 ml-20 -translate-x-1/2 mb-10 text-xl font-semibold relative translate-y-[-0.5rem]">
                   {status}
                 </div>
               </div>
               <div className="relative flex-1">
-                {tasks
-                  .filter(task => (status === 'Document' && task.status === 'Pending') || task.status === status)
-                  .map((task) => {
-                    const taskWidth = calculateTaskWidth(task.startDate, task.dueDate);
-                    const textSizeClass = taskWidth < SMALL_TEXT_THRESHOLD ? 'text-xs' : 'text-sm';
-                    const imageCount = countImages(task);
-                    return (
-                      <div
-                        key={task.id}
-                        className={`absolute ${getStatusIconColor(task.status)} text-white p-2 rounded`}
-                        style={{
-                          width: `${taskWidth}%`,
-                          left: `${calculateTaskLeft(task.startDate)}%`,
-                          whiteSpace: 'nowrap',
-                          top: '50%', // Adjust this value to move the task name up or down
-                          transform: 'translateY(-50%)', // Center vertically
-                        }}
-                      >
-                        <div className={`text-black ${textSizeClass}`}>
-                          {task.taskName}
-                          {imageCount > 0 && (
-                            <div className="flex items-center mt-1 text-xs">
-                              <FontAwesomeIcon
-                                icon={faImage}
-                                className="mr-1 text-gray-700"
-                              />
-                              <span>{imageCount} {imageCount === 1 ? 'Image' : 'Images'}</span>
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex items-center mt-1 text-xs">
-                          <FontAwesomeIcon
-                            icon={faFlag}
-                            className={`mr-1 ${getDifficultyColor(task.difficulty)}`}
-                          />
-                          <span className="px-2 py-1 text-black">
-                            {task.difficulty}
-                          </span>
-                        </div>
+                {tasks.map((task, index) => {
+                  const taskWidth = calculateTaskWidth(task.startDate, task.dueDate);
+                  const textSizeClass = taskWidth < SMALL_TEXT_THRESHOLD ? 'text-xs' : 'text-sm';
+                  const imageCount = countImages(task);
+                  const taskHeight = MAX_TASK_HEIGHT * shrinkFactor;
+
+                  return (
+                    <div
+                      key={task.id}
+                      className={`absolute ${getStatusIconColor(task.status)} text-white p-2 rounded`}
+                      style={{
+                        width: `${taskWidth}%`,
+                        left: `${calculateTaskLeft(task.startDate)}%`,
+                        whiteSpace: 'nowrap',
+                        top: `${index * (taskHeight + TASK_SPACING)}rem`, // Adjust position with spacing and shrink factor
+                        height: `${taskHeight}rem`,
+                        lineHeight: `${taskHeight}rem`, // Vertical centering within the task pin
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <div className={`text-black ${textSizeClass}`}>
+                        {task.taskName}
+                        {imageCount > 0 && (
+                          <div className="flex items-center mt-1 text-xs">
+                            <FontAwesomeIcon
+                              icon={faImage}
+                              className="mr-1 text-gray-700"
+                            />
+                            <span>{imageCount} {imageCount === 1 ? 'Image' : 'Images'}</span>
+                          </div>
+                        )}
                       </div>
-                    );
-                  })
-                }
+                      <div className={`flex items-center mt-1 text-xs ${getDifficultyColor(task.difficulty)}`}>
+                        <FontAwesomeIcon
+                          icon={faFlag}
+                          className="mr-1"
+                        />
+                        <span className="px-2 py-1 text-black">
+                          {task.difficulty}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ))}

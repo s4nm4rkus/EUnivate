@@ -140,23 +140,24 @@ const Kanban = () => {
                 <h3 className="font-semibold mb-2 text-2xl">{task.taskName}</h3>
                 <p className="mt-2">{task.objective}</p>
                 <div className={`flex flex-col items-center gap-4 mt-2`}>
-                  {task.image1 && (
-                    <img
-                      src={task.image1}
-                      alt="Task 1"
-                      className={`object-cover rounded border border-gray-300 w-full md:w-4/4 lg:w-1/10 h-auto`}
-                      style={{ maxHeight: '200px' }}
-                    />
-                  )}
-                  {task.image2 && (
-                    <img
-                      src={task.image2}
-                      alt="Task 2"
-                      className={`object-cover rounded border border-gray-300 w-full md:w-4/4 lg:w-1/10 h-auto`}
-                      style={{ maxHeight: '200px' }}
-                    />
-                  )}
-                </div>
+  {task.image1 && (
+    <img
+      src={task.image1}
+      alt="Task 1"
+      className={`object-cover rounded-lg border  w-full md:w-4/4 lg:w-1/10 h-auto`}
+      style={{ maxHeight: '200px' }}
+    />
+  )}
+  {task.image2 && (
+    <img
+      src={task.image2}
+      alt="Task 2"
+      className={`object-cover rounded-lg border w-full md:w-4/4 lg:w-1/10 h-auto`}
+      style={{ maxHeight: '200px' }}
+    />
+  )}
+</div>
+
                 <div className="p-2 mt-2 flex items-center">
                   <div className="mr-2">
                     {user.profilePicture ? (

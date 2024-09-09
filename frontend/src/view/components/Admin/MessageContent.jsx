@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faReply, faStar, faHeart, faPaperPlane, faPaperclip, faMicrophone, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import axios from 'axios';
 
 const MessageContent = () => {
   const [message, setMessage] = useState('');
@@ -39,18 +40,31 @@ const MessageContent = () => {
     setFile(null);
   };
 
+  const ChatComponent = () => {
+    const [replyingTo, setReplyingTo] = useState(null);
+  
+    const cancelReply = () => {
+      setReplyingTo(null); // Reset the reply state
+    };
+  }
+  
   const sendMessage = async () => {
     if (message.trim() || file) {
       const cleanMessage = message.replace(/<\/?p>/g, '');
 
       if (editingMessageId) {
-        // Update the existing message
-        setMessages((prevMessages) =>
-          prevMessages.map((msg) =>
-            msg._id === editingMessageId ? { ...msg, content: cleanMessage, edited: true } : msg
-          )
-        );
-        setEditingMessageId(null);
+         // Update the existing message and mark as edited
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg._id === editingMessageId
+            ? { ...msg, content: cleanMessage, edited: true }
+            : msg
+        )
+      );
+
+      setEditingMessageId(null); // Clear the editing state
+      setReplyingTo(null); // Clear the reply state after editing
+
       } else {
         const newMessage = {
           content: cleanMessage,
@@ -82,11 +96,12 @@ const MessageContent = () => {
           console.error('Error sending message:', error);
         }
 
-        setReplyingTo(null);
+         // Add new message to state and clear reply
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
+    setReplyingTo(null);
+    setMessage('');
+    setFile(null);
       }
-
-      setMessage('');
-      setFile(null);
     }
   };
 
@@ -122,14 +137,16 @@ const MessageContent = () => {
     }));
   };
 
-  const handleReply = (message) => {
-    setReplyingTo(message);
-  };
+  // Set the message to reply to
+const handleReply = (message) => {
+  setReplyingTo(message);
+};
 
-  const handleEdit = (messageId, messageContent) => {
-    setEditingMessageId(messageId);
-    setMessage(messageContent);
-  };
+const handleEdit = (messageId, messageContent) => {
+  setEditingMessageId(messageId);
+  setMessage(messageContent);
+};
+
 
   const handleDelete = (messageId) => {
     setMessages((prevMessages) => prevMessages.filter((msg) => msg._id !== messageId));
@@ -156,20 +173,52 @@ const MessageContent = () => {
   };
 
   const formatMessageContent = (message) => {
+    let content = message.content;
+
+    // Add "Edited" flag if message was edited
+  if (message.edited) {
+    content += ' <span style="color: gray; font-size: 0.75rem;">(Edited)</span>';
+  }
+
+  // If it's a reply, format the reply content
     if (message.replyTo) {
       return `
-        <div>
-          <p><strong>Replying to ${message.replyTo.sender.name}:</strong></p>
-          <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px;">
-            <p><strong>${message.replyTo.sender.name}</strong> <span class="text-gray-500 text-xs">(${message.replyTo.time})</span></p>
+        <div style="padding: 10px; background-color: #f1f1f1; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 10px; margin-top: 10px;">
+          <p style="font-weight: bold; color: #0078d4;">Replying to ${message.replyTo.sender.name}:</p>
+          <div style="border-left: 4px solid #0078d4; padding: 10px; background-color: #ffffff; border-radius: 8px;">
+            <p style="font-weight: bold; color: #333;">${message.replyTo.sender.name} <span style="color: #777;">(${message.replyTo.time})</span></p>
             <p>${message.replyTo.content}</p>
           </div>
-          <p>${message.content}</p>
+          <p style="margin-top: 10px; color: #333;">${message.content}</p>
         </div>
       `;
     }
     return message.content;
   };
+
+  const editMessage = async (id, updatedContent, updatedFile, updatedTime) => {
+    try {
+      const response = await axios.put(`/api/chatMessages/${id}`, {
+        content: updatedContent,
+        file: updatedFile,
+        time: updatedTime,
+      });
+      console.log('Message updated:', response.data);
+    } catch (error) {
+      console.error('Error updating message:', error);
+    }
+  };
+  
+  const deleteMessage = async (id) => {
+    try {
+      const response = await axios.delete(`/api/chatMessages/${id}`);
+      console.log('Message deleted:', response.data);
+    } catch (error) {
+      console.error('Error deleting message:', error);
+    }
+  };
+  
+  
 
   return (
     <div className="message-content flex flex-col h-full">
@@ -198,12 +247,15 @@ const MessageContent = () => {
               } max-w-[60%] border border-black relative ${editingMessageId === msg._id ? 'border-blue-500' : ''}`}
             >
               <div className="message-header flex items-center justify-between mb-1">
-                <div className="flex items-center">
-                  <p className={`text-sm font-semibold ${msg.sender.name === 'You' ? 'text-blue-800' : 'text-gray-800'}`}>{msg.sender.name}</p>
-                  {msg.edited && <span className="text-xs text-gray-500 mx-2">(Edited)</span>}
-                </div>
-                <p className="text-xs text-gray-400">{msg.time}</p>
-              </div>
+  <div className="flex items-center">
+    <p className={`text-sm font-semibold ${msg.sender.name === 'You' ? 'text-blue-800' : 'text-gray-800'}`}>
+      {msg.sender.name}
+    </p>
+    {msg.edited && <span className="text-xs text-gray-500 mx-2">(Edited)</span>}
+  </div>
+  <p className="text-xs text-gray-400">{msg.time}</p>
+</div>
+
 
               <div
                 className="message-body text-sm break-words"
@@ -259,14 +311,13 @@ const MessageContent = () => {
       {/* Reply Box */}
       {replyingTo && (
         <div className="reply-box p-4 border-t border-gray-200 bg-gray-50 flex flex-col">
-          <div className="flex items-center mb-2">
-            <FontAwesomeIcon icon={faReply} className="text-blue-500 mr-2" />
-            <p className="text-sm text-blue-500">{`Replying to:`}</p>
-          </div>
-          <div className="reply-content p-2 bg-white border border-gray-200 rounded-lg">
-            <p><strong>{replyingTo.sender.name}</strong> <span className="text-gray-500 text-xs">({replyingTo.time})</span></p>
-            <p>{replyingTo.content}</p>
-          </div>
+          <div className="reply-preview p-2 border border-gray-300 rounded bg-gray-100 mb-2">
+      <p><strong>Replying to {replyingTo.sender.name}:</strong></p>
+      <div style={{ border: '1px solid #ddd', padding: '10px', marginBottom: '10px' }}>
+        <p><strong>{replyingTo.sender.name}</strong> <span className="text-gray-500 text-xs">({replyingTo.time})</span></p>
+        <p>{replyingTo.content}</p>
+      </div>
+    </div>
         </div>
       )}
 

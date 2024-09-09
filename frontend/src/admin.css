@@ -79,9 +79,13 @@
 /* CSS for Admin Messages */
 /* SidebarMessage Styles */
 .sidebar-message-content {
-  width: 250px;
+  position: relative;
   background-color: #fff;
-  padding: 20px;
+  max-height: max-content;
+  bottom: 40px;
+  right: 24px;
+  width:320px;
+  height: 455px;
 }
 
 .sidebar-message-title {
@@ -105,9 +109,9 @@
   border-radius: 0.25rem;
 }
 
-.sidebar-message-member-icon {
-  font-size: 1.5rem;
-  color: #9ca3af; /* Tailwind gray-400 */
+.member-count {
+  font-size: 1.1rem;
+  margin-left: 10px;
 }
 
 .sidebar-message-member-name {
@@ -125,95 +129,16 @@
 }
 
 /* MessageContent Styles */
-.message-content-container {
-  flex: 1;
+.message-content {
   background-color: #f3f4f6;
-  padding: 1.5rem;
-}
-
-.message-content-header {
-  margin-bottom: 1rem;
-}
-
-.message-content-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
-.message-content-subtitle {
-  font-size: 0.875rem;
-  color: #6b7280; /* Tailwind gray-600 */
-}
-
-.message-content-messages {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.message-content-message {
-  display: flex;
-}
-
-.message-content-avatar img {
-  border-radius: 9999px;
-}
-
-.message-content-body {
-  background-color: #fff;
+  max-width: auto;
+  height: 83%; 
+  width: 692px;
+  margin: 0 auto; 
   padding: 1rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  position: absolute;
+  top: 89px;
+  bottom: 40px; 
+  right: 1px;
 }
 
-.message-content-name {
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-
-.message-content-time {
-  font-size: 0.75rem;
-  color: #9ca3af; /* Tailwind gray-400 */
-}
-
-.message-content-text {
-  font-size: 0.875rem;
-}
-
-.message-content-actions {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.message-content-action-icon {
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.message-content-input {
-  display: flex;
-  align-items: center;
-  margin-top: 1rem;
-}
-
-.message-content-input-field {
-  flex: 1;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.message-content-send-button {
-  margin-left: 1rem;
-  padding: 0.75rem;
-  background-color: #3b82f6; /* Tailwind blue-500 */
-  color: #fff;
-  border-radius: 9999px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  transition: background-color 0.3s;
-}
-
-.message-content-send-button:hover {
-  background-color: #2563eb; /* Tailwind blue-600 */
-}

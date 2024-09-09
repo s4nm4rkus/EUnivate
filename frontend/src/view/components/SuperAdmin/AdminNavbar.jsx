@@ -34,7 +34,7 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
 
     localStorage.removeItem('user');
     localStorage.removeItem('token'); // Remove the token if stored separately
-
+    // Redirect to login page
     navigate('/login');
   };
 
@@ -44,8 +44,8 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
 
   return (
     <>
-      {/* Search Bar, Notification, and User Profile */}
-      <div className="flex items-center space-x-9">
+      {/* Admin Navbar */}
+      <div className="flex items-center space-x-9 p-0" style={{ transform: 'translateX(1px)' }}>
         {/* Search Bar with Icon */}
         <div className="relative">
           <input

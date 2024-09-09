@@ -16,6 +16,7 @@ const MessageContent = () => {
   const [editingMessageId, setEditingMessageId] = useState(null);
   const [replyingTo, setReplyingTo] = useState(null);
   const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null); // Create a ref for the file input
 
   const startRecording = () => {
     navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
@@ -33,11 +34,17 @@ const MessageContent = () => {
   };
 
   const handleFileChange = (event) => {
-    setFile(event.target.files[0]);
+    setFile(event.target.files[0]); // Capture the selected file
   };
 
   const removeFile = () => {
-    setFile(null);
+    setFile(null); // Clear the attached file
+  };
+
+  const handleAttachmentClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click(); // Trigger file input click
+    }
   };
 
   const ChatComponent = () => {
@@ -50,7 +57,14 @@ const MessageContent = () => {
   
   const sendMessage = async () => {
     if (message.trim() || file) {
-      const cleanMessage = message.replace(/<\/?p>/g, '');
+      const cleanMessage = message.trim().replace(/<\/?p>/g, '');
+
+      const formData = new FormData();
+      formData.append('content', cleanMessage);
+      if (file) formData.append('file', file); // Attach the file if present
+      if (replyingTo) formData.append('replyTo', replyingTo);
+
+      
 
       if (editingMessageId) {
          // Update the existing message and mark as edited
@@ -96,8 +110,6 @@ const MessageContent = () => {
           console.error('Error sending message:', error);
         }
 
-         // Add new message to state and clear reply
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
     setReplyingTo(null);
     setMessage('');
     setFile(null);
@@ -247,29 +259,33 @@ const handleEdit = (messageId, messageContent) => {
               } max-w-[60%] border border-black relative ${editingMessageId === msg._id ? 'border-blue-500' : ''}`}
             >
               <div className="message-header flex items-center justify-between mb-1">
-  <div className="flex items-center">
-    <p className={`text-sm font-semibold ${msg.sender.name === 'You' ? 'text-blue-800' : 'text-gray-800'}`}>
-      {msg.sender.name}
-    </p>
-    {msg.edited && <span className="text-xs text-gray-500 mx-2">(Edited)</span>}
-  </div>
-  <p className="text-xs text-gray-400">{msg.time}</p>
-</div>
-
-
+            <div className="flex items-center">
+              <p className={`text-sm font-semibold ${msg.sender.name === 'You' ? 'text-blue-800' : 'text-gray-800'}`}>
+                {msg.sender.name}
+              </p>
+              {msg.edited && <span className="text-xs text-gray-500 mx-2">(Edited)</span>}
+            </div>
+            <p className="text-xs text-gray-400">{msg.time}</p>
+          </div>
               <div
                 className="message-body text-sm break-words"
                 dangerouslySetInnerHTML={{ __html: formatMessageContent(msg) }}
               />
 
-              {msg.file && (
-                <div className="mt-1 text-xs flex items-center space-x-2">
-                  <a href={msg.file.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline" download={msg.file.name}>
-                    {msg.file.name}
-                  </a>
-                  {msg.file.type && <span className="text-gray-400 text-xs">({msg.file.type})</span>}
-                </div>
-              )}
+            {msg.file && (
+                  <div className="mt-1 text-xs flex items-center space-x-2">
+                    <a 
+                      href={msg.file.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="text-blue-500 hover:underline"
+                      download={msg.file.name} // Ensures the file keeps its original name when opened or downloaded
+                    >
+                      {msg.file.name}
+                    </a>
+                    {msg.file.type && <span className="text-gray-400 text-xs"></span>}
+                  </div>
+                )}
 
               <div className="message-actions flex space-x-2 mt-2">
                 <FontAwesomeIcon
@@ -314,49 +330,72 @@ const handleEdit = (messageId, messageContent) => {
           <div className="reply-preview p-2 border border-gray-300 rounded bg-gray-100 mb-2">
       <p><strong>Replying to {replyingTo.sender.name}:</strong></p>
       <div style={{ border: '1px solid #ddd', padding: '10px', marginBottom: '10px' }}>
-        <p><strong>{replyingTo.sender.name}</strong> <span className="text-gray-500 text-xs">({replyingTo.time})</span></p>
+        <p><strong>{replyingTo.sender.name}</strong> <spaAn className="text-gray-500 text-xs">({replyingTo.time})</spaAn></p>
         <p>{replyingTo.content}</p>
+        <button
+              className="ml-2 text-xs text-red-500"
+              onClick={() => setReplyingTo(null)}
+            >
+              Cancel
+            </button>
       </div>
     </div>
         </div>
       )}
 
       {/* Message Input */}
-      <div className="message-input flex items-center p-4 border-t border-gray-200 bg-gray-50">
-        <FontAwesomeIcon
-          icon={faPaperclip}
-          className="text-gray-500 cursor-pointer mr-2"
-        />
-        <input
-          type="file"
-          onChange={handleFileChange}
-          className="hidden"
-        />
-        <ReactQuill
-          value={message}
-          onChange={handleQuillChange}
-          onKeyDown={handleKeyDown}
-          className="flex-1"
-          placeholder="Type your message here..."
-        />
-        <button
-          onClick={sendMessage}
-          className="ml-2 p-2 bg-blue-500 text-white rounded-full"
-        >
-          <FontAwesomeIcon icon={faPaperPlane} />
-        </button>
-        {isRecording ? (
-          <FontAwesomeIcon
-            icon={faMicrophone}
-            onClick={stopRecording}
-            className="text-red-500 ml-2 cursor-pointer"
+      <div className="message-input p-4 bg-white border-t sticky bottom-0">
+        <div className="relative flex items-center">
+          <ReactQuill
+            value={message}
+            onChange={handleQuillChange}
+            onKeyDown={handleKeyDown}
+            className="bg-white border rounded-lg shadow-sm flex-1"
+            theme="snow"
+            placeholder="Enter a message..."
           />
-        ) : (
-          <FontAwesomeIcon
-            icon={faMicrophone}
-            onClick={startRecording}
-            className="text-gray-500 ml-2 cursor-pointer"
+
+          {/* Icons */}
+          <div className="absolute right-2 top-0 flex flex-col items-center space-y-2 z-10">
+            {/* Attachment Icon */}
+            <label className="cursor-pointer">
+              <input type="file" className="hidden" onChange={handleFileChange} />
+              <FontAwesomeIcon
+            icon={faPaperclip}
+            className="cursor-pointer text-gray-600"
+            title="Attach file"
+            onClick={handleAttachmentClick} // Trigger the file input when clicked
           />
+              {/* Microphone Icon */}
+              <button
+                onClick={isRecording ? stopRecording : startRecording}
+                className={`p-2 transition duration-300 ${isRecording ? 'bg-red-500 text-white' : 'text-gray-600'}`}
+              >
+                <FontAwesomeIcon icon={faMicrophone} style={{ fontSize: '1rem' }} />
+              </button>
+            </label>
+          </div>
+
+          {/* Send Message Button */}
+          <button
+            onClick={sendMessage}
+            className="absolute right-2 bottom-2 p-2 text-blue-500 hover:text-blue-600 transition duration-300"
+          >
+            <FontAwesomeIcon icon={faPaperPlane} />
+          </button>
+        </div>
+
+        {/* File Preview Section */}
+        {file && (
+            <div className="file-preview mt-2 p-2 bg-gray-100 border rounded-lg flex items-center justify-between">
+              <span className="text-sm">{file.name}</span>
+              <button
+                className="text-sm text-red-500"
+                onClick={removeFile}
+              >
+                Remove
+              </button>
+          </div>
         )}
       </div>
     </div>

@@ -15,6 +15,7 @@
   import { ContactEunivate } from '../controllers/contactEunivate.js';
   import { updateUser, updateUserPassword } from '../controllers/updateUserInformation.js';
   import { inviteUsers, updateUserRole, getUsers} from '../controllers/peopleController.js';
+  import { createEvent, getEvents, updateEvent, deleteEvent } from '../controllers/addEventsController.js';
   // import {authenticateUser, listEmails, sendEmail} from '../Services/gmailController.js'
 
 const router = express.Router();
@@ -63,8 +64,12 @@ router.put('/products/:id', upload.single('image'), updateProduct);
       router.get('/projects', getProjects);
       router.put('/projects/:id', upload.single('image'), updateProject);
       router.delete('/projects/:id', deleteProject);
-
-      
+      //Events
+      router.post('/addevent', upload.single('image'), createEvent);
+      router.get('/events', getEvents);
+      router.put('/events/:id', upload.single('image'), updateEvent);
+      router.delete('/events/:id', deleteEvent);
+        
 // SuperAdmin Route (Protected)
 router.get('/superadmin', protect, verifySuperAdmin, (req, res) => {
   res.status(200).json({ message: 'Welcome to the SuperAdmin dashboard' });

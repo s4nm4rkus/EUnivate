@@ -99,7 +99,7 @@ const AdminContainer = ({ children }) => {
                         ref={dropdownRef}
                     >
                         <img
-                            src={profilePicture || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'}
+                            src={profilePicture || 'https://res.cloudinary.com/dzxzc7kwb/image/upload/v1725974053/DefaultProfile/qgtsyl571c1neuls9evd.png'}
                             alt="Profile"
                             className="w-10 h-10 rounded-full object-cover"
                         />

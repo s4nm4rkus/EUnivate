@@ -1,18 +1,63 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faEdit, faTrashAlt, faFilter } from '@fortawesome/free-solid-svg-icons';
 import Layout from '../../components/Admin/AdminContainer';  
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import EditProjectModal from '../../components/Admin/EditProjectModal.jsx';
 
 const Projects = () => {
+  const [projects, setProjects] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortKey, setSortKey] = useState('projectName');
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  const projects = [
-    { name: "Capstone Project Name", description: "Description", teamMembers: "Juan Delacruz, Jane Doe, Pepe Cruz", adviser: "Juan Delacruz", image: "image.png" },
-    { name: "Capstone Project Name", description: "Description", teamMembers: "Juan Delacruz, Jane Doe, Pepe Cruz", adviser: "Juan Delacruz", image: "image.png" },
-    { name: "Capstone Project Name", description: "Description", teamMembers: "Juan Delacruz, Jane Doe, Pepe Cruz", adviser: "Juan Delacruz", image: "image.png" },
-    // Add more projects as needed
-  ];
+  useEffect(() => {
+    // Fetch projects from the backend
+    const fetchProjects = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/users/projects');
+        setProjects(response.data);
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  const handleDelete = async (projectId) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/users/projects/${projectId}`);
+      setProjects(projects.filter(project => project._id !== projectId));
+    } catch (error) {
+      console.error('Error deleting project:', error);
+    }
+  };
+
+  const handleEdit = (project) => {
+    setSelectedProject(project);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditSave = (updatedProject) => {
+    setProjects(projects.map(project => project._id === updatedProject._id ? updatedProject : project));
+    setIsEditModalOpen(false);
+  };
+
+  const filteredProjects = projects
+    .filter(project =>
+      project.projectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.teamMembers.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.adviser.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (a[sortKey] < b[sortKey]) return -1;
+      if (a[sortKey] > b[sortKey]) return 1;
+      return 0;
+    });
 
   return (
     <Layout>
@@ -31,13 +76,19 @@ const Projects = () => {
             type="text"
             placeholder="Search"
             className="w-full p-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-700"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
           <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
         </div>
         <div className="flex items-center">
           <label className="mr-2">Sort by</label>
-          <select className="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-700">
-            <option value="name">Name</option>
+          <select
+            className="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-700"
+            value={sortKey}
+            onChange={(e) => setSortKey(e.target.value)}
+          >
+            <option value="projectName">Name</option>
             <option value="teamMembers">Team Members</option>
             <option value="adviser">Adviser</option>
           </select>
@@ -60,24 +111,30 @@ const Projects = () => {
             </tr>
           </thead>
           <tbody>
-            {projects.map((project, index) => (
+            {filteredProjects.map((project, index) => (
               <tr key={index} className="border-b">
-                <td className="py-4 px-6">{project.name}</td>
+                <td className="py-4 px-6">{project.projectName}</td>
                 <td className="py-4 px-6">{project.description}</td>
                 <td className="py-4 px-6">{project.teamMembers}</td>
                 <td className="py-4 px-6">{project.adviser}</td>
                 <td className="py-4 px-6">
                   <img
-                    src={project.image}
+                    src={project.image?.url || 'placeholder.png'}
                     alt="Project"
                     className="w-12 h-12 object-cover rounded-lg"
                   />
                 </td>
                 <td className="py-4 px-6 text-right">
-                  <button className="mr-2 text-gray-600 hover:text-gray-900">
+                  <button 
+                    className="mr-2 text-gray-600 hover:text-gray-900"
+                    onClick={() => handleEdit(project)}
+                  >
                     <FontAwesomeIcon icon={faEdit} />
                   </button>
-                  <button className="text-gray-600 hover:text-gray-900">
+                  <button
+                    className="text-gray-600 hover:text-gray-900"
+                    onClick={() => handleDelete(project._id)}
+                  >
                     <FontAwesomeIcon icon={faTrashAlt} />
                   </button>
                 </td>
@@ -86,6 +143,14 @@ const Projects = () => {
           </tbody>
         </table>
       </div>
+
+      {isEditModalOpen && (
+        <EditProjectModal
+          project={selectedProject}
+          onClose={() => setIsEditModalOpen(false)}
+          onSave={handleEditSave}
+        />
+      )}
     </Layout>
   );
 };

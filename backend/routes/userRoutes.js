@@ -3,6 +3,7 @@
   import { createQuotation, confirmQuotationEmail, checkVerificationStatus } from '../controllers/quotationController.js'
   import upload from '../middlewares/multerMiddleware.js';
   import {createProduct, getProducts, deleteProduct, updateProduct  } from '../controllers/addProductsController.js'
+  import { updateProject, deleteProject, getProjects, createProject} from '../controllers/addProjectsController.js';
   // import quotationTokenModel from '../models/quotationTokenModel.js';
   // import Quotation from '../models/quotationModel.js';
 
@@ -52,11 +53,18 @@ router.put('/:id', updateUser);
 router.put('/:id/password', updateUserPassword);
 
 //Admin Routes
+      //Products
 router.post('/addproduct', upload.single('image'), createProduct );
 router.get('/products', getProducts);
 router.delete('/products/:id', deleteProduct);
 router.put('/products/:id', upload.single('image'), updateProduct);
+      //Projects
+      router.post('/addproject', upload.single('image'), createProject);
+      router.get('/projects', getProjects);
+      router.put('/projects/:id', upload.single('image'), updateProject);
+      router.delete('/projects/:id', deleteProject);
 
+      
 // SuperAdmin Route (Protected)
 router.get('/superadmin', protect, verifySuperAdmin, (req, res) => {
   res.status(200).json({ message: 'Welcome to the SuperAdmin dashboard' });

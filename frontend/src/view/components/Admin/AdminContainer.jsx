@@ -14,7 +14,7 @@ const AdminContainer = ({ children }) => {
 
     // Update selectedTab based on the current path
     useEffect(() => {
-        const defaultProfilePicture = 'https://ibb.co/5kHg186'; 
+        const defaultProfilePicture = 'https://res.cloudinary.com/dzxzc7kwb/image/upload/v1725974053/DefaultProfile/qgtsyl571c1neuls9evd.png'; 
         const user = JSON.parse(localStorage.getItem('user'));
         if (user) {
             setUserName(`${user.firstName} ${user.lastName}`);

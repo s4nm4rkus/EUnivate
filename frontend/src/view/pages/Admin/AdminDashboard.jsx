@@ -12,7 +12,7 @@ const AdminDashboard = () => {
                 const response = await fetch('http://localhost:5000/api/users/stats');
                 const data = await response.json();
                 setStats([
-                    { label: 'Quotations', value: '2' },
+                    { label: 'Quotations', value: data.quotaions }, //may count nadin to wala lang laman db 
                     { label: 'Services', value: '4' },
                     { label: 'Products', value: data.products },
                     { label: 'Projects', value: data.projects },

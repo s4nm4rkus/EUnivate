@@ -84,7 +84,22 @@ const List = () => {
                 </div>
                 <div>
                   <p className="text-xs text-gray-400 mb-4">Assigned</p>
-                  <p className="text-sm">{task.assignee || 'Unassigned'}</p>
+                  <div className="flex items-center">
+                    {task.selectedAvatar ? (
+                      <img
+                        src={task.selectedAvatar}
+                        alt="Selected User Avatar"
+                        className="w-7 h-7 rounded-full object-cover mr-2"
+                      />
+                    ) : (
+                      <img
+                        src="/path/to/default/avatar.png"
+                        alt="Default Avatar"
+                        className="w-7 h-7 rounded-full object-cover mr-2"
+                      />
+                    )}
+                    <p className="">{task.assignee}</p>
+                  </div>
                 </div>
               </div>
             ))

@@ -4,6 +4,7 @@
   import upload from '../middlewares/multerMiddleware.js';
   import {createProduct, getProducts, deleteProduct, updateProduct  } from '../controllers/addProductsController.js'
   import { updateProject, deleteProject, getProjects, createProject} from '../controllers/addProjectsController.js';
+  import { getDashboardStats } from '../controllers/DashboardController.js';
   // import quotationTokenModel from '../models/quotationTokenModel.js';
   // import Quotation from '../models/quotationModel.js';
 
@@ -55,10 +56,10 @@ router.put('/:id/password', updateUserPassword);
 
 //Admin Routes
       //Products
-router.post('/addproduct', upload.single('image'), createProduct );
-router.get('/products', getProducts);
-router.delete('/products/:id', deleteProduct);
-router.put('/products/:id', upload.single('image'), updateProduct);
+      router.post('/addproduct', upload.single('image'), createProduct );
+      router.get('/products', getProducts);
+      router.delete('/products/:id', deleteProduct);
+      router.put('/products/:id', upload.single('image'), updateProduct);
       //Projects
       router.post('/addproject', upload.single('image'), createProject);
       router.get('/projects', getProjects);
@@ -69,7 +70,8 @@ router.put('/products/:id', upload.single('image'), updateProduct);
       router.get('/events', getEvents);
       router.put('/events/:id', upload.single('image'), updateEvent);
       router.delete('/events/:id', deleteEvent);
-        
+      //Dashboard
+      router.get('/stats', getDashboardStats);
 // SuperAdmin Route (Protected)
 router.get('/superadmin', protect, verifySuperAdmin, (req, res) => {
   res.status(200).json({ message: 'Welcome to the SuperAdmin dashboard' });

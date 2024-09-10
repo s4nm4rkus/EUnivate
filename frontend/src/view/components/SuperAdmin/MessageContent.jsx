@@ -183,20 +183,25 @@ const handleEdit = (messageId, messageContent) => {
       content += ' <span style="color: gray; font-size: 0.75rem;">(Edited)</span>';
     }
   
-     // If it's a reply, format the reply content
-    if (message.replyTo) {
-      return `
-        <div style="padding: 10px; background-color: #f1f1f1; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 10px; margin-top: 10px;">
-          <p style="font-weight: bold; color: #0078d4;">Replying to ${message.replyTo.sender.name}:</p>
-          <div style="border-left: 4px solid #0078d4; padding: 10px; background-color: #ffffff; border-radius: 8px;">
-            <p style="font-weight: bold; color: #333;">${message.replyTo.sender.name} <span style="color: #777;">(${message.replyTo.time})</span></p>
-            <p>${message.replyTo.content}</p>
-          </div>
-          <p style="margin-top: 10px; color: #333;">${message.content}</p>
-        </div>
-      `;
-    }
-    return message.content;
+   // If it's a reply, format the reply content
+if (message.replyTo) {
+  return `
+    <div style="padding: 12px; background-color: #f9fafb; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 12px; margin-top: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+      <p style="font-weight: bold; color: #0078d4; margin-bottom: 10px;">Replying to ${message.replyTo.sender.name}:</p>
+      <div style="border-left: 4px solid #0078d4; padding: 12px; background-color: #ffffff; border-radius: 10px; box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);">
+        <p style="font-weight: bold; color: #333; margin-bottom: 6px;">
+          ${message.replyTo.sender.name} 
+          <span style="color: #777; font-size: 12px; float: right;">${message.replyTo.time}</span>
+        </p>
+        <p style="color: #555;">${message.replyTo.content}</p>
+      </div>
+      <p style="margin-top: 10px; color: #333; font-size: 14px;">${message.content}</p>
+    </div>
+  `;
+}
+return message.content;
+
+
   };
   
 
@@ -244,18 +249,18 @@ const handleEdit = (messageId, messageContent) => {
             {msg.sender.name !== 'You' && (
               <img src={msg.sender.avatar} alt={msg.sender.name} className="rounded-full w-10 h-10 mt-2" />
             )}
-            <div className={`p-3 rounded-lg shadow-sm ${
+            <div className={`p-3 rounded-lg shadow-sm  ${
                 msg.sender.name === 'You' ? 'bg-blue-200 text-gray-800' : 'bg-white text-gray-800'
-              } max-w-[60%] border border-black relative ${editingMessageId === msg._id ? 'border-blue-500' : ''}`}
+              } max-w-[60%] border border-blue relative ${editingMessageId === msg._id ? 'border-blue-500' : ''}`}
             >
-              <div className="message-header flex items-center justify-between mb-1">
+              <div className="message-header flex items-center flex space-x-12 justify-between mb-4">
   <div className="flex items-center">
     <p className={`text-sm font-semibold ${msg.sender.name === 'You' ? 'text-blue-800' : 'text-gray-800'}`}>
       {msg.sender.name}
     </p>
     {msg.edited && <span className="text-xs text-gray-500 mx-2">(Edited)</span>} {/* Show "Edited" label */}
   </div>
-  <p className="text-xs text-gray-400">{msg.time}</p>
+  <p className="text-xs text-gray-500">{msg.time}</p>
 </div>
 
               <div
@@ -289,19 +294,19 @@ const handleEdit = (messageId, messageContent) => {
                   className={`cursor-pointer ${getIconColor(msg._id, 'heart')}`}
                 />
                 {msg.sender.name === 'You' && (
-                  <>
-                    <FontAwesomeIcon
-                      icon={faEdit}
-                      onClick={() => handleEdit(msg._id, msg.content)}
-                      className="cursor-pointer text-gray-400 hover:text-blue-500"
-                    />
-                    <FontAwesomeIcon
-                      icon={faTrash}
-                      onClick={() => handleDelete(msg._id)}
-                      className="cursor-pointer text-gray-400 hover:text-red-500"
-                    />
-                  </>
-                )}
+                <>
+                  <FontAwesomeIcon
+                    icon={faEdit}
+                    onClick={() => handleEdit(msg._id, msg.content)}
+                    className="cursor-pointer text-blue-500"
+                  />
+                  <FontAwesomeIcon
+                    icon={faTrash}
+                    onClick={() => handleDelete(msg._id)}
+                    className="cursor-pointer text-red-500"
+                  />
+                </>
+              )}
               </div>
             </div>
           </div>
@@ -311,18 +316,30 @@ const handleEdit = (messageId, messageContent) => {
 
 
       {/* Reply Box */}
-      {replyingTo && (
-        <div className="reply-box p-4 border-t border-gray-200 bg-gray-50 flex flex-col">
-          <div className="reply-preview p-2 border border-gray-300 rounded bg-gray-100 mb-2">
-      <p><strong>Replying to {replyingTo.sender.name}:</strong></p>
-      <div style={{ border: '1px solid #ddd', padding: '10px', marginBottom: '10px' }}>
-        <p><strong>{replyingTo.sender.name}</strong> <span className="text-gray-500 text-xs">({replyingTo.time})</span></p>
-        <p>{replyingTo.content}</p>
-        <button onClick={cancelReply} className="text-red-500">Cancel</button>
+{replyingTo && (
+  <div className="reply-box border-t border-gray-200 bg-gray-50 flex flex-col space-y-2">
+    <div className="reply-preview p-3 border border-gray-300 rounded-lg bg-white shadow-sm">
+      <p className="text-sm text-gray-700 font-semibold mb-2">
+        Replying to <span className="text-blue-600">{replyingTo.sender.name}</span>:
+      </p>
+      <div className="reply-content p-3 border border-gray-200 bg-gray-100 rounded-lg">
+        <div className="flex items-center justify-between mb-1">
+          <p className="font-medium text-gray-800">{replyingTo.sender.name}</p>
+          <span className="text-gray-400 text-xs">{replyingTo.time}</span>
+        </div>
+        <p className="text-sm text-gray-600 mb-2">{replyingTo.content}</p>
+        <button
+          onClick={cancelReply}
+          className="text-sm text-red-500 hover:text-red-700 transition-colors"
+        >
+          Cancel
+        </button>
       </div>
     </div>
-        </div>
-      )}
+  </div>
+)}
+
+
 
       {/* Message Input */}
       <div className="message-input p-4 bg-white border-t sticky bottom-0">

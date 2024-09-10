@@ -1,16 +1,64 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faEdit, faTrashAlt, faFilter } from '@fortawesome/free-solid-svg-icons';
 import Layout from '../../components/Admin/AdminContainer';  
-import { useNavigate } from 'react-router-dom'; // use 'react-router-dom' instead of 'react-router'
+import { useNavigate } from 'react-router-dom';
+import EditProductModal from '../../components/Admin/EditProductModal';
 
 const Product = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false); 
+
   const navigate = useNavigate();
 
-  const products = [
-    { name: "Product Name", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor...", image: "image.png", status: "Available" },
-    // Add other products here
-  ];
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/users/products');
+        setProducts(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        setError('Failed to fetch products');
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const handleDelete = async (productId) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/users/products/${productId}`);
+      setProducts(products.filter(product => product._id !== productId));
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      setError('Failed to delete product');
+    }
+  };
+
+  const handleEdit = (product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const handleSave = (updatedProduct) => {
+    setProducts(products.map(product =>
+        product._id === updatedProduct._id ? updatedProduct : product
+    ));
+};
+
+  if (loading) {
+    return <p>Loading products...</p>;
+  }
+
+  if (error) {
+    return <p>{error}</p>;
+  }
 
   return (
     <Layout>
@@ -57,32 +105,44 @@ const Product = () => {
           </thead>
           <tbody>
             {products.map((product, index) => (
-              <tr key={index} className="border-b">
-                <td className="py-4 px-6">{product.name}</td>
+              <tr key={product._id} className="border-b">
+                <td className="py-4 px-6">{product.productName}</td>
                 <td className="py-4 px-6">{product.description}</td>
                 <td className="py-4 px-6">
-                  <img
-                    src={product.image}
-                    alt="Product"
-                    className="w-12 h-12 object-cover rounded-lg"
-                  />
+                  {product.image && product.image.url ? (
+                    <img
+                      src={product.image.url}
+                      alt={product.productName}
+                      className="w-12 h-12 object-cover rounded-lg"
+                    />
+                  ) : (
+                    <span>No image</span>
+                  )}
                 </td>
                 <td className="py-4 px-6">
                   <button
                     className={`py-2 px-4 rounded-lg ${
-                      product.status === "Available"
+                      product.availability === "Available"
                         ? "bg-teal-100 text-teal-700"
-                        : "bg-orange-100 text-orange-700"
+                        : product.availability === "Pending"
+                        ? "bg-orange-100 text-orange-700"
+                        : "bg-gray-100 text-gray-700"
                     }`}
                   >
-                    {product.status}
+                    {product.availability}
                   </button>
                 </td>
                 <td className="py-4 px-6 text-right">
-                  <button className="mr-2 text-gray-600 hover:text-gray-900">
+                  <button
+                    className="mr-2 text-gray-600 hover:text-gray-900"
+                    onClick={() => handleEdit(product)}
+                  >
                     <FontAwesomeIcon icon={faEdit} />
                   </button>
-                  <button className="text-gray-600 hover:text-gray-900">
+                  <button 
+                    className="text-gray-600 hover:text-gray-900"
+                    onClick={() => handleDelete(product._id)}
+                  >
                     <FontAwesomeIcon icon={faTrashAlt} />
                   </button>
                 </td>
@@ -91,6 +151,14 @@ const Product = () => {
           </tbody>
         </table>
       </div>
+
+      {isModalOpen && (
+        <EditProductModal
+          product={selectedProduct}
+          onClose={() => setIsModalOpen(false)}
+          onSave={handleSave}
+        />
+      )}
     </Layout>
   );
 };

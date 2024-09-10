@@ -1,7 +1,8 @@
-import express from 'express';
+  import express from 'express';
 
   import { createQuotation, confirmQuotationEmail, checkVerificationStatus } from '../controllers/quotationController.js'
   import upload from '../middlewares/multerMiddleware.js';
+  import {createProduct, getProducts, deleteProduct, updateProduct  } from '../controllers/addProductsController.js'
   // import quotationTokenModel from '../models/quotationTokenModel.js';
   // import Quotation from '../models/quotationModel.js';
 
@@ -13,7 +14,7 @@ import express from 'express';
   import { ContactEunivate } from '../controllers/contactEunivate.js';
   import { updateUser, updateUserPassword } from '../controllers/updateUserInformation.js';
   import { inviteUsers, updateUserRole, getUsers} from '../controllers/peopleController.js';
-  import {authenticateUser, listEmails, sendEmail} from '../Services/gmailController.js'
+  // import {authenticateUser, listEmails, sendEmail} from '../Services/gmailController.js'
 
 const router = express.Router();
 
@@ -30,9 +31,9 @@ router.post('/refresh-token', refreshToken);
 router.post('/contactEunivate',ContactEunivate )
 
 // Gmail related
-router.get('/auth', authenticateUser);
-router.get('/emails', listEmails);
-router.post('/send-email', sendEmail);
+// router.get('/auth', authenticateUser);
+// router.get('/emails', listEmails);
+// router.post('/send-email', sendEmail);
 
 // User Management Routes
 router.get('/', getUsers); 
@@ -49,6 +50,12 @@ router.put('/:userId/role', updateUserRole);
 // User Update Routes
 router.put('/:id', updateUser);
 router.put('/:id/password', updateUserPassword);
+
+//Admin Routes
+router.post('/addproduct', upload.single('image'), createProduct );
+router.get('/products', getProducts);
+router.delete('/products/:id', deleteProduct);
+router.put('/products/:id', upload.single('image'), updateProduct);
 
 // SuperAdmin Route (Protected)
 router.get('/superadmin', protect, verifySuperAdmin, (req, res) => {

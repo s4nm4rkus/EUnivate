@@ -1,16 +1,79 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';  // Import useNavigate
 
 const AdminAddProduct = () => {
   const [selectedImage, setSelectedImage] = useState(null);
+  const [productName, setProductName] = useState('');
+  const [description, setDescription] = useState('');
+  const [availability, setAvailability] = useState('Available');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null); // State for error handling
+
+  const navigate = useNavigate();  // Initialize useNavigate
 
   const handleImageChange = (event) => {
     if (event.target.files && event.target.files[0]) {
-      setSelectedImage(URL.createObjectURL(event.target.files[0]));
+      setSelectedImage(event.target.files[0]);
+    }
+  };
+  
+  const uploadImageToCloudinary = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'EunivateImage'); 
+    formData.append('cloud_name', 'dzxzc7kwb'); 
+
+    try {
+      const response = await axios.post(
+        'https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload',
+        formData
+      );
+      return response.data.url; // URL of the uploaded image
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw error;
+    }
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null); // Clear any previous errors
+
+    try {
+      let imageUrl = null;
+      if (selectedImage) {
+        // Upload image to Cloudinary and get the URL
+        imageUrl = await uploadImageToCloudinary(selectedImage);
+      }
+
+      // Prepare the data to send to the backend
+      const productData = {
+        productName: productName,
+        description: description,
+        availability: availability,
+        image: imageUrl ? { url: imageUrl, publicId: selectedImage.name } : null,
+      };
+
+      // Send the product data to the backend
+      const response = await axios.post('http://localhost:5000/api/users/addproduct', productData);
+
+      console.log(response.data);
+      setLoading(false);
+
+      // Navigate to the dashboard after successful submission
+      navigate('/products');
+
+    } catch (error) {
+      setLoading(false);
+      console.error('Error uploading product:', error);
+      setError('Failed to upload product. Please try again.'); // Display error message
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-8 rounded-lg bg-white shadow-lg max-w-lg mx-auto mt-12">
+    <form onSubmit={handleFormSubmit} className="flex flex-col items-center justify-center p-8 rounded-lg bg-white shadow-lg max-w-lg mx-auto mt-12">
       {/* Upload Image Section */}
       <div className="flex flex-col items-center mb-8 relative">
         <input
@@ -24,7 +87,7 @@ const AdminAddProduct = () => {
           <div className="w-30 h-30 rounded-full bg-gray-200 flex justify-center items-center mb-4 overflow-hidden">
             {selectedImage ? (
               <img
-                src={selectedImage}
+                src={URL.createObjectURL(selectedImage)}
                 alt="Selected"
                 className="w-full h-full object-cover"
               />
@@ -42,11 +105,17 @@ const AdminAddProduct = () => {
           type="text"
           placeholder="Product Name"
           className="p-2 mb-4 rounded-md border border-gray-300 bg-gray-100"
+          value={productName}
+          onChange={(e) => setProductName(e.target.value)}
+          required
         />
         <textarea
           placeholder="Description"
           className="p-2 rounded-md border border-gray-300 bg-gray-100"
           rows="4"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          required
         />
       </div>
 
@@ -60,7 +129,8 @@ const AdminAddProduct = () => {
               name="availability"
               value="Available"
               className="hidden peer"
-              defaultChecked
+              checked={availability === 'Available'}
+              onChange={(e) => setAvailability(e.target.value)}
             />
             <span className="peer-checked:bg-teal-600 peer-checked:text-white peer-checked:border-teal-600 bg-teal-100 text-teal-700 border-2 border-teal-600 rounded-full px-4 py-2 font-bold transition-all">
               Available
@@ -72,6 +142,8 @@ const AdminAddProduct = () => {
               name="availability"
               value="Pending"
               className="hidden peer"
+              checked={availability === 'Pending'}
+              onChange={(e) => setAvailability(e.target.value)}
             />
             <span className="peer-checked:bg-orange-500 peer-checked:text-white peer-checked:border-orange-500 bg-orange-100 text-orange-600 border-2 border-orange-500 rounded-full px-4 py-2 font-bold transition-all">
               Pending
@@ -83,6 +155,8 @@ const AdminAddProduct = () => {
               name="availability"
               value="NotAvailable"
               className="hidden peer"
+              checked={availability === 'NotAvailable'}
+              onChange={(e) => setAvailability(e.target.value)}
             />
             <span className="peer-checked:bg-gray-500 peer-checked:text-white peer-checked:border-gray-500 bg-gray-200 text-gray-600 border-2 border-gray-500 rounded-full px-4 py-2 font-bold transition-all">
               Not Available
@@ -91,11 +165,14 @@ const AdminAddProduct = () => {
         </div>
       </div>
 
+      {/* Error Message */}
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+
       {/* Save Button */}
-      <button className="w-48 h-12 rounded-full bg-red-800 text-white">
-        Save
+      <button type="submit" className="w-48 h-12 rounded-full bg-red-800 text-white" disabled={loading}>
+        {loading ? 'Saving ...' : 'Save'}
       </button>
-    </div>
+    </form>
   );
 };
 

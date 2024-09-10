@@ -17,7 +17,7 @@ app.use(express.json());
 app.use('/api/users', userRoutes);
 
 // Chat message routes
-app.use('/api/messages', chatMessageRoutes); // Ensure this path is correct
+app.use('/api/messages', chatMessageRoutes); 
 app.get('/api/users/quotation/confirm/', confirmQuotationEmail);
 
 app.get('/quotation-complete', (req, res) => {

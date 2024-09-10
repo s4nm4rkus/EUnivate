@@ -14,7 +14,7 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const defaultProfilePicture = 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'; 
+    const defaultProfilePicture = 'https://res.cloudinary.com/dzxzc7kwb/image/upload/v1725974053/DefaultProfile/qgtsyl571c1neuls9evd.png'; 
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
       setUserName(`${user.firstName} ${user.lastName}`);

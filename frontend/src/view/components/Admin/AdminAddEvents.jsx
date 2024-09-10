@@ -1,16 +1,77 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const AdminAddEvents = () => {
   const [selectedImage, setSelectedImage] = useState(null);
+  const [webinarName, setWebinarName] = useState('');
+  const [description, setDescription] = useState('');
+  const [dateAndTime, setDateAndTime] = useState('');
+  const [embeddedLink, setEmbeddedLink] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const navigate = useNavigate();
 
   const handleImageChange = (event) => {
     if (event.target.files && event.target.files[0]) {
-      setSelectedImage(URL.createObjectURL(event.target.files[0]));
+      setSelectedImage(event.target.files[0]);
+    }
+  };
+
+  const uploadImageToCloudinary = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'EunivateImage');
+    formData.append('cloud_name', 'dzxzc7kwb');
+
+    try {
+      const response = await axios.post(
+        'https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload',
+        formData
+      );
+      return response.data.url;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw error;
+    }
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      let imageUrl = null;
+      if (selectedImage) {
+        imageUrl = await uploadImageToCloudinary(selectedImage);
+      }
+
+      const eventData = {
+        webinarName: webinarName,
+        description: description,
+        dateAndTime: dateAndTime,
+        embeddedLink: embeddedLink,
+        image: imageUrl ? { url: imageUrl, publicId: selectedImage.name } : null,
+      };
+
+      const response = await axios.post('http://localhost:5000/api/users/addevent', eventData);
+
+      console.log(response.data);
+      setLoading(false);
+
+      navigate('/events-admin');
+
+    } catch (error) {
+      setLoading(false);
+      console.error('Error uploading event:', error);
+      setError('Failed to upload event. Please try again.');
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-8 rounded-lg bg-white shadow-lg max-w-lg mx-auto mt-12">
+    <form onSubmit={handleFormSubmit} className="flex flex-col items-center justify-center p-8 rounded-lg bg-white shadow-lg w-[90%] max-w-4xl mx-auto mt-12">
       {/* Upload Image Section */}
       <div className="flex flex-col items-center mb-8 relative">
         <input
@@ -21,10 +82,10 @@ const AdminAddEvents = () => {
           onChange={handleImageChange}
         />
         <label htmlFor="upload-image" className="cursor-pointer">
-          <div className="w-30 h-30 rounded-full bg-gray-200 flex justify-center items-center mb-4 overflow-hidden">
+          <div className="w-24 h-24 rounded-full bg-gray-200 flex justify-center items-center mb-4 overflow-hidden">
             {selectedImage ? (
               <img
-                src={selectedImage}
+                src={URL.createObjectURL(selectedImage)}
                 alt="Selected"
                 className="w-full h-full object-cover"
               />
@@ -42,34 +103,43 @@ const AdminAddEvents = () => {
           type="text"
           placeholder="Event Name"
           className="p-2 rounded-md border border-gray-300 bg-gray-100"
+          value={webinarName}
+          onChange={(e) => setWebinarName(e.target.value)}
+          required
         />
         <input
-          type="text"
-          placeholder="Time"
+          type="datetime-local"
+          placeholder="Date and Time"
           className="p-2 rounded-md border border-gray-300 bg-gray-100"
+          value={dateAndTime}
+          onChange={(e) => setDateAndTime(e.target.value)}
+          required
         />
         <input
           type="text"
-          placeholder="Date"
-          className="p-2 rounded-md border border-gray-300 bg-gray-100"
-        />
-        <input
-          type="text"
-          placeholder="Address"
-          className="p-2 rounded-md border border-gray-300 bg-gray-100"
-        />
-        <input
-          type="text"
-          placeholder="Contact Number"
+          placeholder="Embedded Link"
           className="col-span-2 p-2 rounded-md border border-gray-300 bg-gray-100"
+          value={embeddedLink}
+          onChange={(e) => setEmbeddedLink(e.target.value)}
+          required
+        />
+        <textarea
+          placeholder="Description"
+          className="col-span-2 p-2 rounded-md border border-gray-300 bg-gray-100"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows="4"
         />
       </div>
 
-      {/* Add Now Button */}
-      <button className="w-48 h-12 rounded-full bg-red-800 text-white">
-        Add Now
+      {/* Error Message */}
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+
+      {/* Save Button */}
+      <button type="submit" className="w-48 h-12 rounded-full bg-red-800 text-white" disabled={loading}>
+        {loading ? 'Saving ...' : 'Save'}
       </button>
-    </div>
+    </form>
   );
 };
 

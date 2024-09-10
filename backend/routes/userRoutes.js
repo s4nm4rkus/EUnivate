@@ -1,9 +1,12 @@
-import express from 'express';
+  import express from 'express';
 
   import { createQuotation, confirmQuotationEmail, checkVerificationStatus } from '../controllers/quotationController.js'
   import upload from '../middlewares/multerMiddleware.js';
-  import quotationTokenModel from '../models/quotationTokenModel.js';
-  import Quotation from '../models/quotationModel.js';
+  import {createProduct, getProducts, deleteProduct, updateProduct  } from '../controllers/addProductsController.js'
+  import { updateProject, deleteProject, getProjects, createProject} from '../controllers/addProjectsController.js';
+  import { getDashboardStats } from '../controllers/DashboardController.js';
+  // import quotationTokenModel from '../models/quotationTokenModel.js';
+  // import Quotation from '../models/quotationModel.js';
 
   import {createUser } from '../controllers/userController.js';
   import { loginUser, forgotPassword, resetPassword } from '../controllers/authController.js';
@@ -13,6 +16,8 @@ import express from 'express';
   import { ContactEunivate } from '../controllers/contactEunivate.js';
   import { updateUser, updateUserPassword } from '../controllers/updateUserInformation.js';
   import { inviteUsers, updateUserRole, getUsers} from '../controllers/peopleController.js';
+  import { createEvent, getEvents, updateEvent, deleteEvent } from '../controllers/addEventsController.js';
+  // import {authenticateUser, listEmails, sendEmail} from '../Services/gmailController.js'
 
 const router = express.Router();
 
@@ -27,7 +32,12 @@ router.post('/refresh-token', refreshToken);
 
 //User Messages Related
 router.post('/contactEunivate',ContactEunivate )
-// router.get('/emails', getEmails); 
+
+// Gmail related
+// router.get('/auth', authenticateUser);
+// router.get('/emails', listEmails);
+// router.post('/send-email', sendEmail);
+
 // User Management Routes
 router.get('/', getUsers); 
 router.post('/signup', createUser);  
@@ -44,6 +54,24 @@ router.put('/:userId/role', updateUserRole);
 router.put('/:id', updateUser);
 router.put('/:id/password', updateUserPassword);
 
+//Admin Routes
+      //Products
+      router.post('/addproduct', upload.single('image'), createProduct );
+      router.get('/products', getProducts);
+      router.delete('/products/:id', deleteProduct);
+      router.put('/products/:id', upload.single('image'), updateProduct);
+      //Projects
+      router.post('/addproject', upload.single('image'), createProject);
+      router.get('/projects', getProjects);
+      router.put('/projects/:id', upload.single('image'), updateProject);
+      router.delete('/projects/:id', deleteProject);
+      //Events
+      router.post('/addevent', upload.single('image'), createEvent);
+      router.get('/events', getEvents);
+      router.put('/events/:id', upload.single('image'), updateEvent);
+      router.delete('/events/:id', deleteEvent);
+      //Dashboard
+      router.get('/stats', getDashboardStats);
 // SuperAdmin Route (Protected)
 router.get('/superadmin', protect, verifySuperAdmin, (req, res) => {
   res.status(200).json({ message: 'Welcome to the SuperAdmin dashboard' });

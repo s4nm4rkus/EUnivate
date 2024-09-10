@@ -1,16 +1,31 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar, faSearch, faTrash, faEdit, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import Layout from '../../components/Admin/AdminContainer';
 
 const AdminDashboard = () => {
-    const stats = [
-        { label: 'Quotations', value: 5 },
-        { label: 'Services', value: 9 },
-        { label: 'Products', value: 12 },
-        { label: 'Projects', value: 25 },
-        { label: 'Webinars', value: 3 },
-    ];
+    const [stats, setStats] = useState([]);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/users/stats');
+                const data = await response.json();
+                setStats([
+                    { label: 'Quotations', value: data.quotaions }, //may count nadin to wala lang laman db 
+                    { label: 'Services', value: '4' },
+                    { label: 'Products', value: data.products },
+                    { label: 'Projects', value: data.projects },
+                    { label: 'Webinars', value: data.webinars }
+                    
+                ]);
+            } catch (error) {
+                console.error('Failed to fetch stats', error);
+            }
+        };
+
+        fetchStats();
+    }, []);
 
     const emails = [
         { sender: 'Juan Dela Cruz', subject: 'Quotation Subject – Lorem ipsum dolor sit amet, consect...', time: '8:38 AM', status: 'New' },
@@ -28,7 +43,7 @@ const AdminDashboard = () => {
                     <div key={index} className={`flex-1 text-center ${index !== stats.length - 1 ? 'border-r border-gray-200' : ''}`}>
                         <p className="text-gray-500">{stat.label}</p>
                         <h4 className="text-2xl font-bold text-red-700">{stat.value}</h4>
-                        <p className="text-green-500">22.45% ↑</p>
+                 
                     </div>
                 ))}
             </div>

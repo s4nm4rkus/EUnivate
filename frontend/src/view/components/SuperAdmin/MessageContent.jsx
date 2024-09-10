@@ -47,27 +47,17 @@ const MessageContent = () => {
     }
   };
 
-  const ChatComponent = () => {
-    const [replyingTo, setReplyingTo] = useState(null);
-  
     const cancelReply = () => {
       setReplyingTo(null); // Reset the reply state
     };
-  }
+  
   
   const sendMessage = async () => {
     if (message.trim() || file) {
-      const cleanMessage = message.trim().replace(/<\/?p>/g, '');
-
-      const formData = new FormData();
-      formData.append('content', cleanMessage);
-      if (file) formData.append('file', file); // Attach the file if present
-      if (replyingTo) formData.append('replyTo', replyingTo);
-
-      
+      const cleanMessage = message.replace(/<\/?p>/g, '');
 
       if (editingMessageId) {
-         // Update the existing message and mark as edited
+        // Update the existing message and mark as edited
       setMessages((prevMessages) =>
         prevMessages.map((msg) =>
           msg._id === editingMessageId
@@ -76,21 +66,19 @@ const MessageContent = () => {
         )
       );
 
-      setEditingMessageId(null); // Clear the editing state
-      setReplyingTo(null); // Clear the reply state after editing
+     setEditingMessageId(null); // Clear the editing state
+     setReplyingTo(null); // Clear the reply state after editing
 
       } else {
-        const newMessage = {
-          content: cleanMessage,
-          sender: { name: 'You', avatar: 'https://via.placeholder.com/40' },
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          file: file ? { name: file.name, type: file.type, url: URL.createObjectURL(file) } : null,
-          replyTo: replyingTo ? replyingTo : null,
-          edited: false
-        };
-
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-
+         // Sending a new message
+  const newMessage = {
+    content: cleanMessage,
+    sender: { name: 'You', avatar: 'https://via.placeholder.com/40' },
+    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    file: file ? { name: file.name, type: file.type, url: URL.createObjectURL(file) } : null,
+    replyTo: replyingTo ? replyingTo : null,
+    edited: false,
+  };
         try {
           const response = await fetch('http://localhost:5000/api/messages', {
             method: 'POST',
@@ -110,6 +98,8 @@ const MessageContent = () => {
           console.error('Error sending message:', error);
         }
 
+         // Add new message to state and clear reply
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
     setReplyingTo(null);
     setMessage('');
     setFile(null);
@@ -155,9 +145,10 @@ const handleReply = (message) => {
 };
 
 const handleEdit = (messageId, messageContent) => {
-  setEditingMessageId(messageId);
-  setMessage(messageContent);
+  setEditingMessageId(messageId); // Set the message ID being edited
+  setMessage(messageContent); // Set the current content to the input field for editing
 };
+
 
 
   const handleDelete = (messageId) => {
@@ -186,27 +177,33 @@ const handleEdit = (messageId, messageContent) => {
 
   const formatMessageContent = (message) => {
     let content = message.content;
-
+  
     // Add "Edited" flag if message was edited
-  if (message.edited) {
-    content += ' <span style="color: gray; font-size: 0.75rem;">(Edited)</span>';
-  }
-
-  // If it's a reply, format the reply content
-    if (message.replyTo) {
-      return `
-        <div style="padding: 10px; background-color: #f1f1f1; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 10px; margin-top: 10px;">
-          <p style="font-weight: bold; color: #0078d4;">Replying to ${message.replyTo.sender.name}:</p>
-          <div style="border-left: 4px solid #0078d4; padding: 10px; background-color: #ffffff; border-radius: 8px;">
-            <p style="font-weight: bold; color: #333;">${message.replyTo.sender.name} <span style="color: #777;">(${message.replyTo.time})</span></p>
-            <p>${message.replyTo.content}</p>
-          </div>
-          <p style="margin-top: 10px; color: #333;">${message.content}</p>
-        </div>
-      `;
+    if (message.edited) {
+      content += ' <span style="color: gray; font-size: 0.75rem;">(Edited)</span>';
     }
-    return message.content;
+  
+   // If it's a reply, format the reply content
+if (message.replyTo) {
+  return `
+    <div style="padding: 12px; background-color: #f9fafb; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 12px; margin-top: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+      <p style="font-weight: bold; color: #0078d4; margin-bottom: 10px;">Replying to ${message.replyTo.sender.name}:</p>
+      <div style="border-left: 4px solid #0078d4; padding: 12px; background-color: #ffffff; border-radius: 10px; box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);">
+        <p style="font-weight: bold; color: #333; margin-bottom: 6px;">
+          ${message.replyTo.sender.name} 
+          <span style="color: #777; font-size: 12px; float: right;">${message.replyTo.time}</span>
+        </p>
+        <p style="color: #555;">${message.replyTo.content}</p>
+      </div>
+      <p style="margin-top: 10px; color: #333; font-size: 14px;">${message.content}</p>
+    </div>
+  `;
+}
+return message.content;
+
+
   };
+  
 
   const editMessage = async (id, updatedContent, updatedFile, updatedTime) => {
     try {
@@ -230,8 +227,6 @@ const handleEdit = (messageId, messageContent) => {
     }
   };
   
-  
-
   return (
     <div className="message-content flex flex-col h-full">
       {/* Header */}
@@ -254,40 +249,35 @@ const handleEdit = (messageId, messageContent) => {
             {msg.sender.name !== 'You' && (
               <img src={msg.sender.avatar} alt={msg.sender.name} className="rounded-full w-10 h-10 mt-2" />
             )}
-            <div className={`p-3 rounded-lg shadow-sm ${
+            <div className={`p-3 rounded-lg shadow-sm  ${
                 msg.sender.name === 'You' ? 'bg-blue-200 text-gray-800' : 'bg-white text-gray-800'
-              } max-w-[60%] border border-black relative ${editingMessageId === msg._id ? 'border-blue-500' : ''}`}
+              } max-w-[60%] border border-blue relative ${editingMessageId === msg._id ? 'border-blue-500' : ''}`}
             >
-              <div className="message-header flex items-center justify-between mb-1">
-            <div className="flex items-center">
-              <p className={`text-sm font-semibold ${msg.sender.name === 'You' ? 'text-blue-800' : 'text-gray-800'}`}>
-                {msg.sender.name}
-              </p>
-              {msg.edited && <span className="text-xs text-gray-500 mx-2">(Edited)</span>}
-            </div>
-            <p className="text-xs text-gray-400">{msg.time}</p>
-          </div>
+              <div className="message-header flex items-center flex space-x-12 justify-between mb-4">
+  <div className="flex items-center">
+    <p className={`text-sm font-semibold ${msg.sender.name === 'You' ? 'text-blue-800' : 'text-gray-800'}`}>
+      {msg.sender.name}
+    </p>
+    {msg.edited && <span className="text-xs text-gray-500 mx-2">(Edited)</span>} {/* Show "Edited" label */}
+  </div>
+  <p className="text-xs text-gray-500">{msg.time}</p>
+</div>
+
               <div
                 className="message-body text-sm break-words"
                 dangerouslySetInnerHTML={{ __html: formatMessageContent(msg) }}
               />
 
-            {msg.file && (
-                  <div className="mt-1 text-xs flex items-center space-x-2">
-                    <a 
-                      href={msg.file.url} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="text-blue-500 hover:underline"
-                      download={msg.file.name} // Ensures the file keeps its original name when opened or downloaded
-                    >
-                      {msg.file.name}
-                    </a>
-                    {msg.file.type && <span className="text-gray-400 text-xs"></span>}
-                  </div>
-                )}
+              {msg.file && (
+                <div className="mt-1 text-xs flex items-center space-x-2">
+                  <a href={msg.file.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline" download={msg.file.name}>
+                    {msg.file.name}
+                  </a>
+                  {msg.file.type && <span className="text-gray-400 text-xs"></span>}
+                </div>
+              )}
 
-              <div className="message-actions flex space-x-2 mt-2">
+<div className="message-actions flex space-x-2 mt-2">
                 <FontAwesomeIcon
                   icon={faReply}
                   onClick={() => handleReply(msg)}
@@ -304,19 +294,19 @@ const handleEdit = (messageId, messageContent) => {
                   className={`cursor-pointer ${getIconColor(msg._id, 'heart')}`}
                 />
                 {msg.sender.name === 'You' && (
-                  <>
-                    <FontAwesomeIcon
-                      icon={faEdit}
-                      onClick={() => handleEdit(msg._id, msg.content)}
-                      className="cursor-pointer text-gray-400 hover:text-blue-500"
-                    />
-                    <FontAwesomeIcon
-                      icon={faTrash}
-                      onClick={() => handleDelete(msg._id)}
-                      className="cursor-pointer text-gray-400 hover:text-red-500"
-                    />
-                  </>
-                )}
+                <>
+                  <FontAwesomeIcon
+                    icon={faEdit}
+                    onClick={() => handleEdit(msg._id, msg.content)}
+                    className="cursor-pointer text-blue-500"
+                  />
+                  <FontAwesomeIcon
+                    icon={faTrash}
+                    onClick={() => handleDelete(msg._id)}
+                    className="cursor-pointer text-red-500"
+                  />
+                </>
+              )}
               </div>
             </div>
           </div>
@@ -324,24 +314,32 @@ const handleEdit = (messageId, messageContent) => {
         <div ref={messagesEndRef} />
       </div>
 
+
       {/* Reply Box */}
-      {replyingTo && (
-        <div className="reply-box p-4 border-t border-gray-200 bg-gray-50 flex flex-col">
-          <div className="reply-preview p-2 border border-gray-300 rounded bg-gray-100 mb-2">
-      <p><strong>Replying to {replyingTo.sender.name}:</strong></p>
-      <div style={{ border: '1px solid #ddd', padding: '10px', marginBottom: '10px' }}>
-        <p><strong>{replyingTo.sender.name}</strong> <spaAn className="text-gray-500 text-xs">({replyingTo.time})</spaAn></p>
-        <p>{replyingTo.content}</p>
+{replyingTo && (
+  <div className="reply-box border-t border-gray-200 bg-gray-50 flex flex-col space-y-2">
+    <div className="reply-preview p-3 border border-gray-300 rounded-lg bg-white shadow-sm">
+      <p className="text-sm text-gray-700 font-semibold mb-2">
+        Replying to <span className="text-blue-600">{replyingTo.sender.name}</span>:
+      </p>
+      <div className="reply-content p-3 border border-gray-200 bg-gray-100 rounded-lg">
+        <div className="flex items-center justify-between mb-1">
+          <p className="font-medium text-gray-800">{replyingTo.sender.name}</p>
+          <span className="text-gray-400 text-xs">{replyingTo.time}</span>
+        </div>
+        <p className="text-sm text-gray-600 mb-2">{replyingTo.content}</p>
         <button
-              className="ml-2 text-xs text-red-500"
-              onClick={() => setReplyingTo(null)}
-            >
-              Cancel
-            </button>
+          onClick={cancelReply}
+          className="text-sm text-red-500 hover:text-red-700 transition-colors"
+        >
+          Cancel
+        </button>
       </div>
     </div>
-        </div>
-      )}
+  </div>
+)}
+
+
 
       {/* Message Input */}
       <div className="message-input p-4 bg-white border-t sticky bottom-0">
@@ -384,6 +382,7 @@ const handleEdit = (messageId, messageContent) => {
             <FontAwesomeIcon icon={faPaperPlane} />
           </button>
         </div>
+
 
         {/* File Preview Section */}
         {file && (

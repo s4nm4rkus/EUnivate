@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
   const [user, setUser] = useState({ firstName: '', lastName: '', profilePicture: { url: ''} });
   const navigate = useNavigate();
-  const defaultProfilePicture = '/mnt/data/image.png'; // Use your actual path or URL here
+  const defaultProfilePicture = 'https://res.cloudinary.com/dzxzc7kwb/image/upload/v1725974053/DefaultProfile/qgtsyl571c1neuls9evd.png'; // Use your actual path or URL here
   const dropdownRef = useRef();
 
   useEffect(() => {

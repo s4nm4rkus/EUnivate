@@ -34,6 +34,7 @@ const Navbar = () => {
       title: "Products",
       hasDropdown: true,
       subLinks: [
+        { id: "products", title: "Products", path: "/product" },
         { id: "showcases", title: "Showcases", path: "/showcases" },
         {
           id: "quotation",
@@ -50,6 +51,7 @@ const Navbar = () => {
       title: "Services",
       hasDropdown: true,
       subLinks: [
+        { id: "services", title: "Services", path: "/services" },
         { id: "webinars", title: "Webinars", path: "/webinar" },
         { id: "events", title: "Events", path: "/events" },
         { id: "challenges", title: "Challenges", path: "/challenges" },

@@ -18,6 +18,10 @@ const chatMessageSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  edited: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const ChatMessage = mongoose.model('ChatMessage', chatMessageSchema); // This should match the collection name

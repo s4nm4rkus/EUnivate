@@ -5,6 +5,16 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import axios from 'axios';
 
+// Modal component to view images in full screen
+const ImageModal = ({ src, onClose }) => (
+  <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+    <div className="relative">
+      <img src={src} alt="Full screen" className="max-w-full max-h-full" />
+      <button onClick={onClose} className="absolute top-2 right-2 text-white text-2xl">×</button>
+    </div>
+  </div>
+);
+
 const MessageContent = () => {
   const [message, setMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
@@ -17,6 +27,8 @@ const MessageContent = () => {
   const [replyingTo, setReplyingTo] = useState(null);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null); // Create a ref for the file input
+  const [imageModalSrc, setImageModalSrc] = useState(null); // State for image modal
+
 
   const startRecording = () => {
     navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
@@ -275,14 +287,23 @@ return message.content;
                 dangerouslySetInnerHTML={{ __html: formatMessageContent(msg) }}
               />
 
-              {msg.file && (
-                <div className="mt-1 text-xs flex items-center space-x-2">
-                  <a href={msg.file.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline" download={msg.file.name}>
-                    {msg.file.name}
-                  </a>
-                  {msg.file.type && <span className="text-gray-400 text-xs"></span>}
-                </div>
-              )}
+{msg.file && (
+   msg.file.type.startsWith('image/') ? (
+      <img
+        src={msg.file.url}
+        alt={msg.file.name}
+        className="w-full h-auto cursor-pointer"
+        onClick={() => setImageModalSrc(msg.file.url)} // Open modal with image URL
+      />
+  ) : msg.file.type.startsWith('video/') ? (
+    <video controls src={msg.file.url} className="message-file my-2 max-w-full h-auto" />
+  ) : (
+    <a href={msg.file.url} target="_blank" rel="noopener noreferrer" className="message-file my-2 text-blue-500">
+      {msg.file.name}
+    </a>
+  )
+)}
+
 
 <div className="message-actions flex space-x-2 mt-2">
                 <FontAwesomeIcon
@@ -365,12 +386,10 @@ return message.content;
             {/* Attachment Icon */}
             <label className="cursor-pointer">
               <input type="file" className="hidden" onChange={handleFileChange} />
-              <FontAwesomeIcon
-            icon={faPaperclip}
-            className="cursor-pointer text-gray-600"
-            title="Attach file"
-            onClick={handleAttachmentClick} // Trigger the file input when clicked
-          />
+              <button onClick={handleAttachmentClick} className="mr-2 text-gray-400 hover:text-gray-600">
+  <FontAwesomeIcon icon={faPaperclip} />
+  <input type="file" accept="*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
+</button>
               {/* Microphone Icon */}
               <button
                 onClick={isRecording ? stopRecording : startRecording}
@@ -393,16 +412,22 @@ return message.content;
 
         {/* File Preview Section */}
         {file && (
-            <div className="file-preview mt-2 p-2 bg-gray-100 border rounded-lg flex items-center justify-between">
-              <span className="text-sm">{file.name}</span>
-              <button
-                className="text-sm text-red-500"
-                onClick={removeFile}
-              >
-                Remove
-              </button>
-          </div>
-        )}
+  <div className="file-preview flex items-center">
+    {file.type.startsWith('image/') ? (
+      <img src={URL.createObjectURL(file)} alt="Preview" className="w-16 h-16 object-cover mr-2" />
+    ) : file.type.startsWith('video/') ? (
+      <video controls src={URL.createObjectURL(file)} className="w-16 h-16 object-cover mr-2" />
+    ) : (
+      <span className="text-sm">{file.name}</span>
+    )}
+    <button onClick={removeFile} className="ml-2 text-red-500 hover:text-red-700">
+      <FontAwesomeIcon icon={faTrash} />
+    </button>
+  </div>
+)}
+{imageModalSrc && (
+  <ImageModal src={imageModalSrc} onClose={() => setImageModalSrc(null)} />
+)}
       </div>
     </div>
   );

@@ -1,10 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; 
 import MessageContent from '../../components/SuperAdmin/MessageContent';
 import SidebarMessage from '../../components/SuperAdmin/SidebarMessage';
 import AdminNavbar from '../../components/SuperAdmin/AdminNavbar';
+import MediaModal from '../../components/MediaModal';
+
 const Messages = () => {
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [modalMedia, setModalMedia] = useState(null);
     const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
+
+    // Define your messages array or fetch it from a state or props
+    const messages = []; // Replace this with actual message data
+
+    const openModal = (media) => {
+        setModalMedia(media);
+        setModalIsOpen(true);
+    };
+
+    const closeModal = () => {
+        setModalIsOpen(false);
+        setModalMedia(null);
+    };
 
     const toggleProjectDropdown = () => setIsProjectDropdownOpen(!isProjectDropdownOpen);
     const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
@@ -25,6 +42,42 @@ const Messages = () => {
                 <SidebarMessage />  {/* Sidebar Component */}
                 <MessageContent />  {/* Message Content Component */}
             </div>
+
+            {/* Render messages */}
+            <div>
+                {messages.map((msg, index) => (
+                    <div key={index} className="message">
+                        {msg.file && (
+                            msg.file.type.startsWith('image/') ? (
+                                <img
+                                    src={msg.file.url}
+                                    alt={msg.file.name}
+                                    className="message-file cursor-pointer"
+                                    onClick={() => openModal(msg.file)}
+                                />
+                            ) : msg.file.type.startsWith('video/') ? (
+                                <video
+                                    controls
+                                    src={msg.file.url}
+                                    className="message-file cursor-pointer"
+                                    onClick={() => openModal(msg.file)}
+                                />
+                            ) : (
+                                <a href={msg.file.url} target="_blank" rel="noopener noreferrer">
+                                    {msg.file.name}
+                                </a>
+                            )
+                        )}
+                    </div>
+                ))}
+            </div>
+
+            {/* Media Modal */}
+            <MediaModal
+                isOpen={modalIsOpen}
+                onRequestClose={closeModal}
+                media={modalMedia}
+            />
         </div>
     );
 };

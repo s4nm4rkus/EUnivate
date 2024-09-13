@@ -57,14 +57,14 @@ const MessageContent = () => {
       const cleanMessage = message.replace(/<\/?p>/g, '');
 
       if (editingMessageId) {
-        // Update the existing message and mark as edited
-      setMessages((prevMessages) =>
-        prevMessages.map((msg) =>
-          msg._id === editingMessageId
-            ? { ...msg, content: cleanMessage, edited: true }
-            : msg
-        )
-      );
+        const updatedMessage = {
+          content: cleanMessage,
+          file: file ? { name: file.name, type: file.type, url: URL.createObjectURL(file) } : null,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        };
+      
+        // Call the editMessage function to update the message on the backend
+        await editMessage(editingMessageId, updatedMessage.content, updatedMessage.file, updatedMessage.time);
 
      setEditingMessageId(null); // Clear the editing state
      setReplyingTo(null); // Clear the reply state after editing
@@ -149,11 +149,14 @@ const handleEdit = (messageId, messageContent) => {
   setMessage(messageContent); // Set the current content to the input field for editing
 };
 
+const handleDelete = async (messageId) => {
+  // Call the deleteMessage function to remove the message from the backend
+  await deleteMessage(messageId);
 
+  // Remove the message from the frontend state
+  setMessages((prevMessages) => prevMessages.filter((msg) => msg._id !== messageId));
+};
 
-  const handleDelete = (messageId) => {
-    setMessages((prevMessages) => prevMessages.filter((msg) => msg._id !== messageId));
-  };
 
   const getIconColor = (messageId, icon) => {
     switch (icon) {
@@ -200,32 +203,36 @@ if (message.replyTo) {
   `;
 }
 return message.content;
-
-
   };
   
 
   const editMessage = async (id, updatedContent, updatedFile, updatedTime) => {
     try {
-      const response = await axios.put(`/api/chatMessages/${id}`, {
+      const response = await axios.put(`http://localhost:5000/api/messages/${id}`, {
         content: updatedContent,
         file: updatedFile,
         time: updatedTime,
       });
-      console.log('Message updated:', response.data);
+  
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg._id === id ? { ...msg, content: updatedContent, file: updatedFile, time: updatedTime, edited: true } : msg
+        )
+      );
     } catch (error) {
       console.error('Error updating message:', error);
     }
   };
   
+  
   const deleteMessage = async (id) => {
     try {
-      const response = await axios.delete(`/api/chatMessages/${id}`);
-      console.log('Message deleted:', response.data);
+      await axios.delete(`http://localhost:5000/api/messages/${id}`);
+      setMessages((prevMessages) => prevMessages.filter((msg) => msg._id !== id));
     } catch (error) {
       console.error('Error deleting message:', error);
     }
-  };
+  };  
   
   return (
     <div className="message-content flex flex-col h-full">

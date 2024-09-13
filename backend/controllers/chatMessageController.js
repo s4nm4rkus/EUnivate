@@ -1,6 +1,6 @@
-// backend/controllers/userChatMessageController.js
 import Message from '../models/chatMessageModel.js';
 
+// Get all messages
 export const getMessages = async (req, res) => {
   try {
     const messages = await Message.find();
@@ -10,29 +10,64 @@ export const getMessages = async (req, res) => {
   }
 };
 
+// Send a new message
 export const sendMessage = async (req, res) => {
   try {
     const { content, sender, file, time } = req.body;
 
-    // Create a new message instance
     const newMessage = new Message({
       content,
       sender,
       file: {
-        name: file?.name || '', // Ensure file properties are handled correctly
+        name: file?.name || '',
         type: file?.type || '',
-        url: file?.url || ''
+        url: file?.url || '',
       },
-      time
+      time,
     });
 
-    // Save the message to the database
     await newMessage.save();
-
-    // Send response with the saved message
     res.status(201).json(newMessage);
   } catch (error) {
-    console.error('Error saving message:', error);
     res.status(500).json({ error: 'Failed to save message' });
+  }
+};
+
+// Update a message by ID
+export const updateMessage = async (req, res) => {
+  const { id } = req.params;
+  const { content, file, time } = req.body;
+
+  try {
+    const updatedMessage = await Message.findByIdAndUpdate(
+      id,
+      { content, file, time, edited: true },
+      { new: true }
+    );
+
+    if (!updatedMessage) {
+      return res.status(404).json({ message: 'Message not found' });
+    }
+
+    res.json(updatedMessage);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Delete a message by ID
+export const deleteMessage = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedMessage = await Message.findByIdAndDelete(id);
+
+    if (!deletedMessage) {
+      return res.status(404).json({ message: 'Message not found' });
+    }
+
+    res.json({ message: 'Message deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

@@ -53,15 +53,16 @@ const GanttChart = () => {
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
       case 'High':
-        return 'text-red-500';
+        return 'text-red-500'; // Red for High
       case 'Medium':
-        return 'text-yellow-500';
-      case 'Low':
-        return 'text-green-500';
+        return 'text-yellow-500'; // Yellow for Medium
+      case 'Easy':
+        return 'text-green-500'; // Green for Easy
       default:
-        return 'text-gray-500';
+        return 'text-gray-500'; // Default color if difficulty is unknown
     }
   };
+  
 
   // Function to count images in a task
   const countImages = (task) => {

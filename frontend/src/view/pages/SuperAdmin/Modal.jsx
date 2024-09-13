@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { FaTimes, FaUser, FaCircle, FaFlag, FaCamera, FaPlus } from 'react-icons/fa';
+import { FaTimes, FaUser, FaCircle, FaFlag, FaPlus } from 'react-icons/fa';
 import UserNameModal from './UserNameModal';
 
 const Modal = ({ isOpen, onClose, projectName, onTaskSubmit }) => {
   const [taskName, setTaskName] = useState('');
   const [objective, setObjective] = useState('');
-  const [user, setUser] = useState({ firstName: '', lastName: '' });
+  const [user, setUser] = useState({ firstName: '', lastName: '', profilePicture: '' });
   const [isUserNameModalOpen, setIsUserNameModalOpen] = useState(false);
   const [selectedName, setSelectedName] = useState('');
+  const [selectedAvatar, setSelectedAvatar] = useState('');
   const [namesList, setNamesList] = useState([]);
   const [status, setStatus] = useState('');
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
@@ -17,9 +18,7 @@ const Modal = ({ isOpen, onClose, projectName, onTaskSubmit }) => {
   const [startDate, setStartDate] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [image1, setImage1] = useState(null);
-const [image2, setImage2] = useState(null);
-
-
+  const [image2, setImage2] = useState(null);
 
   // useEffect(() => {
   //   const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -53,6 +52,7 @@ const [image2, setImage2] = useState(null);
       dueDate,
       image1,
       image2,
+      selectedAvatar // Include selectedAvatar here
     };
   
     // Set category based on status
@@ -65,14 +65,14 @@ const [image2, setImage2] = useState(null);
     onTaskSubmit(newTask);
   };
   
-  
 
   const toggleUserNameVisibility = () => {
     setIsUserNameModalOpen(true);
   };
 
-  const handleNameSelect = (name) => {
+  const handleNameSelect = (name, avatar) => {
     setSelectedName(name);
+    setSelectedAvatar(avatar);
   };
 
   const toggleStatusDropdown = () => {
@@ -100,7 +100,7 @@ const [image2, setImage2] = useState(null);
       setImage2(null);
     }
   };
-  
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -116,13 +116,11 @@ const [image2, setImage2] = useState(null);
       reader.readAsDataURL(file);
     }
   };
-  
-  
 
   const handleImageClick = () => {
     document.getElementById('imageUpload').click();
   };
-  
+
   const statusIconColor = 
     status === 'Ongoing' ? 'text-yellow-500' :
     status === 'Done' ? 'text-green-500' :
@@ -221,7 +219,7 @@ const [image2, setImage2] = useState(null);
                       onClick={() => handleDifficultySelect('High')}
                       className="cursor-pointer px-4 py-2 flex items-center hover:bg-gray-100 text-red-500"
                     >
-                      <FaFlag className="mr-2" /> High
+                                           <FaFlag className="mr-2" /> High
                     </li>
                   </ul>
                 </div>
@@ -286,70 +284,77 @@ const [image2, setImage2] = useState(null);
           />
         </div>
         <div className="mb-4">
-    <label className="block text-gray-700 text-sm font-bold mb-2">
-      Attach Images
-    </label>
-    <div className="flex items-center justify-center space-x-4 border-2 border-dashed border-gray-300 rounded-lg p-4">
-      {image1 && (
-        <div className="relative">
-          <img
-            src={image1}
-            alt="Uploaded Preview 1"
-            className="w-32 h-32 object-cover rounded cursor-pointer"
-            onClick={handleImageClick}
-          />
-          <button
-            onClick={() => handleImageDelete(1)}
-            className="absolute top-0 right-0 bg-red-600 text-white rounded-full p-1"
-          >
-            <FaTimes size={16} />
-          </button>
-        </div>
-      )}
-      {image2 && (
-        <div className="relative">
-          <img
-            src={image2}
-            alt="Uploaded Preview 2"
-            className="w-32 h-32 object-cover rounded cursor-pointer"
-            onClick={handleImageClick}
-          />
-          <button
-            onClick={() => handleImageDelete(2)}
-            className="absolute top-0 right-0 bg-red-600 text-white rounded-full p-1"
-          >
-            <FaTimes size={16} />
-          </button>
-        </div>
-      )}
-      {(image1 === null || image2 === null) && (
-        <label htmlFor="imageUpload" className="cursor-pointer">
-          <FaPlus size={24} className="text-gray-600" />
-        </label>
-      )}
-      <input
-        type="file"
-        id="imageUpload"
-        accept="image/*"
-        onChange={handleImageChange}
-        className="hidden"
-      />
-    </div>
-  </div>
-        <div className="flex justify-center items-center mt-4">
-          <button
-            onClick={toggleUserNameVisibility}
-            className="bg-gray-200 p-2 rounded-full hover:bg-gray-300 focus:outline-none"
-            style={{ margin: '0 auto' }}
-          >
-            <FaUser size={20} className="text-gray-600" />
-          </button>
-        </div>
-        {selectedName && (
-          <div className="mt-2 text-center text-gray-700">
-            {selectedName}
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            Attach Images
+          </label>
+          <div className="flex items-center justify-center space-x-4 border-2 border-dashed border-gray-300 rounded-lg p-4">
+            {image1 && (
+              <div className="relative">
+                <img
+                  src={image1}
+                  alt="Uploaded Preview 1"
+                  className="w-32 h-32 object-cover rounded cursor-pointer"
+                  onClick={handleImageClick}
+                />
+                <button
+                  onClick={() => handleImageDelete(1)}
+                  className="absolute top-0 right-0 bg-red-600 text-white rounded-full p-1"
+                >
+                  <FaTimes size={16} />
+                </button>
+              </div>
+            )}
+            {image2 && (
+              <div className="relative">
+                <img
+                  src={image2}
+                  alt="Uploaded Preview 2"
+                  className="w-32 h-32 object-cover rounded cursor-pointer"
+                  onClick={handleImageClick}
+                />
+                <button
+                  onClick={() => handleImageDelete(2)}
+                  className="absolute top-0 right-0 bg-red-600 text-white rounded-full p-1"
+                >
+                  <FaTimes size={16} />
+                </button>
+              </div>
+            )}
+            {(image1 === null || image2 === null) && (
+              <label htmlFor="imageUpload" className="cursor-pointer">
+                <FaPlus size={24} className="text-gray-600" />
+              </label>
+            )}
+            <input
+              type="file"
+              id="imageUpload"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="hidden"
+            />
           </div>
-        )}
+        </div>
+        <div className="flex items-center justify-center mt-4">
+<button
+  onClick={toggleUserNameVisibility}
+  className="bg-gray-200 p-2 rounded-full hover:bg-gray-300 focus:outline-none flex items-center"
+>
+  {/* Display selected user's avatar if available */}
+  {selectedAvatar ? (
+    <img
+      src={selectedAvatar}
+      alt="Selected User Avatar"
+      className="w-8 h-8 rounded-full mr-2"
+    />
+  ) : (
+    <FaUser size={20} className="text-gray-600" />
+  )}
+  {selectedName && (
+    <span className="text-sm text-gray-700">{selectedName}</span>
+  )}
+</button>
+
+        </div>
         <div className="flex justify-end">
           <button
             onClick={handleSubmit}

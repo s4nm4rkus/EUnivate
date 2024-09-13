@@ -75,8 +75,8 @@ const Login = () => {
             navigate('/superadmin/dashboard');
           } else if (roleLowerCase === 'admin') {
             navigate('/admin');
-          } else if (roleLowerCase === 'collaborator') {
-            navigate('/collaborator-dashboard');
+          } else if (roleLowerCase === 'member') {
+            navigate('/member-dashboard');
           } else if (roleLowerCase === 'user') {
             navigate('/');
           } else {

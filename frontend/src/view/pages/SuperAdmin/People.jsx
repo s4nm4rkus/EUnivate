@@ -18,7 +18,7 @@ const People = () => {
     const [selectedEmails, setSelectedEmails] = useState([]);
     const [projects] = useState(['Project A', 'Project B', 'Project C']);
     const dropdownRef = useRef();
-
+    const [loading, setloading] = useState(false);
     // Fetch users from the backend
     const fetchUsers = async () => {
         try {
@@ -110,6 +110,7 @@ const People = () => {
     };
 
     const handleInvite = async () => {
+        
         const emails = selectedEmails.join(',');
 
         if (!emails) {
@@ -119,7 +120,7 @@ const People = () => {
         }
 
         console.log(`Inviting users with emails: ${emails}`);
-
+        setloading(true);
         try {
             const response = await fetch('http://localhost:5000/api/users/invite', {
                 method: 'POST',
@@ -161,6 +162,7 @@ const People = () => {
                 alert(`Error inviting users: ${errorResponse.message}`);
             }
         } catch (error) {
+            setloading(false);
             console.error('Error inviting users:', error.message);
             alert(`An error occurred: ${error.message}`);
         }
@@ -406,8 +408,9 @@ const People = () => {
                             <button
                                 className="ml-4 bg-red-800 text-white px-4 py-2 rounded hover:bg-red-900"
                                 onClick={handleInvite}
+                                disabled={loading}
                             >
-                                Invite
+                                {loading ? 'Inviting' : 'Invite'}
                             </button>
                         </div>
 

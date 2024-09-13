@@ -91,7 +91,7 @@ const App = () => {
         {/* <Route path="/verify-2fa-pending" element={<PrivateOTP><Verify2FAPending /></PrivateOTP>} /> */}
 
         {/* Admin Routes */}
-        <Route path="/admin" element={<AdminAuth><AdminDashboard /></AdminAuth>} />
+      <Route path="/admin" element={<AdminAuth><AdminDashboard /></AdminAuth>} />
       <Route path="/admin-addproducts" element={<AdminAuth><AdminAddProduct /></AdminAuth>} />
       <Route path="/products" element={<AdminAuth><Product /></AdminAuth>} />
       <Route path="/admin-addprojects" element={<AdminAuth><AdminAddProject /></AdminAuth>} />

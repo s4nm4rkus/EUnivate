@@ -21,19 +21,19 @@ const [image2, setImage2] = useState(null);
 
 
 
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    if (storedUser) {
-      setUser(storedUser);
-      fetchNames(storedUser);
-    }
-  }, []);
+  // useEffect(() => {
+  //   const storedUser = JSON.parse(localStorage.getItem('user'));
+  //   if (storedUser) {
+  //     setUser(storedUser);
+  //     fetchNames(storedUser);
+  //   }
+  // }, []);
 
-  const fetchNames = async (currentUser) => {
-    const response = await fetch('/api/names');
-    const data = await response.json();
-    setNamesList([`${currentUser.firstName} ${currentUser.lastName}`, ...data.names]);
-  };
+  // const fetchNames = async (currentUser) => {
+  //   const response = await fetch('/api/names');
+  //   const data = await response.json();
+  //   setNamesList([`${currentUser.firstName} ${currentUser.lastName}`, ...data.names]);
+  // };
 
   if (!isOpen) return null;
 

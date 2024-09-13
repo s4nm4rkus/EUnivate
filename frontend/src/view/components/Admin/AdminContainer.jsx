@@ -8,12 +8,13 @@ const AdminContainer = ({ children }) => {
     const [profilePicture, setProfilePicture] = useState(null);
     const [userName, setUserName] = useState('');
     const [showLogoutBox, setShowLogoutBox] = useState(false);
+    const [hasNewNotifications, setHasNewNotifications] = useState(false);
     const dropdownRef = useRef(null);
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Update selectedTab based on the current path
     useEffect(() => {
+        // Fetch user details
         const defaultProfilePicture = 'https://res.cloudinary.com/dzxzc7kwb/image/upload/v1725974053/DefaultProfile/qgtsyl571c1neuls9evd.png'; 
         const user = JSON.parse(localStorage.getItem('user'));
         if (user) {
@@ -47,11 +48,31 @@ const AdminContainer = ({ children }) => {
                 setShowLogoutBox(false);
             }
         };
-        
+
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
+    }, []);
+
+    // Fetch notification status
+    useEffect(() => {
+        const fetchNotifications = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/users/notifications');
+                const data = await response.json();
+                setHasNewNotifications(data.hasNew);
+            } catch (error) {
+                console.error('Failed to fetch notifications', error);
+            }
+        };
+
+        fetchNotifications();
+        const intervalId = setInterval(() => {
+            fetchNotifications();
+        }, 600000); // 10 minutes in milliseconds
+
+        return () => clearInterval(intervalId);
     }, []);
 
     const handleLogout = () => {
@@ -60,6 +81,16 @@ const AdminContainer = ({ children }) => {
         navigate('/login'); // Assuming you have a login route
         window.location.reload(); // Refresh the page
     };
+
+    const handleBellClick = async () => {
+        setHasNewNotifications(false);
+        try {
+            await fetch('http://localhost:5000/api/users/notifications', { method: 'GET' });
+        } catch (error) {
+            console.error('Failed to fetch notifications', error);
+        }
+    };
+
 
     const tabStyle = (isSelected) =>
         `py-2 px-6 rounded-full cursor-pointer transition-all duration-300 ${
@@ -92,7 +123,17 @@ const AdminContainer = ({ children }) => {
                 </div>
 
                 <div className="flex items-center mt-4 sm:mt-0 relative">
-                    <FontAwesomeIcon icon={faBell} size="lg" className="text-gray-500 cursor-pointer mr-6" />
+                    <div className="relative">
+                        <FontAwesomeIcon 
+                            icon={faBell} 
+                            size="lg" 
+                            className="text-gray-500 cursor-pointer mr-6"
+                            onClick={handleBellClick}
+                        />
+                        {hasNewNotifications && (
+                            <span className="absolute top-0 right-6 w-2 h-2 bg-red-500 rounded-full"></span>
+                        )}
+                    </div>
                     <div
                         className="relative flex items-center cursor-pointer"
                         onClick={() => setShowLogoutBox(!showLogoutBox)}

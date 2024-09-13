@@ -23,8 +23,8 @@ import CTA from "./view/components/Client/LastSection/CTA.jsx";
 import MainPage from './view/pages/Client/MainPage.jsx';
 import CompleteQuotation from './view/pages/Client/CompleteQuotation.jsx';
 import VerifyEmailQuotationSent from './view/pages/Client/VerifyEmailQuotationSent.jsx';
-
-
+import Servicespage from './view/pages/Client/Servicespage.jsx';
+import Productpage from './view/pages/Client/Productpage.jsx';
 
 // Hooks (for authentication and role-based routing)
 import Auth from './view/hooks/Auth.jsx';
@@ -75,6 +75,8 @@ const App = () => {
         <Route path="/quotation" element={<Auth><Quotation /></Auth>}/>
         <Route path="/showcases" element={<Showcases />} />
         <Route path="/challenges" element={<Challenges />} />
+        <Route path="/services" element={<Servicespage />} />
+        <Route path="/product" element={<Productpage />} />
         <Route path="/project" element={<ProjectmanagementAuth><ProjectManagement /></ProjectmanagementAuth>} />
         <Route path="/webinar" element={<Webinars />} />
         <Route path="/login" element={<Login />} />

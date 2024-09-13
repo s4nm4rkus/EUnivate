@@ -1,23 +1,85 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar, faSearch, faTrash, faEdit, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faTrash, faEdit, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import Layout from '../../components/Admin/AdminContainer';
 
-const AdminDashboard = () => {
-    const [stats, setStats] = useState([]);
+const ONE_HOUR = 3600000; // 1 hour in milliseconds
 
+const AdminDashboard = () => {
+    const [emails, setEmails] = useState([]);
+    const [stats, setStats] = useState([]);
+    const [selectedIds, setSelectedIds] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    // Fetching quotations for the emails section
+    useEffect(() => {
+        const fetchQuotations = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/users/quotations');
+                const data = await response.json();
+                
+                const now = new Date();
+                const updatedEmails = data.map(quotation => {
+                    const createdAt = new Date(quotation.createdAt);
+                    const isNew = now - createdAt < ONE_HOUR;
+                    const status = isNew ? 'New' : (quotation.verified ? 'Clicked' : 'Pending');
+                    
+                    return {
+                        id: quotation._id,
+                        sender: quotation.name,
+                        subject: `Quotation for ${quotation.service}`,
+                        time: createdAt.toLocaleTimeString(),
+                        status: isNew ? status : ''
+                    };
+                });
+                setEmails(updatedEmails);
+            } catch (error) {
+                console.error('Failed to fetch quotations', error);
+            }
+        };
+
+        fetchQuotations();
+    }, []);
+
+    const handleCheckboxChange = (id) => {
+        setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+    };
+
+    const handleDelete = async () => {
+        try {
+            await Promise.all(selectedIds.map(id => 
+                fetch(`http://localhost:5000/api/users/quotations/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                })
+            ));
+            setEmails(emails.filter(email => !selectedIds.includes(email.id)));
+            setSelectedIds([]);
+        } catch (error) {
+            console.error('Failed to delete quotations', error);
+        }
+    };
+
+    // Handle redirect to Gmail inbox
+    const handleEmailClick = () => {
+        window.open('https://mail.google.com/mail/u/2/#inbox', '_blank');
+    };
+
+    const handleSearchChange = (event) => {
+        setSearchQuery(event.target.value);
+    };
+
+    // Fetching statistics for the dashboard
     useEffect(() => {
         const fetchStats = async () => {
             try {
                 const response = await fetch('http://localhost:5000/api/users/stats');
                 const data = await response.json();
                 setStats([
-                    { label: 'Quotations', value: data.quotaions }, //may count nadin to wala lang laman db 
-                    { label: 'Services', value: '4' },
+                    { label: 'Quotations', value: data.quotations }, 
+                    { label: 'Services', value: '4' }, 
                     { label: 'Products', value: data.products },
                     { label: 'Projects', value: data.projects },
                     { label: 'Webinars', value: data.webinars }
-                    
                 ]);
             } catch (error) {
                 console.error('Failed to fetch stats', error);
@@ -27,14 +89,12 @@ const AdminDashboard = () => {
         fetchStats();
     }, []);
 
-    const emails = [
-        { sender: 'Juan Dela Cruz', subject: 'Quotation Subject – Lorem ipsum dolor sit amet, consect...', time: '8:38 AM', status: 'New' },
-        { sender: 'Juan Dela Cruz', subject: 'Quotation Subject – Lorem ipsum dolor sit amet, consect...', time: '8:13 AM', status: 'Pending' },
-        { sender: 'Juan Dela Cruz', subject: 'Quotation Subject – Lorem ipsum dolor sit amet, consect...', time: '7:52 PM', status: 'Pending' },
-    ];
+    const services = ['Service 1', 'Service 2', 'Service 3', 'Service 4', 'Service 5'];
 
-    const services = ['Services', 'Services', 'Services', 'Services', 'Services'];
-
+    // Filter and highlight emails based on search query
+    const filteredEmails = emails.filter(email =>
+        email.sender.toLowerCase().includes(searchQuery.toLowerCase())
+    );
     return (
         <Layout>
             {/* Statistics Section */}
@@ -43,7 +103,6 @@ const AdminDashboard = () => {
                     <div key={index} className={`flex-1 text-center ${index !== stats.length - 1 ? 'border-r border-gray-200' : ''}`}>
                         <p className="text-gray-500">{stat.label}</p>
                         <h4 className="text-2xl font-bold text-red-700">{stat.value}</h4>
-                 
                     </div>
                 ))}
             </div>
@@ -56,26 +115,33 @@ const AdminDashboard = () => {
                         <input
                             type="text"
                             placeholder="Search quotation"
+                            value={searchQuery}
+                            onChange={handleSearchChange}
                             className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-200"
                         />
                         <div className="flex ml-4 space-x-3">
                             <FontAwesomeIcon icon={faSearch} className="text-gray-500 cursor-pointer" />
-                            <FontAwesomeIcon icon={faEnvelope} className="text-gray-500 cursor-pointer" />
-                            <FontAwesomeIcon icon={faTrash} className="text-gray-500 cursor-pointer" />
+                            <FontAwesomeIcon icon={faEnvelope} className="text-gray-500 cursor-pointer" onClick={handleEmailClick} />
+                            <FontAwesomeIcon icon={faTrash} className="text-gray-500 cursor-pointer" onClick={handleDelete} />
                         </div>
                     </div>
-                    {emails.map((email, index) => (
-                        <div key={index} className="flex items-center border-b border-gray-200 py-4">
-                            <input type="checkbox" className="mr-4" />
-                            <FontAwesomeIcon icon={faStar} className="text-yellow-500 mr-4" />
+                    {filteredEmails.map((email, index) => (
+                        <div
+                            key={index}
+                            className={`flex items-center border-b border-gray-200 py-4 cursor-pointer ${selectedIds.includes(email.id) ? 'bg-gray-100' : ''}`}
+                            onClick = {handleEmailClick}        >
+                            <input
+                                type="checkbox"
+                                className="mr-4"
+                                checked={selectedIds.includes(email.id)}
+                                onChange={() => handleCheckboxChange(email.id)}
+                            />
                             <p className="flex-1 truncate text-gray-700">{email.sender}</p>
-                            <span
-                                className={`px-3 py-1 rounded-full text-white mr-4 ${
-                                    email.status === 'New' ? 'bg-teal-400' : 'bg-red-400'
-                                }`}
-                            >
-                                {email.status}
-                            </span>
+                            {email.status && (
+                                <span className={`px-3 py-1 rounded-full text-white mr-4 ${email.status === 'New' ? 'bg-teal-400' : 'bg-red-400'}`}>
+                                    {email.status}
+                                </span>
+                            )}
                             <p className="flex-1 truncate text-gray-500">{email.subject}</p>
                             <p className="text-gray-500">{email.time}</p>
                         </div>
@@ -86,9 +152,7 @@ const AdminDashboard = () => {
                 <div className="bg-white rounded-lg shadow p-6">
                     <div className="flex justify-between items-center mb-6">
                         <h6 className="text-gray-700 font-semibold">Manage Services</h6>
-                        <select
-                            className="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-200"
-                        >
+                        <select className="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-200">
                             <option>Sort by</option>
                         </select>
                     </div>

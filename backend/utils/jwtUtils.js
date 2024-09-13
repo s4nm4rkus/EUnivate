@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/userModels.js';
 import nodemailer from 'nodemailer';
-import Quotation from '../models/quotationModel.js';
-import {text} from 'express';
+// import Quotation from '../models/quotationModel.js';
+// import {text} from 'express';
 
 // Generate JWT Token
 export const generateToken = (id) => {

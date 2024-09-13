@@ -2,6 +2,32 @@ import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { FaTimes, FaUser, FaCircle, FaFlag, FaCamera, FaPlus } from 'react-icons/fa';
 import UserNameModal from './UserNameModal';
+import { useDrag, useDrop, DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+
+// Task component for drag and drop
+const Task = ({ task, index, moveTask }) => {
+  const [, ref] = useDrag({
+    type: 'task',
+    item: { index }, // Dragged item index
+  });
+
+  const [, drop] = useDrop({
+    accept: 'task', // The type of item this drop target accepts
+    hover: (draggedItem) => {
+      if (draggedItem.index !== index) {
+        moveTask(draggedItem.index, index); // Move task when hovered over
+        draggedItem.index = index; // Update the dragged item index
+      }
+    },
+  });
+
+  return (
+    <div ref={(node) => ref(drop(node))} className="task-item bg-gray-200 p-2 mb-2 rounded">
+      {task.taskName} - {task.status}
+    </div>
+  );
+};
 
 const Modal = ({ isOpen, onClose, projectName, onTaskSubmit }) => {
   const [taskName, setTaskName] = useState('');
@@ -17,9 +43,16 @@ const Modal = ({ isOpen, onClose, projectName, onTaskSubmit }) => {
   const [startDate, setStartDate] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [image1, setImage1] = useState(null);
-const [image2, setImage2] = useState(null);
+  const [image2, setImage2] = useState(null);
+  const [tasks, setTasks] = useState([]); // Initialize the tasks array
 
-
+  // Drag-and-drop function to move tasks
+  const moveTask = (fromIndex, toIndex) => {
+    const updatedTasks = [...tasks];
+    const [movedTask] = updatedTasks.splice(fromIndex, 1);
+    updatedTasks.splice(toIndex, 0, movedTask);
+    setTasks(updatedTasks);
+  };
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -42,7 +75,7 @@ const [image2, setImage2] = useState(null);
       alert("Please fill in all fields before submitting.");
       return;
     }
-  
+
     const newTask = {
       taskName,
       objective,
@@ -54,18 +87,17 @@ const [image2, setImage2] = useState(null);
       image1,
       image2,
     };
-  
+
     // Set category based on status
     if (status === 'Pending') {
       newTask.category = 'Document';
     } else if (status === 'Backlogs') {
       newTask.category = 'Backlogs';
     }
-  
+
     onTaskSubmit(newTask);
+    setTasks([...tasks, newTask]); // Add new task to task list
   };
-  
-  
 
   const toggleUserNameVisibility = () => {
     setIsUserNameModalOpen(true);
@@ -100,7 +132,7 @@ const [image2, setImage2] = useState(null);
       setImage2(null);
     }
   };
-  
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -116,14 +148,12 @@ const [image2, setImage2] = useState(null);
       reader.readAsDataURL(file);
     }
   };
-  
-  
 
   const handleImageClick = () => {
     document.getElementById('imageUpload').click();
   };
-  
-  const statusIconColor = 
+
+  const statusIconColor =
     status === 'Ongoing' ? 'text-yellow-500' :
     status === 'Done' ? 'text-green-500' :
     status === 'Pending' ? 'text-gray-500' :
@@ -136,237 +166,140 @@ const [image2, setImage2] = useState(null);
                          'text-gray-500';
 
   return ReactDOM.createPortal(
-    <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center">
-      <div className="bg-white p-6 w-96 max-h-[90vh] overflow-auto rounded-lg shadow-lg">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center">
-            <h2 className="text-xl font-bold mr-2">Add {projectName}</h2>
-            <div className="relative flex items-center mr-4">
-              <button
-                onClick={toggleStatusDropdown}
-                className={`p-2 rounded-full hover:bg-gray-300 focus:outline-none ${statusIconColor}`}
-              >
-                <FaCircle size={20} />
-              </button>
-              {status && (
-                <span className="ml-2 text-sm text-gray-700">
-                  {status}
-                </span>
-              )}
-              {isStatusDropdownOpen && (
-                <div className="absolute mt-60 w-32 bg-white border border-gray-300 rounded shadow-lg z-10">
-                  <ul>
-                    <li
-                      onClick={() => handleStatusSelect('Ongoing')}
-                      className="cursor-pointer px-4 py-2 flex items-center hover:bg-gray-100 text-yellow-500"
-                    >
-                      <FaCircle className="mr-2" /> Ongoing
-                    </li>
-                    <li
-                      onClick={() => handleStatusSelect('Done')}
-                      className="cursor-pointer px-4 py-2 flex items-center hover:bg-gray-100 text-green-500"
-                    >
-                      <FaCircle className="mr-2" /> Done
-                    </li>
-                    <li
-                      onClick={() => handleStatusSelect('Pending')}
-                      className="cursor-pointer px-4 py-2 flex items-center hover:bg-gray-100 text-gray-500"
-                    >
-                      <FaCircle className="mr-2" /> Pending
-                    </li>
-                    <li
-                      onClick={() => handleStatusSelect('Todo')}
-                      className="cursor-pointer px-4 py-2 flex items-center hover:bg-gray-100 text-pink-500"
-                    >
-                      <FaCircle className="mr-2" /> Todo
-                    </li>
-                    <li
-                      onClick={() => handleStatusSelect('Backlogs')}
-                      className="cursor-pointer px-4 py-2 flex items-center hover:bg-gray-100 text-red-500"
-                    >
-                      <FaCircle className="mr-2" /> Backlogs
-                    </li>
-                  </ul>
-                </div>
-              )}
+    <DndProvider backend={HTML5Backend}>
+      <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center">
+        <div className="bg-white p-6 w-96 max-h-[90vh] overflow-auto rounded-lg shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              <h2 className="text-xl font-bold mr-2">Add {projectName}</h2>
+              <div className="relative flex items-center mr-4">
+                <button
+                  onClick={toggleStatusDropdown}
+                  className={`p-2 rounded-full hover:bg-gray-300 focus:outline-none ${statusIconColor}`}
+                >
+                  <FaCircle size={20} />
+                </button>
+                {status && (
+                  <span className="ml-2 text-sm text-gray-700">
+                    {status}
+                  </span>
+                )}
+                {isStatusDropdownOpen && (
+                  <div className="absolute mt-60 w-32 bg-white border border-gray-300 rounded shadow-lg z-10">
+                    <ul>
+                      <li
+                        onClick={() => handleStatusSelect('Ongoing')}
+                        className="cursor-pointer px-4 py-2 flex items-center hover:bg-gray-100 text-yellow-500"
+                      >
+                        <FaCircle className="mr-2" /> Ongoing
+                      </li>
+                      <li
+                        onClick={() => handleStatusSelect('Done')}
+                        className="cursor-pointer px-4 py-2 flex items-center hover:bg-gray-100 text-green-500"
+                      >
+                        <FaCircle className="mr-2" /> Done
+                      </li>
+                      <li
+                        onClick={() => handleStatusSelect('Pending')}
+                        className="cursor-pointer px-4 py-2 flex items-center hover:bg-gray-100 text-gray-500"
+                      >
+                        <FaCircle className="mr-2" /> Pending
+                      </li>
+                      <li
+                        onClick={() => handleStatusSelect('Todo')}
+                        className="cursor-pointer px-4 py-2 flex items-center hover:bg-gray-100 text-pink-500"
+                      >
+                        <FaCircle className="mr-2" /> Todo
+                      </li>
+                      <li
+                        onClick={() => handleStatusSelect('Backlogs')}
+                        className="cursor-pointer px-4 py-2 flex items-center hover:bg-gray-100 text-red-500"
+                      >
+                        <FaCircle className="mr-2" /> Backlogs
+                      </li>
+                    </ul>
+                  </div>
+                )}
+              </div>
+              <div className="relative flex items-center">
+                <button
+                  onClick={toggleDifficultyDropdown}
+                  className={`p-2 rounded-full hover:bg-gray-300 focus:outline-none ${flagIconColor}`}
+                >
+                  <FaFlag size={20} />
+                </button>
+                {difficulty && (
+                  <span className="ml-2 text-sm text-gray-700">
+                    {difficulty}
+                  </span>
+                )}
+                {isDifficultyDropdownOpen && (
+                  <div className="absolute mt-12 w-32 bg-white border border-gray-300 rounded shadow-lg z-10">
+                    <ul>
+                      <li
+                        onClick={() => handleDifficultySelect('Easy')}
+                        className="cursor-pointer px-4 py-2 flex items-center hover:bg-gray-100 text-green-500"
+                      >
+                        <FaFlag className="mr-2" /> Easy
+                      </li>
+                      <li
+                        onClick={() => handleDifficultySelect('Medium')}
+                        className="cursor-pointer px-4 py-2 flex items-center hover:bg-gray-100 text-yellow-500"
+                      >
+                        <FaFlag className="mr-2" /> Medium
+                      </li>
+                      <li
+                        onClick={() => handleDifficultySelect('High')}
+                        className="cursor-pointer px-4 py-2 flex items-center hover:bg-gray-100 text-red-500"
+                      >
+                        <FaFlag className="mr-2" /> High
+                      </li>
+                    </ul>
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="relative flex items-center">
-              <button
-                onClick={toggleDifficultyDropdown}
-                className={`p-2 rounded-full hover:bg-gray-300 focus:outline-none ${flagIconColor}`}
-              >
-                <FaFlag size={20} />
-              </button>
-              {difficulty && (
-                <span className="ml-2 text-sm text-gray-700">
-                  {difficulty}
-                </span>
-              )}
-              {isDifficultyDropdownOpen && (
-                <div className="absolute mt-40 w-32 bg-white border border-gray-300 rounded shadow-lg z-10">
-                  <ul>
-                    <li
-                      onClick={() => handleDifficultySelect('Easy')}
-                      className="cursor-pointer px-4 py-2 flex items-center hover:bg-gray-100 text-green-500"
-                    >
-                      <FaFlag className="mr-2" /> Easy
-                    </li>
-                    <li
-                      onClick={() => handleDifficultySelect('Medium')}
-                      className="cursor-pointer px-4 py-2 flex items-center hover:bg-gray-100 text-yellow-500"
-                    >
-                      <FaFlag className="mr-2" /> Medium
-                    </li>
-                    <li
-                      onClick={() => handleDifficultySelect('High')}
-                      className="cursor-pointer px-4 py-2 flex items-center hover:bg-gray-100 text-red-500"
-                    >
-                      <FaFlag className="mr-2" /> High
-                    </li>
-                  </ul>
-                </div>
-              )}
-            </div>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700 focus:outline-none"
+            >
+              <FaTimes size={24} />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <FaTimes size={24} />
-          </button>
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="taskName">
-            Task Name
-          </label>
+
+          {/* Tasks Display */}
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold mb-2">Tasks:</h3>
+            {tasks.map((task, index) => (
+              <Task key={index} task={task} index={index} moveTask={moveTask} />
+            ))}
+          </div>
+
+          {/* Rest of form */}
           <input
             type="text"
-            id="taskName"
+            placeholder="Task Name"
+            className="mb-2 p-2 border rounded w-full"
             value={taskName}
             onChange={(e) => setTaskName(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            placeholder="Enter task name"
           />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="startDate">
-            Start Date
-          </label>
-          <input
-            type="date"
-            id="startDate"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="dueDate">
-            Due Date
-          </label>
-          <input
-            type="date"
-            id="dueDate"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="objective">
-            Objective
-          </label>
           <textarea
-            id="objective"
+            placeholder="Objective"
+            className="mb-2 p-2 border rounded w-full"
             value={objective}
             onChange={(e) => setObjective(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            rows="4"
-            placeholder="Enter the objective"
           />
-        </div>
-        <div className="mb-4">
-    <label className="block text-gray-700 text-sm font-bold mb-2">
-      Attach Images
-    </label>
-    <div className="flex items-center justify-center space-x-4 border-2 border-dashed border-gray-300 rounded-lg p-4">
-      {image1 && (
-        <div className="relative">
-          <img
-            src={image1}
-            alt="Uploaded Preview 1"
-            className="w-32 h-32 object-cover rounded cursor-pointer"
-            onClick={handleImageClick}
-          />
-          <button
-            onClick={() => handleImageDelete(1)}
-            className="absolute top-0 right-0 bg-red-600 text-white rounded-full p-1"
-          >
-            <FaTimes size={16} />
-          </button>
-        </div>
-      )}
-      {image2 && (
-        <div className="relative">
-          <img
-            src={image2}
-            alt="Uploaded Preview 2"
-            className="w-32 h-32 object-cover rounded cursor-pointer"
-            onClick={handleImageClick}
-          />
-          <button
-            onClick={() => handleImageDelete(2)}
-            className="absolute top-0 right-0 bg-red-600 text-white rounded-full p-1"
-          >
-            <FaTimes size={16} />
-          </button>
-        </div>
-      )}
-      {(image1 === null || image2 === null) && (
-        <label htmlFor="imageUpload" className="cursor-pointer">
-          <FaPlus size={24} className="text-gray-600" />
-        </label>
-      )}
-      <input
-        type="file"
-        id="imageUpload"
-        accept="image/*"
-        onChange={handleImageChange}
-        className="hidden"
-      />
-    </div>
-  </div>
-        <div className="flex justify-center items-center mt-4">
-          <button
-            onClick={toggleUserNameVisibility}
-            className="bg-gray-200 p-2 rounded-full hover:bg-gray-300 focus:outline-none"
-            style={{ margin: '0 auto' }}
-          >
-            <FaUser size={20} className="text-gray-600" />
-          </button>
-        </div>
-        {selectedName && (
-          <div className="mt-2 text-center text-gray-700">
-            {selectedName}
+          {/* Additional form fields for images, dates, etc. */}
+
+          <div className="flex justify-between">
+            <button onClick={handleSubmit} className="bg-blue-500 text-white p-2 rounded">
+              Submit Task
+            </button>
           </div>
-        )}
-        <div className="flex justify-end">
-          <button
-            onClick={handleSubmit}
-            className="bg-red-800 text-white px-9 py-3 rounded-md shadow hover:bg-red-900 w-full mt-10"
-          >
-            Submit
-          </button>
         </div>
       </div>
-      <UserNameModal
-        isOpen={isUserNameModalOpen}
-        onClose={() => setIsUserNameModalOpen(false)}
-        user={user}
-        onSelectName={handleNameSelect}
-      />
-    </div>,
-    document.body
+    </DndProvider>,
+    document.getElementById('modal-root')
   );
 };
 

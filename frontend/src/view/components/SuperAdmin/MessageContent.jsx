@@ -298,12 +298,11 @@ return message.content;
   ) : msg.file.type.startsWith('video/') ? (
     <video controls src={msg.file.url} className="message-file my-2 max-w-full h-auto" />
   ) : (
-    <a href={msg.file.url} target="_blank" rel="noopener noreferrer" className="message-file my-2 text-blue-500">
+    <a href={msg.file.url} target="_blank" rel="noopener noreferrer" className="message-file text-sm my-2 text-blue-500">
       {msg.file.name}
     </a>
   )
 )}
-
 
 <div className="message-actions flex space-x-2 mt-2">
                 <FontAwesomeIcon
@@ -367,8 +366,6 @@ return message.content;
   </div>
 )}
 
-
-
       {/* Message Input */}
       <div className="message-input p-4 bg-white border-t sticky bottom-0">
         <div className="relative flex items-center">
@@ -386,7 +383,7 @@ return message.content;
             {/* Attachment Icon */}
             <label className="cursor-pointer">
               <input type="file" className="hidden" onChange={handleFileChange} />
-              <button onClick={handleAttachmentClick} className="mr-2 text-gray-400 hover:text-gray-600">
+              <button onClick={handleAttachmentClick} className="mr-2 text-gray-600">
   <FontAwesomeIcon icon={faPaperclip} />
   <input type="file" accept="*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
 </button>
@@ -411,20 +408,31 @@ return message.content;
 
 
         {/* File Preview Section */}
-        {file && (
-  <div className="file-preview flex items-center">
+{file && (
+  <div className="file-preview flex items-center bg-gray-50 p-4 rounded-lg shadow-lg border border-gray-200">
     {file.type.startsWith('image/') ? (
-      <img src={URL.createObjectURL(file)} alt="Preview" className="w-16 h-16 object-cover mr-2" />
+      <img 
+        src={URL.createObjectURL(file)} 
+        alt="Preview" 
+        className="w-24 h-24 object-cover rounded-lg mr-4 hover:opacity-90 transition duration-300 ease-in-out"
+      />
     ) : file.type.startsWith('video/') ? (
-      <video controls src={URL.createObjectURL(file)} className="w-16 h-16 object-cover mr-2" />
+      <video 
+        controls 
+        src={URL.createObjectURL(file)} 
+        className="w-42 h-24 object-cover rounded-lg mr-4"
+      />
     ) : (
-      <span className="text-sm">{file.name}</span>
+      <span className="text-sm text-gray-600 font-medium truncate">{file.name}</span>
     )}
-    <button onClick={removeFile} className="ml-2 text-red-500 hover:text-red-700">
-      <FontAwesomeIcon icon={faTrash} />
+    <button 
+      onClick={removeFile} 
+      className="ml-4 text-red-500 hover:text-red-700 transition duration-300 ease-in-out">
+      <FontAwesomeIcon icon={faTrash} className="text-lg" />
     </button>
   </div>
 )}
+
 {imageModalSrc && (
   <ImageModal src={imageModalSrc} onClose={() => setImageModalSrc(null)} />
 )}

@@ -5,9 +5,8 @@
   import {createProduct, getProducts, deleteProduct, updateProduct  } from '../controllers/addProductsController.js'
   import { updateProject, deleteProject, getProjects, createProject} from '../controllers/addProjectsController.js';
   import { getDashboardStats } from '../controllers/DashboardController.js';
-  // import quotationTokenModel from '../models/quotationTokenModel.js';
-  // import Quotation from '../models/quotationModel.js';
-
+  import { createSaNewProject, getAllProjects, deleteProjectById, getProjectById } from '../controllers/saNewProjectController.js';
+  import { getMembersAndSuperAdmins } from '../controllers/getallMemberController.js';
   import {createUser } from '../controllers/userController.js';
   import { loginUser, forgotPassword, resetPassword } from '../controllers/authController.js';
   import {verifyLoginOtp, verifyTwoFactorAuth, resendOtp } from '../controllers/adminAuthentication.js';
@@ -31,12 +30,14 @@ router.post('/resend-otp',  resendOtp);
 router.post('/refresh-token', refreshToken);
 
 //User Messages Related
-router.post('/contactEunivate',ContactEunivate )
+router.post('/contactEunivate',ContactEunivate );
 
-// Gmail related
-// router.get('/auth', authenticateUser);
-// router.get('/emails', listEmails);
-// router.post('/send-email', sendEmail);
+//SuperAdminRoutes
+router.post('/sa-newproject', createSaNewProject);
+router.get('/sa-getnewproject', getAllProjects);
+router.delete('/sa-newproject/:id', deleteProjectById);
+router.get('/sa-getnewproject/:id', getProjectById)
+router.get('/members-superadmins', getMembersAndSuperAdmins);
 
 // User Management Routes
 router.get('/', getUsers); 

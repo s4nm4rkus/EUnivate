@@ -1,5 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react'; 
 import { useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx';
 import Kanban from './Kanban';
 import List from './List';
@@ -11,11 +14,30 @@ const ProjectDetails = () => {
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
     const [selectedView, setSelectedView] = useState('Kanban');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isUserModalOpen, setIsUserModalOpen] = useState(false); // For user+ modal
+    const [members, setMembers] = useState([]); // Store project members
+    const [searchQuery, setSearchQuery] = useState(''); // Search query for filtering members
     const [addText, setAddText] = useState('');
+    const [project, setProject] = useState({});
     const modalRef = useRef(null);
     const location = useLocation();
     const navigate = useNavigate();
-    const project = location.state?.project || {};
+    const projectId = location.state?.projectId; // Assuming projectId is passed in state
+
+    useEffect(() => {
+        const fetchProjectDetails = async () => {
+            try {
+                const response = await axios.get(`http://localhost:5000/api/users/sa-getnewproject/${projectId}`);
+                setProject(response.data);
+            } catch (error) {
+                console.error('Error fetching project details:', error);
+            } 
+        };
+
+        if (projectId) {
+            fetchProjectDetails();
+        }
+    }, [projectId]);
 
     const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
 
@@ -29,6 +51,21 @@ const ProjectDetails = () => {
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
+    };
+
+    const handleUserIconClick = async () => {
+        try {
+            // Fetch members and their roles from the backend
+            const response = await axios.get(`http://localhost:5000/api/users/members-superadmins`);
+            setMembers(response.data);
+            setIsUserModalOpen(true);
+        } catch (error) {
+            console.error('Error fetching members:', error);
+        }
+    };
+
+    const handleCloseUserModal = () => {
+        setIsUserModalOpen(false);
     };
 
     const handleButtonTextUpdate = (text) => {
@@ -52,6 +89,11 @@ const ProjectDetails = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    // Filter members based on search query
+    const filteredMembers = members.filter(member => 
+        member.email.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
         <div className="bg-gray-100 min-h-screen p-6">
             <div className="flex justify-between items-center mb-16">
@@ -64,11 +106,11 @@ const ProjectDetails = () => {
 
             <div className="bg-white p-4 rounded-md shadow-md border border-gray-200">
                 <div className="flex items-start space-x-4">
-                    {project.image && (
+                    {project.thumbnail && (
                         <div className="w-24 h-24 flex-shrink-0">
                             <img 
-                                src={project.image} 
-                                alt={project.name} 
+                                src={project.thumbnail.url} 
+                                alt={project.projectName} 
                                 className="w-full h-full object-cover rounded-md"
                             />
                         </div>
@@ -86,7 +128,17 @@ const ProjectDetails = () => {
                             <span className="text-gray-500">Detail</span>
                         </div>
 
-                        <h2 className="text-3xl font-semibold mt-[-1rem]">{project.name}.App</h2>
+                        <div className="flex items-center space-x-4">
+                            <h2 className="text-3xl font-semibold mt-[-1rem]">
+                                {project.projectName}
+                            </h2>
+                            <FontAwesomeIcon 
+                                icon={faUserPlus} 
+                                className="cursor-pointer mt-[-1rem]" 
+                                size="lg" 
+                                onClick={handleUserIconClick} // Open the modal on click
+                            />
+                        </div>
 
                         <div className="flex items-center space-x-4 mt-4">
                             <button
@@ -127,39 +179,65 @@ const ProjectDetails = () => {
                 </div>
             </div>
 
-            <div className="mt-6  border-gray-200">
-                {selectedView === 'Kanban' && <Kanban projectName={project.name} />}
+            <div className="mt-6 border-gray-200">
+                {selectedView === 'Kanban' && <Kanban projectName={project.projectName} />}
                 {selectedView === 'List' && <List />}
                 {selectedView === 'Calendar' && <Calendar project={project} />}
                 {selectedView === 'GanttChart' && <GanttChart />}
                 {selectedView === 'RaciMatrix' && <RaciMatrix />}
             </div>
 
-            {isModalOpen && (
+            {/* Modal for adding new members */}
+            {isUserModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-500 bg-opacity-50">
-                    <div
-                        ref={modalRef}
-                        className="bg-white p-6 rounded-md shadow-lg border border-gray-200"
-                    >
-                        <div className="flex space-x-4">
-                            <button
-                                onClick={() => handleButtonTextUpdate('Gantt Chart')}
-                                className="bg-orange-100 text-orange-600 px-4 py-2 rounded-md"
+                    <div className="relative bg-white p-6 rounded-md shadow-lg border border-gray-200 w-1/3">
+                        <button
+                            className="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-xl"
+                            onClick={handleCloseUserModal}
+                        >
+                            &times; {/* Close button */}
+                        </button>
+                        <h2 className="text-xl font-semibold mb-4">Add New Member</h2>
+                        
+                        <div className="flex items-center mb-4">
+                            <input 
+                                type="text" 
+                                placeholder="Search by email..." 
+                                className="flex-grow p-2 border border-gray-300 rounded-md"
+                                onChange={(e) => setSearchQuery(e.target.value)} // Capture search input
+                                value={searchQuery} // Display search input value
+                            />
+                            <button 
+                                className="ml-2 bg-red-600 text-white px-4 py-2 rounded-md whitespace-nowrap"
+                                onClick={() => console.log('Add member logic here')}
                             >
-                                Gantt Chart
+                                Add Member
                             </button>
-                            <button
-                                onClick={() => handleButtonTextUpdate('RACI Matrix')}
-                                className="bg-blue-100 text-blue-600 px-4 py-2 rounded-md"
-                            >
-                                RACI Matrix
-                            </button>
+                        </div>
+
+                        <div className="mt-4">
+                            <h3 className="font-semibold mb-2 text-red-800">Members</h3>
+                            {filteredMembers.length > 0 ? (
+                                <ul>
+                                    {filteredMembers.map((member) => (
+                                        <li key={member._id} className="flex justify-between items-start py-2 border-b border-gray-200">
+                                            <div className="flex-grow">
+                                                <span className="block font-medium">{member.username}</span> {/* Display user username */}
+                                                <span className="block text-gray-600">{member.email}</span> {/* Display user email */}
+                                            </div>
+                                            <span className="text-gray-600">{member.role}</span> {/* Display user role */}
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p>No members found.</p>
+                            )}
                         </div>
                     </div>
                 </div>
             )}
         </div>
-    );
-};
+            );
+            };
 
 export default ProjectDetails;

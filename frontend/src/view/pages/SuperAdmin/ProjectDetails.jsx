@@ -14,15 +14,15 @@ const ProjectDetails = () => {
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
     const [selectedView, setSelectedView] = useState('Kanban');
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isUserModalOpen, setIsUserModalOpen] = useState(false); // For user+ modal
-    const [members, setMembers] = useState([]); // Store project members
-    const [searchQuery, setSearchQuery] = useState(''); // Search query for filtering members
+    const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+    const [members, setMembers] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
     const [addText, setAddText] = useState('');
     const [project, setProject] = useState({});
     const modalRef = useRef(null);
     const location = useLocation();
     const navigate = useNavigate();
-    const projectId = location.state?.projectId; // Assuming projectId is passed in state
+    const projectId = location.state?.projectId;
 
     useEffect(() => {
         const fetchProjectDetails = async () => {
@@ -31,7 +31,7 @@ const ProjectDetails = () => {
                 setProject(response.data);
             } catch (error) {
                 console.error('Error fetching project details:', error);
-            } 
+            }
         };
 
         if (projectId) {
@@ -55,7 +55,6 @@ const ProjectDetails = () => {
 
     const handleUserIconClick = async () => {
         try {
-            // Fetch members and their roles from the backend
             const response = await axios.get(`http://localhost:5000/api/users/members-superadmins`);
             setMembers(response.data);
             setIsUserModalOpen(true);
@@ -89,7 +88,6 @@ const ProjectDetails = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    // Filter members based on search query
     const filteredMembers = members.filter(member => 
         member.email.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -136,7 +134,7 @@ const ProjectDetails = () => {
                                 icon={faUserPlus} 
                                 className="cursor-pointer mt-[-1rem]" 
                                 size="lg" 
-                                onClick={handleUserIconClick} // Open the modal on click
+                                onClick={handleUserIconClick}
                             />
                         </div>
 
@@ -180,11 +178,12 @@ const ProjectDetails = () => {
             </div>
 
             <div className="mt-6 border-gray-200">
-                {selectedView === 'Kanban' && <Kanban projectName={project.projectName} />}
-                {selectedView === 'List' && <List />}
-                {selectedView === 'Calendar' && <Calendar project={project} />}
-                {selectedView === 'GanttChart' && <GanttChart />}
-                {selectedView === 'RaciMatrix' && <RaciMatrix />}
+                    {selectedView === 'Kanban' && <Kanban projectId={projectId} projectName={project.projectName} />}
+                    {selectedView === 'List' && <List projectId={projectId} />}
+                    {selectedView === 'Calendar' && <Calendar project={project} />}
+                    {selectedView === 'GanttChart' && <GanttChart projectId={projectId} />}
+                    {selectedView === 'RaciMatrix' && <RaciMatrix projectId={projectId} />}
+
             </div>
 
             {/* Modal for adding new members */}
@@ -195,7 +194,7 @@ const ProjectDetails = () => {
                             className="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-xl"
                             onClick={handleCloseUserModal}
                         >
-                            &times; {/* Close button */}
+                            &times;
                         </button>
                         <h2 className="text-xl font-semibold mb-4">Add New Member</h2>
                         
@@ -204,8 +203,8 @@ const ProjectDetails = () => {
                                 type="text" 
                                 placeholder="Search by email..." 
                                 className="flex-grow p-2 border border-gray-300 rounded-md"
-                                onChange={(e) => setSearchQuery(e.target.value)} // Capture search input
-                                value={searchQuery} // Display search input value
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                value={searchQuery}
                             />
                             <button 
                                 className="ml-2 bg-red-600 text-white px-4 py-2 rounded-md whitespace-nowrap"
@@ -222,10 +221,10 @@ const ProjectDetails = () => {
                                     {filteredMembers.map((member) => (
                                         <li key={member._id} className="flex justify-between items-start py-2 border-b border-gray-200">
                                             <div className="flex-grow">
-                                                <span className="block font-medium">{member.username}</span> {/* Display user username */}
-                                                <span className="block text-gray-600">{member.email}</span> {/* Display user email */}
+                                                <span className="block font-medium">{member.username}</span>
+                                                <span className="block text-gray-600">{member.email}</span>
                                             </div>
-                                            <span className="text-gray-600">{member.role}</span> {/* Display user role */}
+                                            <span className="text-gray-600">{member.role}</span>
                                         </li>
                                     ))}
                                 </ul>
@@ -236,8 +235,33 @@ const ProjectDetails = () => {
                     </div>
                 </div>
             )}
+
+            {/* Modal for Gantt Chart and RACI Matrix */}
+            {isModalOpen && (
+                <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-500 bg-opacity-50">
+                    <div
+                        ref={modalRef}
+                        className="bg-white p-6 rounded-md shadow-lg border border-gray-200"
+                    >
+                        <div className="flex space-x-4">
+                            <button
+                                onClick={() => handleButtonTextUpdate('Gantt Chart')}
+                                className="bg-orange-100 text-orange-600 px-4 py-2 rounded-md"
+                            >
+                                Gantt Chart
+                            </button>
+                            <button
+                                onClick={() => handleButtonTextUpdate('RACI Matrix')}
+                                className="bg-blue-100 text-blue-600 px-4 py-2 rounded-md"
+                            >
+                                RACI Matrix
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
-            );
-            };
+    );
+};
 
 export default ProjectDetails;

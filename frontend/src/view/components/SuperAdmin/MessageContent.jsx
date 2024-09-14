@@ -270,7 +270,7 @@ const handleDelete = async (messageId) => {
   };  
   
   return (
-    <div className="message-content flex flex-col h-full">
+    <div className="message-content bg-white flex flex-col h-full">
       {/* Header */}
       <div className="header mb-2 pl-2">
         <h2 className="text-xl font-semibold text-black">Superboard</h2>
@@ -291,8 +291,8 @@ const handleDelete = async (messageId) => {
             {msg.sender.name !== 'You' && (
               <img src={msg.sender.avatar} alt={msg.sender.name} className="rounded-full w-10 h-10 mt-2" />
             )}
-            <div className={`p-3 rounded-lg shadow-sm  ${
-                msg.sender.name === 'You' ? 'bg-blue-200 text-gray-800' : 'bg-white text-gray-800'
+            <div className={`p-3 rounded-lg shadow-md  ${
+                msg.sender.name === 'You' ? 'bg-blue-200 text-gray-800' : 'bg-red-100 text-gray-800'
               } max-w-[60%] border border-blue relative ${editingMessageId === msg._id ? 'border-blue-500' : ''}`}
             >
               <div className="message-header flex items-center flex space-x-12 justify-between mb-4">
@@ -390,7 +390,7 @@ const handleDelete = async (messageId) => {
 )}
 
       {/* Message Input */}
-      <div className="message-input p-4 bg-white border-t sticky bottom-0">
+      <div className="message-input p-4 bg-gray-100 rounded-lg shadow-md border-t sticky bottom-0">
         <div className="relative flex items-center">
           <ReactQuill
             value={message}

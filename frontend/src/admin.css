@@ -82,10 +82,13 @@
   position: relative;
   background-color: #fff;
   max-height: max-content;
+  top: -16px;
   bottom: 40px;
   right: 24px;
   width:320px;
-  height: 455px;
+  height: 550px;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 .sidebar-message-title {

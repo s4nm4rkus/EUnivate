@@ -107,20 +107,24 @@ const App = () => {
       <Route path="/events-admin" element={<AdminAuth><EventsAdmin /></AdminAuth>} />
         
 
-      {/* Members */}
-      <Route
-        path="/member/*"
-        element={
-          <MemberAuth>
-            <Member />
-          </MemberAuth>
-        }
-      >
-        <Route path="projectmem" element={<ProjMem />} />
-        <Route path="taskmem" element={<TaskMem />} />
-        <Route path="messages" element={<Messages />} />
-        <Route path="settings" element={<Settings />} />
-      </Route>
+{/* Members */}
+<Route
+  path="/member/*"
+  element={
+    <MemberAuth>
+      <Member />
+    </MemberAuth>
+  }
+>
+  {/* Default route for "/member" */}
+  <Route index element={<ProjMem />} />
+  
+  {/* Other routes */}
+  <Route path="projectmem" element={<ProjMem />} />
+  <Route path="taskmem" element={<TaskMem />} />
+  <Route path="messages" element={<Messages />} />
+  <Route path="settings" element={<Settings />} />
+</Route>
 
         {/*
               <Route path="/admin-container" element={<AdminContainer />} />

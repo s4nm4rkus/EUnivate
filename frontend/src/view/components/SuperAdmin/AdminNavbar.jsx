@@ -4,22 +4,21 @@ import { faSearch, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 
 const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
-  const [user, setUser] = useState({ firstName: '', lastName: '', profilePicture: { url: ''} });
+  const [user, setUser] = useState({ firstName: '', lastName: '', profilePicture: { url: '' } });
   const navigate = useNavigate();
-  const defaultProfilePicture = 'https://res.cloudinary.com/dzxzc7kwb/image/upload/v1725974053/DefaultProfile/qgtsyl571c1neuls9evd.png'; // Use your actual path or URL here
+  const defaultProfilePicture = 'https://res.cloudinary.com/dzxzc7kwb/image/upload/v1725974053/DefaultProfile/qgtsyl571c1neuls9evd.png'; 
   const dropdownRef = useRef();
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     if (storedUser) {
-      setUser(storedUser); // Set the user state with the stored user data
+      setUser(storedUser);
     }
 
-    // Close dropdown when clicking outside
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         if (isAccountDropdownOpen) {
-          toggleAccountDropdown(); // Close the dropdown if it is open
+          toggleAccountDropdown();
         }
       }
     };
@@ -31,21 +30,19 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
   }, [isAccountDropdownOpen]);
 
   const handleLogout = () => {
-
     localStorage.removeItem('user');
-    localStorage.removeItem('token'); // Remove the token if stored separately
-    // Redirect to login page
+    localStorage.removeItem('token');
     navigate('/login');
   };
 
   const handleProfileClick = () => {
-    navigate('/superadmin/settings'); 
+    navigate('/superadmin/settings');
   };
 
   return (
     <>
       {/* Admin Navbar */}
-      <div className="flex items-center space-x-9 p-0" style={{ transform: 'translateX(1px)' }}>
+      <div className="flex items-center space-x-9 p-0 relative z-[9999]" style={{ transform: 'translateX(1px)' }}>
         {/* Search Bar with Icon */}
         <div className="relative">
           <input
@@ -63,7 +60,7 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
         <div ref={dropdownRef} className="relative flex items-center cursor-pointer" onClick={toggleAccountDropdown}>
           {user.profilePicture ? (
             <img 
-              src={user.profilePicture.url || user.profilePicture} // Check for both structure cases
+              src={user.profilePicture.url || user.profilePicture}
               alt="Profile"
               className="w-8 h-8 rounded-full object-cover"
             />
@@ -87,7 +84,7 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
             className={`absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg ${
               isAccountDropdownOpen ? 'block' : 'hidden'
             }`}
-            style={{ top: '100%', zIndex: 1000 }} 
+            style={{ top: '100%', zIndex: 10000 }} 
           >
             <a
               href="#"

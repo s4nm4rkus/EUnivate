@@ -64,60 +64,84 @@ const MessageContent = () => {
     };
   
   
-  const sendMessage = async () => {
-    if (message.trim() || file) {
-      const cleanMessage = message.replace(/<\/?p>/g, '');
-
-      if (editingMessageId) {
-        const updatedMessage = {
-          content: cleanMessage,
-          file: file ? { name: file.name, type: file.type, url: URL.createObjectURL(file) } : null,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        };
-      
-        // Call the editMessage function to update the message on the backend
-        await editMessage(editingMessageId, updatedMessage.content, updatedMessage.file, updatedMessage.time);
-
-     setEditingMessageId(null); // Clear the editing state
-     setReplyingTo(null); // Clear the reply state after editing
-
-      } else {
-         // Sending a new message
-  const newMessage = {
-    content: cleanMessage,
-    sender: { name: 'You', avatar: 'https://via.placeholder.com/40' },
-    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    file: file ? { name: file.name, type: file.type, url: URL.createObjectURL(file) } : null,
-    replyTo: replyingTo ? replyingTo : null,
-    edited: false,
-  };
-        try {
-          const response = await fetch('http://localhost:5000/api/messages', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newMessage),
-          });
-
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+    const sendMessage = async () => {
+      if (message.trim() || file) {
+        const cleanMessage = message.replace(/<\/?p>/g, '');
+    
+        if (editingMessageId) {
+          // Editing an existing message
+          const updatedMessage = {
+            content: cleanMessage,
+            file: file ? { name: file.name, type: file.type, url: URL.createObjectURL(file) } : null,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          };
+    
+          try {
+            // Call the editMessage function to update the message on the backend
+            await editMessage(editingMessageId, updatedMessage.content, updatedMessage.file, updatedMessage.time);
+    
+            // Update the message in the state
+            setMessages((prevMessages) =>
+              prevMessages.map((msg) =>
+                msg._id === editingMessageId ? { ...msg, ...updatedMessage, edited: true } : msg
+              )
+            );
+    
+            // Clear the editing state and input fields
+            setEditingMessageId(null);
+            setReplyingTo(null);
+            setMessage('');
+            setFile(null);
+          } catch (error) {
+            console.error('Error updating message:', error);
           }
-
-          const data = await response.json();
-          setMessages((prevMessages) =>
-            prevMessages.map((msg) => (msg === newMessage ? data : msg))
-          );
-        } catch (error) {
-          console.error('Error sending message:', error);
+        } else {
+          // Sending a new message
+          const newMessage = {
+            content: cleanMessage,
+            sender: { name: 'You', avatar: 'https://via.placeholder.com/40' },
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            file: file ? { name: file.name, type: file.type, url: URL.createObjectURL(file) } : null,
+            replyTo: replyingTo ? { 
+              _id: replyingTo._id,
+              content: replyingTo.content,
+              sender: replyingTo.sender,
+              time: replyingTo.time
+            } : null,
+            edited: false
+          };
+      
+          try {
+            const response = await fetch('http://localhost:5000/api/messages', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newMessage),
+            });
+      
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+      
+            const data = await response.json();
+            setMessages((prevMessages) =>
+              prevMessages.map((msg) =>
+                msg._id === 'temp-id' ? { ...data } : msg
+              )
+            );
+          } catch (error) {
+            console.error('Error sending message:', error);
+          }
+          setMessages((prevMessages) => [...prevMessages, { ...newMessage, _id: 'temp-id' }]);
+          setReplyingTo(null);
+          setMessage('');
+          setFile(null);
         }
-
-         // Add new message to state and clear reply
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
-    setReplyingTo(null);
-    setMessage('');
-    setFile(null);
       }
-    }
-  };
+    };
+    
+    
+    
+    
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -193,29 +217,28 @@ const handleDelete = async (messageId) => {
   const formatMessageContent = (message) => {
     let content = message.content;
   
-    // Add "Edited" flag if message was edited
     if (message.edited) {
       content += ' <span style="color: gray; font-size: 0.75rem;">(Edited)</span>';
     }
   
-   // If it's a reply, format the reply content
-if (message.replyTo) {
-  return `
-    <div style="padding: 12px; background-color: #f9fafb; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 12px; margin-top: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
-      <p style="font-weight: bold; color: #0078d4; margin-bottom: 10px;">Replying to ${message.replyTo.sender.name}:</p>
-      <div style="border-left: 4px solid #0078d4; padding: 12px; background-color: #ffffff; border-radius: 10px; box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);">
-        <p style="font-weight: bold; color: #333; margin-bottom: 6px;">
-          ${message.replyTo.sender.name} 
-          <span style="color: #777; font-size: 12px; float: right;">${message.replyTo.time}</span>
-        </p>
-        <p style="color: #555;">${message.replyTo.content}</p>
-      </div>
-      <p style="margin-top: 10px; color: #333; font-size: 14px;">${message.content}</p>
-    </div>
-  `;
-}
-return message.content;
+    if (message.replyTo) {
+      return `
+        <div style="padding: 12px; background-color: #f9fafb; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 12px; margin-top: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+          <p style="font-weight: bold; color: #0078d4; margin-bottom: 10px;">Replying to ${message.replyTo.sender.name}:</p>
+          <div style="border-left: 4px solid #0078d4; padding: 12px; background-color: #ffffff; border-radius: 10px; box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);">
+            <p style="font-weight: bold; color: #333; margin-bottom: 6px;">
+              ${message.replyTo.sender.name} 
+              <span style="color: #777; font-size: 12px; float: right;">${message.replyTo.time}</span>
+            </p>
+            <p style="color: #555;">${message.replyTo.content}</p>
+          </div>
+          <p style="margin-top: 10px; color: #333; font-size: 14px;">${message.content}</p>
+        </div>
+      `;
+    }
+    return message.content;
   };
+  
   
 
   const editMessage = async (id, updatedContent, updatedFile, updatedTime) => {

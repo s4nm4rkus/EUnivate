@@ -5,7 +5,7 @@ import '../../../admin.css';
 
 const SidebarMessage = () => {
   return (
-    <div className="bg-white right-4 bottom-4 flex flex-col border-r border-gray-300 sidebar-message-content"> {/* Reduced width */}
+    <div className="bg-white right-4 bottom-0 flex flex-col border-r border-gray-300 sidebar-message-content"> {/* Reduced width */}
       {/* About Section */}
       <div className="p-3"> {/* Reduced padding */}
         <h2 className="text-lg font-semibold mb-2 ml-2">About</h2> {/* Reduced font size and margin */}

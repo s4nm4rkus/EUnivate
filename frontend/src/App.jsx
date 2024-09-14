@@ -32,6 +32,8 @@ import SuperAdminRoute from './view/hooks/SuperadminAuth.jsx';
 import ProjectmanagementAuth from './view/hooks/AuthProjectmanagement.jsx';
 import Verify2FAPending from './view/hooks/Verify2faPending.jsx';
 import AdminAuth from './view/hooks/AdminAuth.jsx';
+import MemberAuth from './view/hooks/MembersAuth.jsx'; 
+
 //Admin
 import AdminDashboard from './view/pages/Admin/AdminDashboard.jsx';
 import AdminAddProduct from './view/components/Admin/AdminAddProduct.jsx';
@@ -52,6 +54,11 @@ import Activity from './view/pages/SuperAdmin/Activity';
 import Settings from './view/pages/SuperAdmin/Settings';
 import ProjectDetails from './view/pages/SuperAdmin/ProjectDetails'; 
 
+//Member
+
+import Member from "./view/pages/Members/Member.jsx"; 
+import ProjMem from "./view/pages/Members/ProjectMem.jsx"; 
+import TaskMem from "./view/pages/Members/TaskMem.jsx"; 
 
 /* Global CSS */
 import './index.css';
@@ -100,8 +107,24 @@ const App = () => {
       <Route path="/events-admin" element={<AdminAuth><EventsAdmin /></AdminAuth>} />
         
 
-
-
+{/* Members */}
+<Route
+  path="/member/*"
+  element={
+    <MemberAuth>
+      <Member />
+    </MemberAuth>
+  }
+>
+  {/* Default route for "/member" */}
+  <Route index element={<ProjMem />} />
+  
+  {/* Other routes */}
+  <Route path="projectmem" element={<ProjMem />} />
+  <Route path="taskmem" element={<TaskMem />} />
+  <Route path="messages" element={<Messages />} />
+  <Route path="settings" element={<Settings />} />
+</Route>
 
         {/*
               <Route path="/admin-container" element={<AdminContainer />} />

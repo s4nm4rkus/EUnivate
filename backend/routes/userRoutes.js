@@ -1,9 +1,9 @@
   import express from 'express';
  
   import { createQuotation, confirmQuotationEmail, checkVerificationStatus } from '../controllers/quotationController.js'
+  // import { sendCompletionEmail } from '../controllers/quotationController.js';
   import upload from '../middlewares/multerMiddleware.js';
-  import quotationTokenModel from '../models/quotationTokenModel.js';
-  import Quotation from '../models/quotationModel.js';
+
 
   import {createUser } from '../controllers/userController.js';
   import { loginUser, forgotPassword, resetPassword } from '../controllers/authController.js';
@@ -13,6 +13,8 @@
   import { ContactEunivate } from '../controllers/contactEunivate.js';
   import { updateUser, updateUserPassword } from '../controllers/updateUserInformation.js';
   import { inviteUsers, updateUserRole, getUsers} from '../controllers/peopleController.js';
+
+  
 
 
 const router = express.Router();
@@ -35,10 +37,12 @@ router.post('/', upload.single('profilePicture'), createUser);
 router.post('/invite', inviteUsers);  
 router.put('/:userId/role', updateUserRole); 
 
-  // quotation route
-  router.post('/quotation',createQuotation);
-  router.get('/quotation/confirm/:quotationToken', confirmQuotationEmail);
-  router.get('/quotations/:id/status', checkVerificationStatus);
+// quotation route
+router.post('/quotation',createQuotation);
+router.get('/quotation/confirm/:quotationToken', confirmQuotationEmail);
+router.get('/quotations/:id/status', checkVerificationStatus);
+// router.post('/quotation/send-completion-email', sendCompletionEmail);
+
 
 // User Update Routes
 router.put('/:id', updateUser);

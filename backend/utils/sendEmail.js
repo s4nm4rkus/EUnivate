@@ -13,12 +13,12 @@ const sendEmail = async (options) => {
   // Define the email options
   const mailOptions = {
     from: 'eunivate@gmail.com', 
-    to: options.email, // Recipient address
-    subject: options.subject, // Subject of the email
-    text: options.message, // Plain text body
+    to: options.email, 
+    subject: options.subject,
+    text: options.message, 
   };
 
-  // Send the email
+
   await transporter.sendMail(mailOptions);
 };
 

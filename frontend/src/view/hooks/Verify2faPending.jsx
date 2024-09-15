@@ -98,9 +98,9 @@ const Verify2FAPending = () => {
                   navigate('/superadmin/dashboard');
                 } else if (roleLowerCase === 'admin') {
                   navigate('/admin');
-                } else if (roleLowerCase === 'collaborator') {
-                  navigate('/collaborator-dashboard');
-                } else if (roleLowerCase === 'ser') {
+                } else if (roleLowerCase === 'members') {
+                  navigate('/member');
+                } else if (roleLowerCase === 'User') {
                   navigate('/');
                 } else {
                   console.error('Unknown role:', role);

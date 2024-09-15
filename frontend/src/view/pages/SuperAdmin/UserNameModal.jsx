@@ -1,11 +1,10 @@
-// src/view/pages/SuperAdmin/UserNameModal.jsx
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { FaTimes } from 'react-icons/fa'; // Importing the close icon
+import { FaTimes } from 'react-icons/fa';
 
 const UserNameModal = ({ isOpen, onClose, user, onSelectName }) => {
   const [userNames, setUserNames] = useState([]);
-  
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -14,7 +13,11 @@ const UserNameModal = ({ isOpen, onClose, user, onSelectName }) => {
           throw new Error('Failed to fetch users');
         }
         const users = await response.json();
-        setUserNames(users.map(u => `${u.firstName} ${u.lastName}`));
+        // Store both names and profile pictures
+        setUserNames(users.map(u => ({
+          name: `${u.firstName} ${u.lastName}`,
+          profilePicture: u.profilePicture?.url || u.profilePicture || ''
+        })));
       } catch (error) {
         console.error('Error fetching users:', error);
       }
@@ -27,12 +30,16 @@ const UserNameModal = ({ isOpen, onClose, user, onSelectName }) => {
 
   if (!isOpen) return null;
 
-  // Combine fetched names with the current user's name
-  const allNames = [...new Set([`${user.firstName} ${user.lastName}`, ...userNames])];
+  // Combine fetched names and avatars with the current user's name and avatar
+  const currentUserData = {
+    name: `${user.firstName} ${user.lastName}`,
+    profilePicture: user.profilePicture?.url || user.profilePicture || ''
+  };
+  const allUserData = [currentUserData, ...userNames];
 
-  // Handle the name selection
-  const handleNameSelect = (name) => {
-    onSelectName(name); // Pass the selected name back to the parent
+  // Handle the name selection with avatar
+  const handleNameSelect = (name, avatar) => {
+    onSelectName(name, avatar); // Pass the selected name and avatar back to the parent
     onClose(); // Close the modal
   };
 
@@ -49,13 +56,19 @@ const UserNameModal = ({ isOpen, onClose, user, onSelectName }) => {
           </button>
         </div>
         <ul className="mt-4 space-y-2">
-          {allNames.map((name, index) => (
+          {allUserData.map((userData, index) => (
             <li 
               key={index} 
-              className="text-gray-700 cursor-pointer hover:bg-gray-200 p-2 rounded"
-              onClick={() => handleNameSelect(name)}
+              className="flex items-center text-gray-700 cursor-pointer hover:bg-gray-200 p-2 rounded"
+              onClick={() => handleNameSelect(userData.name, userData.profilePicture)}
             >
-              {name}
+              {/* Display avatar */}
+              <img 
+                src={userData.profilePicture || '/path/to/default/avatar.png'} 
+                alt="Avatar" 
+                className="w-8 h-8 rounded-full mr-2 object-cover"
+              />
+              {userData.name}
             </li>
           ))}
         </ul>

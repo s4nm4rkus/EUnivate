@@ -21,6 +21,7 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
   const [startDate, setStartDate] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [question, setQuestion] = useState('');
+  const [loading, setLoading] = useState(false);
   const [image1, setImage1] = useState(null);
   const [image2, setImage2] = useState(null);
   const [priority, setPriority] = useState('');
@@ -78,31 +79,99 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
     }
   };
 
-  const handleSubmit = () => {
-    if (!taskName || !startDate || !dueDate || !objectives.length || !status || !priority || !selectedName) {
+  const handleSaveattachment = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'EunivateImage');
+    formData.append('cloud_name', 'dzxzc7kwb');
+  
+    try {
+      const response = await axios.post(
+        'https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload',
+        formData
+      );
+      return { publicId: response.data.public_id, url: response.data.secure_url };
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw error;
+    }
+  };
+  
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    if (!taskName || !startDate || !dueDate || !status || !priority || !selectedName) {
       alert('Please fill in all fields before submitting.');
       return;
     }
-
+  
     if (new Date(dueDate) < new Date(startDate)) {
       alert('Due Date cannot be earlier than Start Date.');
       return;
     }
-
-    const newTask = {
-      taskName,
-      objectives,
-      selectedName,
-      status,
-      priority,
-      startDate,
-      dueDate,
-      image1,
-      image2,
-    };
-
-    onTaskSubmit(newTask);
+  
+    let uploadedImages = [];
+  
+    // Upload selected files to Cloudinary
+    for (const file of selectedFiles) {
+      try {
+        const result = await handleSaveattachment(file); // Upload to Cloudinary
+        uploadedImages.push({
+          publicId: result.publicId,
+          url: result.url
+        }); // Collect the Cloudinary image data
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        alert('Failed to upload one or more images.');
+        return;
+      }
+    }
+  
+    try {
+      // Get the ObjectId for the selected user
+      const userResponse = await axios.get(`http://localhost:5000/api/users/findByUsername/${selectedName}`);
+      const assigneeId = userResponse.data._id;
+  
+      // Create the task with the uploaded image data
+      const newTask = {
+        taskName,
+        objectives,
+        assignee: assigneeId, // Use ObjectId for assignee
+        status,
+        priority,
+        startDate,
+        dueDate,
+        attachment: uploadedImages, 
+        description,
+        questionUpdate: question,
+      };
+  
+      // Send data to the backend API to save in MongoDB
+      const response = await axios.post('http://localhost:5000/api/users/sa-task', newTask);
+      console.log('Task created:', response.data);
+      onTaskSubmit(newTask); 
+          // Clear the fields
+            setTaskName('');
+            setDescription('');
+            setObjectives([]);
+            setSelectedObjective(null);
+            setSelectedName('');
+            setStatus('');
+            setStartDate('');
+            setDueDate('');
+            setQuestion('');
+            setSelectedFiles([]);
+            // Close the modal
+            onClose();
+            
+    } catch (error) {
+      setLoading(false)
+      console.error('Error saving task:', error);
+      alert('Failed to save task.');
+    }
   };
+  
+
 
   const toggleUserNameVisibility = () => {
     setIsUserNameModalOpen(true);
@@ -228,8 +297,9 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
           <button
             onClick={handleSubmit}
             className="bg-red-600 w-full text-white px-4 py-2 rounded hover:bg-red-700"
+            
           >
-            Submit
+                  {loading ? 'Submitting ...' : 'Submit'}
           </button>
         </div>
         {isUserNameModalOpen && (

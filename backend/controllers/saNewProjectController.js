@@ -73,3 +73,37 @@ export const deleteProjectById = async (req, res) => {
         return res.status(500).json({ error: error.message || 'An error occurred while deleting the project' });
     }
 };
+
+//Mamaya to gaagamitin 
+// import SaNewProject from '../models/saNewProject.js';
+// import saAddTask from '../models/saAddTask.js'; // Import Task model
+
+// // Delete a project by its ID
+// export const deleteProjectById = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     // Delete the project by its ID
+//     const deletedProject = await SaNewProject.findByIdAndDelete(id);
+
+//     if (!deletedProject) {
+//       return res.status(404).json({ message: 'Project not found' });
+//     }
+
+//     // Also delete all tasks related to this project
+//     await saAddTask.deleteMany({ project: id });
+
+//     return res.status(200).json({
+//       success: true,
+//       message: 'Project and its related tasks deleted successfully!',
+//       deletedProject,
+//     });
+//   } catch (error) {
+//     console.error('Error in deleting project:', error.message);
+//     return res.status(500).json({
+//       success: false,
+//       message: 'Server Error. Could not delete project.',
+//       error: error.message,
+//     });
+//   }
+// };

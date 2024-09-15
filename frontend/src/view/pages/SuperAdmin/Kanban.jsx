@@ -1,13 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { FaPlus, FaCircle } from 'react-icons/fa';
+import { FaPlus } from 'react-icons/fa';
 import Modal from './KanbanModals/Modal';
-// import axios from 'axios'; // Import axios for API calls
+import axios from 'axios'; // Import axios for API calls
 
-const Kanban = ({ projectId }) => {
+const Kanban = ({ projectId, projectName }) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [tasks, setTasks] = useState([]); // Initialize tasks as an empty array
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [taskToEdit, setTaskToEdit] = useState(null);
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        if (!projectId) {
+          console.error('Project ID is not defined');
+          return; // Exit if projectId is not valid
+        }
+  
+        console.log('Fetching tasks for projectId:', projectId); // Debugging log
+        // Update the URL to match your backend route definition
+        const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${projectId}`);
+        setTasks(response.data.data); // Assuming the tasks are in response.data.data
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      }
+    };
+  
+    fetchTasks(); // Call the function to fetch tasks when projectId is available
+  }, [projectId]); // Re-fetch tasks whenever projectId changes
+  
 
   const handleOpenModal = () => {
     setModalOpen(true);
@@ -17,12 +38,9 @@ const Kanban = ({ projectId }) => {
     setModalOpen(false);
   };
 
-
-
   const handleStatusChange = (task, newStatus) => {
     const updatedTask = { ...task, status: newStatus };
-    // Update task status locally
-    setTasks(prevTasks => prevTasks.map(t => (t.id === task.id ? updatedTask : t)));
+    setTasks(prevTasks => prevTasks.map(t => (t._id === task._id ? updatedTask : t)));
   };
 
   const handleDropdownToggle = (task) => {
@@ -30,7 +48,9 @@ const Kanban = ({ projectId }) => {
     setTaskToEdit(task);
   };
 
-
+  const handleTaskSubmit = (newTask) => {
+    setTasks(prevTasks => [...prevTasks, newTask]);
+  };
 
   return (
     <div className="flex space-x-4 p-4">
@@ -49,12 +69,12 @@ const Kanban = ({ projectId }) => {
           <div className="space-y-2">
             {tasks.filter(task => task.status === status).map(task => (
               <div
-                key={task.id}
+                key={task._id}
                 className="bg-white p-4 rounded shadow"
               >
+                <div>{task.priority}</div>
                 <h3 className="text-lg font-semibold">{task.taskName}</h3>
                 <p className="text-gray-700">{task.description}</p>
-                {/* Add more task details if needed */}
                 <button
                   onClick={() => handleDropdownToggle(task)}
                   className="text-blue-500"
@@ -104,7 +124,7 @@ const Kanban = ({ projectId }) => {
         isOpen={isModalOpen} 
         onClose={handleCloseModal} 
         projectId={projectId} 
-
+        onTaskSubmit={handleTaskSubmit} 
       />
     </div>
   );

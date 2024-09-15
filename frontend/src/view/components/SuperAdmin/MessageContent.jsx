@@ -5,6 +5,16 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import axios from 'axios';
 
+// Modal component to view images in full screen
+const ImageModal = ({ src, onClose }) => (
+  <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+    <div className="relative">
+      <img src={src} alt="Full screen" className="max-w-full max-h-full" />
+      <button onClick={onClose} className="absolute top-2 right-2 text-white text-2xl">×</button>
+    </div>
+  </div>
+);
+
 const MessageContent = () => {
   const [message, setMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
@@ -17,6 +27,8 @@ const MessageContent = () => {
   const [replyingTo, setReplyingTo] = useState(null);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null); // Create a ref for the file input
+  const [imageModalSrc, setImageModalSrc] = useState(null); // State for image modal
+
 
   const startRecording = () => {
     navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
@@ -52,60 +64,84 @@ const MessageContent = () => {
     };
   
   
-  const sendMessage = async () => {
-    if (message.trim() || file) {
-      const cleanMessage = message.replace(/<\/?p>/g, '');
-
-      if (editingMessageId) {
-        // Update the existing message and mark as edited
-      setMessages((prevMessages) =>
-        prevMessages.map((msg) =>
-          msg._id === editingMessageId
-            ? { ...msg, content: cleanMessage, edited: true }
-            : msg
-        )
-      );
-
-     setEditingMessageId(null); // Clear the editing state
-     setReplyingTo(null); // Clear the reply state after editing
-
-      } else {
-         // Sending a new message
-  const newMessage = {
-    content: cleanMessage,
-    sender: { name: 'You', avatar: 'https://via.placeholder.com/40' },
-    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    file: file ? { name: file.name, type: file.type, url: URL.createObjectURL(file) } : null,
-    replyTo: replyingTo ? replyingTo : null,
-    edited: false,
-  };
-        try {
-          const response = await fetch('http://localhost:5000/api/messages', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newMessage),
-          });
-
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+    const sendMessage = async () => {
+      if (message.trim() || file) {
+        const cleanMessage = message.replace(/<\/?p>/g, '');
+    
+        if (editingMessageId) {
+          // Editing an existing message
+          const updatedMessage = {
+            content: cleanMessage,
+            file: file ? { name: file.name, type: file.type, url: URL.createObjectURL(file) } : null,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          };
+    
+          try {
+            // Call the editMessage function to update the message on the backend
+            await editMessage(editingMessageId, updatedMessage.content, updatedMessage.file, updatedMessage.time);
+    
+            // Update the message in the state
+            setMessages((prevMessages) =>
+              prevMessages.map((msg) =>
+                msg._id === editingMessageId ? { ...msg, ...updatedMessage, edited: true } : msg
+              )
+            );
+    
+            // Clear the editing state and input fields
+            setEditingMessageId(null);
+            setReplyingTo(null);
+            setMessage('');
+            setFile(null);
+          } catch (error) {
+            console.error('Error updating message:', error);
           }
-
-          const data = await response.json();
-          setMessages((prevMessages) =>
-            prevMessages.map((msg) => (msg === newMessage ? data : msg))
-          );
-        } catch (error) {
-          console.error('Error sending message:', error);
+        } else {
+          // Sending a new message
+          const newMessage = {
+            content: cleanMessage,
+            sender: { name: 'You', avatar: 'https://via.placeholder.com/40' },
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            file: file ? { name: file.name, type: file.type, url: URL.createObjectURL(file) } : null,
+            replyTo: replyingTo ? { 
+              _id: replyingTo._id,
+              content: replyingTo.content,
+              sender: replyingTo.sender,
+              time: replyingTo.time
+            } : null,
+            edited: false
+          };
+      
+          try {
+            const response = await fetch('http://localhost:5000/api/messages', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newMessage),
+            });
+      
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+      
+            const data = await response.json();
+            setMessages((prevMessages) =>
+              prevMessages.map((msg) =>
+                msg._id === 'temp-id' ? { ...data } : msg
+              )
+            );
+          } catch (error) {
+            console.error('Error sending message:', error);
+          }
+          setMessages((prevMessages) => [...prevMessages, { ...newMessage, _id: 'temp-id' }]);
+          setReplyingTo(null);
+          setMessage('');
+          setFile(null);
         }
-
-         // Add new message to state and clear reply
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
-    setReplyingTo(null);
-    setMessage('');
-    setFile(null);
       }
-    }
-  };
+    };
+    
+    
+    
+    
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -149,11 +185,14 @@ const handleEdit = (messageId, messageContent) => {
   setMessage(messageContent); // Set the current content to the input field for editing
 };
 
+const handleDelete = async (messageId) => {
+  // Call the deleteMessage function to remove the message from the backend
+  await deleteMessage(messageId);
 
+  // Remove the message from the frontend state
+  setMessages((prevMessages) => prevMessages.filter((msg) => msg._id !== messageId));
+};
 
-  const handleDelete = (messageId) => {
-    setMessages((prevMessages) => prevMessages.filter((msg) => msg._id !== messageId));
-  };
 
   const getIconColor = (messageId, icon) => {
     switch (icon) {
@@ -178,57 +217,60 @@ const handleEdit = (messageId, messageContent) => {
   const formatMessageContent = (message) => {
     let content = message.content;
   
-    // Add "Edited" flag if message was edited
     if (message.edited) {
       content += ' <span style="color: gray; font-size: 0.75rem;">(Edited)</span>';
     }
   
-   // If it's a reply, format the reply content
-if (message.replyTo) {
-  return `
-    <div style="padding: 12px; background-color: #f9fafb; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 12px; margin-top: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
-      <p style="font-weight: bold; color: #0078d4; margin-bottom: 10px;">Replying to ${message.replyTo.sender.name}:</p>
-      <div style="border-left: 4px solid #0078d4; padding: 12px; background-color: #ffffff; border-radius: 10px; box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);">
-        <p style="font-weight: bold; color: #333; margin-bottom: 6px;">
-          ${message.replyTo.sender.name} 
-          <span style="color: #777; font-size: 12px; float: right;">${message.replyTo.time}</span>
-        </p>
-        <p style="color: #555;">${message.replyTo.content}</p>
-      </div>
-      <p style="margin-top: 10px; color: #333; font-size: 14px;">${message.content}</p>
-    </div>
-  `;
-}
-return message.content;
-
-
+    if (message.replyTo) {
+      return `
+        <div style="padding: 12px; background-color: #f9fafb; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 12px; margin-top: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+          <p style="font-weight: bold; color: #0078d4; margin-bottom: 10px;">Replying to ${message.replyTo.sender.name}:</p>
+          <div style="border-left: 4px solid #0078d4; padding: 12px; background-color: #ffffff; border-radius: 10px; box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);">
+            <p style="font-weight: bold; color: #333; margin-bottom: 6px;">
+              ${message.replyTo.sender.name} 
+              <span style="color: #777; font-size: 12px; float: right;">${message.replyTo.time}</span>
+            </p>
+            <p style="color: #555;">${message.replyTo.content}</p>
+          </div>
+          <p style="margin-top: 10px; color: #333; font-size: 14px;">${message.content}</p>
+        </div>
+      `;
+    }
+    return message.content;
   };
+  
   
 
   const editMessage = async (id, updatedContent, updatedFile, updatedTime) => {
     try {
-      const response = await axios.put(`/api/chatMessages/${id}`, {
+      const response = await axios.put(`http://localhost:5000/api/messages/${id}`, {
         content: updatedContent,
         file: updatedFile,
         time: updatedTime,
       });
-      console.log('Message updated:', response.data);
+  
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg._id === id ? { ...msg, content: updatedContent, file: updatedFile, time: updatedTime, edited: true } : msg
+        )
+      );
     } catch (error) {
       console.error('Error updating message:', error);
     }
   };
   
+  
   const deleteMessage = async (id) => {
     try {
-      const response = await axios.delete(`/api/chatMessages/${id}`);
-      console.log('Message deleted:', response.data);
+      await axios.delete(`http://localhost:5000/api/messages/${id}`);
+      setMessages((prevMessages) => prevMessages.filter((msg) => msg._id !== id));
     } catch (error) {
       console.error('Error deleting message:', error);
     }
-  };
+  };  
   
   return (
-    <div className="message-content flex flex-col h-full">
+    <div className="message-content bg-white flex flex-col h-full">
       {/* Header */}
       <div className="header mb-2 pl-2">
         <h2 className="text-xl font-semibold text-black">Superboard</h2>
@@ -249,8 +291,8 @@ return message.content;
             {msg.sender.name !== 'You' && (
               <img src={msg.sender.avatar} alt={msg.sender.name} className="rounded-full w-10 h-10 mt-2" />
             )}
-            <div className={`p-3 rounded-lg shadow-sm  ${
-                msg.sender.name === 'You' ? 'bg-blue-200 text-gray-800' : 'bg-white text-gray-800'
+            <div className={`p-3 rounded-lg shadow-md  ${
+                msg.sender.name === 'You' ? 'bg-blue-200 text-gray-800' : 'bg-red-100 text-gray-800'
               } max-w-[60%] border border-blue relative ${editingMessageId === msg._id ? 'border-blue-500' : ''}`}
             >
               <div className="message-header flex items-center flex space-x-12 justify-between mb-4">
@@ -268,14 +310,22 @@ return message.content;
                 dangerouslySetInnerHTML={{ __html: formatMessageContent(msg) }}
               />
 
-              {msg.file && (
-                <div className="mt-1 text-xs flex items-center space-x-2">
-                  <a href={msg.file.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline" download={msg.file.name}>
-                    {msg.file.name}
-                  </a>
-                  {msg.file.type && <span className="text-gray-400 text-xs"></span>}
-                </div>
-              )}
+{msg.file && (
+   msg.file.type.startsWith('image/') ? (
+      <img
+        src={msg.file.url}
+        alt={msg.file.name}
+        className="w-full h-auto cursor-pointer"
+        onClick={() => setImageModalSrc(msg.file.url)} // Open modal with image URL
+      />
+  ) : msg.file.type.startsWith('video/') ? (
+    <video controls src={msg.file.url} className="message-file my-2 max-w-full h-auto" />
+  ) : (
+    <a href={msg.file.url} target="_blank" rel="noopener noreferrer" className="message-file text-sm my-2 text-blue-500">
+      {msg.file.name}
+    </a>
+  )
+)}
 
 <div className="message-actions flex space-x-2 mt-2">
                 <FontAwesomeIcon
@@ -339,10 +389,8 @@ return message.content;
   </div>
 )}
 
-
-
       {/* Message Input */}
-      <div className="message-input p-4 bg-white border-t sticky bottom-0">
+      <div className="message-input p-4 bg-gray-100 rounded-lg shadow-md border-t sticky bottom-0">
         <div className="relative flex items-center">
           <ReactQuill
             value={message}
@@ -358,12 +406,10 @@ return message.content;
             {/* Attachment Icon */}
             <label className="cursor-pointer">
               <input type="file" className="hidden" onChange={handleFileChange} />
-              <FontAwesomeIcon
-            icon={faPaperclip}
-            className="cursor-pointer text-gray-600"
-            title="Attach file"
-            onClick={handleAttachmentClick} // Trigger the file input when clicked
-          />
+              <button onClick={handleAttachmentClick} className="mr-2 text-gray-600">
+  <FontAwesomeIcon icon={faPaperclip} />
+  <input type="file" accept="*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
+</button>
               {/* Microphone Icon */}
               <button
                 onClick={isRecording ? stopRecording : startRecording}
@@ -385,17 +431,34 @@ return message.content;
 
 
         {/* File Preview Section */}
-        {file && (
-            <div className="file-preview mt-2 p-2 bg-gray-100 border rounded-lg flex items-center justify-between">
-              <span className="text-sm">{file.name}</span>
-              <button
-                className="text-sm text-red-500"
-                onClick={removeFile}
-              >
-                Remove
-              </button>
-          </div>
-        )}
+{file && (
+  <div className="file-preview flex items-center bg-gray-50 p-4 rounded-lg shadow-lg border border-gray-200">
+    {file.type.startsWith('image/') ? (
+      <img 
+        src={URL.createObjectURL(file)} 
+        alt="Preview" 
+        className="w-24 h-24 object-cover rounded-lg mr-4 hover:opacity-90 transition duration-300 ease-in-out"
+      />
+    ) : file.type.startsWith('video/') ? (
+      <video 
+        controls 
+        src={URL.createObjectURL(file)} 
+        className="w-42 h-24 object-cover rounded-lg mr-4"
+      />
+    ) : (
+      <span className="text-sm text-gray-600 font-medium truncate">{file.name}</span>
+    )}
+    <button 
+      onClick={removeFile} 
+      className="ml-4 text-red-500 hover:text-red-700 transition duration-300 ease-in-out">
+      <FontAwesomeIcon icon={faTrash} className="text-lg" />
+    </button>
+  </div>
+)}
+
+{imageModalSrc && (
+  <ImageModal src={imageModalSrc} onClose={() => setImageModalSrc(null)} />
+)}
       </div>
     </div>
   );

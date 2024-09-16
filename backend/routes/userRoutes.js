@@ -1,6 +1,7 @@
   import express from 'express';
 
   import { createQuotation, confirmQuotationEmail, checkVerificationStatus } from '../controllers/quotationController.js'
+  // import { sendCompletionEmail } from '../controllers/quotationController.js';
   import upload from '../middlewares/multerMiddleware.js';
   import {createProduct, getProducts, deleteProduct, updateProduct  } from '../controllers/addProductsController.js'
   import { updateProject, deleteProject, getProjects, createProject} from '../controllers/addProjectsController.js';
@@ -57,10 +58,12 @@ router.post('/', upload.single('profilePicture'), createUser);
 router.post('/invite', inviteUsers);  
 router.put('/:userId/role', updateUserRole); 
 
-  // quotation route
-  router.post('/quotation',createQuotation);
-  router.get('/quotation/confirm/:quotationToken', confirmQuotationEmail);
-  router.get('/quotations/:id/status', checkVerificationStatus);
+// quotation route
+router.post('/quotation',createQuotation);
+router.get('/quotation/confirm/:quotationToken', confirmQuotationEmail);
+router.get('/quotations/:id/status', checkVerificationStatus);
+// router.post('/quotation/send-completion-email', sendCompletionEmail);
+
 
 // User Update Routes
 router.put('/:id', updateUser);

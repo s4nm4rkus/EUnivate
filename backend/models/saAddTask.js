@@ -1,5 +1,5 @@
     import mongoose from 'mongoose';
-
+    
 
 
     const saAddTaskSchema = new mongoose.Schema({
@@ -16,7 +16,7 @@
         publicId: { type: String, required: true },
         url: { type: String, required: true },
     }],
-    project: { type: mongoose.Schema.Types.ObjectId, ref: 'SaNewProject'}, // Reference to Project
+    project: { type: mongoose.Schema.Types.ObjectId, ref: 'SaNewProject'}, 
     }, { timestamps: true });
 
     const saAddTask = mongoose.model('saAddTask', saAddTaskSchema);

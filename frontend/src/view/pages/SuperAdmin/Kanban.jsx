@@ -1,21 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { FaPlus } from 'react-icons/fa';
+import { useDrag, useDrop, DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import Modal from './KanbanModals/Modal';
 import axios from 'axios';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
-// Define unique IDs for each status
-const statusMapping = {
-  Document: 'droppable-document',
-  Todo: 'droppable-todo',
-  Ongoing: 'droppable-ongoing',
-  Done: 'droppable-done',
-  Backlogs: 'droppable-backlogs'
+const ItemType = {
+  TASK: 'task',
 };
 
 const Kanban = ({ projectId }) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [tasks, setTasks] = useState([]);
+  const [dropdownOpen, setDropdownOpen] = useState(null);
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -41,82 +38,84 @@ const Kanban = ({ projectId }) => {
     setModalOpen(false);
   };
 
+  const updateTaskStatus = async (taskId, newStatus) => {
+    try {
+      await axios.patch(`http://localhost:5000/api/users/sa-tasks/${taskId}`, { status: newStatus });
+    } catch (error) {
+      console.error('Error updating task status:', error);
+    }
+  };
+
+  const moveTask = (taskId, newStatus) => {
+    const updatedTask = tasks.find(task => task._id === taskId);
+    if (updatedTask) {
+      updatedTask.status = newStatus;
+      setTasks([...tasks]);
+      updateTaskStatus(taskId, newStatus);
+    }
+  };
   const handleTaskSubmit = (newTask) => {
     setTasks(prevTasks => [...prevTasks, newTask]);
   };
 
-  const handleDragEnd = (result) => {
-    if (!result.destination) return;
+  const Column = ({ status, children }) => {
+    const [, drop] = useDrop({
+      accept: ItemType.TASK,
+      drop: (item) => moveTask(item.id, status),
+    });
 
-    const { source, destination } = result;
+    
+    return (
+      <div ref={drop} className="w-1/5">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-xl text-gray-600 font-bold">{status}</h2>
+          <button
+            onClick={handleOpenModal}
+            className="text-gray-600 p-0 flex items-center justify-center"
+            style={{ width: '30px', height: '30px' }}
+          >
+            <FaPlus size={16} />
+          </button>
+        </div>
+        <div className="space-y-2">{children}</div>
+      </div>
+    );
+  };
 
-    if (source.droppableId === destination.droppableId && source.index === destination.index) {
-      return;
-    }
-
-    const updatedTasks = Array.from(tasks);
-    const [draggedTask] = updatedTasks.splice(source.index, 1);
-    // Map back droppableId to status
-    draggedTask.status = Object.keys(statusMapping).find(key => statusMapping[key] === destination.droppableId);
-    updatedTasks.splice(destination.index, 0, draggedTask);
-
-    setTasks(updatedTasks); 
+  const TaskCard = ({ task }) => {
+    const [, drag] = useDrag({
+      type: ItemType.TASK,
+      item: { id: task._id },
+    });
+    return (
+      <div ref={drag} className="bg-white p-4 rounded shadow relative">
+        <div>{task.priority}</div>
+        <h3 className="text-lg font-semibold">{task.taskName}</h3>
+        <p className="text-gray-700">{task.description}</p>
+      </div>
+    );
   };
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
+    <DndProvider backend={HTML5Backend}>
       <div className="flex space-x-4 p-4">
-        {Object.keys(statusMapping).map((statusKey) => (
-          <Droppable droppableId={statusMapping[statusKey]} key={statusKey}>
-            {(provided) => (
-              <div
-                className="w-1/5"
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <h2 className="text-xl text-gray-600 font-bold">{statusKey.charAt(0).toUpperCase() + statusKey.slice(1)}</h2>
-                  <button
-                    onClick={handleOpenModal}
-                    className="text-gray-600 p-0 flex items-center justify-center"
-                    style={{ width: '30px', height: '30px' }}
-                  >
-                    <FaPlus size={16} />
-                  </button>
-                </div>
-                <div className="space-y-2">
-                  {tasks
-                    .filter(task => task.status === statusKey)
-                    .map((task, index) => (
-                      <Draggable key={task._id} draggableId={task._id} index={index}>
-                        {(provided) => (
-                          <div
-                            className="bg-white p-4 rounded shadow"
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                          >
-                            <div>{task.priority}</div>
-                            <h3 className="text-lg font-semibold">{task.taskName}</h3>
-                            <p className="text-gray-700">{task.description}</p>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                  {provided.placeholder}
-                </div>
-              </div>
-            )}
-          </Droppable>
+        {['Document', 'Todo', 'Ongoing', 'Done', 'Backlogs'].map((status) => (
+          <Column key={status} status={status}>
+            {tasks
+              .filter(task => (task.status === status || (status === 'Document' && task.status === 'Pending')))
+              .map(task => (
+                <TaskCard key={task._id} task={task} />
+              ))}
+          </Column>
         ))}
       </div>
-      <Modal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        projectId={projectId}
-        onTaskSubmit={handleTaskSubmit}
+      <Modal 
+        isOpen={isModalOpen} 
+        onClose={handleCloseModal} 
+        projectId={projectId} 
+        onTaskSubmit={handleTaskSubmit} 
       />
-    </DragDropContext>
+    </DndProvider>
   );
 };
 

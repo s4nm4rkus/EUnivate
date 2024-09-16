@@ -136,14 +136,15 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
       const newTask = {
         taskName,
         objectives,
-        assignee: assigneeId, // Use ObjectId for assignee
+        assignee: assigneeId,
         status,
         priority,
         startDate,
         dueDate,
-        attachment: uploadedImages, 
+        attachment: uploadedImages,
         description,
         questionUpdate: question,
+        project: projectId,  // Include the project ID
       };
   
       // Send data to the backend API to save in MongoDB

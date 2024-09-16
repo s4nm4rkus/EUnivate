@@ -3,7 +3,7 @@ import saAddTask from '../models/saAddTask.js';
 // Create Task Controller
 export const createTask = async (req, res) => {
   try {
-    const { taskName, assignee, startDate, dueDate, priority, status, description, objectives, questionUpdate, attachment } = req.body;
+    const { taskName, assignee, startDate, dueDate, priority, status, description, objectives, questionUpdate, attachment, project} = req.body;
 
     // Create a new task document
     const newTask = new saAddTask({
@@ -16,7 +16,8 @@ export const createTask = async (req, res) => {
       description,
       objectives,
       questionUpdate,
-      attachment
+      attachment,
+      project,
     });
 
     // Save to the database

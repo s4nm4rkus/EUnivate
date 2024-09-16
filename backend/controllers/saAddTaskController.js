@@ -116,7 +116,7 @@ export const updateTask = async (req, res) => {
 // Delete Task Controller
 export const deleteTask = async (req, res) => {
   try {
-    const deletedTask = await saAddTask.findByIdAndDelete(req.params.id);
+     const deletedTask = await saAddTask.findByIdAndDelete(req.params.id);
     if (!deletedTask) {
       return res.status(404).json({
         success: false,

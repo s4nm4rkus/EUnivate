@@ -91,28 +91,45 @@ export const getTaskById = async (req, res) => {
 };
 
 // Update Task Controller
-export const updateTask = async (req, res) => {
+export const updateTaskStatusById = async (req, res) => {
   try {
-    const updatedTask = await saAddTask.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    const { status } = req.body; // Extract status from request body
+
+    if (!status) {
+      return res.status(400).json({
+        success: false,
+        message: 'Status is required to update the task.'
+      });
+    }
+
+    // Find the task by ID and update the status field
+    const updatedTask = await saAddTask.findByIdAndUpdate(
+      req.params.id,
+      { status }, // Only update the status field
+      { new: true, runValidators: true }
+    );
+
     if (!updatedTask) {
       return res.status(404).json({
         success: false,
         message: 'Task not found.'
       });
     }
+
     res.status(200).json({
       success: true,
-      message: 'Task updated successfully!',
+      message: 'Task status updated successfully!',
       data: updatedTask
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Server Error. Could not update task.',
+      message: 'Server Error. Could not update task status.',
       error: error.message
     });
   }
 };
+
 
 // Delete Task Controller
 export const deleteTask = async (req, res) => {

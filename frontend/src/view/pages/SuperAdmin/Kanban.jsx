@@ -1,18 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { FaPlus } from 'react-icons/fa';
-import { useDrag, useDrop, DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import Modal from './KanbanModals/Modal';
 import axios from 'axios';
-
-const ItemType = {
-  TASK: 'task',
-};
 
 const Kanban = ({ projectId }) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [tasks, setTasks] = useState([]);
-  const [dropdownOpen, setDropdownOpen] = useState(null);
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -46,65 +40,81 @@ const Kanban = ({ projectId }) => {
     }
   };
 
-  const moveTask = (taskId, newStatus) => {
-    const updatedTask = tasks.find(task => task._id === taskId);
-    if (updatedTask) {
-      updatedTask.status = newStatus;
-      setTasks([...tasks]);
-      updateTaskStatus(taskId, newStatus);
-    }
-  };
   const handleTaskSubmit = (newTask) => {
     setTasks(prevTasks => [...prevTasks, newTask]);
   };
 
-  const Column = ({ status, children }) => {
-    const [, drop] = useDrop({
-      accept: ItemType.TASK,
-      drop: (item) => moveTask(item.id, status),
-    });
+  const onDragEnd = (result) => {
+    const { destination, source, draggableId } = result;
 
-    
-    return (
-      <div ref={drop} className="w-1/5">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-xl text-gray-600 font-bold">{status}</h2>
-          <button
-            onClick={handleOpenModal}
-            className="text-gray-600 p-0 flex items-center justify-center"
-            style={{ width: '30px', height: '30px' }}
-          >
-            <FaPlus size={16} />
-          </button>
+    if (!destination) return;
+
+    const sourceColumn = source.droppableId;
+    const destinationColumn = destination.droppableId;
+
+    if (sourceColumn !== destinationColumn) {
+      const updatedTasks = tasks.map(task => {
+        if (task._id === draggableId) {
+          task.status = destinationColumn;
+        }
+        return task;
+      });
+      setTasks(updatedTasks);
+      updateTaskStatus(draggableId, destinationColumn);
+    }
+  };
+
+  const Column = ({ status, children }) => (
+    <Droppable droppableId={status}>
+      {(provided) => (
+        <div
+          {...provided.droppableProps}
+          ref={provided.innerRef}
+          className="w-1/5"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-xl text-gray-600 font-bold">{status}</h2>
+            <button
+              onClick={handleOpenModal}
+              className="text-gray-600 p-0 flex items-center justify-center"
+              style={{ width: '30px', height: '30px' }}
+            >
+              <FaPlus size={16} />
+            </button>
+          </div>
+          <div className="space-y-2">{children}</div>
+          {provided.placeholder}
         </div>
-        <div className="space-y-2">{children}</div>
-      </div>
-    );
-  };
+      )}
+    </Droppable>
+  );
 
-  const TaskCard = ({ task }) => {
-    const [, drag] = useDrag({
-      type: ItemType.TASK,
-      item: { id: task._id },
-    });
-    return (
-      <div ref={drag} className="bg-white p-4 rounded shadow relative">
-        <div>{task.priority}</div>
-        <h3 className="text-lg font-semibold">{task.taskName}</h3>
-        <p className="text-gray-700">{task.description}</p>
-      </div>
-    );
-  };
+  const TaskCard = ({ task, index }) => (
+    <Draggable draggableId={task._id} index={index}>
+      {(provided) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          className="bg-white p-4 rounded shadow relative"
+        >
+          <div>{task.priority}</div>
+          <h3 className="text-lg font-semibold">{task.taskName}</h3>
+          <p className="text-gray-700">{task.description}</p>
+        </div>
+      )}
+    </Draggable>
+  );
 
   return (
-    <DndProvider backend={HTML5Backend}>
+    <DragDropContext onDragEnd={onDragEnd}>
       <div className="flex space-x-4 p-4">
         {['Document', 'Todo', 'Ongoing', 'Done', 'Backlogs'].map((status) => (
           <Column key={status} status={status}>
             {tasks
               .filter(task => (task.status === status || (status === 'Document' && task.status === 'Pending')))
-              .map(task => (
-                <TaskCard key={task._id} task={task} />
+              .map((task, index) => (
+                <TaskCard key={task._id} task={task} index={index} />
               ))}
           </Column>
         ))}
@@ -115,7 +125,7 @@ const Kanban = ({ projectId }) => {
         projectId={projectId} 
         onTaskSubmit={handleTaskSubmit} 
       />
-    </DndProvider>
+    </DragDropContext>
   );
 };
 

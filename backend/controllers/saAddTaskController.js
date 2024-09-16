@@ -160,6 +160,8 @@ export const deleteTask = async (req, res) => {
 
 // Import your model
 
+
+
 export const getTasksByProjectId = async (req, res) => {
   try {
     const { projectId } = req.params;
@@ -172,7 +174,9 @@ export const getTasksByProjectId = async (req, res) => {
       });
     }
 
-    const tasks = await saAddTask.find({ project: projectId }).populate('assignee', 'name profilePicture');;
+
+
+    const tasks = await saAddTask.find({ project: projectId }).populate('assignee', 'name profilePicture');
     console.log('Tasks found:', tasks); // Debug log
 
     if (!tasks || tasks.length === 0) {

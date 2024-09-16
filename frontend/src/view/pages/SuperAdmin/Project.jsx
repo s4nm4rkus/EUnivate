@@ -216,10 +216,8 @@ const Project = () => {
             <div className="flex items-center text-gray-500 mt-2">
               <FaCalendar className="mr-2" />
               <p>{new Date(project.createdAt).toLocaleDateString() || 'No date available'}</p>
-              <FaPaperclip className="ml-5" />
-              <p className="ml-2">{project.imageCount || 0}</p>
               <FaCheckCircle className="ml-5" />
-              <p className="ml-2">0</p>
+              <p className="ml-2"> I want to fetch the all of the obejctives of</p>
               <button
                 onClick={(e) => {
                   e.stopPropagation(); // Prevent event from bubbling up

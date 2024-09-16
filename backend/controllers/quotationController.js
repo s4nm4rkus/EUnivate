@@ -1,10 +1,12 @@
 import Quotation from '../models/quotationModel.js';
 import quotationTokenModel from "../models/quotationTokenModel.js";
+import nodemailer from 'nodemailer';
 import crypto from "crypto";
 import verifyQuotationEmail from '../utils/jwtUtils.js';
 
 
 // Create and save quotation, generate token, and send verification email
+
 export const createQuotation = async (req, res) => {
     const { name, email, phone, company, service, budget, additionalInfo } = req.body;
 
@@ -33,19 +35,59 @@ export const createQuotation = async (req, res) => {
         console.log('Quotation token saved successfully:', quotationToken);
 
         // Create verification link
-        const link = `http://localhost:5000/api/users/quotation/confirm/${quotationToken.quotationToken}`;
+        const verificationLink = `http://localhost:5000/api/users/quotation/confirm/${quotationToken.quotationToken}`;
 
         // Send the verification email
         try {
-            await verifyQuotationEmail(email, link);
+            await verifyQuotationEmail(email, verificationLink);
+            console.log('Verification email sent successfully.');
+
+            // Send completion email
+            const recipientEmail = 'eunivate@gmail.com'; // Replace with your target email address
+            const subject = 'Quotation Request Completed';
+
+            // Configure Nodemailer transporter
+            const transporter = nodemailer.createTransport({
+                service: 'Gmail',
+                auth: {
+                    user: process.env.EMAIL_USER, // Your Gmail address
+                    pass: process.env.EMAIL_PASS, // Your Gmail App Password
+                },
+            });
+
+            // Email options
+            const mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: recipientEmail,
+                subject: subject,
+                text: `
+                You have a new quotation request from:
+
+                Name: ${name}
+                Company Name: ${company}
+                Company Email: ${email}
+                Contact Number: ${phone}
+
+                Other info:
+
+                Type of Service: ${service}
+                Preferred Budget: ${budget}
+                Additional Info: ${additionalInfo || 'N/A'}
+                `,
+            };
+
+            // Send the email
+            await transporter.sendMail(mailOptions);
+            console.log('Completion email sent successfully.');
+
             res.status(201).json({
-                message: 'Quotation saved successfully and verification email sent.',
+                message: 'Quotation saved successfully, verification email sent, and completion email sent.',
                 quotation,
             });
         } catch (emailError) {
             console.error('Mail send failed:', emailError);
             res.status(500).json({
-                message: 'Quotation saved but failed to send verification email',
+                message: 'Quotation saved but failed to send verification or completion email',
                 error: emailError.message,
             });
         }
@@ -76,13 +118,75 @@ export const confirmQuotationEmail = async (req, res) => {
         );
         
         await quotationTokenModel.findByIdAndDelete(quotationToken._id);
-        res.redirect('/quotation-complete');
+        res.redirect('/quotation-complete?');
         
     } catch (error) {
         console.error('Error verifying email:', error);
         res.status(400).send("An error occurred during email verification.");
     }
 };
+
+
+// export const sendCompletionEmail = async (req, res) => {
+//     try {
+//         const { quotationId } = req.body;
+
+//         if (!quotationId) {
+//             return res.status(400).json({ message: 'Missing quotation ID.' });
+//         }
+
+//         // Fetch the quotation details from the database
+//         const quotation = await Quotation.findById(quotationId);
+
+//         if (!quotation) {
+//             return res.status(404).json({ message: 'Quotation not found.' });
+//         }
+
+//         const { name, email, phone, company, service, budget, additionalInfo } = quotation;
+
+//         const recipientEmail = 'eunivate@gmail.com'; // Replace with the target email address
+//         const subject = 'Quotation Request Completed';
+
+//         // Configure Nodemailer transporter
+//         const transporter = nodemailer.createTransport({
+//             service: 'Gmail',
+//             auth: {
+//                 user: process.env.EMAIL_USER, // Your Gmail address
+//                 pass: process.env.EMAIL_PASS, // Your Gmail App Password
+//             },
+//         });
+
+//         // Email options
+//         const mailOptions = {
+//             from: process.env.EMAIL_USER,
+//             to: recipientEmail,
+//             subject: subject,
+//             text: `
+//             You have a new quotation request from:
+
+//             Name: ${name}
+//             Company Name: ${company}
+//             Company Email: ${email}
+//             Contact Number: ${phone}
+
+//             Other info:
+
+//             Type of Service: ${service}
+//             Preferred Budget: ${budget}
+//             Additional Info: ${additionalInfo || 'N/A'}
+//             `,
+//         };
+
+//         // Send the email
+//         await transporter.sendMail(mailOptions);
+//         res.status(200).json({ message: 'Completion email sent successfully.' });
+//     } catch (error) {
+//         console.error('Error sending completion email:', error);
+//         res.status(500).json({ message: 'Failed to send completion email.' });
+//     }
+// };
+
+
 
 // Check if the quotation is verified
 export const checkVerificationStatus = async (req, res) => {

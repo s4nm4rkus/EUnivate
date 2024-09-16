@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaPlus } from 'react-icons/fa';
+import { FaPlus, FaCalendar, FaPaperclip, FaCheckCircle} from 'react-icons/fa';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import Modal from './KanbanModals/Modal';
@@ -86,7 +86,7 @@ const Kanban = ({ projectId }) => {
       type: ItemType.TASK,
       item: { id: task._id },
     });
-
+  
     // Set background color based on priority
     const getPriorityBackgroundColor = (priority) => {
       switch (priority) {
@@ -101,39 +101,78 @@ const Kanban = ({ projectId }) => {
       }
     };
   
-
+    // Function to format the start month
+    const formatStartMonth = (startDate) => {
+      if (!startDate) return 'N/A';
+      const date = new Date(startDate);
+      return date.toLocaleString('default', { month: 'long' });
+    };
+  
     return (
-      <div 
-        ref={drag} 
-        className="p-4 rounded-lg shadow-md bg-white relative"
-      >
-        <div className={`absolute top-2 left-2 px-2 py-1 text-lg font-bold rounded-sm ${getPriorityBackgroundColor(task.priority)}`}>
-          {task.priority}
-        </div>
-        <div className="mt-10">
-          <h2 className= "text-2xl font-semibold">{task.taskName}</h2>
-          <p className="text-lg text-gray-800">{task.description}</p>
-          {task.attachment && task.attachment.length > 0 && (
-            <div className="mt-4 flex overflow-x-auto space-x-2 py-2">
-              {task.attachment.map((attachment, index) => (
-                <img
-                  key={index}
-                  src={attachment.url}
-                  alt={`Attachment ${index + 1}`}
-                  className="w-32 h-32 object-cover rounded-md"
-                />
-                
-              ))}
-            </div>
-     
-          )}
-        </div>
-        <div className='mt-5'>
-              ngiks
-              </div>
+<div ref={drag} className="p-4 rounded-lg shadow-md bg-white relative">
+  
+<div className="flex items-start justify-between">
+    <div className={`px-2 py-1 text-lg font-bold rounded-sm ${getPriorityBackgroundColor(task.priority)}`}>
+      {task.priority}
+    </div>
+    
+    {/* Display assignee profile pictures */}
+    <div className='flex -space-x-3'>
+      {task.assignee && task.assignee.map((member, index) => (
+        <img
+          key={index}
+          src={member.profilePicture}
+          alt={member.name}
+          className="w-8 h-8 rounded-full border-2 border-white"
+          title={member.name}
+        />
+      ))}
+    </div>
+  </div>
+  
+  
+  <div className="mt-10">
+    <h2 className="text-2xl font-semibold">{task.taskName}</h2>
+    <p className="text-lg text-gray-800">{task.description}</p>
+
+    {/* Display attachments */}
+    {task.attachment && task.attachment.length > 0 && (
+      <div className="mt-4 flex overflow-x-auto space-x-2 py-2">
+        {task.attachment.map((attachment, index) => (
+          <img
+            key={index}
+            src={attachment.url}
+            alt={`Attachment ${index + 1}`}
+            className="w-32 h-32 object-cover rounded-md"
+          />
+        ))}
       </div>
+    )}
+  </div>
+
+  {/* Display additional details */}
+  <div className="mt-5 flex items-center space-x-3 overflow-x-auto">
+
+    <div className="flex items-center space-x-2 flex-shrink-0">
+      <FaCalendar className="text-gray-400" />
+      <p>{formatStartMonth(task.startDate)}</p>
+    </div>
+    
+    <div className="flex items-center space-x-2 flex-shrink-0">
+      <FaPaperclip className="text-gray-400" />
+      <p>{task.attachment ? task.attachment.length : 0}</p>
+    </div>
+
+    <div className="flex items-center space-x-2 flex-shrink-0">
+      <FaCheckCircle className="text-gray-400" />
+      <p>{task.objectives ? task.objectives.length : 0}</p>
+    </div>
+  </div>
+</div>
+
     );
   };
+  
 
   return (
     <DndProvider backend={HTML5Backend}>

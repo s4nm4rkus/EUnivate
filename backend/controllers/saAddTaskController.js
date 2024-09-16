@@ -41,7 +41,10 @@ export const createTask = async (req, res) => {
 // Get All Tasks Controller
 export const getTasks = async (req, res) => {
   try {
-    const tasks = await saAddTask.find().populate('assignee'); // Populating the assignee field with the User model
+    const tasks = await saAddTask
+      .find()
+      .populate('assignee', 'name profilePicture'); // Specify only the 'name' and 'profilePicture' fields from the User model
+
     res.status(200).json({
       success: true,
       data: tasks
@@ -54,6 +57,7 @@ export const getTasks = async (req, res) => {
     });
   }
 };
+
 
 // Get Single Task by ID
 
@@ -168,7 +172,7 @@ export const getTasksByProjectId = async (req, res) => {
       });
     }
 
-    const tasks = await saAddTask.find({ project: projectId });
+    const tasks = await saAddTask.find({ project: projectId }).populate('assignee', 'name profilePicture');;
     console.log('Tasks found:', tasks); // Debug log
 
     if (!tasks || tasks.length === 0) {

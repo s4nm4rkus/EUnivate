@@ -4,7 +4,7 @@
 
     const saAddTaskSchema = new mongoose.Schema({
     taskName: { type: String, required: true },
-    assignee: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, 
+    assignee: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }], 
     startDate: { type: Date, required: true },
     dueDate: { type: Date, required: true },
     priority: { type: String, required: true, enum: ['easy', 'medium', 'hard'] },

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faSignOutAlt, faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 import { downArrow, menu, close, webinar } from '../../../../constants/assets';
-
+import axios from 'axios';
 const Navbar = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [toggle, setToggle] = useState(false);
@@ -14,10 +14,11 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const defaultProfilePicture = 'https://res.cloudinary.com/dzxzc7kwb/image/upload/v1725974053/DefaultProfile/qgtsyl571c1neuls9evd.png'; 
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
       setUserName(`${user.firstName} ${user.lastName}`);
-      setProfilePicture(user.profilePicture); // Set the profile picture if available
+      setProfilePicture(user.profilePicture ? user.profilePicture.url || user.profilePicture : defaultProfilePicture); 
       setIsAuthenticated(true);
     }
   }, []);
@@ -33,6 +34,7 @@ const Navbar = () => {
       title: "Products",
       hasDropdown: true,
       subLinks: [
+        { id: "products", title: "Products", path: "/product" },
         { id: "showcases", title: "Showcases", path: "/showcases" },
         {
           id: "quotation",
@@ -49,6 +51,7 @@ const Navbar = () => {
       title: "Services",
       hasDropdown: true,
       subLinks: [
+        { id: "services", title: "Services", path: "/services" },
         { id: "webinars", title: "Webinars", path: "/webinar" },
         { id: "events", title: "Events", path: "/events" },
         { id: "challenges", title: "Challenges", path: "/challenges" },
@@ -84,6 +87,9 @@ const Navbar = () => {
     navigate('/');
     window.location.reload();
   };
+  
+
+
 
   const handleLogin = () => {
     navigate('/login'); // Directly navigate to the login page
@@ -97,6 +103,23 @@ const Navbar = () => {
     }
   };
 
+  useEffect(() => {
+    const handleProfileUpdate = () => {
+      const updatedUser = JSON.parse(localStorage.getItem('user'));
+      if (updatedUser) {
+        setUserName(`${updatedUser.firstName} ${updatedUser.lastName}`);
+        setProfilePicture(updatedUser.profilePicture); // Update profile picture
+        setIsAuthenticated(true);
+      }
+    };
+  
+    window.addEventListener('profileUpdated', handleProfileUpdate);
+  
+    return () => {
+      window.removeEventListener('profileUpdated', handleProfileUpdate);
+    };
+  }, []);
+  
   return (
     <nav className="w-full flex justify-between items-center py-4 bg-white px-4 sm:px-8 relative">
       <div className="flex items-center space-x-2 sm:space-x-10 cursor-pointer" onClick={handleLogoClick}>
@@ -160,7 +183,7 @@ const Navbar = () => {
         >
           {profilePicture ? (
             <img 
-              src={profilePicture.url} // Assuming `profilePicture` contains a `url` field
+              src={profilePicture} 
               alt="Profile"
               className="w-8 h-8 rounded-full object-cover"
             />

@@ -9,7 +9,7 @@ const SettingProfile = () => {
   const [isBiodataEditable, setIsBiodataEditable] = useState(false);
 
   const [email, setEmail] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');         
   const [biodata, setBiodata] = useState('');
   const [username, setUsername] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -23,27 +23,48 @@ const SettingProfile = () => {
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [success, setSuccess] = useState('');
+  const [error, setError] = useState('');
+
+  const defaultProfilePictureUrl = 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png';
+
+  const validatePassword = (password) => {
+    const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{9,}$/;
+    return passwordRegex.test(password);
+  };
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
+    const storedBiodata = localStorage.getItem('biodata');
     if (storedUser) {
       setEmail(storedUser.email || '');
       setPhoneNumber(storedUser.phoneNumber || '');
-      setBiodata(storedUser.role || '');
+      setBiodata(storedBiodata || ''); 
       setUsername(storedUser.username || '');
       setFirstName(storedUser.firstName || '');
       setLastName(storedUser.lastName || '');
-      setProfilePicture(storedUser.profilePicture || '');
+
+      // Handle the profile picture logic
+      if (storedUser.profilePicture && storedUser.profilePicture.url) {
+        setProfilePicture(storedUser.profilePicture.url);
+      } else if (storedUser.profilePicture && typeof storedUser.profilePicture === 'string') {
+        setProfilePicture(storedUser.profilePicture);
+      } else {
+        setProfilePicture(defaultProfilePictureUrl);
+      }
     }
   }, []);
 
-  const handleEditClick = (field) => {
+  const handleEditClick = async (field) => {
     if (field === 'email') {
       setIsEmailEditable((prevState) => !prevState);
+      if (isEmailEditable) await handleSaveProfile(false); // Modal should not close
     } else if (field === 'phone') {
       setIsPhoneEditable((prevState) => !prevState);
+      if (isPhoneEditable) await handleSaveProfile(false); // Modal should not close
     } else if (field === 'biodata') {
       setIsBiodataEditable((prevState) => !prevState);
+      if (isBiodataEditable) await handleSaveProfile(false); // Modal should not close
     }
   };
 
@@ -60,7 +81,7 @@ const SettingProfile = () => {
     setProfilePicture(file);
   };
 
-  const handleSaveProfile = async () => {
+  const handleSaveProfile = async (shouldCloseModal = true) => {
     const uploadImageToCloudinary = async (file) => {
       const formData = new FormData();
       formData.append('file', file);
@@ -80,6 +101,7 @@ const SettingProfile = () => {
     };
 
     const storedUser = JSON.parse(localStorage.getItem('user')); // Retrieve the stored user data
+
     if (!storedUser || !storedUser._id) {
       console.error('User is not logged in or user ID is missing.');
       return;
@@ -93,6 +115,9 @@ const SettingProfile = () => {
         console.error('Error uploading profile picture:', error);
         return;
       }
+    } else if (!profilePictureUrl) {
+      // If profilePicture is empty or null, set it to default
+      profilePictureUrl = defaultProfilePictureUrl;
     }
 
     const updatedUser = {
@@ -102,6 +127,7 @@ const SettingProfile = () => {
       phoneNumber,
       username,
       profilePicture: profilePictureUrl,
+      role: biodata, // Add the biodata (role) to be updated
     };
 
     try {
@@ -114,40 +140,65 @@ const SettingProfile = () => {
           },
         }
       );
-      localStorage.setItem('user', JSON.stringify(response.data)); // Update local storage
-      toggleEditProfileModal(); // Close the modal
+      localStorage.setItem('user', JSON.stringify(response.data));
+      localStorage.setItem('biodata', biodata);
+      setIsEmailEditable(false);
+      setIsPhoneEditable(false);
+      setIsBiodataEditable(false);
+
+      // Conditionally close the modal based on the parameter
+      if (shouldCloseModal) {
+        toggleEditProfileModal();
+      }
     } catch (error) {
       console.error('Error updating profile', error);
     }
   };
 
-  const handleChangePassword = async () => {
-    if (newPassword === confirmPassword) {
-      try {
-        const storedUser = JSON.parse(localStorage.getItem('user')); // Retrieve the stored user data
-        if (!storedUser || !storedUser._id) {
-          console.error('User is not logged in or user ID is missing.');
-          return;
-        }
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
 
-        await axios.put(
-          `http://localhost:5000/api/users/${storedUser._id}/password`,
-          {
-            newPassword,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`, // Include the token in the request
-            },
-          }
-        );
+    if (!validatePassword(newPassword)) {
+      setError("Password must be at least 9 characters long and include at least one number and one symbol.");
+      return;
+    }
 
-        toggleChangePasswordModal(); // Close the modal
-      } catch (error) {
-        console.error('Error changing password', error);
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    try {
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      if (!storedUser || !storedUser._id) {
+        setError('User not logged in or user ID is missing.');
+        return;
       }
-    } else {
-      console.error('Passwords do not match');
+
+      const response = await axios.put(
+        `http://localhost:5000/api/users/${storedUser._id}/password`,
+        { newPassword },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        setSuccess("Password changed successfully!");
+        setTimeout(() => {
+          setShowChangePasswordModal(false);
+          setNewPassword('');
+          setConfirmPassword('');
+          setError('');
+          setSuccess('');
+        }, 3000);
+      } else {
+        setError(response.data.message || 'Something went wrong');
+      }
+    } catch (err) {
+      setError('An error occurred');
     }
   };
 
@@ -156,7 +207,7 @@ const SettingProfile = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           <img
-            src={profilePicture || 'default_profile_picture_url'}
+            src={profilePicture || defaultProfilePictureUrl}
             alt="Profile"
             className="w-20 h-20 rounded-full mr-4"
           />
@@ -256,12 +307,11 @@ const SettingProfile = () => {
 
       <div className="mt-12">
         <h4 className="text-2xl font-bold text-gray-900">
-          Password & Authentication
+          Change your Password
         </h4>
         <p className="mt-2 text-gray-600">
           You can change your password periodically to increase the security of
-          your account. Make sure you remember your current password to prove
-          that the person who changed the password was actually you.
+          your account. 
         </p>
         <div className="mt-3 flex">
           <button
@@ -269,22 +319,6 @@ const SettingProfile = () => {
             className="px-4 py-2 bg-red-800 text-white rounded hover:bg-red-900"
           >
             Change Password
-          </button>
-        </div>
-      </div>
-
-      <div className="mt-12">
-        <h4 className="text-2xl font-bold text-gray-900">
-          Two-Factor Authentication
-        </h4>
-        <p className="mt-2 text-gray-600">
-          Protect your account with an extra layer of security. Once configured,
-          you will be required to enter both your password and an authentication
-          code from your mobile phone in order to sign in.
-        </p>
-        <div className="mt-3 flex">
-          <button className="px-4 py-2 bg-red-800 text-white rounded hover:bg-red-900">
-            Enable Two-Factor Auth
           </button>
         </div>
       </div>
@@ -364,7 +398,7 @@ const SettingProfile = () => {
                 Cancel
               </button>
               <button
-                onClick={handleSaveProfile} // Update this line to save the profile changes
+                onClick={() => handleSaveProfile(true)} // Save the profile changes and close the modal
                 className="ml-3 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
               >
                 Save
@@ -380,6 +414,8 @@ const SettingProfile = () => {
           <div className="bg-white rounded-lg p-8 shadow-lg w-96">
             <h2 className="text-xl font-bold mb-4">Change Password</h2>
             <div className="space-y-4">
+              {error && <p className="text-red-600">{error}</p>}
+              {success && <p className="text-green-600">{success}</p>}
               <div>
                 <label
                   htmlFor="newPassword"
@@ -441,7 +477,7 @@ const SettingProfile = () => {
                 Cancel
               </button>
               <button
-                onClick={handleChangePassword} // Update this line to save the password changes
+                onClick={handleChangePassword}
                 className="ml-3 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
               >
                 Save

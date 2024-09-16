@@ -40,8 +40,18 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String, 
-        enum: ['User', 'Guest', 'Members', 'admin', 'Superadmin'], 
+        enum: ['User', 'members', 'admin', 'superadmin'], 
         default: 'User'
+    },
+    twoFactorEnabled: {
+        type: Boolean,
+        default: false,
+    },
+    twoFactorToken: {
+        type: String,  // Token for 2FA verification
+    },
+    twoFactorTokenExpire: {
+        type: Date,
     },
     resetPasswordToken: String,
     resetPasswordExpire: Date,

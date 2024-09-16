@@ -4,7 +4,7 @@ import SettingProfile from "../../components/SuperAdmin/SettingProfile";
 // import Account from './Account';
 // import Privacy from './Privacy';
 // import Apps from './Apps';
-import AdminNavbar from '../../components/SuperAdmin/adminNavbar'; // Import AdminNavbar
+import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx'; // Import AdminNavbar
 
 const Settings = () => {
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);

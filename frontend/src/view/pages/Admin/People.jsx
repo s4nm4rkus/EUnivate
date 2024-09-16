@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../../../admin.css';
-import AdminNavbar from '../../components/Admin/adminNavbar';
+import AdminNavbar from '../../components/SuperAdmin/AdminNavbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { User } from '../../../constants/assets';  // Import the default image
@@ -89,26 +89,26 @@ const People = () => {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                         {/* Display all users */}
-                        {allUsers.map((admin, index) => (
+                        {allUsers.map((user, index) => (
                             <tr key={index}>
                                 <td className="px-6 py-4 whitespace-nowrap flex items-center">
                                     {/* Avatar */}
                                     <img 
-                                        src={admin.avatar || User}  // Use the imported image if no user avatar
+                                        src={user.avatar || User}  // Use the imported image if no user avatar
                                         alt="Avatar" 
                                         className="w-12 h-12 rounded-full mr-4 object-cover"
                                     />
                                     <div>
                                         <div className="text-xl font-medium text-gray-900">
-                                            {admin.firstName} {admin.lastName}
+                                            {user.firstName} {user.lastName}
                                         </div>
-                                        <div className="text-sm text-gray-500">{admin.email}</div>
+                                        <div className="text-sm text-gray-500">{user.email}</div>
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-xl text-gray-500 relative">
-                                    {admin.email === currentUser?.email ? (
+                                    {user.email === currentUser?.email ? (
                                         <>
-                                            {admin.role}
+                                            {user.role}
                                             <FontAwesomeIcon 
                                                 icon={faChevronDown} 
                                                 className="ml-2 cursor-pointer" 
@@ -140,7 +140,7 @@ const People = () => {
                                             )}
                                         </>
                                     ) : (
-                                        <>{admin.role}</>
+                                        <>{user.role}</>
                                     )}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

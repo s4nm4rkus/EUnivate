@@ -28,6 +28,10 @@ const QuotationSchema = new mongoose.Schema({
     additionalInfo: {
         type: String,
     },
+    verified:{
+        type:Boolean,
+        default: false
+    },
 }, {
     timestamps: true, 
 });

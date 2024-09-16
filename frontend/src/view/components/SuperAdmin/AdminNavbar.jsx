@@ -1,31 +1,48 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 
 const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
-  const [user, setUser] = useState({ firstName: '', lastName: '', profilePicture: '' });
+  const [user, setUser] = useState({ firstName: '', lastName: '', profilePicture: { url: '' } });
   const navigate = useNavigate();
+  const defaultProfilePicture = 'https://res.cloudinary.com/dzxzc7kwb/image/upload/v1725974053/DefaultProfile/qgtsyl571c1neuls9evd.png'; 
+  const dropdownRef = useRef();
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     if (storedUser) {
-      setUser(storedUser); // Set the user state with the stored user data
+      setUser(storedUser);
     }
-  }, []);
+
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        if (isAccountDropdownOpen) {
+          toggleAccountDropdown();
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isAccountDropdownOpen]);
 
   const handleLogout = () => {
-    // Clear user data from localStorage
     localStorage.removeItem('user');
-    localStorage.removeItem('token'); // Remove the token if stored separately
-    // Redirect to login page
+    localStorage.removeItem('token');
     navigate('/login');
+  };
+
+  const handleProfileClick = () => {
+    navigate('/superadmin/settings');
   };
 
   return (
     <>
-      {/* Search Bar, Notification, and User Profile */}
-      <div className="flex items-center space-x-9">
+      {/* Admin Navbar */}
+      <div className="flex items-center space-x-9 p-0 relative z-[9999]" style={{ transform: 'translateX(1px)' }}>
         {/* Search Bar with Icon */}
         <div className="relative">
           <input
@@ -40,17 +57,19 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
         </div>
 
         {/* User Profile */}
-        <div className="relative flex items-center cursor-pointer" onClick={toggleAccountDropdown}>
+        <div ref={dropdownRef} className="relative flex items-center cursor-pointer" onClick={toggleAccountDropdown}>
           {user.profilePicture ? (
             <img 
-              src={user.profilePicture} // Assuming `profilePicture` is a URL
+              src={user.profilePicture.url || user.profilePicture}
               alt="Profile"
               className="w-8 h-8 rounded-full object-cover"
             />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
-              <span className="text-white text-sm">{user.firstName.charAt(0)}{user.lastName.charAt(0)}</span>
-            </div>
+            <img 
+              src={defaultProfilePicture} 
+              alt="Default Profile"
+              className="w-8 h-8 rounded-full object-cover"
+            />
           )}
           <span className="ml-2 font-medium text-gray-800">
             {user.firstName} {user.lastName}
@@ -65,9 +84,13 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
             className={`absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg ${
               isAccountDropdownOpen ? 'block' : 'hidden'
             }`}
-            style={{ top: '100%', zIndex: 1000 }} // Ensure dropdown is on top
+            style={{ top: '100%', zIndex: 10000 }} 
           >
-            <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+            <a
+              href="#"
+              className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
+              onClick={handleProfileClick}
+            >
               Profile
             </a>
             <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100" onClick={handleLogout}>

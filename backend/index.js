@@ -3,6 +3,8 @@
   import connectDB from './config/db.js';
   import userRoutes from './routes/userRoutes.js';
   import cors from 'cors';
+  import chatMessageRoutes from './routes/chatMessageRoutes.js'; // Ensure this path is correct
+  import { confirmQuotationEmail } from './controllers/quotationController.js'; // Adjust the path as needed
   
 dotenv.config();
 connectDB();
@@ -14,6 +16,15 @@ app.use(express.json());
 // Use user routes
 app.use('/api/users', userRoutes);
 
+// Chat message routes
+app.use('/api/messages', chatMessageRoutes); 
+app.get('/api/users/quotation/confirm/', confirmQuotationEmail);
+
+app.get('/quotation-complete', (req, res) => {
+  // res.send('Quotation verification complete');
+  res.redirect('http://localhost:5173/quotation-complete');
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -23,12 +34,10 @@ app.use((err, req, res, next) => {
   });
 });
 
-
 app.get('/', (req, res) => {
   res.send('Welcome to the API');
 });
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
 

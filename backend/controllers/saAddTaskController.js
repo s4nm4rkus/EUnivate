@@ -159,13 +159,11 @@ export const deleteTask = async (req, res) => {
 };
 
 // Import your model
-
-
-
+// Controller to fetch the task by project ID
 export const getTasksByProjectId = async (req, res) => {
   try {
     const { projectId } = req.params;
-    console.log('Fetching tasks for projectId:', projectId); // Debug log
+    const { status } = req.query; // Read status from query parameters
 
     if (!projectId) {
       return res.status(400).json({
@@ -174,18 +172,17 @@ export const getTasksByProjectId = async (req, res) => {
       });
     }
 
-
-
-    const tasks = await saAddTask.find({ project: projectId }).populate('assignee', 'name profilePicture');
-    console.log('Tasks found:', tasks); // Debug log
-
-    if (!tasks || tasks.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'No tasks found for this project.'
-      });
+    // Build the query, including the status if provided
+    const query = { project: projectId };
+    if (status) {
+      query.status = status; // Filter by status if provided
     }
 
+    // Fetch tasks based on the query
+    const tasks = await saAddTask.find(query).populate('assignee', 'name profilePicture');
+    console.log('Tasks found:', tasks); // Debug log
+
+    // Return tasks, even if none are found
     res.status(200).json({
       success: true,
       data: tasks
@@ -199,3 +196,5 @@ export const getTasksByProjectId = async (req, res) => {
     });
   }
 };
+
+

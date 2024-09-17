@@ -45,7 +45,7 @@ router.get('/findByUsername/:username', findUserByUsername);
 // Task Routes
 router.post('/sa-task', createTask);         
 router.get('/sa-tasks', getTasks);  
-router.get('/sa-tasks/:projectId', getTasksByProjectId);       
+router.get('/sa-tasks/:projectId', getTasksByProjectId); 
 router.get('/sa-tasks/:id', getTaskById);     
 router.patch('/sa-tasks/:id', updateTaskStatusById);     
 router.delete('/sa-tasks/:id', deleteTask);  

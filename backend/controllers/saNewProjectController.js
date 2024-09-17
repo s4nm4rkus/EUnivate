@@ -1,5 +1,5 @@
 import SaNewProject from '../models/saNewProject.js';
-
+import saAddTask from '../models/saAddTask.js'; 
 export const createSaNewProject = async (req, res) => {
     try {
         const { projectName, thumbnail } = req.body;
@@ -60,17 +60,24 @@ export const deleteProjectById = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Delete the project by its ID
+        // Find and delete the project by its ID
         const deletedProject = await SaNewProject.findByIdAndDelete(id);
 
         if (!deletedProject) {
             return res.status(404).json({ message: 'Project not found' });
         }
 
-        return res.status(200).json({ message: 'Project deleted successfully', deletedProject });
+        // Also delete all tasks associated with the deleted project
+        const deletedTasks = await saAddTask.deleteMany({ project: id });
+
+        return res.status(200).json({
+            message: 'Project and associated tasks deleted successfully',
+            deletedProject,
+            deletedTasks,
+        });
     } catch (error) {
-        console.error("Error in deleting project:", error.message);
-        return res.status(500).json({ error: error.message || 'An error occurred while deleting the project' });
+        console.error("Error in deleting project and tasks:", error.message);
+        return res.status(500).json({ error: error.message || 'An error occurred while deleting the project and tasks' });
     }
 };
 

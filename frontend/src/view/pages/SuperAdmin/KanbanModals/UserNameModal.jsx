@@ -51,7 +51,7 @@ const UserNameModal = ({ isOpen, onClose, membersList, onSelect }) => {
           />
           <button
             onClick={handleConfirmSelection}
-            className="ml-2 bg-blue-500 text-white px-3 py-1 rounded-md"
+            className="ml-2 bg-red-500 text-white px-3 py-1 rounded-md"
           >
             Confirm
           </button>

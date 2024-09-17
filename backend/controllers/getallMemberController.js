@@ -15,7 +15,7 @@ export const getMembersAndSuperAdmins = async (req, res) => {
         res.status(500).json({ message: 'Error fetching users' });
     }
 };
-//tobecontinued hihi -_-, XD
+
 //Invite to project
 export const inviteUsers = async (req, res) => {
     try {

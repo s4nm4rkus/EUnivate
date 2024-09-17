@@ -42,7 +42,7 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
   return (
     <>
       {/* Admin Navbar */}
-      <div className="flex items-center space-x-9 p-0 relative z-[9999]" style={{ transform: 'translateX(1px)' }}>
+      <div className="flex items-center space-x-9 p-0 relative" style={{ transform: 'translateX(1px)' }}>
         {/* Search Bar with Icon */}
         <div className="relative">
           <input

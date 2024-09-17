@@ -31,7 +31,7 @@ const StatusDropdown = ({ status, setStatus, dropdownRef }) => {
             ref={dropdownRef}
             className="absolute top-full right-0 bg-white border left-0 border-gray-300 rounded shadow-lg mt-1 w-48 z-10"
           >
-            {['Pending', 'Todo', 'Ongoing', 'Done', 'Backlog'].map((item) => (
+            {['Document', 'Todo', 'Ongoing', 'Done', 'Backlog'].map((item) => (
               <button
                 key={item}
                 type="button"

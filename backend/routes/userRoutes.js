@@ -1,6 +1,7 @@
   import express from 'express';
 
   import { createQuotation, confirmQuotationEmail, checkVerificationStatus } from '../controllers/quotationController.js'
+  // import { sendCompletionEmail } from '../controllers/quotationController.js';
   import upload from '../middlewares/multerMiddleware.js';
   import {createProduct, getProducts, deleteProduct, updateProduct  } from '../controllers/addProductsController.js'
   import { updateProject, deleteProject, getProjects, createProject} from '../controllers/addProjectsController.js';
@@ -17,7 +18,7 @@
   import { inviteUsers, updateUserRole, getUsers} from '../controllers/peopleController.js';
   import { createEvent, getEvents, updateEvent, deleteEvent } from '../controllers/addEventsController.js';
   import { getQuotations, deleteQuotation, checkNotifications } from '../controllers/getQuotationAdminController.js';
-  import { createTask, getTasks, getTaskById, updateTask, getTasksByProjectId, deleteTask } from '../controllers/saAddTaskController.js';
+  import { createTask, getTasks, getTaskById, updateTaskStatusById, getTasksByProjectId, deleteTask } from '../controllers/saAddTaskController.js';
   import { findUserByUsername } from '../controllers/findUserNameIDController.js';
 const router = express.Router();
 
@@ -44,9 +45,9 @@ router.get('/findByUsername/:username', findUserByUsername);
 // Task Routes
 router.post('/sa-task', createTask);         
 router.get('/sa-tasks', getTasks);  
-router.get('/sa-tasks/:projectId', getTasksByProjectId);       
+router.get('/sa-tasks/:projectId', getTasksByProjectId); 
 router.get('/sa-tasks/:id', getTaskById);     
-router.put('/sa-tasks/:id', updateTask);     
+router.patch('/sa-tasks/:id', updateTaskStatusById);     
 router.delete('/sa-tasks/:id', deleteTask);  
 
 
@@ -57,10 +58,12 @@ router.post('/', upload.single('profilePicture'), createUser);
 router.post('/invite', inviteUsers);  
 router.put('/:userId/role', updateUserRole); 
 
-  // quotation route
-  router.post('/quotation',createQuotation);
-  router.get('/quotation/confirm/:quotationToken', confirmQuotationEmail);
-  router.get('/quotations/:id/status', checkVerificationStatus);
+// quotation route
+router.post('/quotation',createQuotation);
+router.get('/quotation/confirm/:quotationToken', confirmQuotationEmail);
+router.get('/quotations/:id/status', checkVerificationStatus);
+// router.post('/quotation/send-completion-email', sendCompletionEmail);
+
 
 // User Update Routes
 router.put('/:id', updateUser);

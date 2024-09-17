@@ -15,7 +15,7 @@ const Project = () => {
   const [error, setError] = useState('');
   const [loading, setloading] = useState(false);
   const navigate = useNavigate();
-
+  const [doneTaskCounts, setDoneTaskCounts] = useState({});
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -29,6 +29,7 @@ const Project = () => {
     fetchProjects();
   }, []);
 
+  
   const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
@@ -93,6 +94,34 @@ const Project = () => {
       setError('An error occurred while creating the project.');
     }
   };
+
+  useEffect(() => {
+    // Fetch done task count for each project
+    const fetchDoneTaskCounts = async () => {
+      try {
+        const counts = {};
+        for (let project of projects) {
+          try {
+            const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}?status=Done`);
+            counts[project._id] = response.data.data.length; // Store count of done tasks
+          } catch (error) {
+            // Handle errors for individual project requests (optional)
+            console.error('Error fetching done task count:', error);
+            counts[project._id] = 0; // Set to 0 if there is an error
+          }
+        }
+        setDoneTaskCounts(counts);
+      } catch (error) {
+        console.error('Error fetching done task counts:', error);
+      }
+    };
+
+    if (projects.length) {
+      fetchDoneTaskCounts();
+    }
+  }, [projects]);
+
+
   const handleProjectClick = (project) => {
     navigate(`/superadmin/projects/${project._id}`, { state: { projectId: project._id } });
     };
@@ -174,8 +203,8 @@ const Project = () => {
                 value={team}
                 onChange={(e) => setTeam(e.target.value)}
               >
-                <option value="" disabled>Select a team</option>
-                <option value="team1">Team 1</option>
+                <option value="" disabled>Team</option>
+                <option value="team1">Super Board</option>
                 <option value="team2">Team 2</option>
                 <option value="team3">Team 3</option>
               </select>
@@ -216,10 +245,10 @@ const Project = () => {
             <div className="flex items-center text-gray-500 mt-2">
               <FaCalendar className="mr-2" />
               <p>{new Date(project.createdAt).toLocaleDateString() || 'No date available'}</p>
-              <FaPaperclip className="ml-5" />
-              <p className="ml-2">{project.imageCount || 0}</p>
               <FaCheckCircle className="ml-5" />
-              <p className="ml-2">0</p>
+              <p className="ml-2">
+                {doneTaskCounts[project._id] !== undefined ? doneTaskCounts[project._id] : 'Loading...'}
+              </p>
               <button
                 onClick={(e) => {
                   e.stopPropagation(); // Prevent event from bubbling up

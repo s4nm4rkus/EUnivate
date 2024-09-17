@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
+import logomobile from "../../../assets/logomobile.png"; // Correct image import
 
 const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
   const [user, setUser] = useState({ firstName: '', lastName: '', profilePicture: { url: '' } });
@@ -41,10 +42,19 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
 
   return (
     <>
+      {/* Mobile Image */}
+      <div className="lg:hidden inset-x-0 top-0 z-50 ml-16">
+        <img
+          src={logomobile} // Use the imported image here
+          alt="Centered Image"
+          className="w-40 h-18 mx-auto"
+        />
+      </div>
+
       {/* Admin Navbar */}
-      <div className="flex items-center space-x-9 p-0 relative" style={{ transform: 'translateX(1px)' }}>
+      <div className="flex items-center space-x-9 p-0 relative ">
         {/* Search Bar with Icon */}
-        <div className="relative">
+        <div className="relative hidden lg:block"> {/* Hide on mobile */}
           <input
             type="text"
             placeholder="Search anything..."
@@ -71,12 +81,12 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
               className="w-8 h-8 rounded-full object-cover"
             />
           )}
-          <span className="ml-2 font-medium text-gray-800">
+          <div className="hidden lg:block ml-2 font-medium text-gray-800"> {/* Hide name on mobile */}
             {user.firstName} {user.lastName}
-          </span>
+          </div>
           <FontAwesomeIcon 
             icon={faChevronDown} 
-            className="ml-1 text-gray-600"
+            className="ml-1 text-gray-600 hidden lg:block" // Hide on mobile
           />
 
           {/* Account Dropdown Menu */}

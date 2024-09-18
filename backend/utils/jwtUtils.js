@@ -37,7 +37,7 @@ export const protect = async(req, res, next) => {
 };
 // Generate Access Token
 export const generateAccessToken = (id) => {
-  return jwt.sign({ _id: id  }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  return jwt.sign({ _id: id  }, process.env.JWT_SECRET, { expiresIn: '5h' });
 };
 
 // Generate Refresh Token

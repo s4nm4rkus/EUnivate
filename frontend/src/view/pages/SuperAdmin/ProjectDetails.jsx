@@ -15,6 +15,7 @@ const ProjectDetails = () => {
     const [selectedView, setSelectedView] = useState('Kanban');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+    const [error, setError] = useState(null);
     const [selectedMembers, setSelectedMembers] = useState([]); 
     const [addedMembers, setAddedMembers] = useState([]);
     const [members, setMembers] = useState([]);
@@ -29,10 +30,22 @@ const ProjectDetails = () => {
     useEffect(() => {
         const fetchProjectDetails = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/users/sa-getnewproject/${projectId}`);
+                const user = JSON.parse(localStorage.getItem('user'));
+                const accessToken = user?.accessToken;
+
+                if (!accessToken) {
+                    setError('No access token found. Please log in again.');
+                    return;
+                }
+
+                const response = await axios.get(`http://localhost:5000/api/users/sa-getnewproject/${projectId}`, {
+                    headers: { Authorization: `Bearer ${accessToken}` },
+                });
+
                 setProject(response.data);
             } catch (error) {
                 console.error('Error fetching project details:', error);
+                setError('Error fetching project details.');
             }
         };
 
@@ -57,28 +70,75 @@ const ProjectDetails = () => {
 
     const handleUserIconClick = async () => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/users/members-superadmins`);
+            const user = JSON.parse(localStorage.getItem('user'));
+            const accessToken = user?.accessToken;
+
+            if (!accessToken) {
+                throw new Error('No access token found. Please log in.');
+            }
+
+            const response = await axios.get(`http://localhost:5000/api/users/members-superadmins`, {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            });
+
             setMembers(response.data);
             setIsUserModalOpen(true);
         } catch (error) {
-            console.error('Error fetching members:', error);
+            console.error('Error fetching members:', error.response?.data || error.message);
+            setError('Error fetching members.');
         }
     };
 
-        const toggleMemberSelection = (member) => {
-            setSelectedMembers(prevSelectedMembers => 
-                prevSelectedMembers.some(selected => selected._id === member._id)
-                    ? prevSelectedMembers.filter(selected => selected._id !== member._id)
-                    : [...prevSelectedMembers, member]
-            );
-        };
-
-        const handleAddMembers = () => {
-            setAddedMembers([...addedMembers, ...selectedMembers]); 
-            setSelectedMembers([]);
-            setIsUserModalOpen(false); 
-        };
+    const handleAddMembers = async () => {
+        try {
+            if (!project || !project._id) {
+                throw new Error('Invalid project object.');
+            }
+            const user = JSON.parse(localStorage.getItem('user'));
+            const accessToken = user?.accessToken;
+            
+            const userIds = selectedMembers.map(member => {
+                if (!member || !member._id) {
+                    console.error('Invalid member object in selectedMembers:', member);
+                    return null;
+                }
+                return member._id;
+            }).filter(id => id !== null);
     
+            if (userIds.length === 0) {
+                throw new Error('No valid user IDs to add.');
+            }
+    
+            const response = await axios.post(`http://localhost:5000/api/users/sa-invite-users`, {
+                projectId: project._id,
+                users: userIds
+            }, {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            });
+    
+            setAddedMembers(response.data.invitedUsers);
+            setSelectedMembers([]);
+            setIsUserModalOpen(false);
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || error.message || 'An error occurred while adding members.';
+            console.error('Error adding members:', errorMessage);
+            setError(errorMessage); // Set error message to state
+        }
+    };
+    
+    
+
+    const toggleMemberSelection = (member) => {
+        if (!member?._id) {
+            console.error('Invalid member object:', member);
+            return;
+        }
+        setSelectedMembers(prevSelectedMembers =>
+            prevSelectedMembers.some(selected => selected._id === member._id)
+                ? prevSelectedMembers.filter(selected => selected._id !== member._id)
+                : [...prevSelectedMembers, member]
+        );
+    };
 
     const handleCloseUserModal = () => {
         setIsUserModalOpen(false);
@@ -105,7 +165,7 @@ const ProjectDetails = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const filteredMembers = members.filter(member => 
+    const filteredMembers = members.filter(member =>
         member.email.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
@@ -153,16 +213,16 @@ const ProjectDetails = () => {
                                 size="lg" 
                                 onClick={handleUserIconClick}
                             />
-                            {/* Updated section for added users */}
-                            <div className="flex -space-x-4  right-0">
-                                {addedMembers.map(member => (
-                                    <img
+                            <div className="flex -space-x-4 right-0">
+                            {addedMembers.map(member => (
+                                <img
                                     key={member._id}
                                     src={member.profilePicture} // Assuming profilePicture is available
                                     alt={member.username}
-                                    className="w-8 h-8 rounded-full border border-gray-300"
-                                    />
-                                ))}
+                                    className="w-8 h-8 rounded-full border border-gray-300 cursor-pointer"
+                                    onClick={() => toggleMemberSelection(member)}
+                                />
+                            ))}
                             </div>
                         </div>
 
@@ -213,18 +273,22 @@ const ProjectDetails = () => {
                 {selectedView === 'RaciMatrix' && <RaciMatrix projectId={projectId} />}
             </div>
 
-             {/* Modal for adding new members */}
-             {isUserModalOpen && (
+            {isUserModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-500 bg-opacity-50">
                     <div className="relative bg-white p-6 rounded-md shadow-lg border border-gray-200 w-1/3">
+                        {error && (
+                            <div className="bg-red-100 text-red-700 p-4 rounded-md mb-4">
+                                {error}
+                            </div>
+                        )}
                         <button
-                            className="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-xl"
+                            className="absolute top-2 right-2 text-gray-600"
                             onClick={handleCloseUserModal}
                         >
                             &times;
                         </button>
-                        <h2 className="text-xl font-semibold mb-4">Add New Member</h2>
-                        
+                        <h2 className="text-xl font-semibold mb-4">Add Members</h2>
+
                         <div className="flex items-center mb-4">
                             <input
                                 type="text"
@@ -240,38 +304,24 @@ const ProjectDetails = () => {
                                 Add Member
                             </button>
                         </div>
-
-                        <div className="mt-4">
-                            <h3 className="font-semibold mb-2 text-red-800">Members</h3>
-                            {filteredMembers.length > 0 ? (
-                               <ul>
-                               {filteredMembers.map((member) => (
-                                 <li
-                                   key={member._id}
-                                   className={`flex justify-between items-center py-2 border-b border-gray-200 cursor-pointer hover:bg-gray-100 ${
-                                     selectedMembers.some(selected => selected._id === member._id) ? 'bg-gray-300' : ''
-                                   }`}
-                                   onClick={() => toggleMemberSelection(member)}
-                                 >
-                                   <div className="flex items-center space-x-2">
-                                     <img
-                                       src={member.profilePicture}
-                                       alt={member.username}
-                                       className="w-8 h-8 rounded-full"
-                                     />
-                                     <span>{member.username}</span>
-                                   </div>
-                                   <span>{member.email}</span>
-                                   {selectedMembers.some(selected => selected._id === member._id) && (
-                                     <span className="text-red-500 font-bold">Selected</span>
-                                   )}
-                                 </li>
-                               ))}
-                             </ul>
-                            ) : (
-                                <p>No members found.</p>
-                            )}
-                        </div>
+                        <ul className="mb-4">
+                            {filteredMembers.map(member => (
+                                <li key={member._id} className="flex items-center mb-2">
+                                    <img
+                                        src={typeof member.profilePicture === 'string' ? member.profilePicture : member.profilePicture?.url}
+                                        alt={member.username}
+                                        className="w-8 h-8 rounded-full mr-2"
+                                    />
+                                    <span>{member.username}</span>
+                                    <button
+                                        onClick={() => toggleMemberSelection(member)}
+                                        className={`ml-auto p-1 border rounded-md ${selectedMembers.some(selected => selected._id === member._id) ? 'bg-red-400' : 'bg-gray-200'}`}
+                                    >
+                                        {selectedMembers.some(selected => selected._id === member._id) ? 'Selected' : 'Select'}
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 </div>
             )}
@@ -280,4 +330,3 @@ const ProjectDetails = () => {
 };
 
 export default ProjectDetails;
-

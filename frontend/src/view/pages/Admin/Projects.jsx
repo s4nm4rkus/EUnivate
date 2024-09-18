@@ -61,17 +61,9 @@ const Projects = () => {
 
   return (
     <Layout>
-      <div className="flex justify-end mb-4">
-        <button 
-          className="bg-red-700 text-white py-2 px-4 rounded-lg"
-          onClick={() => navigate('/admin-addprojects')}
-        >
-          Add Project
-        </button>
-      </div>
-
-      <div className="flex justify-between items-center mb-6">
-        <div className="relative w-3/5">
+      {/* Mobile layout */}
+      <div className="block md:hidden">
+        <div className="relative mb-4">
           <input
             type="text"
             placeholder="Search"
@@ -81,7 +73,8 @@ const Projects = () => {
           />
           <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
         </div>
-        <div className="flex items-center">
+
+        <div className="flex items-center mb-4 sm:mb-0">
           <label className="mr-2">Sort by</label>
           <select
             className="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-700"
@@ -96,9 +89,88 @@ const Projects = () => {
             <FontAwesomeIcon icon={faFilter} />
           </button>
         </div>
+
+        <div className="mb-4">
+          <button 
+            className="bg-red-700 text-white py-2 px-4 rounded-lg w-full"
+            onClick={() => navigate('/admin-addprojects')}
+          >
+            Add Project
+          </button>
+        </div>
       </div>
 
-      <div className="overflow-hidden rounded-lg shadow-lg bg-white">
+      {/* Desktop layout */}
+      <div className="hidden md:flex items-center justify-between mb-6">
+        <div className="relative w-3/5 flex-grow">
+          <input
+            type="text"
+            placeholder="Search"
+            className="w-full p-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-700"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+        </div>
+        <div className="flex items-center ml-4">
+          <label className="mr-2">Sort by</label>
+          <select
+            className="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-700"
+            value={sortKey}
+            onChange={(e) => setSortKey(e.target.value)}
+          >
+            <option value="projectName">Name</option>
+            <option value="teamMembers">Team Members</option>
+            <option value="adviser">Adviser</option>
+          </select>
+          <button className="ml-2 p-2 text-gray-500 hover:text-gray-700">
+            <FontAwesomeIcon icon={faFilter} />
+          </button>
+        </div>
+        <button 
+          className="bg-red-700 text-white py-2 px-4 rounded-lg ml-4"
+          onClick={() => navigate('/admin-addprojects')}
+        >
+          Add Project
+        </button>
+      </div>
+
+      {/* Card Layout for Mobile */}
+      <div className="block md:hidden">
+        {filteredProjects.map((project, index) => (
+          <div key={index} className="border-b border-gray-200 mb-4 p-4 rounded-lg shadow-md bg-white">
+            <div className="flex items-center mb-4">
+              <img
+                src={project.image?.url || 'placeholder.png'}
+                alt="Project"
+                className="w-16 h-16 object-cover rounded-lg mr-4"
+              />
+              <div>
+                <h3 className="text-lg font-semibold">{project.projectName}</h3>
+                <p className="text-sm text-gray-600">{project.adviser}</p>
+              </div>
+            </div>
+            <p className="text-gray-700 mb-4">{project.description}</p>
+            <div className="flex justify-between items-center">
+              <button
+                className="text-gray-600 hover:text-gray-900"
+                onClick={() => handleEdit(project)}
+              >
+                <FontAwesomeIcon icon={faEdit} />
+              </button>
+              <button
+                className="text-gray-600 hover:text-gray-900"
+                onClick={() => handleDelete(project._id)}
+              >
+                <FontAwesomeIcon icon={faTrashAlt} />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Table Layout for Desktop */}
+      <div className="overflow-hidden rounded-lg shadow-lg bg-white hidden md:block">
         <table className="min-w-full">
           <thead>
             <tr>
@@ -128,7 +200,7 @@ const Projects = () => {
                   <button 
                     className="mr-2 text-gray-600 hover:text-gray-900"
                     onClick={() => handleEdit(project)}
-                  >
+                    >
                     <FontAwesomeIcon icon={faEdit} />
                   </button>
                   <button
@@ -156,3 +228,4 @@ const Projects = () => {
 };
 
 export default Projects;
+

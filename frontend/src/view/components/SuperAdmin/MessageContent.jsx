@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faReply, faStar, faHeart, faPaperPlane, faPaperclip, faMicrophone, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
@@ -466,3 +467,15 @@ const handleDelete = async (messageId) => {
 };
 
 export default MessageContent;
+
+
+
+
+
+
+
+
+
+
+
+

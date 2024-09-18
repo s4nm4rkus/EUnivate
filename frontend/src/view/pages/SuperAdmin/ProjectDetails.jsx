@@ -94,13 +94,17 @@ const ProjectDetails = () => {
 
     return (
         <div className="bg-gray-100 min-h-screen p-6">
-            <div className="flex justify-between items-center mb-16">
-                <h1 className="text-2xl font-medium text-gray-800">Project Details</h1>
-                <AdminNavbar 
-                    isAccountDropdownOpen={isAccountDropdownOpen} 
-                    toggleAccountDropdown={toggleAccountDropdown} 
-                />
-            </div>
+               <div className="w-full flex justify-between items-center mb-16">
+      <div className="relative">
+    <h1 className="text-2xl font-medium text-gray-800 hidden md:block">
+        Project Details 
+    </h1>
+</div>
+        <AdminNavbar
+          isAccountDropdownOpen={isAccountDropdownOpen}
+          toggleAccountDropdown={toggleAccountDropdown}
+        />
+      </div>
 
             <div className="bg-white p-4 rounded-md shadow-md border border-gray-200">
                 <div className="flex items-start space-x-4">

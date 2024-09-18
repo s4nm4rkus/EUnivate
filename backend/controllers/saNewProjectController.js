@@ -43,10 +43,12 @@ export const getAllProjects = async (req, res) => {
 //Get Project by id
 export const getProjectById = async (req, res) => {
     try {
-        const projectId = req.params.id;
+        const projectId = req.params.id;    
 
         // Fetch project by ID from the database
-        const project = await SaNewProject.findById(projectId);
+        const project = await SaNewProject.findById(projectId)
+        .populate('invitedUsers', 'username profilePicture') // Populate invitedUsers with username and profilePicture
+        .exec();
 
         // Check if project exists
         if (!project) {
@@ -87,8 +89,6 @@ export const deleteProjectById = async (req, res) => {
 };
 
 
-
-// Invite users to a project
 // Invite users to a project
 export const inviteUsersToProject = async (req, res) => {
     try {
@@ -106,6 +106,14 @@ export const inviteUsersToProject = async (req, res) => {
 
         if (!project) {
             return res.status(404).json({ message: 'Project not found' });
+        }
+
+        const alreadyInvited = users.filter(userId => 
+            project.invitedUsers.includes(userId)
+        );
+
+        if (alreadyInvited.length > 0) {
+            return res.status(400).json({ message: 'Some users are already invited.' });
         }
 
         // Check if current user is the owner

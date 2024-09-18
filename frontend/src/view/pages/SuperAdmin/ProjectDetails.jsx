@@ -22,6 +22,8 @@ const ProjectDetails = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [addText, setAddText] = useState('');
     const [project, setProject] = useState({});
+    const [isImageVisible, setIsImageVisible] = useState(false);
+
     const modalRef = useRef(null);
     const location = useLocation();
     const navigate = useNavigate();
@@ -43,6 +45,7 @@ const ProjectDetails = () => {
                 });
 
                 setProject(response.data);
+                   setAddedMembers(response.data.invitedUsers);
             } catch (error) {
                 console.error('Error fetching project details:', error);
                 setError('Error fetching project details.');
@@ -69,6 +72,7 @@ const ProjectDetails = () => {
     };
 
     const handleUserIconClick = async () => {
+        setIsImageVisible(!isImageVisible);
         try {
             const user = JSON.parse(localStorage.getItem('user'));
             const accessToken = user?.accessToken;
@@ -89,6 +93,9 @@ const ProjectDetails = () => {
         }
     };
 
+    const handleProfileClick = () => {
+        setIsImageVisible(true); // Show the image when profile is clicked
+    };
     const handleAddMembers = async () => {
         try {
             if (!project || !project._id) {
@@ -116,6 +123,7 @@ const ProjectDetails = () => {
                 headers: { Authorization: `Bearer ${accessToken}` }
             });
     
+                 // Handle response
             setAddedMembers(response.data.invitedUsers);
             setSelectedMembers([]);
             setIsUserModalOpen(false);
@@ -215,14 +223,15 @@ const ProjectDetails = () => {
                             />
                             <div className="flex -space-x-4 right-0">
                             {addedMembers.map(member => (
-                                <img
-                                    key={member._id}
-                                    src={member.profilePicture} // Assuming profilePicture is available
-                                    alt={member.username}
-                                    className="w-8 h-8 rounded-full border border-gray-300 cursor-pointer"
-                                    onClick={() => toggleMemberSelection(member)}
-                                />
-                            ))}
+    <img
+        key={member._id} // Assuming _id is unique, but ensure this in your data
+        src={member.profilePicture}
+        alt={member.username}
+        className="w-8 h-8 rounded-full border border-gray-300 cursor-pointer"
+        onClick={() => toggleMemberSelection(member)}
+    />
+))}
+
                             </div>
                         </div>
 
@@ -277,9 +286,9 @@ const ProjectDetails = () => {
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-500 bg-opacity-50">
                     <div className="relative bg-white p-6 rounded-md shadow-lg border border-gray-200 w-1/3">
                         {error && (
-                            <div className="bg-red-100 text-red-700 p-4 rounded-md mb-4">
+                            <p className=" text-red-700 p-4 rounded-md mb-4">
                                 {error}
-                            </div>
+                            </p>
                         )}
                         <button
                             className="absolute top-2 right-2 text-gray-600"

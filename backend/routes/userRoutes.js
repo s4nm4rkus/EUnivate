@@ -40,7 +40,7 @@ router.post('/sa-invite-users',protect,  inviteUsersToProject);
 router.get('/sa-getnewproject', protect, getAllProjects);
 router.delete('/sa-newproject/:id', deleteProjectById);
 router.get('/sa-getnewproject/:id', protect,  getProjectById)
-router.get('/members-superadmins',protect, getMembersAndSuperAdmins);
+router.get('/members-superadmins', getMembersAndSuperAdmins);
 router.get('/findByUsername/:username', findUserByUsername);
 
 // Task Routes

@@ -66,7 +66,7 @@ const MessageContent = () => {
   
     const sendMessage = async () => {
       if (message.trim() || file) {
-        const cleanMessage = message.replace(/<\/?p>/g, '');
+        const cleanMessage = message.replace(/<\/?p>/g, '').replace(/<br\s*\/?>/g, '').trim();
     
         if (editingMessageId) {
           // Editing an existing message
@@ -238,6 +238,7 @@ const handleDelete = async (messageId) => {
     }
     return message.content;
   };
+  
   
   
 

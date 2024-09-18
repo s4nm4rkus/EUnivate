@@ -24,6 +24,7 @@ const ProjectDetails = () => {
     const [project, setProject] = useState({});
     const [isImageVisible, setIsImageVisible] = useState(false);
 
+
     const modalRef = useRef(null);
     const location = useLocation();
     const navigate = useNavigate();

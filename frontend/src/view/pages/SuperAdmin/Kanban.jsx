@@ -12,7 +12,7 @@ const ItemType = {
 const Kanban = ({ projectId }) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [tasks, setTasks] = useState([]);
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     const fetchTasks = async () => {
       try {

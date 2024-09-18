@@ -3,17 +3,19 @@ import Message from '../models/chatMessageModel.js';
 // Get all messages
 export const getMessages = async (req, res) => {
   try {
-    const messages = await Message.find();
+    const messages = await Message.find().populate('replyTo');
     res.json(messages);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
+
 // Send a new message
 export const sendMessage = async (req, res) => {
   try {
-    const { content, sender, file, time } = req.body;
+    const { content, sender, file, time, replyTo } = req.body;
+
 
     const newMessage = new Message({
       content,
@@ -24,6 +26,7 @@ export const sendMessage = async (req, res) => {
         url: file?.url || '',
       },
       time,
+      replyTo: replyTo || null, // Assign the replyTo message ID if provided
     });
 
     await newMessage.save();

@@ -20,7 +20,7 @@ const Kanban = ({ projectId }) => {
           console.error('Project ID is not defined');
           return;
         }
-        const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${projectId}`);
+        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-tasks/${projectId}`);
         setTasks(response.data.data);
       } catch (error) {
         console.error('Error fetching tasks:', error);
@@ -39,7 +39,7 @@ const Kanban = ({ projectId }) => {
 
   const updateTaskStatus = async (taskId, newStatus) => {
     try {
-      await axios.patch(`http://localhost:5000/api/users/sa-tasks/${taskId}`, { status: newStatus });
+      await axios.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-tasks/${taskId}`, { status: newStatus });
     } catch (error) {
       console.error('Error updating task status:', error);
     }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaCalendar, FaPaperclip, FaPlus, FaTimes, FaCheckCircle, FaTrash } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx';
 
 const Project = () => {
@@ -13,9 +13,11 @@ const Project = () => {
   const [team, setTeam] = useState('');
   const [projects, setProjects] = useState([]);
   const [error, setError] = useState('');
-  const [loading, setloading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [doneTaskCounts, setDoneTaskCounts] = useState({});
+  const { isNavOpen } = useOutletContext();
+
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -72,8 +74,7 @@ const Project = () => {
   };
 
   const handleCreateProject = async () => {
-    setloading(true);
-  
+    setLoading(true);
     if (!imagePreview || !projectName || !team) {
       setError('Please fill out all fields including image, project name, and team.');
       setloading(false);
@@ -107,6 +108,7 @@ const Project = () => {
       setProjects([...projects, response.data]);
       closeModal();
     } catch (error) {
+        setloading(false);
       console.error('Error creating project:', error);
       setError('An error occurred while creating the project.');
     } finally {
@@ -144,7 +146,7 @@ const Project = () => {
 
   const handleProjectClick = (project) => {
     navigate(`/superadmin/projects/${project._id}`, { state: { projectId: project._id } });
-    };
+  };
 
   const handleDeleteProject = async (projectId) => {
     try {
@@ -157,9 +159,13 @@ const Project = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 relative">
+    <div className="bg-gray-100 min-h-screen p-6">
       <div className="w-full flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-medium text-gray-800">Project</h1>
+        <div className="relative">
+          <h1 className={`text-2xl font-medium text-gray-800 hidden md:block ${isNavOpen ? 'hidden' : ''}`}>
+            Project 
+          </h1>
+        </div>
         <AdminNavbar
           isAccountDropdownOpen={isAccountDropdownOpen}
           toggleAccountDropdown={toggleAccountDropdown}
@@ -167,6 +173,9 @@ const Project = () => {
       </div>
 
       <div className="relative mt-10">
+        <div className={`absolute left-4 top-4 font-semibold text-2xl transform -translate-y-1/2 text-black md:hidden ${isNavOpen ? 'hidden' : ''}`}>
+          Project
+        </div>
         <button
           onClick={openModal}
           className="absolute right-4 flex items-center bg-red-800 text-white px-4 py-2 rounded-md shadow hover:bg-red-600"
@@ -237,9 +246,8 @@ const Project = () => {
                 onClick={handleCreateProject}
                 className="bg-red-800 text-white px-8 py-3 rounded-md shadow hover:bg-red-900 w-full"
                 disabled={loading}
-             
               >
-              {loading ? 'Creating Project...' : 'Create Project'}
+                {loading ? 'Creating Project...' : 'Create Project'}
               </button>
             </div>
           </div>

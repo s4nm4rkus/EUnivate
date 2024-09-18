@@ -21,15 +21,33 @@ const Project = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject');
+        const user = JSON.parse(localStorage.getItem('user'));
+        const accessToken = user ? user.accessToken : null;
+      
+        if (!accessToken) {
+          setloading(false);
+          setError('No access token found. Please log in again.');
+          return;
+        }
+  
+        const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+  
         setProjects(response.data);
       } catch (error) {
         console.error('Error fetching projects:', error);
+        setError('An error occurred while fetching projects.');
+      } finally {
+        setloading(false);
       }
     };
-
+  
     fetchProjects();
   }, []);
+  
 
   
   const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
@@ -239,7 +257,6 @@ const Project = () => {
               </select>
             </div>
 
-            {error && <p className="text-red-500 mt-4">{error}</p>}
 
             <div className="mt-6 flex justify-center">
               <button

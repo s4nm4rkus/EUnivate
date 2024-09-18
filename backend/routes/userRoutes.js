@@ -6,7 +6,7 @@
   import {createProduct, getProducts, deleteProduct, updateProduct  } from '../controllers/addProductsController.js'
   import { updateProject, deleteProject, getProjects, createProject} from '../controllers/addProjectsController.js';
   import { getDashboardStats } from '../controllers/DashboardController.js';
-  import { createSaNewProject, getAllProjects, deleteProjectById, getProjectById } from '../controllers/saNewProjectController.js';
+  import { createSaNewProject, getAllProjects, deleteProjectById, getProjectById, inviteUsersToProject } from '../controllers/saNewProjectController.js';
   import { getMembersAndSuperAdmins } from '../controllers/getallMemberController.js';
   import {createUser } from '../controllers/userController.js';
   import { loginUser, forgotPassword, resetPassword } from '../controllers/authController.js';
@@ -36,9 +36,10 @@ router.post('/contactEunivate',ContactEunivate );
 
 //SuperAdminRoutes
 router.post('/sa-newproject',protect, createSaNewProject);
-router.get('/sa-getnewproject', getAllProjects);
+router.post('/sa-invite-users',protect,  inviteUsersToProject);
+router.get('/sa-getnewproject', protect, getAllProjects);
 router.delete('/sa-newproject/:id', deleteProjectById);
-router.get('/sa-getnewproject/:id', getProjectById)
+router.get('/sa-getnewproject/:id', protect,  getProjectById)
 router.get('/members-superadmins', getMembersAndSuperAdmins);
 router.get('/findByUsername/:username', findUserByUsername);
 

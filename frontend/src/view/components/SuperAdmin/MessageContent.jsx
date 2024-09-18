@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faReply, faStar, faHeart, faPaperPlane, faPaperclip, faMicrophone, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
@@ -66,7 +67,7 @@ const MessageContent = () => {
   
     const sendMessage = async () => {
       if (message.trim() || file) {
-        const cleanMessage = message.replace(/<\/?p>/g, '');
+        const cleanMessage = message.replace(/<\/?p>/g, '').replace(/<br\s*\/?>/g, '').trim();
     
         if (editingMessageId) {
           // Editing an existing message
@@ -238,6 +239,7 @@ const handleDelete = async (messageId) => {
     }
     return message.content;
   };
+  
   
   
 
@@ -465,3 +467,15 @@ const handleDelete = async (messageId) => {
 };
 
 export default MessageContent;
+
+
+
+
+
+
+
+
+
+
+
+

@@ -5,6 +5,7 @@ import '../../../admin.css';
 import "slick-carousel/slick/slick.css"; // Import slick-carousel css
 import "slick-carousel/slick/slick-theme.css"; // Import slick-carousel theme css
 import AdminNavbar from '../../components/SuperAdmin/AdminNavbar';
+import { FaCalendarAlt } from 'react-icons/fa';
 
 const Dashboard = () => {
     const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);

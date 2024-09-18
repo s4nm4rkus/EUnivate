@@ -2,12 +2,13 @@ import SaNewProject from '../models/saNewProject.js';
 import saAddTask from '../models/saAddTask.js'; 
 export const createSaNewProject = async (req, res) => {
     try {
-        const { projectName, thumbnail } = req.body;
+        const { projectName, thumbnail,invitedUsers  } = req.body;
 
         const newSaNewProject = new SaNewProject({
             projectName: projectName,
             thumbnail: thumbnail,
-            owner: req.user._id 
+            owner: req.user._id,
+            invitedUsers
         });
 
         const savedSaNewProject = await newSaNewProject.save();
@@ -21,28 +22,33 @@ export const createSaNewProject = async (req, res) => {
 //Get all Project
 export const getAllProjects = async (req, res) => {
     try {
-        // Fetch all projects from the database
-        const projects = await SaNewProject.find({});
-
-        // Check if projects exist
+        const projects = await SaNewProject.find({
+          $or: [
+            { owner: req.user._id },
+            { invitedUsers: req.user._id }
+          ]
+        });
+    
         if (projects.length === 0) {
-            return res.status(404).json({ message: 'No projects found' });
+          return res.status(404).json({ message: 'No projects found' });
         }
-
+    
         return res.status(200).json(projects);
-    } catch (error) {
+      } catch (error) {
         console.error("Error in fetching projects:", error.message);
         return res.status(500).json({ error: error.message || 'An error occurred while fetching the projects' });
-    }
-};
-
+      }
+    };
+    
 //Get Project by id
 export const getProjectById = async (req, res) => {
     try {
-        const projectId = req.params.id;
+        const projectId = req.params.id;    
 
         // Fetch project by ID from the database
-        const project = await SaNewProject.findById(projectId);
+        const project = await SaNewProject.findById(projectId)
+        .populate('invitedUsers', 'username profilePicture') // Populate invitedUsers with username and profilePicture
+        .exec();
 
         // Check if project exists
         if (!project) {
@@ -82,36 +88,46 @@ export const deleteProjectById = async (req, res) => {
     }
 };
 
-//Mamaya to gaagamitin 
-// import SaNewProject from '../models/saNewProject.js';
-// import saAddTask from '../models/saAddTask.js'; // Import Task model
 
-// // Delete a project by its ID
-// export const deleteProjectById = async (req, res) => {
-//   try {
-//     const { id } = req.params;
+// Invite users to a project
+export const inviteUsersToProject = async (req, res) => {
+    try {
+        const { projectId, users } = req.body;
 
-//     // Delete the project by its ID
-//     const deletedProject = await SaNewProject.findByIdAndDelete(id);
+        // Debugging log
+        console.log("Request Body:", req.body);
 
-//     if (!deletedProject) {
-//       return res.status(404).json({ message: 'Project not found' });
-//     }
+        // Validate input
+        if (!Array.isArray(users) || !projectId) {
+            return res.status(400).json({ message: 'Invalid input data' });
+        }
 
-//     // Also delete all tasks related to this project
-//     await saAddTask.deleteMany({ project: id });
+        const project = await SaNewProject.findById(projectId);
 
-//     return res.status(200).json({
-//       success: true,
-//       message: 'Project and its related tasks deleted successfully!',
-//       deletedProject,
-//     });
-//   } catch (error) {
-//     console.error('Error in deleting project:', error.message);
-//     return res.status(500).json({
-//       success: false,
-//       message: 'Server Error. Could not delete project.',
-//       error: error.message,
-//     });
-//   }
-// };
+        if (!project) {
+            return res.status(404).json({ message: 'Project not found' });
+        }
+
+        const alreadyInvited = users.filter(userId => 
+            project.invitedUsers.includes(userId)
+        );
+
+        if (alreadyInvited.length > 0) {
+            return res.status(400).json({ message: 'Some users are already invited.' });
+        }
+
+        // Check if current user is the owner
+        if (!req.user || project.owner.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'You do not have permission to invite users to this project' });
+        }
+
+        // Add user IDs directly to the invitedUsers array
+        project.invitedUsers = [...new Set([...project.invitedUsers, ...users])]; // Prevent duplicates
+        await project.save();
+
+        return res.status(200).json(project);
+    } catch (error) {
+        console.error("Error in inviting users:", error.message);
+        return res.status(500).json({ error: error.message || 'An error occurred while inviting users' });
+    }
+};

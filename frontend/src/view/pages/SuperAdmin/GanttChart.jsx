@@ -63,8 +63,6 @@ const GanttChart = () => {
     }
   };
   
-
-  // Function to count images in a task
   const countImages = (task) => {
     return ['image1', 'image2'].reduce((count, imageKey) => {
       return task[imageKey] ? count + 1 : count;
@@ -77,7 +75,6 @@ const GanttChart = () => {
   const MAX_TASK_HEIGHT = 4; // maximum height of each task pin in rem
   const TASK_SPACING = 1; // spacing between tasks in rem
 
-  // Group tasks by status for vertical stacking
   const groupedTasks = allStatuses.map((status) => {
     const filteredTasks = tasks.filter(task => (status === 'Document' && task.status === 'Pending') || task.status === status);
     const totalHeight = filteredTasks.length * (MAX_TASK_HEIGHT + TASK_SPACING);
@@ -92,8 +89,7 @@ const GanttChart = () => {
 
   return (
     <div className="p-4 sm:p-8 bg-white shadow-lg rounded-lg overflow-x-auto">
-      <div className="relative">
-        {/* Header with months */}
+      <div className="relative min-w-[1000px]"> {/* Ensure horizontal scrolling */}
         <div className="flex items-center border-b border-gray-300">
           <div className="w-36 min-w-[1rem] border-r border-gray-300 p-2 text-center -ml-28"></div>
           {months.map((month) => (
@@ -102,7 +98,6 @@ const GanttChart = () => {
             </div>
           ))}
         </div>
-        {/* Gantt chart rows */}
         <div className="overflow-x-auto">
           {groupedTasks.map(({ status, tasks, shrinkFactor }) => (
             <div
@@ -132,9 +127,9 @@ const GanttChart = () => {
                         width: `${taskWidth}%`,
                         left: `${calculateTaskLeft(task.startDate)}%`,
                         whiteSpace: 'nowrap',
-                        top: `${index * (taskHeight + TASK_SPACING)}rem`, // Adjust position with spacing and shrink factor
+                        top: `${index * (taskHeight + TASK_SPACING)}rem`,
                         height: `${taskHeight}rem`,
-                        lineHeight: `${taskHeight}rem`, // Vertical centering within the task pin
+                        lineHeight: `${taskHeight}rem`,
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'center',

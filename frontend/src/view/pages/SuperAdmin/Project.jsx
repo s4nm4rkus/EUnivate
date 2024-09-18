@@ -95,7 +95,7 @@ const Project = () => {
     setLoading(true);
     if (!imagePreview || !projectName || !team) {
       setError('Please fill out all fields including image, project name, and team.');
-      setloading(false);
+      setLoading(false);
       return;
     }
   
@@ -104,7 +104,7 @@ const Project = () => {
     const accessToken = user ? user.accessToken : null;
   
     if (!accessToken) {
-      setloading(false);
+      setLoading(false);
       setError('No access token found. Please log in again.');
       return;
     }

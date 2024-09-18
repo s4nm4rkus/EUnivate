@@ -115,11 +115,11 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
     // Upload selected files to Cloudinary
     for (const file of selectedFiles) {
       try {
-        const result = await handleSaveattachment(file); // Upload to Cloudinary
+        const result = await handleSaveattachment(file);
         uploadedImages.push({
           publicId: result.publicId,
           url: result.url
-        }); // Collect the Cloudinary image data
+        });
       } catch (error) {
         console.error('Error uploading image:', error);
         alert('Failed to upload one or more images.');
@@ -128,48 +128,50 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
     }
   
     try {
-      // Get the ObjectId for the selected user
-      const userResponse = await axios.get(`http://localhost:5000/api/users/findByUsername/${selectedName}`);
-      const assigneeId = userResponse.data._id;
+      // Send the array of assignees
+      const assigneeIds = selectedName.split(', ').map(async (name) => {
+        const userResponse = await axios.get(`http://localhost:5000/api/users/findByUsername/${name}`);
+        return userResponse.data._id;
+      });
   
-      // Create the task with the uploaded image data
       const newTask = {
         taskName,
         objectives,
-        assignee: assigneeId, // Use ObjectId for assignee
+        assignee: await Promise.all(assigneeIds), // Assign array of assignee IDs
         status,
         priority,
         startDate,
         dueDate,
-        attachment: uploadedImages, 
+        attachment: uploadedImages,
         description,
         questionUpdate: question,
+        project: projectId,
       };
   
-      // Send data to the backend API to save in MongoDB
       const response = await axios.post('http://localhost:5000/api/users/sa-task', newTask);
       console.log('Task created:', response.data);
-      onTaskSubmit(newTask); 
-          // Clear the fields
-            setTaskName('');
-            setDescription('');
-            setObjectives([]);
-            setSelectedObjective(null);
-            setSelectedName('');
-            setStatus('');
-            setStartDate('');
-            setDueDate('');
-            setQuestion('');
-            setSelectedFiles([]);
-            // Close the modal
-            onClose();
-            
+      onTaskSubmit(newTask);
+  
+      // Clear the fields
+      setTaskName('');
+      setDescription('');
+      setObjectives([]);
+      setSelectedObjective(null);
+      setSelectedName('');
+      setStatus('');
+      setStartDate('');
+      setDueDate('');
+      setQuestion('');
+      setSelectedFiles([]);
+      onClose();
+  
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       console.error('Error saving task:', error);
       alert('Failed to save task.');
     }
   };
+  
   
 
 
@@ -177,9 +179,12 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
     setIsUserNameModalOpen(true);
   };
 
-  const handleNameSelect = (member) => {
-    setSelectedName(member.username);
+  const handleNameSelect = (members) => {
+    const memberNames = members.map(member => member.username).join(', ');
+    setSelectedName(memberNames);  
   };
+  
+  
 
   const handleClickFileInput = () => {
     fileInputRef.current.click();
@@ -307,7 +312,7 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
             isOpen={isUserNameModalOpen}
             onClose={() => setIsUserNameModalOpen(false)}
             membersList={membersList}
-            onSelect={handleNameSelect}
+            onSelect={handleNameSelect} 
           />
         )}
       </div>

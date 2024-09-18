@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaCalendar, FaPaperclip, FaPlus, FaTimes, FaCheckCircle, FaTrash } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx';
 
 const Project = () => {
@@ -13,8 +13,10 @@ const Project = () => {
   const [team, setTeam] = useState('');
   const [projects, setProjects] = useState([]);
   const [error, setError] = useState('');
-  const [loading, setloading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [doneTaskCounts, setDoneTaskCounts] = useState({});
+  const { isNavOpen } = useOutletContext();
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -29,6 +31,7 @@ const Project = () => {
     fetchProjects();
   }, []);
 
+  
   const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
@@ -71,7 +74,7 @@ const Project = () => {
   };
 
   const handleCreateProject = async () => {
-    setloading(true);
+    setLoading(true);
     if (!imagePreview || !projectName || !team) {
       setError('Please fill out all fields including image, project name, and team.');
       return;
@@ -88,14 +91,42 @@ const Project = () => {
       setProjects([...projects, response.data]);
       closeModal();
     } catch (error) {
-        setloading(false);
+      setLoading(false);
       console.error('Error creating project:', error);
       setError('An error occurred while creating the project.');
     }
   };
+
+  useEffect(() => {
+    // Fetch done task count for each project
+    const fetchDoneTaskCounts = async () => {
+      try {
+        const counts = {};
+        for (let project of projects) {
+          try {
+            const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}?status=Done`);
+            counts[project._id] = response.data.data.length; // Store count of done tasks
+          } catch (error) {
+            // Handle errors for individual project requests (optional)
+            console.error('Error fetching done task count:', error);
+            counts[project._id] = 0; // Set to 0 if there is an error
+          }
+        }
+        setDoneTaskCounts(counts);
+      } catch (error) {
+        console.error('Error fetching done task counts:', error);
+      }
+    };
+
+    if (projects.length) {
+      fetchDoneTaskCounts();
+    }
+  }, [projects]);
+
+
   const handleProjectClick = (project) => {
     navigate(`/superadmin/projects/${project._id}`, { state: { projectId: project._id } });
-    };
+  };
 
   const handleDeleteProject = async (projectId) => {
     try {
@@ -108,9 +139,13 @@ const Project = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 relative">
+    <div className="bg-gray-100 min-h-screen p-6">
       <div className="w-full flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-medium text-gray-800">Project</h1>
+        <div className="relative">
+          <h1 className={`text-2xl font-medium text-gray-800 hidden md:block ${isNavOpen ? 'hidden' : ''}`}>
+            Project 
+          </h1>
+        </div>
         <AdminNavbar
           isAccountDropdownOpen={isAccountDropdownOpen}
           toggleAccountDropdown={toggleAccountDropdown}
@@ -118,6 +153,9 @@ const Project = () => {
       </div>
 
       <div className="relative mt-10">
+        <div className={`absolute left-4 top-4 font-semibold text-2xl transform -translate-y-1/2 text-black md:hidden ${isNavOpen ? 'hidden' : ''}`}>
+          Project
+        </div>
         <button
           onClick={openModal}
           className="absolute right-4 flex items-center bg-red-800 text-white px-4 py-2 rounded-md shadow hover:bg-red-600"
@@ -174,8 +212,8 @@ const Project = () => {
                 value={team}
                 onChange={(e) => setTeam(e.target.value)}
               >
-                <option value="" disabled>Select a team</option>
-                <option value="team1">Team 1</option>
+                <option value="" disabled>Team</option>
+                <option value="team1">Super Board</option>
                 <option value="team2">Team 2</option>
                 <option value="team3">Team 3</option>
               </select>
@@ -188,9 +226,8 @@ const Project = () => {
                 onClick={handleCreateProject}
                 className="bg-red-800 text-white px-8 py-3 rounded-md shadow hover:bg-red-900 w-full"
                 disabled={loading}
-             
               >
-              {loading ? 'Creating Project...' : 'Create Project'}
+                {loading ? 'Creating Project...' : 'Create Project'}
               </button>
             </div>
           </div>
@@ -216,10 +253,10 @@ const Project = () => {
             <div className="flex items-center text-gray-500 mt-2">
               <FaCalendar className="mr-2" />
               <p>{new Date(project.createdAt).toLocaleDateString() || 'No date available'}</p>
-              <FaPaperclip className="ml-5" />
-              <p className="ml-2">{project.imageCount || 0}</p>
               <FaCheckCircle className="ml-5" />
-              <p className="ml-2">0</p>
+              <p className="ml-2">
+                {doneTaskCounts[project._id] !== undefined ? doneTaskCounts[project._id] : 'Loading...'}
+              </p>
               <button
                 onClick={(e) => {
                   e.stopPropagation(); // Prevent event from bubbling up

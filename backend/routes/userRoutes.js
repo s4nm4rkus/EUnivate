@@ -18,7 +18,7 @@
   import { inviteUsers, updateUserRole, getUsers} from '../controllers/peopleController.js';
   import { createEvent, getEvents, updateEvent, deleteEvent } from '../controllers/addEventsController.js';
   import { getQuotations, deleteQuotation, checkNotifications } from '../controllers/getQuotationAdminController.js';
-  import { createTask, getTasks, getTaskById, updateTask, getTasksByProjectId, deleteTask } from '../controllers/saAddTaskController.js';
+  import { createTask, getTasks, getTaskById, updateTaskStatusById, getTasksByProjectId, deleteTask } from '../controllers/saAddTaskController.js';
   import { findUserByUsername } from '../controllers/findUserNameIDController.js';
 const router = express.Router();
 
@@ -41,12 +41,13 @@ router.delete('/sa-newproject/:id', deleteProjectById);
 router.get('/sa-getnewproject/:id', getProjectById)
 router.get('/members-superadmins', getMembersAndSuperAdmins);
 router.get('/findByUsername/:username', findUserByUsername);
+
 // Task Routes
 router.post('/sa-task', createTask);         
 router.get('/sa-tasks', getTasks);  
-router.get('/sa-tasks/:projectId', getTasks);       
+router.get('/sa-tasks/:projectId', getTasksByProjectId); 
 router.get('/sa-tasks/:id', getTaskById);     
-router.put('/sa-tasks/:id', updateTask);     
+router.patch('/sa-tasks/:id', updateTaskStatusById);     
 router.delete('/sa-tasks/:id', deleteTask);  
 
 

@@ -204,27 +204,31 @@ const SettingProfile = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          <img
-            src={profilePicture || defaultProfilePictureUrl}
-            alt="Profile"
-            className="w-20 h-20 rounded-full mr-4"
-          />
-          <div className="flex flex-col">
-            <div className="text-lg font-medium">
-              {firstName} {lastName}
-            </div>
-            <p className="text-sm text-gray-600 mt-1">@{username}</p>
-          </div>
+  <div className="flex flex-col sm:flex-row items-center justify-between">
+    <div className="flex flex-col sm:flex-row items-center sm:items-start">
+      <img
+        src={profilePicture || defaultProfilePictureUrl}
+        alt="Profile"
+        className="w-24 h-24 sm:w-20 sm:h-20 rounded-full mb-4 sm:mb-0 sm:mr-4"
+      />
+      <div className="text-center sm:text-left mt-3">
+        <div className="text-lg font-medium">
+          {firstName} {lastName}
         </div>
-        <button
-          onClick={toggleEditProfileModal}
-          className="px-4 py-2 bg-red-800 text-white rounded hover:bg-red-900"
-        >
-          Edit User Profile
-        </button>
+        <p className="text-sm text-gray-600 mt-1">@{username}</p>
+
       </div>
+    </div>
+
+    {/* Button stays in original position on website, moves below content on mobile */}
+    <button
+      onClick={toggleEditProfileModal}
+      className="px-3 py-1 sm:px-4 sm:py-2 bg-red-800 text-white rounded hover:bg-red-900 text-sm sm:text-base mt-4 sm:mt-0 w-full h-10 sm:w-auto" // Button on mobile takes full width
+    >
+      Edit User Profile
+    </button>
+  </div>
+ 
 
       <div className="p-4 bg-gray-100 rounded-lg shadow-md">
         <div className="space-y-4">

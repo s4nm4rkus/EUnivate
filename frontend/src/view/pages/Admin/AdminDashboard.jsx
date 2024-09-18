@@ -100,7 +100,7 @@ const AdminDashboard = () => {
                 {stats.map((stat, index) => (
                     <div key={index} className={`flex-1 text-center ${index !== stats.length - 1 ? 'border-r border-gray-200' : ''}`}>
                         <p className="text-gray-500 text-sm md:text-base">{stat.label}</p>
-                        <h4 className="text-2xl font-bold text-red-700 text-lg md:text-2xl">{stat.value}</h4>
+                        <h4 className="text-2xl font-bold text-red-700 md:text-2xl">{stat.value}</h4>
                     </div>
                 ))}
             </div>

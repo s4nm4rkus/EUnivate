@@ -132,7 +132,7 @@ const SettingProfile = () => {
 
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/users/${storedUser._id}`,
+        `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/${storedUser._id}`,
         updatedUser,
         {
           headers: {
@@ -176,7 +176,7 @@ const SettingProfile = () => {
       }
 
       const response = await axios.put(
-        `http://localhost:5000/api/users/${storedUser._id}/password`,
+        `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/${storedUser._id}/password`,
         { newPassword },
         {
           headers: {

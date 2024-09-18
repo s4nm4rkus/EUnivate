@@ -62,7 +62,7 @@ const EditProductModal = ({ product, onClose, onSave }) => {
       };
 
       const response = await axios.put(
-        `http://localhost:5000/api/users/products/${product._id}`,
+        `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/products/${product._id}`,
         updatedProduct
       );
 

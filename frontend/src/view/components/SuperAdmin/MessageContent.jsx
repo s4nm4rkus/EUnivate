@@ -295,7 +295,7 @@ const handleDelete = async (messageId) => {
                 msg.sender.name === 'You' ? 'bg-blue-200 text-gray-800' : 'bg-red-100 text-gray-800'
               } max-w-[60%] border border-blue relative ${editingMessageId === msg._id ? 'border-blue-500' : ''}`}
             >
-              <div className="message-header flex items-center flex space-x-12 justify-between mb-4">
+              <div className="message-header flex items-center space-x-12 justify-between mb-4">
   <div className="flex items-center">
     <p className={`text-sm font-semibold ${msg.sender.name === 'You' ? 'text-blue-800' : 'text-gray-800'}`}>
       {msg.sender.name}

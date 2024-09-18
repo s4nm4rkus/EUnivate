@@ -35,7 +35,7 @@ const AdminLayout = () => {
             <main 
                 className={`transition-transform duration-300 ${
                     isNavOpen ? 'lg:ml-[250px] ml-64' : 'lg:ml-[250px] ml-0'
-                } w-full h-full z-20`}
+                } w-full h-full`}
             >
                 <Outlet context={{ isNavOpen }} />
             </main>

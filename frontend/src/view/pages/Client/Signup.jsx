@@ -63,8 +63,10 @@ const Signup = () => {
 
     let profilePictureUrl = profilePicture;
 
-    if (profilePicture) {
-      try {
+    if (!profilePicture) {
+      profilePictureUrl = "https://res.cloudinary.com/dzxzc7kwb/image/upload/v1725974053/DefaultProfile/qgtsyl571c1neuls9evd.png";
+    } else {
+       try {
         profilePictureUrl = await uploadImageToCloudinary(profilePicture);
       } catch (uploadError) {
         setError("Failed to upload profile picture. Please try again.");

@@ -73,27 +73,47 @@ const Project = () => {
 
   const handleCreateProject = async () => {
     setloading(true);
+  
     if (!imagePreview || !projectName || !team) {
       setError('Please fill out all fields including image, project name, and team.');
+      setloading(false);
       return;
     }
-
+  
+    // Retrieve access token from local storage
+    const user = JSON.parse(localStorage.getItem('user'));
+    const accessToken = user ? user.accessToken : null;
+  
+    if (!accessToken) {
+      setloading(false);
+      setError('No access token found. Please log in again.');
+      return;
+    }
+  
     try {
       const thumbnail = await handleSavethumbnail(selectedImage);
       const newProject = {
         projectName,
         thumbnail,
       };
-
-      const response = await axios.post('http://localhost:5000/api/users/sa-newproject', newProject);
+  
+      // Include token in the request headers
+      const response = await axios.post('http://localhost:5000/api/users/sa-newproject', newProject, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+  
       setProjects([...projects, response.data]);
       closeModal();
     } catch (error) {
-        setloading(false);
       console.error('Error creating project:', error);
       setError('An error occurred while creating the project.');
+    } finally {
+      setloading(false);
     }
   };
+  
 
   useEffect(() => {
     // Fetch done task count for each project

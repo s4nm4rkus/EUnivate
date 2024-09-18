@@ -34,15 +34,18 @@ const Login = () => {
       const data = response.data;
 
       if (response.status === 200) {
+        
         // Check if OTP is required
         if (data.twoFactorEnabled) {
           localStorage.setItem('user', JSON.stringify({
             userId: data._id,
             email: data.email,
+            accessToken: data.accessToken, 
+        
           }));
           navigate('/verify-2fa-pending');
         } else {
-          const { _id, firstName, lastName, email, role, username, phoneNumber, profilePicture, accessToken, refreshToken, twoFactorToken } = data;
+          const { _id, firstName, lastName, email, role, username, phoneNumber, profilePicture, accessToken, twoFactorToken } = data;
 
           localStorage.setItem('user', JSON.stringify({
             _id,
@@ -55,7 +58,6 @@ const Login = () => {
             role,
             twoFactorToken,
             accessToken,
-            refreshToken,
           }));
 
           if (rememberMe) {

@@ -7,6 +7,7 @@ export const createSaNewProject = async (req, res) => {
         const newSaNewProject = new SaNewProject({
             projectName: projectName,
             thumbnail: thumbnail,
+            owner: req.user._id 
         });
 
         const savedSaNewProject = await newSaNewProject.save();

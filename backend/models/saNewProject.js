@@ -11,7 +11,10 @@ const projectSchema = new mongoose.Schema({
       type: String,
       required: true,
     }
-  }
+  },
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, 
+  // invitedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+
 }, { timestamps: true });
 
 const Project = mongoose.model('SaNewProject', projectSchema);

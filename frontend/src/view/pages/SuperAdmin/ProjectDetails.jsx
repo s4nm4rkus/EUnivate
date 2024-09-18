@@ -15,6 +15,8 @@ const ProjectDetails = () => {
     const [selectedView, setSelectedView] = useState('Kanban');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+    const [selectedMembers, setSelectedMembers] = useState([]); 
+    const [addedMembers, setAddedMembers] = useState([]);
     const [members, setMembers] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [addText, setAddText] = useState('');
@@ -62,6 +64,21 @@ const ProjectDetails = () => {
             console.error('Error fetching members:', error);
         }
     };
+
+        const toggleMemberSelection = (member) => {
+            setSelectedMembers(prevSelectedMembers => 
+                prevSelectedMembers.some(selected => selected._id === member._id)
+                    ? prevSelectedMembers.filter(selected => selected._id !== member._id)
+                    : [...prevSelectedMembers, member]
+            );
+        };
+
+        const handleAddMembers = () => {
+            setAddedMembers([...addedMembers, ...selectedMembers]); 
+            setSelectedMembers([]);
+            setIsUserModalOpen(false); 
+        };
+    
 
     const handleCloseUserModal = () => {
         setIsUserModalOpen(false);
@@ -126,7 +143,7 @@ const ProjectDetails = () => {
                             <span className="text-gray-500">Detail</span>
                         </div>
 
-                        <div className="flex items-center space-x-4">
+                        <div className="relative flex items-center space-x-4">
                             <h2 className="text-3xl font-semibold mt-[-1rem]">
                                 {project.projectName}
                             </h2>
@@ -136,6 +153,17 @@ const ProjectDetails = () => {
                                 size="lg" 
                                 onClick={handleUserIconClick}
                             />
+                            {/* Updated section for added users */}
+                            <div className="flex -space-x-4  right-0">
+                                {addedMembers.map(member => (
+                                    <img
+                                    key={member._id}
+                                    src={member.profilePicture} // Assuming profilePicture is available
+                                    alt={member.username}
+                                    className="w-8 h-8 rounded-full border border-gray-300"
+                                    />
+                                ))}
+                            </div>
                         </div>
 
                         <div className="flex items-center space-x-4 mt-4">
@@ -178,16 +206,15 @@ const ProjectDetails = () => {
             </div>
 
             <div className="mt-6 border-gray-200">
-                    {selectedView === 'Kanban' && <Kanban projectId={projectId} projectName={project.projectName} />}
-                    {selectedView === 'List' && <List projectId={projectId} />}
-                    {selectedView === 'Calendar' && <Calendar project={project} />}
-                    {selectedView === 'GanttChart' && <GanttChart projectId={projectId} />}
-                    {selectedView === 'RaciMatrix' && <RaciMatrix projectId={projectId} />}
-
+                {selectedView === 'Kanban' && <Kanban projectId={projectId} projectName={project.projectName} />}
+                {selectedView === 'List' && <List projectId={projectId} />}
+                {selectedView === 'Calendar' && <Calendar project={project} />}
+                {selectedView === 'GanttChart' && <GanttChart projectId={projectId} />}
+                {selectedView === 'RaciMatrix' && <RaciMatrix projectId={projectId} />}
             </div>
 
-            {/* Modal for adding new members */}
-            {isUserModalOpen && (
+             {/* Modal for adding new members */}
+             {isUserModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-500 bg-opacity-50">
                     <div className="relative bg-white p-6 rounded-md shadow-lg border border-gray-200 w-1/3">
                         <button
@@ -199,16 +226,16 @@ const ProjectDetails = () => {
                         <h2 className="text-xl font-semibold mb-4">Add New Member</h2>
                         
                         <div className="flex items-center mb-4">
-                            <input 
-                                type="text" 
-                                placeholder="Search by email..." 
+                            <input
+                                type="text"
+                                placeholder="Search by email..."
                                 className="flex-grow p-2 border border-gray-300 rounded-md"
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 value={searchQuery}
                             />
-                            <button 
-                                className="ml-2 bg-red-600 text-white px-4 py-2 rounded-md whitespace-nowrap"
-                                onClick={() => console.log('Add member logic here')}
+                            <button
+                                className="ml-2 bg-red-600 text-white px-4 py-2 rounded-md"
+                                onClick={handleAddMembers}
                             >
                                 Add Member
                             </button>
@@ -217,45 +244,33 @@ const ProjectDetails = () => {
                         <div className="mt-4">
                             <h3 className="font-semibold mb-2 text-red-800">Members</h3>
                             {filteredMembers.length > 0 ? (
-                                <ul>
-                                    {filteredMembers.map((member) => (
-                                        <li key={member._id} className="flex justify-between items-start py-2 border-b border-gray-200">
-                                            <div className="flex-grow">
-                                                <span className="block font-medium">{member.username}</span>
-                                                <span className="block text-gray-600">{member.email}</span>
-                                            </div>
-                                            <span className="text-gray-600">{member.role}</span>
-                                        </li>
-                                    ))}
-                                </ul>
+                               <ul>
+                               {filteredMembers.map((member) => (
+                                 <li
+                                   key={member._id}
+                                   className={`flex justify-between items-center py-2 border-b border-gray-200 cursor-pointer hover:bg-gray-100 ${
+                                     selectedMembers.some(selected => selected._id === member._id) ? 'bg-gray-300' : ''
+                                   }`}
+                                   onClick={() => toggleMemberSelection(member)}
+                                 >
+                                   <div className="flex items-center space-x-2">
+                                     <img
+                                       src={member.profilePicture}
+                                       alt={member.username}
+                                       className="w-8 h-8 rounded-full"
+                                     />
+                                     <span>{member.username}</span>
+                                   </div>
+                                   <span>{member.email}</span>
+                                   {selectedMembers.some(selected => selected._id === member._id) && (
+                                     <span className="text-red-500 font-bold">Selected</span>
+                                   )}
+                                 </li>
+                               ))}
+                             </ul>
                             ) : (
                                 <p>No members found.</p>
                             )}
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Modal for Gantt Chart and RACI Matrix */}
-            {isModalOpen && (
-                <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-500 bg-opacity-50">
-                    <div
-                        ref={modalRef}
-                        className="bg-white p-6 rounded-md shadow-lg border border-gray-200"
-                    >
-                        <div className="flex space-x-4">
-                            <button
-                                onClick={() => handleButtonTextUpdate('Gantt Chart')}
-                                className="bg-orange-100 text-orange-600 px-4 py-2 rounded-md"
-                            >
-                                Gantt Chart
-                            </button>
-                            <button
-                                onClick={() => handleButtonTextUpdate('RACI Matrix')}
-                                className="bg-blue-100 text-blue-600 px-4 py-2 rounded-md"
-                            >
-                                RACI Matrix
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -265,3 +280,4 @@ const ProjectDetails = () => {
 };
 
 export default ProjectDetails;
+

@@ -62,8 +62,8 @@ export const loginUser = async (req, res) => {
       profilePicture: user.profilePicture,
       role: user.role,
       twoFactorEnabled: user.twoFactorEnabled,
-      token: accessToken,  // Pass the access token here
-      refreshToken,
+      accessToken: accessToken,  // Pass the access token here
+
     });
   } catch (error) {
     console.error('Error during login:', error);

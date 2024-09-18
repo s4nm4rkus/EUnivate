@@ -26,7 +26,7 @@ const router = express.Router();
 router.post('/login', loginUser);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password/:token', resetPassword);
-router.post('/verify-otp', verifyTwoFactorAuth);  
+router.post('/verify-otp', protect, verifyTwoFactorAuth);  
 router.post('/verify-login-otp',  verifyLoginOtp);  
 router.post('/resend-otp',  resendOtp);  
 router.post('/refresh-token', refreshToken);
@@ -35,7 +35,7 @@ router.post('/refresh-token', refreshToken);
 router.post('/contactEunivate',ContactEunivate );
 
 //SuperAdminRoutes
-router.post('/sa-newproject', createSaNewProject);
+router.post('/sa-newproject',protect, createSaNewProject);
 router.get('/sa-getnewproject', getAllProjects);
 router.delete('/sa-newproject/:id', deleteProjectById);
 router.get('/sa-getnewproject/:id', getProjectById)

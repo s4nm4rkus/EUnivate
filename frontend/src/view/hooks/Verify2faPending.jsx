@@ -53,7 +53,7 @@ const Verify2FAPending = () => {
         }
       
         try {
-          const response = await axios.post('http://localhost:5000/api/users/verify-otp', {
+          const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/verify-otp`, {
             userId,
             otp: otpCode,
           });
@@ -127,7 +127,7 @@ const Verify2FAPending = () => {
     }
 
     try {
-      await axios.post('http://localhost:5000/api/users/resend-otp', {
+      await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/resend-otp`, {
         email: storedUser.email,
       });
       setSuccess('OTP resent successfully!');

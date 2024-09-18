@@ -14,7 +14,7 @@ const AdminDashboard = () => {
     useEffect(() => {
         const fetchQuotations = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/users/quotations');
+                const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/quotations`);
                 const data = await response.json();
                 
                 const now = new Date();
@@ -47,7 +47,7 @@ const AdminDashboard = () => {
     const handleDelete = async () => {
         try {
             await Promise.all(selectedIds.map(id => 
-                fetch(`http://localhost:5000/api/users/quotations/${id}`, {
+                fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/quotations/${id}`, {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                 })
@@ -72,7 +72,7 @@ const AdminDashboard = () => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/users/stats');
+                const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/stats`);
                 const data = await response.json();
                 setStats([
                     { label: 'Quotations', value: data.quotations }, 

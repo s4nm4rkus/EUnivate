@@ -27,7 +27,7 @@ const ProjectDetails = () => {
     useEffect(() => {
         const fetchProjectDetails = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/users/sa-getnewproject/${projectId}`);
+                const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-getnewproject/${projectId}`);
                 setProject(response.data);
             } catch (error) {
                 console.error('Error fetching project details:', error);
@@ -55,7 +55,7 @@ const ProjectDetails = () => {
 
     const handleUserIconClick = async () => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/users/members-superadmins`);
+            const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/members-superadmins`);
             setMembers(response.data);
             setIsUserModalOpen(true);
         } catch (error) {

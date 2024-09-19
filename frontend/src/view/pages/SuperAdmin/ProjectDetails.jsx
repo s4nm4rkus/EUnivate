@@ -40,7 +40,7 @@ const ProjectDetails = () => {
                     return;
                 }
 
-                const response = await axios.get(`http://localhost:5000/api/users/sa-getnewproject/${projectId}`, {
+                const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-getnewproject/${projectId}`, {
                     headers: { Authorization: `Bearer ${accessToken}` },
                 });
 
@@ -81,7 +81,7 @@ const ProjectDetails = () => {
                 throw new Error('No access token found. Please log in.');
             }
 
-            const response = await axios.get(`http://localhost:5000/api/users/members-superadmins`, {
+            const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/members-superadmins`, {
                 headers: { Authorization: `Bearer ${accessToken}` }
             });
 
@@ -116,7 +116,7 @@ const ProjectDetails = () => {
                 throw new Error('No valid user IDs to add.');
             }
     
-            const response = await axios.post(`http://localhost:5000/api/users/sa-invite-users`, {
+            const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-invite-users`, {
                 projectId: project._id,
                 users: userIds
             }, {

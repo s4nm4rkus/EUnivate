@@ -72,7 +72,7 @@ const Project = () => {
       reader.readAsDataURL(file);
     }
   };
-
+//post request of cloudnary
   const handleSavethumbnail = async (file) => {
     const formData = new FormData();
     formData.append('file', file);

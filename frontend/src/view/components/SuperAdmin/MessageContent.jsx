@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faReply, faStar, faHeart, faPaperPlane, faPaperclip, faMicrophone, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
@@ -113,7 +112,7 @@ const MessageContent = () => {
           };
       
           try {
-            const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/messages`, {
+            const response = await fetch('http://localhost:5000/api/messages', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(newMessage),
@@ -147,7 +146,7 @@ const MessageContent = () => {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/messages`);
+        const response = await fetch('http://localhost:5000/api/messages');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -245,7 +244,7 @@ const handleDelete = async (messageId) => {
 
   const editMessage = async (id, updatedContent, updatedFile, updatedTime) => {
     try {
-      const response = await axios.put(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/messages/${id}`, {
+      const response = await axios.put(`http://localhost:5000/api/messages/${id}`, {
         content: updatedContent,
         file: updatedFile,
         time: updatedTime,
@@ -264,7 +263,7 @@ const handleDelete = async (messageId) => {
   
   const deleteMessage = async (id) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/messages/${id}`);
+      await axios.delete(`http://localhost:5000/api/messages/${id}`);
       setMessages((prevMessages) => prevMessages.filter((msg) => msg._id !== id));
     } catch (error) {
       console.error('Error deleting message:', error);
@@ -297,7 +296,7 @@ const handleDelete = async (messageId) => {
                 msg.sender.name === 'You' ? 'bg-blue-200 text-gray-800' : 'bg-red-100 text-gray-800'
               } max-w-[60%] border border-blue relative ${editingMessageId === msg._id ? 'border-blue-500' : ''}`}
             >
-              <div className="message-header flex items-center space-x-12 justify-between mb-4">
+              <div className="message-header flex items-center flex space-x-12 justify-between mb-4">
   <div className="flex items-center">
     <p className={`text-sm font-semibold ${msg.sender.name === 'You' ? 'text-blue-800' : 'text-gray-800'}`}>
       {msg.sender.name}
@@ -472,15 +471,3 @@ const handleDelete = async (messageId) => {
 };
 
 export default MessageContent;
-
-
-
-
-
-
-
-
-
-
-
-

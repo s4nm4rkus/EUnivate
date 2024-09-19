@@ -225,7 +225,7 @@ const handleDelete = async (messageId) => {
       return `
         <div style="padding: 12px; background-color: #f9fafb; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 12px; margin-top: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
           <p style="font-weight: bold; color: #0078d4; margin-bottom: 10px;">Replying to ${message.replyTo.sender.name}:</p>
-          <div style="border-left: 4px solid #0078d4; padding: 12px; background-color: #ffffff; border-radius: 10px; box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);">
+          <div style="border-left: 4px solid #ff0000; padding: 12px; background-color: #ffd6d6; border-radius: 10px; box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);">
             <p style="font-weight: bold; color: #333; margin-bottom: 6px;">
               ${message.replyTo.sender.name} 
               <span style="color: #777; font-size: 12px; float: right;">${message.replyTo.time}</span>
@@ -328,37 +328,42 @@ const handleDelete = async (messageId) => {
   )
 )}
 
-<div className="message-actions flex space-x-2 mt-2">
-                <FontAwesomeIcon
-                  icon={faReply}
-                  onClick={() => handleReply(msg)}
-                  className={`cursor-pointer ${getIconColor(msg._id, 'reply')}`}
-                />
-                <FontAwesomeIcon
-                  icon={faStar}
-                  onClick={() => handleIconClick(msg._id, 'star')}
-                  className={`cursor-pointer ${getIconColor(msg._id, 'star')}`}
-                />
-                <FontAwesomeIcon
-                  icon={faHeart}
-                  onClick={() => handleIconClick(msg._id, 'heart')}
-                  className={`cursor-pointer ${getIconColor(msg._id, 'heart')}`}
-                />
-                {msg.sender.name === 'You' && (
-                <>
-                  <FontAwesomeIcon
-                    icon={faEdit}
-                    onClick={() => handleEdit(msg._id, msg.content)}
-                    className="cursor-pointer text-blue-500"
-                  />
-                  <FontAwesomeIcon
-                    icon={faTrash}
-                    onClick={() => handleDelete(msg._id)}
-                    className="cursor-pointer text-red-500"
-                  />
-                </>
-              )}
-              </div>
+<div className="message-actions flex justify-between items-center mt-2">
+  {/* Left side icons */}
+  <div className="flex space-x-2">
+    <FontAwesomeIcon
+      icon={faReply}
+      onClick={() => handleReply(msg)}
+      className={`cursor-pointer hover:text-blue-600 transition duration-300 ${getIconColor(msg._id, 'reply')}`}
+    />
+    <FontAwesomeIcon
+      icon={faStar}
+      onClick={() => handleIconClick(msg._id, 'star')}
+      className={`cursor-pointer ${getIconColor(msg._id, 'star')}`}
+    />
+    <FontAwesomeIcon
+      icon={faHeart}
+      onClick={() => handleIconClick(msg._id, 'heart')}
+      className={`cursor-pointer hover:text-red-600 transition duration-300 ${getIconColor(msg._id, 'heart')}`}
+    />
+  </div>
+
+  {/* Right side icons (edit and delete) */}
+  {msg.sender.name === 'You' && (
+    <div className="flex space-x-2">
+      <FontAwesomeIcon
+        icon={faEdit}
+        onClick={() => handleEdit(msg._id, msg.content)}
+        className="cursor-pointer text-blue-500"
+      />
+      <FontAwesomeIcon
+        icon={faTrash}
+        onClick={() => handleDelete(msg._id)}
+        className="cursor-pointer text-red-500"
+      />
+    </div>
+  )}
+</div>
             </div>
           </div>
         ))}
@@ -407,14 +412,14 @@ const handleDelete = async (messageId) => {
             {/* Attachment Icon */}
             <label className="cursor-pointer">
               <input type="file" className="hidden" onChange={handleFileChange} />
-              <button onClick={handleAttachmentClick} className="mr-2 text-gray-600">
+              <button onClick={handleAttachmentClick} className="mr-2 text-gray-600 hover:text-blue-600 transition duration-300">
   <FontAwesomeIcon icon={faPaperclip} />
   <input type="file" accept="*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
 </button>
               {/* Microphone Icon */}
               <button
                 onClick={isRecording ? stopRecording : startRecording}
-                className={`p-2 transition duration-300 ${isRecording ? 'bg-red-500 text-white' : 'text-gray-600'}`}
+                className={`p-2 hover:text-blue-600 transition duration-300 ${isRecording ? 'bg-red-500 text-white' : 'text-gray-600'}`}
               >
                 <FontAwesomeIcon icon={faMicrophone} style={{ fontSize: '1rem' }} />
               </button>

@@ -27,13 +27,14 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
   const [priority, setPriority] = useState('');
   const [isUserNameModalOpen, setIsUserNameModalOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
-
+  
   const [isPriorityDropdownOpen, setIsPriorityDropdownOpen] = useState(false);
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
 
   const dropdownRef = useRef(null);
   const fileInputRef = useRef(null);
 
+  // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -49,12 +50,14 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
     };
   }, []);
 
+  // Fetch project details when modal is open
   useEffect(() => {
     if (isOpen && projectId) {
       fetchProjectDetails();
     }
   }, [isOpen, projectId]);
 
+  // Fetch members list when modal is open
   useEffect(() => {
     if (isOpen) {
       fetchUsers();
@@ -84,7 +87,7 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
     formData.append('file', file);
     formData.append('upload_preset', 'EunivateImage');
     formData.append('cloud_name', 'dzxzc7kwb');
-  
+
     try {
       const response = await axios.post(
         'https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload',
@@ -96,7 +99,6 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
       throw error;
     }
   };
-  
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -104,14 +106,14 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
       alert('Please fill in all fields before submitting.');
       return;
     }
-  
+
     if (new Date(dueDate) < new Date(startDate)) {
       alert('Due Date cannot be earlier than Start Date.');
       return;
     }
-  
+
     let uploadedImages = [];
-  
+
     // Upload selected files to Cloudinary
     for (const file of selectedFiles) {
       try {
@@ -126,18 +128,17 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
         return;
       }
     }
-  
+
     try {
-      // Send the array of assignees
       const assigneeIds = selectedName.split(', ').map(async (name) => {
         const userResponse = await axios.get(`http://localhost:5000/api/users/findByUsername/${name}`);
         return userResponse.data._id;
       });
-  
+
       const newTask = {
         taskName,
         objectives,
-        assignee: await Promise.all(assigneeIds), // Assign array of assignee IDs
+        assignee: await Promise.all(assigneeIds),
         status,
         priority,
         startDate,
@@ -147,11 +148,11 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
         questionUpdate: question,
         project: projectId,
       };
-  
+
       const response = await axios.post('http://localhost:5000/api/users/sa-task', newTask);
       console.log('Task created:', response.data);
       onTaskSubmit(newTask);
-  
+
       // Clear the fields
       setTaskName('');
       setDescription('');
@@ -164,16 +165,13 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
       setQuestion('');
       setSelectedFiles([]);
       onClose();
-  
+
     } catch (error) {
       setLoading(false);
       console.error('Error saving task:', error);
       alert('Failed to save task.');
     }
   };
-  
-  
-
 
   const toggleUserNameVisibility = () => {
     setIsUserNameModalOpen(true);
@@ -183,8 +181,6 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
     const memberNames = members.map(member => member.username).join(', ');
     setSelectedName(memberNames);  
   };
-  
-  
 
   const handleClickFileInput = () => {
     fileInputRef.current.click();
@@ -209,13 +205,19 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
   if (!isOpen) return null;
 
   return ReactDOM.createPortal(
-    <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50">
-      <div className="bg-white p-6 w-96 max-h-[90vh] overflow-auto rounded-lg shadow-lg">
+    <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-end items-center z-50">
+      <div
+        className={`bg-white p-6 w-96 max-h-[100vh] overflow-auto rounded-lg shadow-lg transform transition-all duration-500 ${
+          isOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
+        }`}
+      >
         <div className="flex items-center justify-between mb-4">
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
             <FaTimes size={16} />
           </button>
         </div>
+
+        {/* Modal Content */}
         <div className="mb-4">
           <h2>{project?.projectName}</h2>
           <input
@@ -227,6 +229,7 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
             placeholder="Write a task name"
           />
         </div>
+
         <div className="mb-4 flex justify-start space-x-3">
           <button
             className="flex items-center space-x-2 bg-transparent border-none outline-none focus:outline-none"

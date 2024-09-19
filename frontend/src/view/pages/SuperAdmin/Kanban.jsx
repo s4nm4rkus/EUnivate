@@ -133,17 +133,18 @@ const Kanban = ({ projectId }) => {
           <p className="text-lg text-gray-800 overflow-hidden text-ellipsis whitespace-nowrap">{task.description}</p>
           {/* Display attachments */}
           {task.attachment && task.attachment.length > 0 && (
-            <div className="mt-4 flex overflow-x-auto space-x-2 py-2 justify-center"> {/* Centered images */}
-              {task.attachment.map((attachment, index) => (
-                <img
-                  key={index}
-                  src={attachment.url}
-                  alt={`Attachment ${index + 1}`}
-                  className="w-40 h-36 object-cover rounded-md" 
-                />
-              ))}
-            </div>
-          )}
+  <div className="mt-4 flex overflow-x-auto space-x-2 py-2 justify-center"> {/* Center images */}
+    {task.attachment.map((attachment, index) => (
+      <img
+        key={index}
+        src={attachment.url}
+        alt={`Attachment ${index + 1}`}
+        className="w-full sm:w-40 h-48 sm:h-36 object-cover rounded-md" 
+      />
+    ))}
+  </div>
+)}
+
         </div>
         {/* Display additional details */}
         <div className="mt-5 flex items-center space-x-3 overflow-x-auto">

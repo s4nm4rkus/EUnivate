@@ -99,7 +99,7 @@ const Signup = () => {
           profilePicture: userData.profilePicture,
           username: userData.username,
           role: userData.role,
-          token: userData.accessToken,
+          accessToken: userData.accessToken,
         }));
 
         navigate("/verify-2fa-pending");

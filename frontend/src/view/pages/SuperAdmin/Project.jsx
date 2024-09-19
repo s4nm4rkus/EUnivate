@@ -30,7 +30,7 @@ const Project = () => {
           return;
         }
   
-        const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
+        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}api/users/sa-getnewproject`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
@@ -72,7 +72,7 @@ const Project = () => {
       reader.readAsDataURL(file);
     }
   };
-
+//post request of cloudnary
   const handleSavethumbnail = async (file) => {
     const formData = new FormData();
     formData.append('file', file);

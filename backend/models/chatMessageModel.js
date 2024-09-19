@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const chatMessageSchema = new mongoose.Schema({
   content: {
     type: String,
-    required: true,
+    required: false,
   },
   sender: {
     name: { type: String, required: true },
@@ -22,8 +22,13 @@ const chatMessageSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  replyTo: {  // Reference to another message
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'ChatMessage',
+    default: null,
+  }
 });
 
-const ChatMessage = mongoose.model('ChatMessage', chatMessageSchema); // This should match the collection name
+const ChatMessage = mongoose.model('ChatMessage', chatMessageSchema);
 
 export default ChatMessage;

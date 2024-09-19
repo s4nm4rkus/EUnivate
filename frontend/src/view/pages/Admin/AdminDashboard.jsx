@@ -10,7 +10,7 @@ const AdminDashboard = () => {
     const [stats, setStats] = useState([]);
     const [selectedIds, setSelectedIds] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
-    // Fetching quotations for the emails section
+
     useEffect(() => {
         const fetchQuotations = async () => {
             try {
@@ -59,7 +59,6 @@ const AdminDashboard = () => {
         }
     };
 
-    // Handle redirect to Gmail inbox
     const handleEmailClick = () => {
         window.open('https://mail.google.com/mail/u/2/#inbox', '_blank');
     };
@@ -68,7 +67,6 @@ const AdminDashboard = () => {
         setSearchQuery(event.target.value);
     };
 
-    // Fetching statistics for the dashboard
     useEffect(() => {
         const fetchStats = async () => {
             try {
@@ -91,18 +89,18 @@ const AdminDashboard = () => {
 
     const services = ['Service 1', 'Service 2', 'Service 3', 'Service 4', 'Service 5'];
 
-    // Filter and highlight emails based on search query
     const filteredEmails = emails.filter(email =>
         email.sender.toLowerCase().includes(searchQuery.toLowerCase())
     );
+    
     return (
         <Layout>
             {/* Statistics Section */}
             <div className="bg-white rounded-lg shadow p-4 flex justify-between items-center">
                 {stats.map((stat, index) => (
                     <div key={index} className={`flex-1 text-center ${index !== stats.length - 1 ? 'border-r border-gray-200' : ''}`}>
-                        <p className="text-gray-500">{stat.label}</p>
-                        <h4 className="text-2xl font-bold text-red-700">{stat.value}</h4>
+                        <p className="text-gray-500 text-sm md:text-base">{stat.label}</p>
+                        <h4 className="text-2xl font-bold text-red-700 md:text-2xl">{stat.value}</h4>
                     </div>
                 ))}
             </div>
@@ -129,21 +127,22 @@ const AdminDashboard = () => {
                         <div
                             key={index}
                             className={`flex items-center border-b border-gray-200 py-4 cursor-pointer ${selectedIds.includes(email.id) ? 'bg-gray-100' : ''}`}
-                            onClick = {handleEmailClick}        >
+                            onClick={handleEmailClick}
+                        >
                             <input
                                 type="checkbox"
                                 className="mr-4"
                                 checked={selectedIds.includes(email.id)}
                                 onChange={() => handleCheckboxChange(email.id)}
                             />
-                            <p className="flex-1 truncate text-gray-700">{email.sender}</p>
+                            <p className="flex-1 truncate text-gray-700 text-sm md:text-base">{email.sender}</p>
                             {email.status && (
                                 <span className={`px-3 py-1 rounded-full text-white mr-4 ${email.status === 'New' ? 'bg-teal-400' : 'bg-red-400'}`}>
                                     {email.status}
                                 </span>
                             )}
-                            <p className="flex-1 truncate text-gray-500">{email.subject}</p>
-                            <p className="text-gray-500">{email.time}</p>
+                            <p className="flex-1 truncate text-gray-500 text-sm md:text-base">{email.subject}</p>
+                            <p className="text-gray-500 text-sm md:text-base">{email.time}</p>
                         </div>
                     ))}
                 </div>
@@ -151,7 +150,7 @@ const AdminDashboard = () => {
                 {/* Manage Services Section */}
                 <div className="bg-white rounded-lg shadow p-6">
                     <div className="flex justify-between items-center mb-6">
-                        <h6 className="text-gray-700 font-semibold">Manage Services</h6>
+                        <h6 className="text-gray-700 font-semibold text-sm md:text-base">Manage Services</h6>
                         <select className="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-200">
                             <option>Sort by</option>
                         </select>
@@ -159,14 +158,14 @@ const AdminDashboard = () => {
                     <table className="w-full">
                         <thead>
                             <tr className="text-left">
-                                <th className="pb-2">Name</th>
-                                <th className="pb-2 text-right">Action</th>
+                                <th className="pb-2 text-sm md:text-base">Name</th>
+                                <th className="pb-2 text-right text-sm md:text-base">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {services.map((service, index) => (
                                 <tr key={index} className="border-b border-gray-200">
-                                    <td className="py-2">{service}</td>
+                                    <td className="py-2 text-sm md:text-base">{service}</td>
                                     <td className="py-2 text-right space-x-2">
                                         <button className="text-blue-500 hover:text-blue-700">
                                             <FontAwesomeIcon icon={faEdit} />

@@ -45,6 +45,7 @@ const ProjectDetails = () => {
                     headers: { Authorization: `Bearer ${accessToken}` },
                 });
 
+                
                 setProject(response.data);
                    setAddedMembers(response.data.invitedUsers);
             } catch (error) {

@@ -63,11 +63,11 @@ const Kanban = ({ projectId }) => {
       accept: ItemType.TASK,
       drop: (item) => moveTask(item.id, status),
     });
-
+  
     return (
       <div ref={drop} className="w-full sm:w-1/5 p-2">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-xl text-gray-600 font-bold">{status}</h2>
+          <h2 className="text-base text-gray-600 font-bold">{status}</h2> {/* Reduced text size */}
           <button
             onClick={handleOpenModal}
             className="text-gray-600 p-0 flex items-center justify-center"
@@ -80,13 +80,13 @@ const Kanban = ({ projectId }) => {
       </div>
     );
   };
-
+  
   const TaskCard = ({ task }) => {
     const [, drag] = useDrag({
       type: ItemType.TASK,
       item: { id: task._id },
     });
-
+  
     // Set background color based on priority
     const getPriorityBackgroundColor = (priority) => {
       switch (priority) {
@@ -100,19 +100,20 @@ const Kanban = ({ projectId }) => {
           return 'bg-gray-200 text-gray-800'; // Default background
       }
     };
-
+  
     // Function to format the start month
     const formatStartMonth = (startDate) => {
       if (!startDate) return 'N/A';
       const date = new Date(startDate);
-      return date.toLocaleString('default', { month: 'long' });
+      return date.toLocaleString('default', { month: 'short' }); 
     };
-
+    
+  
     return (
       <div ref={drag} className="p-4 rounded-lg shadow-md bg-white relative">
         <div className="flex items-start justify-between">
-          <div className={`px-2 py-1 text-lg font-bold rounded-sm ${getPriorityBackgroundColor(task.priority)}`}>
-            {task.priority}
+          <div className={`px-3 py-2 text-sm font-medium rounded-sm ${getPriorityBackgroundColor(task.priority)}`}>
+            {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
           </div>
           {/* Display assignee profile pictures */}
           <div className='flex -space-x-3'>
@@ -127,18 +128,18 @@ const Kanban = ({ projectId }) => {
             ))}
           </div>
         </div>
-        <div className="mt-10">
-          <h2 className="text-2xl font-semibold">{task.taskName}</h2>
-          <p className="text-lg text-gray-800">{task.description}</p>
+        <div className="mt-2"> {/* Adjusted top margin */}
+          <h2 className="text-2xl font-semibold mb-2">{task.taskName}</h2> {/* Adjusted bottom margin */}
+          <p className="text-lg text-gray-800 overflow-hidden text-ellipsis whitespace-nowrap">{task.description}</p>
           {/* Display attachments */}
           {task.attachment && task.attachment.length > 0 && (
-            <div className="mt-4 flex overflow-x-auto space-x-2 py-2">
+            <div className="mt-4 flex overflow-x-auto space-x-2 py-2 justify-center"> {/* Centered images */}
               {task.attachment.map((attachment, index) => (
                 <img
                   key={index}
                   src={attachment.url}
                   alt={`Attachment ${index + 1}`}
-                  className="w-32 h-32 object-cover rounded-md"
+                  className="w-40 h-36 object-cover rounded-md" 
                 />
               ))}
             </div>
@@ -162,6 +163,8 @@ const Kanban = ({ projectId }) => {
       </div>
     );
   };
+  
+  
 
   return (
     <DndProvider backend={HTML5Backend}>

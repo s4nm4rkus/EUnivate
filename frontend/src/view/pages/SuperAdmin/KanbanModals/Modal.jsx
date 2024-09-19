@@ -209,7 +209,7 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
   if (!isOpen) return null;
 
   return ReactDOM.createPortal(
-    <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-modal">
+    <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50">
       <div className="bg-white p-6 w-96 max-h-[90vh] overflow-auto rounded-lg shadow-lg">
         <div className="flex items-center justify-between mb-4">
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">

@@ -39,7 +39,7 @@ const Contact = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:5000/api/users/contactEunivate', {
+      const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/contactEunivate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

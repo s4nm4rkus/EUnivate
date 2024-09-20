@@ -17,8 +17,10 @@ const AdminDashboard = () => {
                 const response = await fetch('http://localhost:5000/api/users/quotations');
                 const data = await response.json();
                 
+                const sortedQuotations = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
                 const now = new Date();
-                const updatedEmails = data.map(quotation => {
+                const updatedEmails = sortedQuotations.map(quotation => {
                     const createdAt = new Date(quotation.createdAt);
                     const isNew = now - createdAt < ONE_HOUR;
                     const status = isNew ? 'New' : (quotation.verified ? 'Clicked' : 'Pending');

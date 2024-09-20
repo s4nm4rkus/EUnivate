@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faReply, faStar, faHeart, faPaperPlane, faPaperclip, faMicrophone, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
@@ -113,7 +112,7 @@ const MessageContent = () => {
           };
       
           try {
-            const response = await fetch('http://localhost:5000/api/messages', {
+            const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/messages`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(newMessage),
@@ -147,7 +146,7 @@ const MessageContent = () => {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/messages');
+        const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/messages`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -226,7 +225,7 @@ const handleDelete = async (messageId) => {
       return `
         <div style="padding: 12px; background-color: #f9fafb; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 12px; margin-top: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
           <p style="font-weight: bold; color: #0078d4; margin-bottom: 10px;">Replying to ${message.replyTo.sender.name}:</p>
-          <div style="border-left: 4px solid #0078d4; padding: 12px; background-color: #ffffff; border-radius: 10px; box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);">
+          <div style="border-left: 4px solid #ff0000; padding: 12px; background-color: #ffd6d6; border-radius: 10px; box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);">
             <p style="font-weight: bold; color: #333; margin-bottom: 6px;">
               ${message.replyTo.sender.name} 
               <span style="color: #777; font-size: 12px; float: right;">${message.replyTo.time}</span>
@@ -245,7 +244,7 @@ const handleDelete = async (messageId) => {
 
   const editMessage = async (id, updatedContent, updatedFile, updatedTime) => {
     try {
-      const response = await axios.put(`http://localhost:5000/api/messages/${id}`, {
+      const response = await axios.put(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}api/messages/${id}`, {
         content: updatedContent,
         file: updatedFile,
         time: updatedTime,
@@ -264,7 +263,7 @@ const handleDelete = async (messageId) => {
   
   const deleteMessage = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/messages/${id}`);
+      await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/messages/${id}`);
       setMessages((prevMessages) => prevMessages.filter((msg) => msg._id !== id));
     } catch (error) {
       console.error('Error deleting message:', error);
@@ -297,7 +296,7 @@ const handleDelete = async (messageId) => {
                 msg.sender.name === 'You' ? 'bg-blue-200 text-gray-800' : 'bg-red-100 text-gray-800'
               } max-w-[60%] border border-blue relative ${editingMessageId === msg._id ? 'border-blue-500' : ''}`}
             >
-              <div className="message-header flex items-center space-x-12 justify-between mb-4">
+              <div className="message-header flex items-center flex space-x-12 justify-between mb-4">
   <div className="flex items-center">
     <p className={`text-sm font-semibold ${msg.sender.name === 'You' ? 'text-blue-800' : 'text-gray-800'}`}>
       {msg.sender.name}
@@ -329,37 +328,42 @@ const handleDelete = async (messageId) => {
   )
 )}
 
-<div className="message-actions flex space-x-2 mt-2">
-                <FontAwesomeIcon
-                  icon={faReply}
-                  onClick={() => handleReply(msg)}
-                  className={`cursor-pointer ${getIconColor(msg._id, 'reply')}`}
-                />
-                <FontAwesomeIcon
-                  icon={faStar}
-                  onClick={() => handleIconClick(msg._id, 'star')}
-                  className={`cursor-pointer ${getIconColor(msg._id, 'star')}`}
-                />
-                <FontAwesomeIcon
-                  icon={faHeart}
-                  onClick={() => handleIconClick(msg._id, 'heart')}
-                  className={`cursor-pointer ${getIconColor(msg._id, 'heart')}`}
-                />
-                {msg.sender.name === 'You' && (
-                <>
-                  <FontAwesomeIcon
-                    icon={faEdit}
-                    onClick={() => handleEdit(msg._id, msg.content)}
-                    className="cursor-pointer text-blue-500"
-                  />
-                  <FontAwesomeIcon
-                    icon={faTrash}
-                    onClick={() => handleDelete(msg._id)}
-                    className="cursor-pointer text-red-500"
-                  />
-                </>
-              )}
-              </div>
+<div className="message-actions flex justify-between items-center mt-2">
+  {/* Left side icons */}
+  <div className="flex space-x-2">
+    <FontAwesomeIcon
+      icon={faReply}
+      onClick={() => handleReply(msg)}
+      className={`cursor-pointer hover:text-blue-600 transition duration-300 ${getIconColor(msg._id, 'reply')}`}
+    />
+    <FontAwesomeIcon
+      icon={faStar}
+      onClick={() => handleIconClick(msg._id, 'star')}
+      className={`cursor-pointer ${getIconColor(msg._id, 'star')}`}
+    />
+    <FontAwesomeIcon
+      icon={faHeart}
+      onClick={() => handleIconClick(msg._id, 'heart')}
+      className={`cursor-pointer hover:text-red-600 transition duration-300 ${getIconColor(msg._id, 'heart')}`}
+    />
+  </div>
+
+  {/* Right side icons (edit and delete) */}
+  {msg.sender.name === 'You' && (
+    <div className="flex space-x-2">
+      <FontAwesomeIcon
+        icon={faEdit}
+        onClick={() => handleEdit(msg._id, msg.content)}
+        className="cursor-pointer text-blue-500"
+      />
+      <FontAwesomeIcon
+        icon={faTrash}
+        onClick={() => handleDelete(msg._id)}
+        className="cursor-pointer text-red-500"
+      />
+    </div>
+  )}
+</div>
             </div>
           </div>
         ))}
@@ -408,14 +412,14 @@ const handleDelete = async (messageId) => {
             {/* Attachment Icon */}
             <label className="cursor-pointer">
               <input type="file" className="hidden" onChange={handleFileChange} />
-              <button onClick={handleAttachmentClick} className="mr-2 text-gray-600">
+              <button onClick={handleAttachmentClick} className="mr-2 text-gray-600 hover:text-blue-600 transition duration-300">
   <FontAwesomeIcon icon={faPaperclip} />
   <input type="file" accept="*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
 </button>
               {/* Microphone Icon */}
               <button
                 onClick={isRecording ? stopRecording : startRecording}
-                className={`p-2 transition duration-300 ${isRecording ? 'bg-red-500 text-white' : 'text-gray-600'}`}
+                className={`p-2 hover:text-blue-600 transition duration-300 ${isRecording ? 'bg-red-500 text-white' : 'text-gray-600'}`}
               >
                 <FontAwesomeIcon icon={faMicrophone} style={{ fontSize: '1rem' }} />
               </button>
@@ -467,15 +471,3 @@ const handleDelete = async (messageId) => {
 };
 
 export default MessageContent;
-
-
-
-
-
-
-
-
-
-
-
-

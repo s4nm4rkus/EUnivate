@@ -63,7 +63,7 @@ const Verify2FAPending = () => {
           }
       
           const response = await axios.post(
-            'http://localhost:5000/api/users/verify-otp',
+           'http://localhost:5000/api/users/verify-otp',
             { userId, otp: otpCode },
             {
               headers: {
@@ -71,7 +71,7 @@ const Verify2FAPending = () => {
               },
             }
           );
-      
+         
           if (response.status === 200) {
             setSuccess('OTP verified successfully!');
       

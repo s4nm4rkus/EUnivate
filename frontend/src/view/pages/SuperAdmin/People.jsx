@@ -124,7 +124,7 @@ const People = () => {
         try {
             const response = await fetch('http://localhost:5000/api/users/invite', {
                 method: 'POST',
-                headers: {
+                headers: {    
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ emails }), // Only send emails, no role
@@ -423,7 +423,7 @@ const People = () => {
   onClick={handleInvite}
   disabled={loading}
 >
-  {loading ? 'Inviting' : 'Invite'}
+  {loading ? 'Inviting ...' : 'Invite'}
 </button>
 
 

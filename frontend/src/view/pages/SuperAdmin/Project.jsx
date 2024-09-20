@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaCalendar, FaPaperclip, FaPlus, FaTimes, FaCheckCircle, FaTrash } from 'react-icons/fa';
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom'; 
 import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx';
 
 const Project = () => {
@@ -14,22 +14,42 @@ const Project = () => {
   const [projects, setProjects] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const [doneTaskCounts, setDoneTaskCounts] = useState({});
   const { isNavOpen } = useOutletContext();
 
+
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject');
+        const user = JSON.parse(localStorage.getItem('user'));
+        const accessToken = user ? user.accessToken : null;
+      
+        if (!accessToken) {
+          setLoading(false);
+          setError('No access token found. Please log in again.');
+          return;
+        }
+  
+        const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+  
         setProjects(response.data);
       } catch (error) {
         console.error('Error fetching projects:', error);
+        setError('An error occurred while fetching projects.');
+      } finally {
+        setLoading(false);
       }
     };
-
+  
     fetchProjects();
   }, []);
+  
 
   
   const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
@@ -54,7 +74,7 @@ const Project = () => {
       reader.readAsDataURL(file);
     }
   };
-
+//post request of cloudnary
   const handleSavethumbnail = async (file) => {
     const formData = new FormData();
     formData.append('file', file);
@@ -108,7 +128,7 @@ const Project = () => {
       setProjects([...projects, response.data]);
       closeModal();
     } catch (error) {
-        setloading(false);
+      setLoading(false);
       console.error('Error creating project:', error);
       setError('An error occurred while creating the project.');
     } finally {
@@ -239,7 +259,6 @@ const Project = () => {
               </select>
             </div>
 
-            {error && <p className="text-red-500 mt-4">{error}</p>}
 
             <div className="mt-6 flex justify-center">
               <button

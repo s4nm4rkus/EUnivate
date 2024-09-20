@@ -76,7 +76,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/api/users/signup", {
+      const response = await axios.post('http://localhost:5000/api/users/signup', {
         firstName,
         lastName,
         username,
@@ -99,7 +99,7 @@ const Signup = () => {
           profilePicture: userData.profilePicture,
           username: userData.username,
           role: userData.role,
-          token: userData.accessToken,
+          accessToken: userData.accessToken,
         }));
 
         navigate("/verify-2fa-pending");

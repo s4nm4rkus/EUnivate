@@ -66,7 +66,7 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
 
   const fetchProjectDetails = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/users/sa-getnewproject/${projectId}`);
+      const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-getnewproject/${projectId}`);
       setProject(response.data);
     } catch (error) {
       console.error('Error fetching project details:', error);

@@ -22,7 +22,7 @@ const People = () => {
     // Fetch users from the backend
     const fetchUsers = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users`, {
+            const response = await fetch('http://localhost:5000/api/users', {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -122,7 +122,7 @@ const People = () => {
         console.log(`Inviting users with emails: ${emails}`);
         setloading(true);
         try {
-            const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/invite`, {
+            const response = await fetch('http://localhost:5000/api/users/invite', {
                 method: 'POST',
                 headers: {    
                     'Content-Type': 'application/json',
@@ -423,7 +423,7 @@ const People = () => {
   onClick={handleInvite}
   disabled={loading}
 >
-  {loading ? 'Inviting' : 'Invite'}
+  {loading ? 'Inviting ...' : 'Invite'}
 </button>
 
 

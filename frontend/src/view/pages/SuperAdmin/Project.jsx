@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaCalendar, FaPaperclip, FaPlus, FaTimes, FaCheckCircle, FaTrash } from 'react-icons/fa';
-import { useNavigate, useOutletContext } from 'react-router-dom';
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom'; 
 import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx';
 
 const Project = () => {
@@ -15,12 +14,11 @@ const Project = () => {
   const [projects, setProjects] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const [doneTaskCounts, setDoneTaskCounts] = useState({});
   const { isNavOpen } = useOutletContext();
 
-  const { isNavOpen } = useOutletContext();
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -34,7 +32,7 @@ const Project = () => {
           return;
         }
   
-        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}api/users/sa-getnewproject`, {
+        const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
@@ -121,7 +119,7 @@ const Project = () => {
       };
   
       // Include token in the request headers
-      const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-newproject`, newProject, {
+      const response = await axios.post('http://localhost:5000/api/users/sa-newproject', newProject, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -146,7 +144,7 @@ const Project = () => {
         const counts = {};
         for (let project of projects) {
           try {
-            const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-tasks/${project._id}?status=Done`);
+            const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}?status=Done`);
             counts[project._id] = response.data.data.length; // Store count of done tasks
           } catch (error) {
             // Handle errors for individual project requests (optional)
@@ -172,7 +170,7 @@ const Project = () => {
 
   const handleDeleteProject = async (projectId) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-newproject/${projectId}`);
+      await axios.delete(`http://localhost:5000/api/users/sa-newproject/${projectId}`);
       setProjects(projects.filter((project) => project._id !== projectId));
     } catch (error) {
       console.error('Error deleting project:', error);

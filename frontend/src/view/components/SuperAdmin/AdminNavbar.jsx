@@ -43,7 +43,7 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
   return (
     <>
       {/* Mobile Image */}
-      <div className="lg:hidden inset-x-0 top-0 z-50 ml-16">
+      <div className="lg:hidden inset-x-0 top-0 ml-16">
         <img
           src={logomobile} // Use the imported image here
           alt="Centered Image"

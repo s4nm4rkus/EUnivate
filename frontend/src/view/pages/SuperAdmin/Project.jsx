@@ -27,7 +27,7 @@ const Project = () => {
         const accessToken = user ? user.accessToken : null;
       
         if (!accessToken) {
-          setloading(false);
+          setLoading(false);
           setError('No access token found. Please log in again.');
           return;
         }
@@ -43,7 +43,7 @@ const Project = () => {
         console.error('Error fetching projects:', error);
         setError('An error occurred while fetching projects.');
       } finally {
-        setloading(false);
+        setLoading(false);
       }
     };
   

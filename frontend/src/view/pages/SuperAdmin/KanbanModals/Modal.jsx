@@ -130,7 +130,7 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
     try {
       // Send the array of assignees
       const assigneeIds = selectedName.split(', ').map(async (name) => {
-        const userResponse = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/findByUsername/${name}`);
+        const userResponse = await axios.get(`http://localhost:5000/api/users/findByUsername/${name}`);
         return userResponse.data._id;
       });
   
@@ -148,7 +148,7 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
         project: projectId,
       };
   
-      const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-task`, newTask);
+      const response = await axios.post('http://localhost:5000/api/users/sa-task', newTask);
       console.log('Task created:', response.data);
       onTaskSubmit(newTask);
   
@@ -210,7 +210,7 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
 
   return ReactDOM.createPortal(
     <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-modal">
-      <div className="bg-white p-6 w-96 max-h-[90vh] overflow-auto rounded-lg shadow-lg">
+      <div className="bg-white p-6 w-96 max-h-[90vh] overflow-auto rounded-lg shadow-lg ">
         <div className="flex items-center justify-between mb-4">
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
             <FaTimes size={16} />

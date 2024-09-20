@@ -58,7 +58,7 @@ const AdminContainer = ({ children }) => {
     useEffect(() => {
         const fetchNotifications = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/users/notifications');
+                const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/notifications`);
                 const data = await response.json();
                 setHasNewNotifications(data.hasNew);
             } catch (error) {
@@ -95,7 +95,7 @@ const AdminContainer = ({ children }) => {
     const handleBellClick = async () => {
         setHasNewNotifications(false);
         try {
-            await fetch('http://localhost:5000/api/users/notifications', { method: 'GET' });
+            await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/notifications`, { method: 'GET' });
         } catch (error) {
             console.error('Failed to fetch notifications', error);
         }

@@ -75,7 +75,7 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/users/members-superadmins');
+      const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/members-superadmins`);
       setMembersList(response.data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -131,7 +131,7 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
 
     try {
       const assigneeIds = selectedName.split(', ').map(async (name) => {
-        const userResponse = await axios.get(`http://localhost:5000/api/users/findByUsername/${name}`);
+        const userResponse = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/findByUsername/${name}`);
         return userResponse.data._id;
       });
 
@@ -149,7 +149,7 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
         project: projectId,
       };
 
-      const response = await axios.post('http://localhost:5000/api/users/sa-task', newTask);
+      const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-task`, newTask);
       console.log('Task created:', response.data);
       onTaskSubmit(newTask);
 

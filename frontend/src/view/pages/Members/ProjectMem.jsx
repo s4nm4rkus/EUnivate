@@ -14,7 +14,7 @@ const ProjectMem = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-getnewproject`);
+        const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject');
         setProjects(response.data);
       } catch (error) {
         console.error('Error fetching projects:', error);

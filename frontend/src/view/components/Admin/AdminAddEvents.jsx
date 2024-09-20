@@ -56,7 +56,7 @@ const AdminAddEvents = () => {
         image: imageUrl ? { url: imageUrl, publicId: selectedImage.name } : null,
       };
 
-      const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/addevent`, eventData);
+      const response = await axios.post('http://localhost:5000/api/users/addevent', eventData);
 
       console.log(response.data);
       setLoading(false);

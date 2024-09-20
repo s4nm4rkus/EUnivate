@@ -10,7 +10,11 @@ dotenv.config();
 connectDB();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: 'https://eunivate.vercel.app', // Replace this with the frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Define allowed HTTP methods
+  credentials: true, // If you need cookies or authorization headers
+}));
 app.use(express.json());
 
 // Use user routes

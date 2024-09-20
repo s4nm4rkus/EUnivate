@@ -124,7 +124,7 @@ const People = () => {
         try {
             const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/invite`, {
                 method: 'POST',
-                headers: {
+                headers: {    
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ emails }), // Only send emails, no role

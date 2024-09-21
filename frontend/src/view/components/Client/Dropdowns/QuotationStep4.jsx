@@ -16,8 +16,8 @@ const QuotationStep4 = ({ prevStep, formData }) => {
             const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/quotation`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json'
+                    
                 },
                 body: JSON.stringify(formData)
             });

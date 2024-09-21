@@ -53,6 +53,9 @@ const userSchema = new mongoose.Schema({
     twoFactorTokenExpire: {
         type: Date,
     },
+    projects:
+     [{ type: mongoose.Schema.Types.ObjectId, ref: 'SaNewProject' }],
+
     resetPasswordToken: String,
     resetPasswordExpire: Date,
     refreshToken: [String], 

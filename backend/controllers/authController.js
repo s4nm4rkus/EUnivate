@@ -88,7 +88,7 @@ export const forgotPassword = async (req, res) => {
     user.resetPasswordExpire = resetTokenExpire;
     await user.save();
 
-    const resetUrl = `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/reset-password/${resetToken}`;
+    const resetUrl = `http://localhost:5000/reset-password/${resetToken}`;
     const message = `You requested a password reset. Please make a PUT request to: \n\n ${resetUrl}`;
 
     await sendEmail({

@@ -112,7 +112,7 @@ const MessageContent = () => {
           };
       
           try {
-            const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/messages`, {
+            const response = await fetch('http://localhost:5000/api/messages', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(newMessage),
@@ -146,7 +146,7 @@ const MessageContent = () => {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/messages`);
+        const response = await fetch('http://localhost:5000/api/messages');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -244,7 +244,7 @@ const handleDelete = async (messageId) => {
 
   const editMessage = async (id, updatedContent, updatedFile, updatedTime) => {
     try {
-      const response = await axios.put(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}api/messages/${id}`, {
+      const response = await axios.put(`http://localhost:5000/api/messages/${id}`, {
         content: updatedContent,
         file: updatedFile,
         time: updatedTime,
@@ -263,7 +263,7 @@ const handleDelete = async (messageId) => {
   
   const deleteMessage = async (id) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/messages/${id}`);
+      await axios.delete(`http://localhost:5000/api/messages/${id}`);
       setMessages((prevMessages) => prevMessages.filter((msg) => msg._id !== id));
     } catch (error) {
       console.error('Error deleting message:', error);

@@ -1,7 +1,12 @@
 import SaNewProject from '../models/saNewProject.js';
 import saAddTask from '../models/saAddTask.js'; 
+import User from '../models/userModels.js';
+
+
+
 export const createSaNewProject = async (req, res) => {
     try {
+   
         const { projectName, thumbnail,invitedUsers  } = req.body;
 
         const newSaNewProject = new SaNewProject({
@@ -9,7 +14,7 @@ export const createSaNewProject = async (req, res) => {
             thumbnail: thumbnail,
             owner: req.user._id,
             invitedUsers
-        });
+        }); 
 
         const savedSaNewProject = await newSaNewProject.save();
         return res.status(201).json(savedSaNewProject);
@@ -22,24 +27,30 @@ export const createSaNewProject = async (req, res) => {
 //Get all Project
 export const getAllProjects = async (req, res) => {
     try {
-        const projects = await SaNewProject.find({
-          $or: [
-            { owner: req.user._id },
-            { invitedUsers: req.user._id }
-          ]
-        });
-    
-        if (projects.length === 0) {
-          return res.status(404).json({ message: 'No projects found' });
-        }
-    
-        return res.status(200).json(projects);
-      } catch (error) {
-        console.error("Error in fetching projects:", error.message);
-        return res.status(500).json({ error: error.message || 'An error occurred while fetching the projects' });
+      // Fetch the user along with their projects
+      const user = await User.findById(req.user._id).populate('projects');
+  
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
       }
-    };
-    
+  
+      // Get projects owned by the user
+      const ownedProjects = await SaNewProject.find({ owner: req.user._id });
+  
+      // Combine owned projects with user's projects
+      const allProjects = [...user.projects, ...ownedProjects];
+  
+      if (allProjects.length === 0) {
+        return res.status(404).json({ message: 'No projects found' });
+      }
+  
+      return res.status(200).json(allProjects);
+    } catch (error) {
+      console.error("Error in fetching projects:", error.message);
+      return res.status(500).json({ error: error.message || 'An error occurred while fetching the projects' });
+    }
+  };
+  
 //Get Project by id
 export const getProjectById = async (req, res) => {
     try {

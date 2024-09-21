@@ -11,7 +11,9 @@ export const getUsers = async (req, res) => {
     }
   };
   
-// Invite users
+
+
+// Invite users to a project
 export const inviteUsers = async (req, res) => {
     try {
         const { emails } = req.body;

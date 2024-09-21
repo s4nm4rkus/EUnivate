@@ -22,7 +22,7 @@ app.get('/api/users/quotation/confirm/', confirmQuotationEmail);
 
 app.get('/quotation-complete', (req, res) => {
 // res.send('Quotation verification complete');
-res.redirect(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/quotation-complete`);
+res.redirect(`https://eunivate.vercel.app//quotation-complete`);
 });
 
 // Error handling middleware

@@ -17,6 +17,12 @@
       "dest": "./index.js"
     }
   ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
   "headers": [
     {
       "source": "/api/(.*)",
@@ -37,4 +43,5 @@
     }
   ]
 }
+
 

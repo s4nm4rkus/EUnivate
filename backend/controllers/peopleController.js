@@ -1,6 +1,6 @@
 import User from '../models/userModels.js';
 import sendEmail from '../utils/sendEmail.js';
-
+import InviteMember from '../models/saInvitedMember.js';
 // Fetch all users
 export const getUsers = async (req, res) => {
     try {
@@ -12,35 +12,51 @@ export const getUsers = async (req, res) => {
   };
   
 
+// Invite users
 
-// Invite users to a project
 export const inviteUsers = async (req, res) => {
     try {
         const { emails } = req.body;
 
         console.log(`Inviting users with emails: ${emails}`);
-        const emailArray = emails.split(',').map(email => email.trim()).filter(email => email); 
+        const emailArray = emails.split(',').map(email => email.trim()).filter(email => email);
 
         if (emailArray.length === 0) {
             console.warn('No valid email addresses provided');
             return res.status(400).json({ message: 'No valid email addresses provided' });
         }
 
-        console.log(`Processed email array: ${emailArray}`);
-
+        // console.log(`Processed email array: ${emailArray}`);
 
         await Promise.all(
             emailArray.map(async (email) => {
                 try {
-                    console.log(`Sending email to ${email}`);
-                    await sendEmail({
-                        email: email, 
-                        subject: 'Invitation to become an Collaborator',
-                        message: `You have been invited to become an Collaborator in our system please wait to change your role of the admin to proceed with your login page.`, 
+                    // Check if the user is already invited
+                    const existingMember = await InviteMember.findOne({ email });
+                    if (existingMember) {
+                        console.warn(`User with email ${email} is already invited.`);
+                        return;
+                    }
+
+                    // Create a new invited member
+                    const newMember = new InviteMember({
+                        email,
+                        role: 'User', // Set default role or allow it to be passed in
+                        project: 'N/A', // Set to the relevant project if applicable
                     });
-                    console.log(`Email sent to ${email}`);
+
+                    await newMember.save();
+                    // console.log(`Invited member saved: ${newMember}`);
+
+                    // console.log(`Sending email to ${email}`);
+                    await sendEmail({
+                        email: email,
+                        subject: 'Invitation to become a Collaborator',
+                        message: `You have been invited to become a Collaborator in our system. Please wait for the admin to change your role to proceed with your login.`,
+                    });
+                    // console.log(`Email sent to ${email}`);
                 } catch (error) {
-                    console.error(`Failed to send email to ${email}:`, error.message);
+                    console.error(`Failed to process invitation for ${email}:`, error.message);
                 }
             })
         );

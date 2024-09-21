@@ -3,6 +3,8 @@ import quotationTokenModel from "../models/quotationTokenModel.js";
 import nodemailer from 'nodemailer';
 import crypto from "crypto";
 import verifyQuotationEmail from '../utils/jwtUtils.js';
+
+
 // Create and save quotation, generate token, and send verification email
 
 export const createQuotation = async (req, res) => {
@@ -33,7 +35,7 @@ export const createQuotation = async (req, res) => {
         console.log('Quotation token saved successfully:', quotationToken);
 
         // Create verification link
-        const verificationLink = ${process.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/quotation/confirm/${quotationToken.quotationToken};
+        const verificationLink = `${process.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/quotation/confirm/${quotationToken.quotationToken}`;
 
         // Send the verification email
         try {
@@ -110,7 +112,7 @@ export const confirmQuotationEmail = async (req, res) => {
             from: process.env.EMAIL_USER,
             to: recipientEmail,
             subject: subject,
-            text: 
+            text: `
             You have a new quotation request from:
 
             Name: ${quotation.name}
@@ -123,7 +125,7 @@ export const confirmQuotationEmail = async (req, res) => {
             Type of Service: ${quotation.service}
             Preferred Budget: ${quotation.budget}
             Additional Info: ${quotation.additionalInfo || 'N/A'}
-            ,
+            `,
         };
 
         // Send the email
@@ -154,3 +156,4 @@ export const checkVerificationStatus = async (req, res) => {
 
 
 export default { createQuotation, confirmQuotationEmail, checkVerificationStatus };
+

@@ -22,12 +22,12 @@ const Project = () => {
 
   useEffect(() => {
     const fetchProjects = async () => {
+      setLoading(true); 
       try {
         const user = JSON.parse(localStorage.getItem('user'));
         const accessToken = user ? user.accessToken : null;
       
         if (!accessToken) {
-          setLoading(false);
           setError('No access token found. Please log in again.');
           return;
         }
@@ -132,7 +132,7 @@ const Project = () => {
       console.error('Error creating project:', error);
       setError('An error occurred while creating the project.');
     } finally {
-      setloading(false);
+      setLoading(false);
     }
   };
   

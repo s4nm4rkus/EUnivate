@@ -3,7 +3,7 @@ import { FaPlus, FaCalendar, FaPaperclip, FaCheckCircle } from 'react-icons/fa';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import Modal from './KanbanModals/Modal';
-import TaskDetailModal from './KanbanModals/TaskDetailModal'; // New modal for task details
+import TaskDetailModal from './EditableModals/TaskDetailModal'; // New modal for task details
 import axios from 'axios';
 
 const ItemType = {
@@ -187,15 +187,16 @@ const Kanban = ({ projectId, projectName }) => {
   return (
     <DndProvider backend={HTML5Backend}>
     <div className="flex flex-wrap p-4">
-      {['Document', 'Todo', 'Ongoing', 'Done', 'Backlog'].map((status) => (
-        <Column key={status} status={status}>
-          {tasks
-            .filter(task => task.status === status)
-            .map(task => (
-              <TaskCard key={task._id} task={task} />
-            ))}
-        </Column>
+    {['Document', 'Todo', 'Ongoing', 'Done', 'Backlog'].map((status) => (
+  <Column key={status} status={status}>
+    {tasks
+      .filter(task => task.status === status)
+      .map(task => (
+        <TaskCard key={task._id} task={task} />
       ))}
+  </Column>
+))}
+
     </div>
     <Modal 
       isOpen={isModalOpen} 

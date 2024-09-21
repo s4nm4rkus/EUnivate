@@ -20,7 +20,7 @@ const People = () => {
     const [selectedProject, setSelectedProject] = useState(null);
     const dropdownRef = useRef();
     const [loading, setloading] = useState(false);
-
+    const [error, setError] = useState(false);
     
         // Fetch projects from the backend
         const fetchProjects = async () => {
@@ -139,50 +139,53 @@ const People = () => {
     };
 
     const handleInvite = async () => {
-        
         const emails = selectedEmails.join(',');
-
+    
         if (!emails) {
             console.error('No email provided');
             alert('Please select at least one email to invite.');
             return;
         }
-
+    
         console.log(`Inviting users with emails: ${emails}`);
         setloading(true);
         try {
             const response = await fetch('http://localhost:5000/api/users/invite', {
                 method: 'POST',
-                headers: {    
+                headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ emails }), // Only send emails, no role
+                body: JSON.stringify({ emails }), // Send only the emails
             });
-
+    
             if (response.ok) {
                 const result = await response.json();
                 console.log('Invitation response:', result.message);
-
-                // Add invited emails to invitedUsers state
+    
+                // Create new invited users data
                 const newInvitedUsers = selectedEmails.map((email) => {
                     const userFromDB = allUsers.find((user) => user.email === email);
                     return {
                         email,
-                        role: userFromDB ? userFromDB.role : 'Guest',
-                        project: 'N/A',
-                        profilePicture: userFromDB ? userFromDB.profilePicture : null,
+                        role: userFromDB ? userFromDB.role : 'User', // Default role if not found
+                        project: 'N/A', // Default project
+                        profilePicture: userFromDB ? userFromDB.profilePicture : null, // Default picture
                     };
                 });
+    
+                // Update invited users state
                 const updatedInvitedUsers = [...invitedUsers, ...newInvitedUsers];
                 setInvitedUsers(updatedInvitedUsers);
-
+    
                 // Store the updated invited users in local storage
                 localStorage.setItem('invitedUsers', JSON.stringify(updatedInvitedUsers));
-
+    
+                // Notify the user for each invited email
                 selectedEmails.forEach((email) => {
                     alert(`Invitation sent to: ${email}`);
                 });
-
+    
+                // Fetch updated users and toggle modal (if applicable)
                 fetchUsers();
                 toggleModal();
             } else {
@@ -191,11 +194,13 @@ const People = () => {
                 alert(`Error inviting users: ${errorResponse.message}`);
             }
         } catch (error) {
-            setloading(false);
             console.error('Error inviting users:', error.message);
             alert(`An error occurred: ${error.message}`);
+        } finally {
+            setloading(false); // Ensure loading state is reset
         }
     };
+    
 
     const handleRoleChange = async (newRole, userEmail) => {
         try {

@@ -20,6 +20,8 @@
   import { getQuotations, deleteQuotation, checkNotifications } from '../controllers/getQuotationAdminController.js';
   import { createTask, getTasks, getTaskById, updateTaskStatusById, getTasksByProjectId, deleteTask } from '../controllers/saAddTaskController.js';
   import { findUserByUsername } from '../controllers/findUserNameIDController.js';
+  import { assignProjectToUser } from '../controllers/assignUserProjectController.js';
+  // import { getInvitedMembersByUserId } from '../controllers/peopleController.js';
 const router = express.Router();
 
 // User Authentication Routes
@@ -36,12 +38,15 @@ router.post('/contactEunivate',ContactEunivate );
 
 //SuperAdminRoutes
 router.post('/sa-newproject',protect, createSaNewProject);
-router.post('/sa-invite-users',protect,  inviteUsersToProject);
+router.post('/sa-invite-users',protect,  inviteUsers);
 router.get('/sa-getnewproject', protect, getAllProjects);
 router.delete('/sa-newproject/:id', deleteProjectById);
 router.get('/sa-getnewproject/:id', protect,  getProjectById)
 router.get('/members-superadmins', getMembersAndSuperAdmins);
 router.get('/findByUsername/:username', findUserByUsername);
+
+//people Controller
+router.put('/assign-project', protect, assignProjectToUser);
 
 // Task Routes
 router.post('/sa-task', createTask);         
@@ -56,8 +61,10 @@ router.delete('/sa-tasks/:id', deleteTask);
 router.get('/', getUsers); 
 router.post('/signup', protect, createUser);  
 router.post('/', upload.single('profilePicture'), createUser);
-router.post('/invite', inviteUsers);  
+router.post('/invite', inviteUsers); 
+// router.get('/invitedMembers', protect, getInvitedMembersByUserId); 
 router.put('/:userId/role', updateUserRole); 
+
 
 // quotation route
 router.post('/quotation',createQuotation);

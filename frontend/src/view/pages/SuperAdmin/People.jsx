@@ -4,7 +4,7 @@ import AdminNavbar from '../../components/SuperAdmin/AdminNavbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { User } from '../../../constants/assets';
-
+import axios from 'axios';
 const People = () => {
     const [user, setUser] = useState({ profilePicture: { url: '' } });
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
@@ -16,9 +16,36 @@ const People = () => {
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [selectedRole, setSelectedRole] = useState('');
     const [selectedEmails, setSelectedEmails] = useState([]);
-    const [projects] = useState(['Project A', 'Project B', 'Project C']);
+    const [projects, setProjects] = useState([]);
+    const [selectedProject, setSelectedProject] = useState(null);
     const dropdownRef = useRef();
     const [loading, setloading] = useState(false);
+
+    
+        // Fetch projects from the backend
+        const fetchProjects = async () => {
+            try {
+                const user = JSON.parse(localStorage.getItem('user'));
+                const accessToken = user ? user.accessToken : null;
+    
+                if (!accessToken) {
+                    setError('No access token found. Please log in again.');
+                    return;
+                }
+    
+                const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                });
+    
+                setProjects(response.data); // Update projects state
+            } catch (error) {
+                console.error('Error fetching projects:', error);
+                setError('An error occurred while fetching projects.');
+            }
+        };
+
     // Fetch users from the backend
     const fetchUsers = async () => {
         try {
@@ -37,7 +64,7 @@ const People = () => {
             setFilteredUsers(users); // Initialize filteredUsers with all users
 
             // Update invited users' roles and profile pictures based on database data
-            const storedInvitedUsers = JSON.parse(localStorage.getItem('invitedUsers')) || [];
+            const storedInvitedUsers = JSON.parse(localStorage.getItem('invitedUsers')) || [	];
             const updatedInvitedUsers = storedInvitedUsers.map((invitedUser) => {
                 const userFromDB = users.find((user) => user.email === invitedUser.email);
                 if (userFromDB) {
@@ -45,6 +72,7 @@ const People = () => {
                         ...invitedUser,
                         role: userFromDB.role,
                         profilePicture: userFromDB.profilePicture,
+                        _id: userFromDB._id, 
                     };
                 }
                 return invitedUser;
@@ -58,6 +86,7 @@ const People = () => {
 
     useEffect(() => {
         fetchUsers();
+        fetchProjects();
 
         // Close dropdowns when clicking outside
         const handleClickOutside = (event) => {
@@ -208,16 +237,64 @@ const People = () => {
         }
     };
 
-    const handleProjectChange = (newProject, userEmail) => {
-        setInvitedUsers((prevUsers) => {
-            const updatedUsers = prevUsers.map((user) =>
-                user.email === userEmail ? { ...user, project: newProject } : user
-            );
-            localStorage.setItem('invitedUsers', JSON.stringify(updatedUsers));
-            return updatedUsers;
-        });
+    //Handle Project Change
+    const handleProjectChange = async (newProject, userEmail) => {
+        const user = invitedUsers.find((user) => user.email === userEmail);
+        if (!user) return;  
+    
+        // Update the UI first and highlight the selected project
+        setSelectedProject(newProject);
+    
+        const updatedUsers = invitedUsers.map((user) => 
+            user.email === userEmail ? { ...user, project: newProject.projectName } : user
+        );
+        setInvitedUsers(updatedUsers);
+    
+        localStorage.setItem('invitedUsers', JSON.stringify(updatedUsers));
+    
+        // Show an alert that the project has been assigned
+        alert(`Assigned project "${newProject.projectName}" to ${userEmail}`);
+    
+        // Call the API to update the user in the database
+        try {
+            const userFromStorage = JSON.parse(localStorage.getItem('user'));
+            const accessToken = userFromStorage?.accessToken;
+    
+            if (!accessToken) {
+                alert('No access token found. Please log in again.');
+                return;
+            }
+    
+            // Create the request payload
+            const payload = {
+                userId: user._id,
+                projectId: newProject._id,
+                updateData: { projectName: newProject.projectName }, // Include update data if needed
+            };
+    
+            const response = await fetch('http://localhost:5000/api/users/assign-project', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`, 
+                },
+                body: JSON.stringify(payload),
+            });
+    
+            if (!response.ok) {
+                const errorResponse = await response.json();
+                throw new Error(errorResponse.message);
+            }
+    
+            console.log('Project assigned successfully.');
+        } catch (error) {
+            console.error('Error assigning project:', error.message);
+            alert(`Error assigning project: ${error.message}`);
+        }
     };
-
+    
+    
+    
     const handleRemoveUser = (userEmail) => {
         const updatedUsers = invitedUsers.filter((user) => user.email !== userEmail);
         setInvitedUsers(updatedUsers);
@@ -332,30 +409,34 @@ const People = () => {
                             )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 relative">
-                            <div className="flex items-center">
-                                {user.project}
-                                <FontAwesomeIcon
-                                    icon={isProjectDropdownOpen[user.email] ? faChevronDown : faChevronRight}
-                                    className="ml-2 cursor-pointer"
-                                    onClick={() => toggleProjectDropdown(user.email)}
-                                />
-                            </div>
-                            {isProjectDropdownOpen[user.email] && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                                    <ul className="py-1">
-                                        {projects.map((project, idx) => (
-                                            <li
-                                                key={idx}
-                                                className="px-4 py-2 text-gray-700 cursor-pointer hover:bg-gray-100"
-                                                onClick={() => handleProjectChange(project, user.email)}
-                                            >
-                                                {project}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-                        </td>
+                    <div className="flex items-center">
+                        {user.project}
+                        <FontAwesomeIcon
+                            icon={isProjectDropdownOpen[user.email] ? faChevronDown : faChevronRight}
+                            className="ml-2 cursor-pointer"
+                            onClick={() => toggleProjectDropdown(user.email)}
+                        />
+                    </div>
+                    {isProjectDropdownOpen[user.email] && (
+                        <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200  rounded-lg shadow-lg z-50">
+                            <ul>
+                                {projects.length > 0 ? (
+                                    projects.map((project, index) => (
+                                        <li 
+                                            key={index} 
+                                            className="py-2 cursor-pointer hover:bg-gray-100"
+                                            onClick={() => handleProjectChange(project, user.email)}
+                                        >
+                                            {project.projectName} {/* Adjust this based on your project data structure */}
+                                        </li>
+                                    ))
+                                ) : (
+                                    <p>No projects found.</p>
+                                )}
+                            </ul>
+                        </div>
+                    )}
+                </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                             <button
                                 className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"

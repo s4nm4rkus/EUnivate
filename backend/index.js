@@ -11,9 +11,7 @@ connectDB();
 
 const app = express();
 app.use(cors({
-  origin: 'https://eunivate.vercel.app', // Replace this with the frontend URL
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Define allowed HTTP methods
-  credentials: true, // If you need cookies or authorization headers
+  origin: '*'
 }));
 app.use(express.json());
 

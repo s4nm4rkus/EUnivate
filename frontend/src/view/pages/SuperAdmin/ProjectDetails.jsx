@@ -1,193 +1,193 @@
-import React, { useState, useEffect, useRef } from 'react'; 
-import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
-import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx';
-import Kanban from './Kanban';
-import List from './List';
-import Calendar from './Calendar';
-import GanttChart from './GanttChart';
-import RaciMatrix from './RaciMatrix';
+    import React, { useState, useEffect, useRef } from 'react'; 
+    import { useLocation, useNavigate } from 'react-router-dom';
+    import axios from 'axios';
+    import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+    import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
+    import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx';
+    import Kanban from './Kanban';
+    import List from './List';
+    import Calendar from './Calendar';
+    import GanttChart from './GanttChart';
+    import RaciMatrix from './RaciMatrix';
 
-const ProjectDetails = () => {
-    const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
-    const [selectedView, setSelectedView] = useState('Kanban');
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isUserModalOpen, setIsUserModalOpen] = useState(false);
-    const [error, setError] = useState(null);
-    const [selectedMembers, setSelectedMembers] = useState([]); 
-    const [addedMembers, setAddedMembers] = useState([]);
-    const [members, setMembers] = useState([]);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [addText, setAddText] = useState('');
-    const [project, setProject] = useState({});
-    const [isImageVisible, setIsImageVisible] = useState(false);
+    const ProjectDetails = () => {
+        const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
+        const [selectedView, setSelectedView] = useState('Kanban');
+        const [isModalOpen, setIsModalOpen] = useState(false);
+        const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+        const [error, setError] = useState(null);
+        const [selectedMembers, setSelectedMembers] = useState([]); 
+        const [addedMembers, setAddedMembers] = useState([]);
+        const [members, setMembers] = useState([]);
+        const [searchQuery, setSearchQuery] = useState('');
+        const [addText, setAddText] = useState('');
+        const [project, setProject] = useState({});
+        const [isImageVisible, setIsImageVisible] = useState(false);
 
 
-    const modalRef = useRef(null);
-    const location = useLocation();
-    const navigate = useNavigate();
-    const projectId = location.state?.projectId;
+        const modalRef = useRef(null);
+        const location = useLocation();
+        const navigate = useNavigate();
+        const projectId = location.state?.projectId;
 
-    useEffect(() => {
-        const fetchProjectDetails = async () => {
+        useEffect(() => {
+            const fetchProjectDetails = async () => {
+                try {
+                    const user = JSON.parse(localStorage.getItem('user'));
+                    const accessToken = user?.accessToken;
+
+                    if (!accessToken) {
+                        setError('No access token found. Please log in again.');
+                        return;
+                    }
+
+                    const response = await axios.get(`http://localhost:5000/api/users/sa-getnewproject/${projectId}`, {
+                        headers: { Authorization: `Bearer ${accessToken}` },
+                    });
+
+                    
+                    setProject(response.data);
+                    setAddedMembers(response.data.invitedUsers);
+                } catch (error) {
+                    console.error('Error fetching project details:', error);
+                    setError('Error fetching project details.');
+                }
+            };
+
+            if (projectId) {
+                fetchProjectDetails();
+            }
+        }, [projectId]);
+
+        const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
+
+        const handleViewChange = (view) => {
+            setSelectedView(view);
+        };
+
+        const handleAddClick = () => {
+            console.log("Add button clicked");
+            setIsModalOpen(true);
+        };
+        
+
+        const handleCloseModal = () => {
+            setIsModalOpen(false);
+        };
+
+        const handleUserIconClick = async () => {
+            setIsImageVisible(!isImageVisible);
             try {
                 const user = JSON.parse(localStorage.getItem('user'));
                 const accessToken = user?.accessToken;
-
+        
                 if (!accessToken) {
-                    setError('No access token found. Please log in again.');
-                    return;
+                    throw new Error('No access token found. Please log in.');
                 }
-
-                const response = await axios.get(`http://localhost:5000/api/users/sa-getnewproject/${projectId}`, {
-                    headers: { Authorization: `Bearer ${accessToken}` },
+        
+                const response = await axios.get('http://localhost:5000/api/users/invited', {
+                    headers: { Authorization: `Bearer ${accessToken}` }
                 });
-
-                
-                setProject(response.data);
-                   setAddedMembers(response.data.invitedUsers);
-            } catch (error) {
-                console.error('Error fetching project details:', error);
-                setError('Error fetching project details.');
-            }
-        };
-
-        if (projectId) {
-            fetchProjectDetails();
-        }
-    }, [projectId]);
-
-    const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
-
-    const handleViewChange = (view) => {
-        setSelectedView(view);
-    };
-
-    const handleAddClick = () => {
-        console.log("Add button clicked");
-        setIsModalOpen(true);
-    };
-    
-
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-    };
-
-    const handleUserIconClick = async () => {
-        setIsImageVisible(!isImageVisible);
-        try {
-            const user = JSON.parse(localStorage.getItem('user'));
-            const accessToken = user?.accessToken;
-
-            if (!accessToken) {
-                throw new Error('No access token found. Please log in.');
-            }
-
-            const response = await axios.get('http://localhost:5000/api/users/invited', {
-                headers: { Authorization: `Bearer ${accessToken}` }
-            });
-
-            if (Array.isArray(response.data)) {
-                setMembers(response.data);
-                setIsUserModalOpen(true);
-            } else {
-                console.error('Unexpected response format:', response.data);
-                setError('Error fetching members. Expected an array.');
-            }
-            
-            setMembers(response.data);
-            setIsUserModalOpen(true);
-        } catch (error) {
-            console.error('Error fetching members:', error.response?.data || error.message);
-            setError('Error fetching members.');
-        }
-    };
-
-    const handleProfileClick = () => {
-        setIsImageVisible(true); // Show the image when profile is clicked
-    };
-    const handleAddMembers = async () => {
-        try {
-            if (!project || !project._id) {
-                throw new Error('Invalid project object.');
-            }
-            const user = JSON.parse(localStorage.getItem('user'));
-            const accessToken = user?.accessToken;
-            
-            const userIds = selectedMembers.map(member => {
-                if (!member || !member._id) {
-                    console.error('Invalid member object in selectedMembers:', member);
-                    return null;
+        
+                if (Array.isArray(response.data.invitedUsers)) {
+                    setMembers(response.data.invitedUsers);  // Corrected to access the invitedUsers array
+                    setIsUserModalOpen(true);
+                } else {
+                    console.error('Unexpected response format:', response.data);
+                    setError('Error fetching members. Expected an array.');
                 }
-                return member._id;
-            }).filter(id => id !== null);
-    
-            if (userIds.length === 0) {
-                throw new Error('No valid user IDs to add.');
-            }
-    
-            const response = await axios.post('http://localhost:5000/api/users/sa-invite-users', {
-                projectId: project._id,
-                users: userIds
-            }, {
-                headers: { Authorization: `Bearer ${accessToken}` }
-            });
-    
-                 // Handle response
-            setAddedMembers(response.data.invitedUsers);
-            setSelectedMembers([]);
-            setIsUserModalOpen(false);
-        } catch (error) {
-            const errorMessage = error.response?.data?.message || error.message || 'An error occurred while adding members.';
-            console.error('Error adding members:', errorMessage);
-            setError(errorMessage); // Set error message to state
-        }
-    };
-    
-    
-
-    const toggleMemberSelection = (member) => {
-        if (!member?._id) {
-            console.error('Invalid member object:', member);
-            return;
-        }
-        setSelectedMembers(prevSelectedMembers =>
-            prevSelectedMembers.some(selected => selected._id === member._id)
-                ? prevSelectedMembers.filter(selected => selected._id !== member._id)
-                : [...prevSelectedMembers, member]
-        );
-    };
-
-    const handleCloseUserModal = () => {
-        setIsUserModalOpen(false);
-    };
-
-    const handleButtonTextUpdate = (text) => {
-        setAddText(text);
-        handleCloseModal();
-        if (text === 'Gantt Chart') {
-            setSelectedView('GanttChart');
-        } else if (text === 'RACI Matrix') {
-            setSelectedView('RaciMatrix');
-        }
-    };
-
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (modalRef.current && !modalRef.current.contains(event.target)) {
-                handleCloseModal();
+            } catch (error) {
+                console.error('Error fetching members:', error.response?.data || error.message);
+                setError('Error fetching members.');
             }
         };
 
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+        
+        const handleProfileClick = () => {
+            setIsImageVisible(true); // Show the image when profile is clicked
+        };
 
-    const filteredMembers = members.filter(member =>
-        member.email.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+        //Handle addMembers
+        const handleAddMembers = async () => {
+            try {
+                if (!project || !project._id) {
+                    throw new Error('Invalid project object.');
+                }
+                const user = JSON.parse(localStorage.getItem('user'));
+                const accessToken = user?.accessToken;
+                
+                const userIds = selectedMembers.map(member => {
+                    if (!member || !member._id) {
+                        console.error('Invalid member object in selectedMembers:', member);
+                        return null;
+                    }
+                    return member._id;
+                }).filter(id => id !== null);
+        
+                if (userIds.length === 0) {
+                    throw new Error('No valid user IDs to add.');
+                }
+        
+                const response = await axios.post('http://localhost:5000/api/users/add-member-to-project', {
+                    projectId: project._id,
+                    users: userIds
+                }, {
+                    headers: { Authorization: `Bearer ${accessToken}` }
+                });
+        
+                    // Handle response
+                setAddedMembers(response.data.invitedUsers);
+                setSelectedMembers([]);
+                setIsUserModalOpen(false);
+            } catch (error) {
+                const errorMessage = error.response?.data?.message || error.message || 'An error occurred while adding members.';
+                console.error('Error adding members:', errorMessage);
+                setError(errorMessage); // Set error message to state
+            }
+        };
+        
+        
+
+        const toggleMemberSelection = (member) => {
+            if (!member?._id) {
+                console.error('Invalid member object:', member);
+                return;
+            }
+            setSelectedMembers(prevSelectedMembers =>
+                prevSelectedMembers.some(selected => selected._id === member._id)
+                    ? prevSelectedMembers.filter(selected => selected._id !== member._id)
+                    : [...prevSelectedMembers, member]
+            );
+        };
+
+        const handleCloseUserModal = () => {
+            setIsUserModalOpen(false);
+        };
+
+        const handleButtonTextUpdate = (text) => {
+            setAddText(text);
+            handleCloseModal();
+            if (text === 'Gantt Chart') {
+                setSelectedView('GanttChart');
+            } else if (text === 'RACI Matrix') {
+                setSelectedView('RaciMatrix');
+            }
+        };
+
+        useEffect(() => {
+            const handleClickOutside = (event) => {
+                if (modalRef.current && !modalRef.current.contains(event.target)) {
+                    handleCloseModal();
+                }
+            };
+
+            document.addEventListener('mousedown', handleClickOutside);
+            return () => document.removeEventListener('mousedown', handleClickOutside);
+        }, []);
+
+        const filteredMembers = members.filter(member =>
+            member.email.toLowerCase().includes(searchQuery.toLowerCase())
+        );
 
     return (
         <div className="bg-gray-100 min-h-screen p-6">
@@ -238,10 +238,10 @@ const ProjectDetails = () => {
                                 onClick={handleUserIconClick}
                             />
                             <div className="flex -space-x-4 right-0">
-                            {addedMembers.map(member => (
+                            {addedMembers?.map(member => (
                                 
                             <img
-                                key={member._id} // Assuming _id is unique, but ensure this in your data
+                                key={member._id} 
                                 src={typeof member.profilePicture === 'string' ? member.profilePicture : member.profilePicture?.url}
                                 alt={member.username}
                                 className="w-8 h-8 rounded-full border border-gray-300 cursor-pointer"
@@ -364,7 +364,7 @@ const ProjectDetails = () => {
                             alt={member.username}
                             className="w-8 h-8 rounded-full mr-2"
                         />
-                        <span>{member.username}</span>
+                        <span>{member.email}</span>
                         <button
                             onClick={() => toggleMemberSelection(member)}
                             className={`ml-auto p-1 border rounded-md text-sm md:text-base ${selectedMembers.some(selected => selected._id === member._id) ? 'bg-red-400' : 'bg-gray-200'}`}

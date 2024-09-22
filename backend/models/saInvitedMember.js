@@ -26,6 +26,11 @@ const saInvitedMemberSchema = new mongoose.Schema({
             default: 'https://res.cloudinary.com/dzxzc7kwb/image/upload/v1725974053/DefaultProfile/qgtsyl571c1neuls9evd.png',
         },
     },
+    invitedBy: {
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'User',
+        required: true,
+    },
 }, {
     timestamps: true,
 });

@@ -15,7 +15,7 @@
   import { protect, verifySuperAdmin } from '../middlewares/middleware.js';
   import { ContactEunivate } from '../controllers/contactEunivate.js';
   import { updateUser, updateUserPassword } from '../controllers/updateUserInformation.js';
-  import { inviteUsers, updateUserRole, getUsers} from '../controllers/peopleController.js';
+  import { inviteUsers, updateUserRole, getInvitedUsers, removeInvitedMember, getUsers} from '../controllers/peopleController.js';
   import { createEvent, getEvents, updateEvent, deleteEvent } from '../controllers/addEventsController.js';
   import { getQuotations, deleteQuotation, checkNotifications } from '../controllers/getQuotationAdminController.js';
   import { createTask, getTasks, getTaskById, updateTaskStatusById, getTasksByProjectId, deleteTask } from '../controllers/saAddTaskController.js';
@@ -45,6 +45,9 @@ router.get('/sa-getnewproject/:id', protect,  getProjectById)
 router.get('/members-superadmins', getMembersAndSuperAdmins);
 router.get('/findByUsername/:username', findUserByUsername);
 
+//get the Invited users from people on superadmin
+router.get('/invited', protect, getInvitedUsers);
+router.delete('/invited/:id', protect, removeInvitedMember);
 //people Controller
 router.put('/assign-project', protect, assignProjectToUser);
 
@@ -58,15 +61,15 @@ router.delete('/sa-tasks/:id', deleteTask);
 
 
 // User Management Routes
-router.get('/', getUsers); 
+router.get('/', protect, getUsers); 
 router.post('/signup', createUser);  
 router.post('/', upload.single('profilePicture'), createUser);
-router.post('/invite', inviteUsers); 
+router.post('/invite', protect, inviteUsers); 
 // router.get('/invitedMembers', protect, getInvitedMembersByUserId); 
 router.put('/:userId/role', updateUserRole); 
 
 
-// quotation route
+// quotation route  
 router.post('/quotation',createQuotation);
 router.get('/quotation/confirm/:quotationToken', confirmQuotationEmail);
 router.get('/quotations/:id/status', checkVerificationStatus);

@@ -82,10 +82,18 @@ const ProjectDetails = () => {
                 throw new Error('No access token found. Please log in.');
             }
 
-            const response = await axios.get('http://localhost:5000/api/users/members-superadmins', {
+            const response = await axios.get('http://localhost:5000/api/users/invited', {
                 headers: { Authorization: `Bearer ${accessToken}` }
             });
 
+            if (Array.isArray(response.data)) {
+                setMembers(response.data);
+                setIsUserModalOpen(true);
+            } else {
+                console.error('Unexpected response format:', response.data);
+                setError('Error fetching members. Expected an array.');
+            }
+            
             setMembers(response.data);
             setIsUserModalOpen(true);
         } catch (error) {

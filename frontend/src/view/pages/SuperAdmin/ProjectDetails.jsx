@@ -66,8 +66,10 @@ const ProjectDetails = () => {
     };
 
     const handleAddClick = () => {
+        console.log("Add button clicked");
         setIsModalOpen(true);
     };
+    
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
@@ -244,39 +246,61 @@ const ProjectDetails = () => {
                         </div>
 
                         <div className="flex items-center space-x-4 mt-4">
-                            <button
-                                onClick={() => handleViewChange('Kanban')}
-                                className="text-black hover:text-gray-700"
-                            >
-                                Kanban
-                            </button>
-                            <button
-                                onClick={() => handleViewChange('List')}
-                                className="text-black hover:text-gray-700"
-                            >
-                                List
-                            </button>
+    <button
+        onClick={() => handleViewChange('Kanban')}
+        className="text-black hover:text-gray-700  text-xs md:text-base" // Added responsive class
+    >
+        Kanban
+    </button>
+    <button
+        onClick={() => handleViewChange('List')}
+        className="text-black hover:text-gray-700  text-xs md:text-base" // Added responsive class
+    >
+        List
+    </button>
+    <button
+        onClick={() => handleViewChange('Calendar')}
+        className="text-black hover:text-gray-700 text-xs md:text-base" // Added responsive class
+    >
+        Calendar
+    </button>
+    <div className="flex items-center space-x-2">
+        <button
+            onClick={handleAddClick}
+            className="text-black hover:text-gray-700  text-xs md:text-base" // Added responsive class
+        >
+            + Add
+        </button>
+        {addText && (
+            <span className="text-black font-bold  text-xs md:text-base">{addText}</span> // Added responsive class
+        )}
+    </div>
 
-                            <button
-                                onClick={() => handleViewChange('Calendar')}
-                                className="text-black hover:text-gray-700"
-                            >
-                                Calendar
-                            </button>
 
-                            <div className="flex items-center space-x-2">
-                                <button
-                                    onClick={handleAddClick}
-                                    className="text-black hover:text-gray-700"
-                                >
-                                    + Add
-                                </button>
-                                {addText && (
-                                    <span className="text-black font-bold">
-                                        {addText}
-                                    </span>
-                                )}
-                            </div>
+{isModalOpen && (
+                <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-500 bg-opacity-50">
+                    <div
+                        ref={modalRef}
+                        className="bg-white p-6 rounded-md shadow-lg border border-gray-200"
+                    >
+                        <div className="flex space-x-4">
+                            <button
+                                onClick={() => handleButtonTextUpdate('Gantt Chart')}
+                                className="bg-orange-100 text-orange-600 px-4 py-2 rounded-md"
+                            >
+                                Gantt Chart
+                            </button>
+                            <button
+                                onClick={() => handleButtonTextUpdate('RACI Matrix')}
+                                className="bg-blue-100 text-blue-600 px-4 py-2 rounded-md"
+                            >
+                                RACI Matrix
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
                         </div>
                     </div>
                 </div>

@@ -3,6 +3,8 @@ import axios from 'axios';
 import { FaCalendar, FaPaperclip, FaPlus, FaTimes, FaCheckCircle, FaTrash } from 'react-icons/fa';
 import { useNavigate, useOutletContext } from 'react-router-dom'; 
 import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx';
+import LoadingSpinner from './Loading Style/Fill File Loading/Loader.jsx';
+import ButtonSpinner from './Loading Style/Spinner Loading/ButtonSpinner.jsx';
 
 const Project = () => {
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
@@ -14,11 +16,12 @@ const Project = () => {
   const [projects, setProjects] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingProject, setLoadingProject] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
 
   const navigate = useNavigate();
   const [doneTaskCounts, setDoneTaskCounts] = useState({});
   const { isNavOpen } = useOutletContext();
-
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -165,7 +168,12 @@ const Project = () => {
 
 
   const handleProjectClick = (project) => {
-    navigate(`/superadmin/projects/${project._id}`, { state: { projectId: project._id } });
+    setSelectedProject(project); // Set the selected project
+    setLoadingProject(true);
+    setTimeout(() => {
+      navigate(`/superadmin/projects/${project._id}`, { state: { projectId: project._id } });
+      setLoadingProject(false);
+    }, 3000);
   };
 
   const handleDeleteProject = async (projectId) => {
@@ -180,6 +188,15 @@ const Project = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen p-6">
+
+{loadingProject && (
+  <div className="flex flex-col items-center">
+    <LoadingSpinner projectName={selectedProject ? selectedProject.projectName : ''} />
+  </div>
+)}
+
+
+
       <div className="w-full flex justify-between items-center mb-4">
         <div className="relative">
           <h1 className={`text-2xl font-medium text-gray-800 hidden md:block ${isNavOpen ? 'hidden' : ''}`}>
@@ -261,64 +278,68 @@ const Project = () => {
 
 
             <div className="mt-6 flex justify-center">
-              <button
-                onClick={handleCreateProject}
-                className="bg-red-800 text-white px-8 py-3 rounded-md shadow hover:bg-red-900 w-full"
-                disabled={loading}
-              >
-                {loading ? 'Creating Project...' : 'Create Project'}
+            <button
+          onClick={handleCreateProject}
+          className="bg-red-800 text-white px-8 py-3 rounded-md shadow hover:bg-red-900 w-full flex items-center justify-center"
+          disabled={loading}
+        >
+                        {loading ? <ButtonSpinner /> : 'Create Project'}
+
               </button>
             </div>
           </div>
         </div>
       )}
-
-      {/* Display Projects */}
-      <div className="mt-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {projects.map((project) => (
-          <div
-            key={project._id}
-            className="bg-white p-4 rounded-md shadow-md border border-gray-200 mt-4 relative cursor-pointer"
-            onClick={() => handleProjectClick(project)}
-          >
-            {project.thumbnail && (
-              <img
-                src={project.thumbnail.url}
-                alt={project.projectName}
-                className="w-full h-32 object-cover rounded-md"
-              />
-            )}
-            <h3 className="text-lg font-semibold mt-2">{project.projectName}</h3>
-            <div className="flex items-center text-gray-500 mt-2">
-              <FaCalendar className="mr-2" />
-              <p>{new Date(project.createdAt).toLocaleDateString() || 'No date available'}</p>
-              <FaCheckCircle className="ml-5" />
-              <p className="ml-2">
-                {doneTaskCounts[project._id] !== undefined ? doneTaskCounts[project._id] : 'Loading...'}
-              </p>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation(); // Prevent event from bubbling up
-                  handleDeleteProject(project._id); // Pass project ID for deletion
-                }}
-                className="absolute bottom-14 right-6 bg-red-600 text-white p-3 rounded-full shadow hover:bg-red-700"
-                title="Delete Project"
-              >
-                <FaTrash size={20} />
-              </button>
-            </div>
-            <div className="flex items-center mt-4">
-              <div className="w-full bg-gray-200 rounded-full h-2 relative">
-                <div
-                  className="bg-green-500 h-2 rounded-full"
-                  style={{ width: '5%' }} // Adjust this as needed
-                ></div>
-              </div>
-              <p className="ml-2 text-gray-500">5%</p>
-            </div>
-          </div>
-        ))}
+  <div className={`mt-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 ${isNavOpen ? 'mt-28' : 'mt-20'}`}>
+  {projects.map((project) => (
+    <div
+      key={project._id}
+      className="bg-white p-4 rounded-md shadow-md border border-gray-200 mt-2 relative cursor-pointer w-full"
+      onClick={() => handleProjectClick(project)}
+    >
+      {project.thumbnail && (
+        <img
+          src={project.thumbnail.url}
+          alt={project.projectName}
+          className="w-full h-32 object-cover rounded-md"
+        />
+      )}
+      <h3 className="text-lg font-semibold mt-2">{project.projectName}</h3>
+      <div className="flex items-center text-gray-500 mt-2">
+        <FaCalendar className="mr-2" />
+        <p>{new Date(project.createdAt).toLocaleDateString() || 'No date available'}</p>
+        <FaCheckCircle className="ml-5" />
+        <p className="ml-2">
+          {doneTaskCounts[project._id] !== undefined ? doneTaskCounts[project._id] : 'Loading...'}
+        </p>
+        <button
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent event from bubbling up
+            handleDeleteProject(project._id); // Pass project ID for deletion
+          }}
+          className="absolute bottom-14 right-6 bg-red-600 text-white p-3 rounded-full shadow hover:bg-red-700"
+          title="Delete Project"
+        >
+          <FaTrash size={20} />
+        </button>
       </div>
+      <div className="flex items-center mt-4">
+        <div className="w-full bg-gray-200 rounded-full h-2 relative">
+          <div
+            className="bg-green-500 h-2 rounded-full"
+            style={{ width: '5%' }} // Adjust this as needed
+          ></div>
+        </div>
+        <p className="ml-2 text-gray-500">5%</p>
+      </div>
+    </div>
+  ))}
+</div>
+
+     
+
+
+
     </div>
   );
 };

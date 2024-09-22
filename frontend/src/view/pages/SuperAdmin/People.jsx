@@ -423,24 +423,25 @@ const People = () => {
                         />
                     </div>
                     {isProjectDropdownOpen[user.email] && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200  rounded-lg shadow-lg z-50">
-                            <ul>
-                                {projects.length > 0 ? (
-                                    projects.map((project, index) => (
-                                        <li 
-                                            key={index} 
-                                            className="py-2 cursor-pointer hover:bg-gray-100"
-                                            onClick={() => handleProjectChange(project, user.email)}
-                                        >
-                                            {project.projectName} {/* Adjust this based on your project data structure */}
-                                        </li>
-                                    ))
-                                ) : (
-                                    <p>No projects found.</p>
-                                )}
-                            </ul>
-                        </div>
-                    )}
+    <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+        <ul>
+            {projects.length > 0 ? (
+                projects.map((project, index) => (
+                    <li 
+                        key={index} 
+                        className="py-2 cursor-pointer hover:bg-gray-100 text-center"
+                        onClick={() => handleProjectChange(project, user.email)}
+                    >
+                        {project.projectName} {/* Adjust this based on your project data structure */}
+                    </li>
+                ))
+            ) : (
+                <p className="text-center">No projects found.</p>
+            )}
+        </ul>
+    </div>
+)}
+
                 </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                             <button

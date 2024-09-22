@@ -1,13 +1,11 @@
   import express from 'express';
 
   import { createQuotation, confirmQuotationEmail, checkVerificationStatus } from '../controllers/quotationController.js'
-  // import { sendCompletionEmail } from '../controllers/quotationController.js';
   import upload from '../middlewares/multerMiddleware.js';
   import {createProduct, getProducts, deleteProduct, updateProduct  } from '../controllers/addProductsController.js'
   import { updateProject, deleteProject, getProjects, createProject} from '../controllers/addProjectsController.js';
   import { getDashboardStats } from '../controllers/DashboardController.js';
   import { createSaNewProject, getAllProjects, deleteProjectById, getProjectById, inviteUsersToProject } from '../controllers/saNewProjectController.js';
-  import { getMembersAndSuperAdmins } from '../controllers/getallMemberController.js';
   import {createUser } from '../controllers/userController.js';
   import { loginUser, forgotPassword, resetPassword } from '../controllers/authController.js';
   import {verifyLoginOtp, verifyTwoFactorAuth, resendOtp } from '../controllers/adminAuthentication.js';
@@ -21,7 +19,14 @@
   import { createTask, getTasks, getTaskById, updateTaskStatusById, getTasksByProjectId, deleteTask } from '../controllers/saAddTaskController.js';
   import { findUserByUsername } from '../controllers/findUserNameIDController.js';
   import { assignProjectToUser } from '../controllers/assignUserProjectController.js';
+  import { addProjectsToUsers } from '../controllers/sa-addMember.js';
+  // Not used any more but save on the future
   // import { getInvitedMembersByUserId } from '../controllers/peopleController.js';
+  // import { getMembersAndSuperAdmins } from '../controllers/sa-addMember.js';
+    // import { sendCompletionEmail } from '../controllers/quotationController.js';
+  // router.get('/members-superadmins', getMembersAndSuperAdmins);
+  // router.post('/quotation/send-completion-email', sendCompletionEmail);
+
 const router = express.Router();
 
 // User Authentication Routes
@@ -42,7 +47,6 @@ router.post('/sa-invite-users',protect,  inviteUsers);
 router.get('/sa-getnewproject', protect, getAllProjects);
 router.delete('/sa-newproject/:id', deleteProjectById);
 router.get('/sa-getnewproject/:id', protect,  getProjectById)
-router.get('/members-superadmins', getMembersAndSuperAdmins);
 router.get('/findByUsername/:username', findUserByUsername);
 
 //get the Invited users from people on superadmin
@@ -50,7 +54,8 @@ router.get('/invited', protect, getInvitedUsers);
 router.delete('/invited/:id', protect, removeInvitedMember);
 //people Controller
 router.put('/assign-project', protect, assignProjectToUser);
-
+//add member on the project details on user add icon
+router.post('/add-member-to-project', addProjectsToUsers);
 // Task Routes
 router.post('/sa-task', createTask);         
 router.get('/sa-tasks', getTasks);  
@@ -73,7 +78,6 @@ router.put('/:userId/role', updateUserRole);
 router.post('/quotation',createQuotation);
 router.get('/quotation/confirm/:quotationToken', confirmQuotationEmail);
 router.get('/quotations/:id/status', checkVerificationStatus);
-// router.post('/quotation/send-completion-email', sendCompletionEmail);
 
 
 // User Update Routes

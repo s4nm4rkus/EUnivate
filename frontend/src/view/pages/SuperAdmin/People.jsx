@@ -33,7 +33,7 @@ const People = () => {
                     return;
                 }
     
-                const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
+                const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-getnewproject`, {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
@@ -272,7 +272,7 @@ const People = () => {
                 updateData: { projectName: newProject.projectName }, // Include update data if needed
             };
     
-            const response = await fetch('http://localhost:5000/api/users/assign-project', {
+            const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/assign-project`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

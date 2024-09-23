@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPhone, faEnvelope, faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
 import { faTwitter, faInstagram, faDiscord } from "@fortawesome/free-brands-svg-icons";
+import ButtonCircle from '../../../pages/SuperAdmin/Loading Style/Circle Loading/ButtonCircle'; 
 
 const Contact = () => {
   const [selectedSubject, setSelectedSubject] = useState('demo_request');
@@ -11,6 +12,7 @@ const Contact = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [message, setMessage] = useState('');
   const [formStatus, setFormStatus] = useState('');
+  const [loading, setLoading] = useState(false); // Loading state
 
   const handleChange = (event) => {
     setSelectedSubject(event.target.value);
@@ -38,6 +40,8 @@ const Contact = () => {
       message,
     };
 
+    setLoading(true); // Start loading
+
     try {
       const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/contactEunivate`, {
         method: 'POST',
@@ -59,39 +63,41 @@ const Contact = () => {
       }
     } catch (error) {
       setFormStatus('An error occurred. Please try again later.');
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
   return (
     <section id="CTA" className="py-16 px-1 lg:px-24">
-      <div className="max-w-1xl mx-auto">
-        <div className="bg-white lg:shadow-lg rounded-lg p-8">
-          <div className="flex flex-col lg:flex-row">
-            <div className="lg:w-1/2 w-full">
-              <h2 className="text-3xl font-bold text-left mb-1 text-red-800">
-                Contact EUnivate
-              </h2>
-              <p className="text-gray-600 text-left mb-8">
-                Let's discuss how innovation can benefit you.
+    <div className="max-w-1xl mx-auto">
+      <div className="bg-white lg:shadow-lg rounded-lg p-8">
+        <div className="flex flex-col lg:flex-row">
+          <div className="lg:w-1/2 w-full">
+            <h2 className="text-3xl font-bold text-left mb-1 text-red-800">
+              Contact EUnivate
+            </h2>
+            <p className="text-gray-600 text-left mb-8">
+              Let's discuss how innovation can benefit you.
+            </p>
+            <div className="mb-8 mt-30 lg:mt-20 md:mt-12 sm:mt-8"> 
+              <p className="text-gray-800 text-left mb-9 flex items-center">
+                <FontAwesomeIcon icon={faPhone} className="mr-6" />
+                +639 12 345 6789
               </p>
-              <div className="mb-8 mt-30 lg:mt-20 md:mt-12 sm:mt-8"> 
-                <p className="text-gray-800 text-left mb-9 flex items-center">
-                  <FontAwesomeIcon icon={faPhone} className="mr-6" />
-                  +639 12 345 6789
-                </p>
-                <p className="text-gray-800 text-left mb-9 flex items-center">
-                  <FontAwesomeIcon icon={faEnvelope} className="mr-6" />
-                  eunivate@gmail.com
-                </p>
-                <p className="text-gray-800 text-left mb-0 flex items-start">
-                  <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-6" />
-                  <span>
-                    University Site, Ibabang Dupay <br />
-                    Lucena City, Quezon Province
-                  </span>
-                </p>
-              </div>
+              <p className="text-gray-800 text-left mb-9 flex items-center">
+                <FontAwesomeIcon icon={faEnvelope} className="mr-6" />
+                eunivate@gmail.com
+              </p>
+              <p className="text-gray-800 text-left mb-0 flex items-start">
+                <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-6" />
+                <span>
+                  University Site, Ibabang Dupay <br />
+                  Lucena City, Quezon Province
+                </span>
+              </p>
             </div>
+          </div>
 
             <div className="lg:w-1/2 w-full">
               <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-xl">
@@ -212,19 +218,23 @@ const Contact = () => {
                     className="border-b border-gray-400 w-full py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 resize-none"
                   ></textarea>
 
-                  <div className="flex justify-center mt-4 md:justify-end"> 
-                    <button
-                      type="submit"
-                      className={`${
-                        isFormValid()
-                          ? "bg-yellow-500 hover:bg-red-700 cursor-pointer"
-                          : "bg-gray-400 cursor-not-allowed"
-                      } text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline w-full md:w-auto`} 
-                      disabled={!isFormValid()}
-                    >
-                      Send Message
-                    </button>
-                  </div>
+<div className="flex justify-center mt-4 md:justify-end">
+{loading ? (
+        <ButtonCircle />
+    ) : (
+        <button
+            type="submit"
+            className={`${
+                isFormValid()
+                    ? "bg-yellow-500 hover:bg-red-700 cursor-pointer"
+                    : "bg-gray-400 cursor-not-allowed"
+            } text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline w-full md:w-auto`} 
+            disabled={!isFormValid()}
+        >
+            Send Message
+        </button>
+    )}
+</div>
                 </div>
               </form>
 

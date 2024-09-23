@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Outlet } from 'react-router-dom';
 import SideNav from './SideNav';
 import { FaBars } from 'react-icons/fa';
@@ -13,6 +13,20 @@ const AdminLayout = () => {
     const closeNav = () => {
         setIsNavOpen(false);
     };
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth > 768) { // Adjust this value as needed
+                closeNav();
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
 
     return (
         <div className="relative flex">

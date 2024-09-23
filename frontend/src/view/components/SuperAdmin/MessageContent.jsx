@@ -244,7 +244,7 @@ const handleDelete = async (messageId) => {
 
   const editMessage = async (id, updatedContent, updatedFile, updatedTime) => {
     try {
-      const response = await axios.put(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}api/messages/${id}`, {
+      const response = await axios.put(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/messages/${id}`, {
         content: updatedContent,
         file: updatedFile,
         time: updatedTime,

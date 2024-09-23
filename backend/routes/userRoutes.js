@@ -66,7 +66,7 @@ router.delete('/sa-tasks/:id', deleteTask);
 
 // User Management Routes
 router.get('/', getUsers); 
-router.post('/signup', protect, createUser);  
+router.post('/signup', createUser);  
 router.post('/', upload.single('profilePicture'), createUser);
 router.post('/invite', protect, inviteUsers); 
 // router.get('/invitedMembers', protect, getInvitedMembersByUserId); 

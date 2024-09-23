@@ -336,10 +336,6 @@ const Project = () => {
   ))}
 </div>
 
-     
-
-
-
     </div>
   );
 };

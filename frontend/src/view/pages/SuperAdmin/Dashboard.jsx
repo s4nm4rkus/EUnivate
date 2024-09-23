@@ -54,8 +54,8 @@ const Dashboard = () => {
                 Dashboard
             </div>
 
-            {/* Project Dropdown */}
-            <div className="relative mb-6">
+           {/* Project Dropdown */}
+           <div className="relative mb-6 z-20"> 
                 <button
                     onClick={toggleProjectDropdown}
                     className="relative flex items-center h-12 w-56 px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-800 shadow-sm"
@@ -76,7 +76,7 @@ const Dashboard = () => {
                 </button>
 
                 {/* Project Dropdown Menu */}
-                <div className={`absolute left-0 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg ${isProjectDropdownOpen ? 'block' : 'hidden'}`}>
+                <div className={`absolute left-0 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg z-50 ${isProjectDropdownOpen ? 'block' : 'hidden'}`}>  {/* Ensure dropdown is in front */}
                     {projects.length > 0 ? (
                         projects.map((project, index) => (
                             <a
@@ -96,7 +96,7 @@ const Dashboard = () => {
             {/* Main Content Area */}
             <div className="mb-6">
                 {/* For Desktop: Show flex row layout, for mobile show carousel */}
-                <div className="hidden md:flex flex-wrap gap-4">
+                <div className="hidden md:flex flex-wrap gap-4 relative z-0">  {/* Ensure boxes are behind */}
                     {[{ title: "Assigned Task", icon: i1, count: projectCount },
                       { title: "Task Complete", icon: i2 },
                       { title: "Objective Complete", icon: i3 },
@@ -124,34 +124,34 @@ const Dashboard = () => {
 
 {/* For Mobile: Show as a carousel with square boxes */}
 <div className="block md:hidden">
-    <Slider {...sliderSettings}>
-        {[{ title: "Assigned Task", icon: i1, count: projectCount },
-          { title: "Task Complete", icon: i2 },
-          { title: "Objective Complete", icon: i3 },
-          { title: "Project Complete", icon: i4 }
-        ].map(({ title, icon, count }, index) => (
-            <div key={index} className="p-4 flex flex-col items-start justify-center">
-                <div
-                    className="bg-white p-4 border border-gray-300 rounded-lg shadow-sm flex flex-col items-start justify-start"
-                    style={{
-                        minWidth: '150px', // Square dimensions for mobile
-                        height: '200px',
-                        backgroundImage: `url(${icon})`,
-                        backgroundSize: '60px 60px', // Icon size
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'left 24px top 20px', // Position the icon at the top left with some margin
-                    }}
-                >
-                    {/* Text and Number */}
-                    <div className="ml-2 mt-20 text-left"> {/* Adjust margin-top to fine-tune spacing */}
-                        <div className="text-gray-800 font-semibold mb-1 text-xl">{title}</div> {/* Reduced font size */}
-                        <div className="text-2xl font-bold">{count || 0}</div> {/* Reduced font size */}
-                    </div>
+                    <Slider {...sliderSettings}>
+                        {[{ title: "Assigned Task", icon: i1, count: projectCount },
+                          { title: "Task Complete", icon: i2 },
+                          { title: "Objective Complete", icon: i3 },
+                          { title: "Project Complete", icon: i4 }
+                        ].map(({ title, icon, count }, index) => (
+                            <div key={index} className="p-4 flex flex-col items-start justify-center">
+                                <div
+                                    className="bg-white p-4 border border-gray-300 rounded-lg shadow-sm flex flex-col items-start justify-start"
+                                    style={{
+                                        minWidth: '150px', // Square dimensions for mobile
+                                        height: '200px',
+                                        backgroundImage: `url(${icon})`,
+                                        backgroundSize: '60px 60px', // Icon size
+                                        backgroundRepeat: 'no-repeat',
+                                        backgroundPosition: 'left 24px top 20px', // Position the icon at the top left with some margin
+                                    }}
+                                >
+                                    {/* Text and Number */}
+                                    <div className="ml-2 mt-20 text-left"> {/* Adjust margin-top to fine-tune spacing */}
+                                        <div className="text-gray-800 font-semibold mb-1 text-xl">{title}</div> {/* Reduced font size */}
+                                        <div className="text-2xl font-bold">{count || 0}</div> {/* Reduced font size */}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </Slider>
                 </div>
-            </div>
-        ))}
-    </Slider>
-</div>
 
 
 

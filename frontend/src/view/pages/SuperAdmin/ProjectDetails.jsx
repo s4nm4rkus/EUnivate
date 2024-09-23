@@ -25,11 +25,23 @@
         const [isImageVisible, setIsImageVisible] = useState(false);
         const [isVisible, setIsVisible] = useState(false);
  
+        const [tasks, setTasks] = useState([]);
+
 
         const modalRef = useRef(null);
         const location = useLocation();
         const navigate = useNavigate();
         const projectId = location.state?.projectId;
+
+        useEffect(() => {
+            const fetchTasks = async () => {
+                // Existing fetch logic
+                const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${projectId}`);
+                setTasks(response.data.data);
+            };
+            fetchTasks();
+        }, [projectId]);
+    
 
         useEffect(() => {
             const fetchProjectDetails = async () => {
@@ -331,12 +343,12 @@
             </div>
 
             <div className="mt-6 border-gray-200">
-                {selectedView === 'Kanban' && <Kanban projectId={projectId} projectName={project.projectName} />}
-                {selectedView === 'List' && <List projectId={projectId} />}
-                {selectedView === 'Calendar' && <Calendar project={project} />}
-                {selectedView === 'GanttChart' && <GanttChart projectId={projectId} />}
-                {selectedView === 'RaciMatrix' && <RaciMatrix projectId={projectId} />}
-            </div>
+            {selectedView === 'Kanban' && <Kanban projectId={projectId} projectName={project.projectName} setTasks={setTasks} />}
+            {selectedView === 'List' && <List tasks={tasks} />} {/* Pass tasks here */}
+            {selectedView === 'Calendar' && <Calendar project={project} />}
+            {selectedView === 'GanttChart' && <GanttChart projectId={projectId} />}
+            {selectedView === 'RaciMatrix' && <RaciMatrix projectId={projectId} />}
+        </div>
 
             {isUserModalOpen && (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-500 bg-opacity-50">

@@ -3,16 +3,19 @@ import { FaPlus, FaCalendar, FaPaperclip, FaCheckCircle } from 'react-icons/fa';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import Modal from './KanbanModals/Modal';
+import TaskDetailModal from './EditableModals/TaskDetailModal'; // New modal for task details
 import axios from 'axios';
 
 const ItemType = {
   TASK: 'task',
 };
 
-const Kanban = ({ projectId }) => {
+const Kanban = ({ projectId, projectName }) => {
   const [isModalOpen, setModalOpen] = useState(false);
+  const [isTaskDetailModalOpen, setTaskDetailModalOpen] = useState(false);
   const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null); 
+
   useEffect(() => {
     const fetchTasks = async () => {
       try {
@@ -37,6 +40,16 @@ const Kanban = ({ projectId }) => {
     setModalOpen(false);
   };
 
+  const handleOpenTaskDetailModal = (task) => {
+    setSelectedTask(task);
+    setTaskDetailModalOpen(true);
+  };
+
+  const handleCloseTaskDetailModal = () => {
+    setTaskDetailModalOpen(false);
+    setSelectedTask(null); // Clear selected task
+  };
+
   const updateTaskStatus = async (taskId, newStatus) => {
     try {
       await axios.patch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-tasks/${taskId}`, { status: newStatus });
@@ -58,6 +71,15 @@ const Kanban = ({ projectId }) => {
     setTasks(prevTasks => [...prevTasks, newTask]);
   };
 
+  // Function to handle task update (description update)
+  const handleUpdateTask = (updatedTask) => {
+    const updatedTasks = tasks.map(task =>
+      task._id === updatedTask._id ? updatedTask : task
+    );
+    setTasks(updatedTasks); // Update the state with the new task list
+  };
+  
+
   const Column = ({ status, children }) => {
     const [, drop] = useDrop({
       accept: ItemType.TASK,
@@ -67,7 +89,7 @@ const Kanban = ({ projectId }) => {
     return (
       <div ref={drop} className="w-full sm:w-1/5 p-2">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-base text-gray-600 font-bold">{status}</h2> {/* Reduced text size */}
+          <h2 className="text-base text-gray-600 font-bold">{status}</h2>
           <button
             onClick={handleOpenModal}
             className="text-gray-600 p-0 flex items-center justify-center"
@@ -86,36 +108,36 @@ const Kanban = ({ projectId }) => {
       type: ItemType.TASK,
       item: { id: task._id },
     });
-  
-    // Set background color based on priority
+
+    const handleTaskClick = () => {
+      handleOpenTaskDetailModal(task); // Open the task detail modal
+    };
+
     const getPriorityBackgroundColor = (priority) => {
       switch (priority) {
         case 'easy':
-          return 'bg-green-200 text-green-800'; // Light green background
+          return 'bg-green-200 text-green-800';
         case 'medium':
-          return 'bg-orange-200 text-orange-800'; // Light orange background
+          return 'bg-orange-200 text-orange-800';
         case 'hard':
-          return 'bg-red-200 text-red-800'; // Light red background
+          return 'bg-red-200 text-red-800';
         default:
-          return 'bg-gray-200 text-gray-800'; // Default background
+          return 'bg-gray-200 text-gray-800';
       }
     };
-  
-    // Function to format the start month
+
     const formatStartMonth = (startDate) => {
       if (!startDate) return 'N/A';
       const date = new Date(startDate);
       return date.toLocaleString('default', { month: 'short' }); 
     };
-    
-  
+
     return (
-      <div ref={drag} className="p-4 rounded-lg shadow-md bg-white relative">
+      <div ref={drag} className="p-4 rounded-lg shadow-md bg-white relative" onClick={handleTaskClick}>
         <div className="flex items-start justify-between">
           <div className={`px-3 py-2 text-sm font-medium rounded-sm ${getPriorityBackgroundColor(task.priority)}`}>
             {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
           </div>
-          {/* Display assignee profile pictures */}
           <div className='flex -space-x-3'>
             {task.assignee && task.assignee.map((member, index) => (
               <img
@@ -128,25 +150,22 @@ const Kanban = ({ projectId }) => {
             ))}
           </div>
         </div>
-        <div className="mt-2"> {/* Adjusted top margin */}
-          <h2 className="text-2xl font-semibold mb-2">{task.taskName}</h2> {/* Adjusted bottom margin */}
+        <div className="mt-2">
+          <h2 className="text-2xl font-semibold mb-2">{task.taskName}</h2>
           <p className="text-lg text-gray-800 overflow-hidden text-ellipsis whitespace-nowrap">{task.description}</p>
-          {/* Display attachments */}
           {task.attachment && task.attachment.length > 0 && (
-  <div className="mt-4 flex overflow-x-auto space-x-2 py-2 justify-center"> {/* Center images */}
-    {task.attachment.map((attachment, index) => (
-      <img
-        key={index}
-        src={attachment.url}
-        alt={`Attachment ${index + 1}`}
-        className="w-full sm:w-40 h-48 sm:h-36 object-cover rounded-md" 
-      />
-    ))}
-  </div>
-)}
-
+            <div className="mt-4 flex overflow-x-auto space-x-2 py-2 justify-center">
+              {task.attachment.map((attachment, index) => (
+                <img
+                  key={index}
+                  src={attachment.url}
+                  alt={`Attachment ${index + 1}`}
+                  className="w-full sm:w-40 h-48 sm:h-36 object-cover rounded-md"
+                />
+              ))}
+            </div>
+          )}
         </div>
-        {/* Display additional details */}
         <div className="mt-5 flex items-center space-x-3 overflow-x-auto">
           <div className="flex items-center space-x-2 flex-shrink-0">
             <FaCalendar className="text-gray-400" />
@@ -164,29 +183,35 @@ const Kanban = ({ projectId }) => {
       </div>
     );
   };
-  
-  
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="flex flex-wrap p-4">
-        {['Document', 'Todo', 'Ongoing', 'Done', 'Backlog'].map((status) => (
-          <Column key={status} status={status}>
-            {tasks
-              .filter(task => task.status === status)
-              .map(task => (
-                <TaskCard key={task._id} task={task} />
-              ))}
-          </Column>
-        ))}
-      </div>
-      <Modal 
-        isOpen={isModalOpen} 
-        onClose={handleCloseModal} 
-        projectId={projectId} 
-        onTaskSubmit={handleTaskSubmit} 
-      />
-    </DndProvider>
+    <div className="flex flex-wrap p-4">
+    {['Document', 'Todo', 'Ongoing', 'Done', 'Backlog'].map((status) => (
+  <Column key={status} status={status}>
+    {tasks
+      .filter(task => task.status === status)
+      .map(task => (
+        <TaskCard key={task._id} task={task} />
+      ))}
+  </Column>
+))}
+
+    </div>
+    <Modal 
+      isOpen={isModalOpen} 
+      onClose={handleCloseModal} 
+      projectId={projectId} 
+      onTaskSubmit={handleTaskSubmit} 
+    />
+    <TaskDetailModal
+      isOpen={isTaskDetailModalOpen} 
+      onClose={handleCloseTaskDetailModal} 
+      task={selectedTask} 
+      projectName={projectName} // Pass the project name here
+      onUpdateTask={handleUpdateTask} // Pass the update task handler to the modal
+    />
+  </DndProvider>
   );
 };
 

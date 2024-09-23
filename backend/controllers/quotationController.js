@@ -35,7 +35,7 @@ export const createQuotation = async (req, res) => {
         console.log('Quotation token saved successfully:', quotationToken);
 
         // Create verification link
-        const verificationLink = `${process.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/quotation/confirm/${quotationToken.quotationToken}`;
+        const verificationLink = `https://eunivatebe.vercel.app/api/users/quotation/confirm/${quotationToken.quotationToken}`;
 
         // Send the verification email
         try {
@@ -156,3 +156,4 @@ export const checkVerificationStatus = async (req, res) => {
 
 
 export default { createQuotation, confirmQuotationEmail, checkVerificationStatus };
+

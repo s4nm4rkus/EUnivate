@@ -10,11 +10,7 @@ dotenv.config();
 connectDB();
 
 const app = express();
-app.use(cors({
-  origin: 'https://eunivate.vercel.app', // Replace this with the frontend URL
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Define allowed HTTP methods
-  credentials: true, // If you need cookies or authorization headers
-}));
+app.use(cors());
 app.use(express.json());
 
 // Use user routes
@@ -26,7 +22,7 @@ app.get('/api/users/quotation/confirm/', confirmQuotationEmail);
 
 app.get('/quotation-complete', (req, res) => {
 // res.send('Quotation verification complete');
-res.redirect(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/quotation-complete`);
+res.redirect(`https://eunivate.vercel.app/quotation-complete`);
 });
 
 // Error handling middleware

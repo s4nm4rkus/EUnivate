@@ -1,418 +1,288 @@
-    import React, { useState, useEffect, useRef } from 'react';
-    import '../../../admin.css';
-    import AdminNavbar from '../../components/SuperAdmin/AdminNavbar';
-    import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-    import { faChevronDown, faChevronRight } from '@fortawesome/free-solid-svg-icons';
-    import { User } from '../../../constants/assets';
-    import axios from 'axios';
-    const People = () => {
-        const [user, setUser] = useState({ profilePicture: { url: '' } });
-        const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
-        const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState({});
-        const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState({});
-        const [isModalOpen, setIsModalOpen] = useState(false);
-        const [allUsers, setAllUsers] = useState([]);
-        const [invitedUsers, setInvitedUsers] = useState([]);
-        const [filteredUsers, setFilteredUsers] = useState([]);
-        const [selectedRole, setSelectedRole] = useState('');
-        const [selectedEmails, setSelectedEmails] = useState([]);
-        const [projects, setProjects] = useState([]);
-        const [selectedProject, setSelectedProject] = useState(null);
-        const dropdownRef = useRef();
-        const [loading, setloading] = useState(false);
-        const [error, setError] = useState(false);
-        
-            // Fetch projects from the backend
-            const fetchProjects = async () => {
-                try {
-                    const user = JSON.parse(localStorage.getItem('user'));
-                    const accessToken = user ? user.accessToken : null;
-        
-                    if (!accessToken) {
-                        setError('No access token found. Please log in again.');
-                        return;
-                    }
-        
-                    const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`,
-                        },
-                    });
-        
-                    setProjects(response.data); // Update projects state
-                } catch (error) {
-                    console.error('Error fetching projects:', error);
-                    setError('An error occurred while fetching projects.');
-                }
-            };
+import React, { useState, useEffect, useRef } from 'react';
+import '../../../admin.css';
+import AdminNavbar from '../../components/SuperAdmin/AdminNavbar';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronDown, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { User } from '../../../constants/assets';
+import axios from 'axios';
 
-        // Fetch users from the backend
-        const fetchUsers = async () => {
-            try {
+const People = () => {
+    const [user, setUser] = useState({ profilePicture: { url: '' } });
+    const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
+    const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState({});
+    const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState({});
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [allUsers, setAllUsers] = useState([]);
+    const [invitedUsers, setInvitedUsers] = useState([]);
+    const [filteredUsers, setFilteredUsers] = useState([]);
+    const [selectedRole, setSelectedRole] = useState('');
+    const [selectedEmails, setSelectedEmails] = useState([]);
+    const [projects, setProjects] = useState([]);
+    const [selectedProject, setSelectedProject] = useState(null);
+    const dropdownRef = useRef();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [showUsersInModal, setShowUsersInModal] = useState(false); 
+    const fetchProjects = async () => {
+        try {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const accessToken = user?.accessToken;
 
-                const user = JSON.parse(localStorage.getItem('user'));
-                const token = user ? user.accessToken : null;
+            if (!accessToken) {
+                throw new Error('No access token found. Please log in again.');
+            }
 
-                if (!token) {
-                    setError('No access token found. Please log in again.');
-                    return;
-                }
+            const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
 
-                const response = await fetch('http://localhost:5000/api/users/', {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                    },
-                });
+            setProjects(response.data);
+        } catch (error) {
+            console.error('Error fetching projects:', error);
+            setError('An error occurred while fetching projects.');
+        }
+    };
 
-                if (!response.ok) {
-                    throw new Error('Failed to fetch users');
-                }
+    const fetchUsers = async () => {
+        try {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const token = user?.accessToken;
 
-                const users = await response.json();
-                setAllUsers(users);
-                setFilteredUsers(users); // Initialize filteredUsers with all users
+            if (!token) {
+                throw new Error('No access token found. Please log in again.');
+            }
 
-                        // Fetch invited users from backend (invited by current user)
-        const invitedUsersResponse = await fetch('http://localhost:5000/api/users/invited', {
+            const response = await fetch('http://localhost:5000/api/users/', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) throw new Error('Failed to fetch users');
+
+            const users = await response.json();
+            setAllUsers(users);
+            setFilteredUsers(users);
+
+            const invitedUsersResponse = await fetch('http://localhost:5000/api/users/invited', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            if (!invitedUsersResponse.ok) throw new Error('Failed to fetch invited users');
+
+            const invitedUsersData = await invitedUsersResponse.json();
+            const updatedInvitedUsers = invitedUsersData.invitedUsers.map((invitedUser) => {
+                const userFromDB = users.find((user) => user.email === invitedUser.email);
+                return userFromDB
+                    ? { ...invitedUser, role: userFromDB.role, profilePicture: userFromDB.profilePicture, _id: userFromDB._id }
+                    : invitedUser;
+            });
+
+            setInvitedUsers(updatedInvitedUsers);
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            setError(error.message);
+        }
+    };
+
+    useEffect(() => {
+        fetchUsers();
+        fetchProjects();
+
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsRoleDropdownOpen({});
+                setIsProjectDropdownOpen({});
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
+
+    const toggleRoleDropdown = (userEmail) => {
+        setIsRoleDropdownOpen((prev) => ({
+            ...prev,
+            [userEmail]: !prev[userEmail],
+        }));
+    };
+
+    const toggleProjectDropdown = (userEmail) => {
+        setIsProjectDropdownOpen((prev) => ({
+            ...prev,
+            [userEmail]: !prev[userEmail],
+        }));
+    };
+
+
+    const toggleModal = () => {
+        setIsModalOpen((prev) => !prev);
+        if (!isModalOpen) {
+            // Reset state when modal opens
+            setSelectedRole('');
+            setFilteredUsers(allUsers); // Show all users
+            setSelectedEmails([]);
+            setShowUsersInModal(false); // Hide users when modal opens
+        } else {
+            // When closing the modal, you might want to show users again
+            setShowUsersInModal(true); 
+        }
+    };
+    
+    const handleRoleFilter = (role) => {
+        setSelectedRole(role);
+        const filteredByRole = role 
+            ? allUsers.filter((user) => user.role.toLowerCase() === role.toLowerCase()) 
+            : allUsers;
+    
+        setFilteredUsers(filteredByRole.filter((user) => {
+            const searchQuery = document.querySelector('input[placeholder="Search email"]').value.toLowerCase();
+            return user.email.toLowerCase().includes(searchQuery) ||
+                   user.firstName.toLowerCase().includes(searchQuery) ||
+                   user.lastName.toLowerCase().includes(searchQuery);
+        }));
+    };
+    
+const handleInvite = async () => {
+    if (!selectedEmails.length) {
+        alert('Please select at least one email to invite.');
+        return;
+    }
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    const token = user?.accessToken;
+
+    if (!token) {
+        alert('No access token found. Please log in again.');
+        return;
+    }
+
+    // Map selected emails to their corresponding user IDs, projects, profilePicture, and role
+    const selectedUsers = selectedEmails.map((email) => {
+        const userFromDB = allUsers.find((user) => user.email === email);
+        return userFromDB 
+            ? { 
+                id: userFromDB._id, 
+                projects: userFromDB.projects.length > 0 ? userFromDB.projects : ['N/A'], // Ensure 'N/A' is an array
+                profilePicture: userFromDB.profilePicture || {}, // Get profilePicture
+                role: userFromDB.role || 'N/A' // Get role, default to 'N/A' if not found
+              } 
+            : null;
+    }).filter((user) => user !== null);
+
+    if (selectedUsers.length === 0) {
+        alert('No valid users found for the selected emails.');
+        return;
+    }
+
+    setLoading(true);
+
+    try {
+        const response = await fetch('http://localhost:5000/api/users/invite', {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
             },
+            body: JSON.stringify({
+                userIds: selectedUsers.map(user => user.id),
+                projects: selectedUsers.map(user => user.projects).flat(), // Flatten the array of project arrays
+                roles: selectedUsers.map(user => user.role), // Pass roles array
+                profilePictures: selectedUsers.map(user => user.profilePicture), // Pass profilePictures array
+                invitedBy: user._id // The ID of the inviter
+            }),
         });
 
-        if (!invitedUsersResponse.ok) {
-            throw new Error('Failed to fetch invited users');
+        if (!response.ok) {
+            const errorResponse = await response.json();
+            throw new Error(errorResponse.message);
         }
 
-        const invitedUsersData = await invitedUsersResponse.json();
-        
-                // Update invited users' roles and profile pictures based on database data
-                const updatedInvitedUsers = invitedUsersData.invitedUsers.map((invitedUser) => {
-                    const userFromDB = users.find((user) => user.email === invitedUser.email);
-                    if (userFromDB) {
-                        return {
-                            ...invitedUser,
-                            role: userFromDB.role,
-                            profilePicture: userFromDB.profilePicture,
-                            _id: userFromDB._id, 
-                        };
-                    }
-                    return invitedUser;
-                });
+        fetchUsers(); // Refresh the user list
 
-                setInvitedUsers(updatedInvitedUsers);
-            } catch (error) {
-                console.error('Error fetching users:', error);
-            }
-        };
+        alert('Invitations sent successfully!');
+        toggleModal();
+    } catch (error) {
+        console.error('Error inviting users:', error.message);
+        alert(`An error occurred: ${error.message}`);
+    } finally {
+        setLoading(false);
+    }
+};
 
-        useEffect(() => {
-            fetchUsers();
-            fetchProjects();
 
-            // Close dropdowns when clicking outside
-            const handleClickOutside = (event) => {
-                if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                    setIsRoleDropdownOpen({});
-                    setIsProjectDropdownOpen({});
-                }
-            };
-
-            document.addEventListener('mousedown', handleClickOutside);
-            return () => {
-                document.removeEventListener('mousedown', handleClickOutside);
-            };
-        }, []);
-
-        const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
-
-        const toggleRoleDropdown = (userEmail) => {
-            setIsRoleDropdownOpen((prev) => ({
-                ...prev,
-                [userEmail]: !prev[userEmail],
-            }));
-        };
-
-        const toggleProjectDropdown = (userEmail) => {
-            setIsProjectDropdownOpen((prev) => ({
-                ...prev,
-                [userEmail]: !prev[userEmail],
-            }));
-        };
-
-        const toggleModal = () => {
-            setIsModalOpen(!isModalOpen);
-            if (!isModalOpen) {
-                setSelectedRole('');
-                setFilteredUsers(allUsers);
-                setSelectedEmails([]);
-            }
-        };
-
-        const handleRoleFilter = (role) => {
-            console.log('Selected role:', role);
-            setSelectedRole(role);
-
-            if (role) {
-                setFilteredUsers(allUsers.filter((user) => user.role.toLowerCase() === role.toLowerCase()));
-            } else {
-                setFilteredUsers(allUsers);
-            }
-        };
-
-        const handleInvite = async () => {
-            const emails = selectedEmails.join(',');
-        
-            if (!emails) {
-                console.error('No email provided');
-                alert('Please select at least one email to invite.');
-                return;
-            }
-        
-            const user = JSON.parse(localStorage.getItem('user'));
-            const token = user ? user.accessToken : null;
-
-            if (!token) {
-                setError('No access token found. Please log in again.');
-                return;
-            }
-
-            console.log(`Inviting users with emails: ${emails}`);
-            setloading(true);
-        
-            try {
-                const response = await fetch('http://localhost:5000/api/users/invite', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}` // Send access token for authorization
-                    },
-                    body: JSON.stringify({ emails }), // Send emails to invite
-                });
-        
-                if (response.ok) {
-                    const result = await response.json();
-                    console.log('Invitation response:', result.message);
-        
-                    const newInvitedUsers = selectedEmails.map((email) => {
-                        const userFromDB = allUsers.find((user) => user.email === email);
-                        return {
-                            email,
-                            role: userFromDB ? userFromDB.role : 'User',
-                            project: 'N/A',
-                            profilePicture: userFromDB ? userFromDB.profilePicture : null,
-                        };
-                    });
-        
-                    // // Update invited users state and local storage
-                    // const updatedInvitedUsers = [...invitedUsers, ...newInvitedUsers];
-                    // setInvitedUsers(updatedInvitedUsers);
-                    // localStorage.setItem('invitedUsers', JSON.stringify(updatedInvitedUsers));
-        
-                    // Notify user for each invited email
-                    selectedEmails.forEach((email) => {
-                        alert(`Invitation sent to: ${email}`);
-                    });
-        
-                    fetchUsers();
-                    toggleModal();
-                } else {
-                    const errorResponse = await response.json();
-                    console.error('Error inviting users:', errorResponse);
-                    alert(`Error inviting users: ${errorResponse.message}`);
-                }
-            } catch (error) {
-                console.error('Error inviting users:', error.message);
-                alert(`An error occurred: ${error.message}`);
-            } finally {
-                setloading(false); // Ensure loading state is reset
-            }
-        };
-        
-        
-        
-
-        const handleRoleChange = async (newRole, userEmail) => {
-            try {
-                const user = allUsers.find((u) => u.email === userEmail);
-        
-
-                if (!user) {
-                    throw new Error(`User with email ${userEmail} not found`);
-                }
-        
-                const User = JSON.parse(localStorage.getItem('user'));
-                const token = User ? User.accessToken : null;
+    const handleRemoveUser = async (userEmail) => {
+        const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
     
-                if (!token) {
-                    setError('No access token found. Please log in again.');
-                    return;
-                }
-        
-                const response = await fetch(`http://localhost:5000/api/users/${user._id}/role`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`, // Pass the token in Authorization header
-                    },
-                    body: JSON.stringify({ role: newRole }),
-                });
-        
-                if (response.ok) {
-                    const updatedUser = await response.json();
-                    console.log('Role change successful:', updatedUser);
-        
-                    // Update the state with the new role, no need for localStorage
-                    setInvitedUsers((prevUsers) => {
-                        return prevUsers.map((user) =>
-                            user.email === userEmail ? { ...user, role: newRole } : user
-                        );
-                    });
-        
-                    alert(`Role changed to ${newRole} and email notification sent to ${userEmail}`);
-                } else {
-                    const errorResponse = await response.json();
-                    console.error('Error updating role:', errorResponse);
-                    alert(`Error updating role: ${errorResponse.message}`);
-                }
-            } catch (error) {
-                console.error('Error updating role:', error.message);
-                alert(`An error occurred: ${error.message}`);
+        if (!token) {
+            alert('Access token is missing. Please log in again.');
+            return;
+        }
+    
+        const invitedMember = invitedUsers.find((u) => u.email === userEmail);
+        if (!invitedMember) {
+            alert('Invited member not found in the list.');
+            return;
+        }
+    
+        try {
+            // Send the actual user ID for deletion
+            const response = await fetch(`http://localhost:5000/api/users/invited/${invitedMember.userId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+    
+            if (!response.ok) {
+                const errorResponse = await response.json();
+                throw new Error(errorResponse.message);
             }
-        };
-        
-        
+    
+            setInvitedUsers((prev) => prev.filter((u) => u.email !== userEmail));
+            alert(`Successfully removed user: ${userEmail}`);
+        } catch (error) {
+            console.error('Error in handleRemoveUser:', error.message);
+            alert(`An error occurred: ${error.message}`);
+        }
+    };
+    
+    
+    
 
-        //Handle Project Change
-        const handleProjectChange = async (newProject, userEmail) => {
-            const user = invitedUsers.find((user) => user.email === userEmail);
-            if (!user) return;  
-        
-            // Update the UI first and highlight the selected project
-            setSelectedProject(newProject);
-        
-            const updatedUsers = invitedUsers.map((user) => 
-                user.email === userEmail ? { ...user, project: newProject.projectName } : user
-            );
-            setInvitedUsers(updatedUsers);
-        
-            localStorage.setItem('invitedUsers', JSON.stringify(updatedUsers));
-        
-            // Show an alert that the project has been assigned
-            alert(`Assigned project "${newProject.projectName}" to ${userEmail}`);
-        
-            // Call the API to update the user in the database
-            try {
-                const userFromStorage = JSON.parse(localStorage.getItem('user'));
-                const accessToken = userFromStorage?.accessToken;
-        
-                if (!accessToken) {
-                    alert('No access token found. Please log in again.');
-                    return;
-                }
-        
-                // Create the request payload
-                const payload = {
-                    userId: user._id,
-                    projectId: newProject._id,
-                    updateData: { projectName: newProject.projectName }, // Include update data if needed
-                };
-        
-                const response = await fetch('http://localhost:5000/api/users/assign-project', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${accessToken}`, 
-                    },
-                    body: JSON.stringify(payload),
-                });
-        
-                if (!response.ok) {
-                    const errorResponse = await response.json();
-                    throw new Error(errorResponse.message);
-                }
-        
-                console.log('Project assigned successfully.');
-            } catch (error) {
-                console.error('Error assigning project:', error.message);
-                alert(`Error assigning project: ${error.message}`);
-            }
-        };
-        
-        //Bug to be continued ...
-        const handleRemoveUser = async (userEmail) => {
-            try {
-                const User = JSON.parse(localStorage.getItem('user'));
-                const token = User ? User.accessToken : null;
-        
-                if (!token) {
-                    alert('Access token is missing. Please log in again.');
-                    return;
-                }
-        
-                const user = invitedUsers.find((u) => u.email === userEmail);
-                if (!user) {
-                    console.error('User not found in invited users');
-                    return;
-                }
-        
-                const invitedMemberId = user._id;
-                console.log('Sending DELETE request for ID:', invitedMemberId);
-        
-                const response = await fetch(`http://localhost:5000/api/users/invited/${invitedMemberId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                    },
-                });
-        
-                if (!response.ok) {
-                    const errorResponse = await response.json();
-                    console.error('Error removing user from database:', errorResponse);
-                    alert(`Error removing user: ${errorResponse.message}`);
-                    return;
-                }
-        
-                console.log(`User ${userEmail} successfully removed from the database.`);
-                const updatedUsers = invitedUsers.filter((u) => u.email !== userEmail);
-                console.log('Updated invited users:', updatedUsers);
-                setInvitedUsers(updatedUsers);
-                alert(`Successfully removed user: ${userEmail}`);
-            } catch (error) {
-                console.error('Error in handleRemoveUser:', error.message);
-                alert(`An error occurred: ${error.message}`);
-            }
-        };
-        
-        
-        
-        
-        
-        
+    const handleSearch = (e) => {
+        const searchQuery = e.target.value.toLowerCase();
+        const roleFilteredUsers = selectedRole 
+            ? allUsers.filter((user) => user.role.toLowerCase() === selectedRole.toLowerCase()) 
+            : allUsers;
+    
+        const filtered = roleFilteredUsers.filter(
+            (user) =>
+                user.email.toLowerCase().includes(searchQuery) ||
+                user.firstName.toLowerCase().includes(searchQuery) ||
+                user.lastName.toLowerCase().includes(searchQuery)
+        );
+        setFilteredUsers(filtered);
+    };
 
-        const handleSearch = (e) => {
-            const searchQuery = e.target.value.toLowerCase();
-            const filtered = allUsers.filter(
-                (user) =>
-                    user.email.toLowerCase().includes(searchQuery) ||
-                    user.firstName.toLowerCase().includes(searchQuery) ||
-                    user.lastName.toLowerCase().includes(searchQuery)
-            );
-            setFilteredUsers(filtered);
-        };
+    const handleEmailSelect = (email) => {
+        setSelectedEmails((prev) =>
+            prev.includes(email) ? prev.filter((e) => e !== email) : [...prev, email]
+        );
+    };
 
-        const handleEmailSelect = (email) => {
-            setSelectedEmails((prev) =>
-                prev.includes(email) ? prev.filter((e) => e !== email) : [...prev, email]
-            );
-        };
-        const [clickedEmail, setClickedEmail] = useState(null);
+    const [clickedEmail, setClickedEmail] = useState(null);
+    const handleAvatarClick = (email) => {
+        setClickedEmail(email === clickedEmail ? null : email); // Toggle email display
+    };
 
-        const handleAvatarClick = (email) => {
-            setClickedEmail(email === clickedEmail ? null : email); // Toggle email display
-        };
         
         return (
             <div className="bg-gray-100 min-h-screen p-6">
@@ -556,88 +426,83 @@
 
 
     {/* Modal */}
-    {isModalOpen && (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-        <div className="absolute inset-0 bg-gray-800 opacity-50"></div>
-        <div className="relative bg-white w-full max-w-sm rounded-lg p-4 sm:p-5 lg:p-6 z-60 mt-21">
-        <div className="flex justify-between items-center mb-4">
-            <h3 className="text-base sm:text-lg font-medium text-gray-900">Add Members</h3>
-            <button
-            className="text-gray-500 hover:text-gray-700"
-            onClick={toggleModal}
-            >
-            &times;
-            </button>
-        </div>
+                {isModalOpen && (
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <div className="absolute inset-0 bg-gray-800 opacity-50"></div>
+                    <div className="relative bg-white w-full max-w-sm rounded-lg p-4 sm:p-5 lg:p-6 z-60 mt-21">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-base sm:text-lg font-medium text-gray-900">Add Members</h3>
+                            <button
+                                className="text-gray-500 hover:text-gray-700"
+                                onClick={toggleModal}
+                            >
+                                &times;
+                            </button>
+                        </div>
 
-        <div className="flex flex-col sm:flex-row items-start mb-4">
-            <input
-            type="text"
-            placeholder="Search email"
-            className="w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
-            onChange={handleSearch}
-            />
-        </div>
+                        <div className="flex flex-col sm:flex-row items-start mb-4">
+                            <input
+                                type="text"
+                                placeholder="Search email"
+                                className="w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
+                                onChange={handleSearch}
+                            />
+                        </div>
 
-        <div className="flex flex-col sm:flex-row items-start mb-4">
-            <select
-            className="p-2 sm:p-3 border rounded-lg text-sm sm:text-base mb-2 sm:mb-0 sm:mr-4 w-full"
-            onChange={(e) => handleRoleFilter(e.target.value)}
-            value={selectedRole}
-            >
-            <option value="">Select Role</option>
-            <option value="admin">Admin</option>
-            <option value="member">Member</option>
-            <option value="Guest">Guest</option>
-            </select>
+                        <div className="flex flex-col sm:flex-row items-start mb-4">
+                            <select
+                                className="p-2 sm:p-3 border rounded-lg text-sm sm:text-base mb-2 sm:mb-0 sm:mr-4 w-full"
+                                onChange={(e) => handleRoleFilter(e.target.value)}
+                                value={selectedRole}
+                            >
+                                <option value="">Select Role</option>
+                                <option value="admin">Admin</option>
+                                <option value="member">Member</option>
+                                <option value="guest">Guest</option>
+                            </select>
 
-    <button
-    className="bg-red-800 text-white px-4 py-2 rounded-lg hover:bg-red-900 text-base sm:px-5 sm:py-3 w-full max-w-30"
-    onClick={handleInvite}
-    disabled={loading}
-    >
-    {loading ? 'Inviting ...' : 'Invite'}
-    </button>
+                            <button
+                                className="bg-red-800 text-white px-4 py-2 rounded-lg hover:bg-red-900 text-base sm:px-5 sm:py-3 w-full max-w-30"
+                                onClick={handleInvite}
+                                disabled={loading}
+                            >
+                                {loading ? 'Inviting ...' : 'Invite'}
+                            </button>
+                        </div>
 
-
-        </div>
-
-        <div className="mt-4 overflow-y-auto max-h-80">
-            {filteredUsers.length > 0 ? (
-            <ul>
-                {filteredUsers.map((user, index) => (
+                        <div className="mt-4 overflow-y-auto max-h-80">
+    {filteredUsers.length > 0 ? (
+        <ul>
+            {filteredUsers.map((user, index) => (
                 <li
                     key={index}
                     className={`flex items-center justify-between p-2 border-b text-xs sm:text-sm ${selectedEmails.includes(user.email) ? 'bg-gray-200' : ''}`}
                     onClick={() => handleEmailSelect(user.email)}
                 >
                     <div className="flex items-center">
-                    <img
-                        src={user.profilePicture?.url || user.profilePicture || User}
-                        alt="Profile"
-                        className="w-6 h-6 rounded-full mr-2 object-cover"
-                    />
-                    <div>
-                        <div className="text-xs sm:text-sm text-gray-800">
-                        {user.firstName} {user.lastName}
+                        <img
+                            src={user.profilePicture?.url || user.profilePicture || User}
+                            alt="Profile"
+                            className="w-6 h-6 rounded-full mr-2 object-cover"
+                        />
+                        <div>
+                            <div className="text-xs sm:text-sm text-gray-800">
+                                {user.firstName} {user.lastName}
+                            </div>
+                            <div className="text-xs text-gray-600">{user.email}</div>
                         </div>
-                        <div className="text-xs text-gray-600">{user.email}</div>
-                    </div>
                     </div>
                     <div className="text-xs text-gray-500">{user.role}</div>
                 </li>
-                ))}
-            </ul>
-            ) : (
-            <p className="text-center text-gray-500 text-xs sm:text-sm">No users found.</p>
-            )}
-        </div>
-        </div>
-    </div>
+            ))}
+        </ul>
+    ) : (
+        <p className="text-center text-gray-500 text-xs sm:text-sm">No users found.</p>
     )}
-
-
-
+</div>
+                    </div>
+                </div>
+            )}
             </div>
         );
     };

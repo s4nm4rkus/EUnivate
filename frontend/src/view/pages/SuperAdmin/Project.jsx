@@ -176,15 +176,15 @@ const Project = () => {
     }, 3000);
   };
 
-  const handleDeleteProject = async (projectId) => {
-    try {
-      await axios.delete(`http://localhost:5000/api/users/sa-newproject/${projectId}`);
-      setProjects(projects.filter((project) => project._id !== projectId));
-    } catch (error) {
-      console.error('Error deleting project:', error);
-      setError('An error occurred while deleting the project.');
-    }
-  };
+  // const handleDeleteProject = async (projectId) => {
+  //   try {
+  //     await axios.delete(`http://localhost:5000/api/users/sa-newproject/${projectId}`);
+  //     setProjects(projects.filter((project) => project._id !== projectId));
+  //   } catch (error) {
+  //     console.error('Error deleting project:', error);
+  //     setError('An error occurred while deleting the project.');
+  //   }
+  // };
 
   return (
     <div className="bg-gray-100 min-h-screen p-6">
@@ -312,16 +312,16 @@ const Project = () => {
         <p className="ml-2">
           {doneTaskCounts[project._id] !== undefined ? doneTaskCounts[project._id] : 'Loading...'}
         </p>
-        <button
+        {/* <button
           onClick={(e) => {
             e.stopPropagation(); // Prevent event from bubbling up
-            handleDeleteProject(project._id); // Pass project ID for deletion
+            // handleDeleteProject(project._id); // Pass project ID for deletion
           }}
           className="absolute bottom-14 right-6 bg-red-600 text-white p-3 rounded-full shadow hover:bg-red-700"
           title="Delete Project"
         >
           <FaTrash size={20} />
-        </button>
+        </button> */}
       </div>
       <div className="flex items-center mt-4">
         <div className="w-full bg-gray-200 rounded-full h-2 relative">

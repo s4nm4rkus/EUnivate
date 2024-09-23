@@ -23,7 +23,8 @@
         const [addText, setAddText] = useState('');
         const [project, setProject] = useState({});
         const [isImageVisible, setIsImageVisible] = useState(false);
-
+        const [isVisible, setIsVisible] = useState(false);
+ 
 
         const modalRef = useRef(null);
         const location = useLocation();
@@ -75,33 +76,47 @@
             setIsModalOpen(false);
         };
 
-        const handleUserIconClick = async () => {
-            setIsImageVisible(!isImageVisible);
-            try {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const accessToken = user?.accessToken;
-        
-                if (!accessToken) {
-                    throw new Error('No access token found. Please log in.');
-                }
-        
-                const response = await axios.get('http://localhost:5000/api/users/invited', {
-                    headers: { Authorization: `Bearer ${accessToken}` }
-                });
-        
-                if (Array.isArray(response.data.invitedUsers)) {
-                    setMembers(response.data.invitedUsers);  // Corrected to access the invitedUsers array
-                    setIsUserModalOpen(true);
-                } else {
-                    console.error('Unexpected response format:', response.data);
-                    setError('Error fetching members. Expected an array.');
-                }
-            } catch (error) {
-                console.error('Error fetching members:', error.response?.data || error.message);
-                setError('Error fetching members.');
-            }
+        const handleUserIconClick = () => {
+            // Just toggle the modal visibility
+            setIsUserModalOpen(!isUserModalOpen);
         };
-
+        
+        useEffect(() => {
+            // Fetch members only when the modal is opened
+            if (isUserModalOpen) {
+                const fetchMembers = async () => {
+                    try {
+                        const user = JSON.parse(localStorage.getItem('user'));
+                        const accessToken = user?.accessToken;
+        
+                        if (!accessToken) {
+                            throw new Error('No access token found. Please log in.');
+                        }
+        
+                        const response = await axios.get('http://localhost:5000/api/users/invited', {
+                            headers: { Authorization: `Bearer ${accessToken}` }
+                        });
+        
+                        if (Array.isArray(response.data.invitedUsers)) {
+                            setMembers(response.data.invitedUsers);
+                        } else {
+                            console.error('Unexpected response format:', response.data);
+                            setError('Error fetching members. Expected an array.');
+                        }
+                    } catch (error) {
+                        console.error('Error fetching members:', error.response?.data || error.message);
+                        setError('Error fetching members.');
+                    }
+                };
+        
+                fetchMembers();
+            }
+        }, [isUserModalOpen]); // This effect runs only when the modal is opened
+        
+        const filteredMembers = (members || []).filter(member =>
+            member.email.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        
         
         const handleProfileClick = () => {
             setIsImageVisible(true); // Show the image when profile is clicked
@@ -115,7 +130,7 @@
                 }
                 const user = JSON.parse(localStorage.getItem('user'));
                 const accessToken = user?.accessToken;
-                
+        
                 const userIds = selectedMembers.map(member => {
                     if (!member || !member._id) {
                         console.error('Invalid member object in selectedMembers:', member);
@@ -123,6 +138,9 @@
                     }
                     return member._id;
                 }).filter(id => id !== null);
+        
+                // Log userIds before sending to API
+                console.log('User IDs being sent:', userIds);
         
                 if (userIds.length === 0) {
                     throw new Error('No valid user IDs to add.');
@@ -135,7 +153,7 @@
                     headers: { Authorization: `Bearer ${accessToken}` }
                 });
         
-                    // Handle response
+                // Handle response
                 setAddedMembers(response.data.invitedUsers);
                 setSelectedMembers([]);
                 setIsUserModalOpen(false);
@@ -145,6 +163,7 @@
                 setError(errorMessage); // Set error message to state
             }
         };
+        
         
         
 
@@ -185,9 +204,6 @@
             return () => document.removeEventListener('mousedown', handleClickOutside);
         }, []);
 
-        const filteredMembers = members.filter(member =>
-            member.email.toLowerCase().includes(searchQuery.toLowerCase())
-        );
 
     return (
         <div className="bg-gray-100 min-h-screen p-6">
@@ -238,7 +254,7 @@
                                 onClick={handleUserIconClick}
                             />
                             <div className="flex -space-x-4 right-0">
-                            {addedMembers?.map(member => (
+                            {/* {addedMembers.map(member => (
                                 
                             <img
                                 key={member._id} 
@@ -247,7 +263,7 @@
                                 className="w-8 h-8 rounded-full border border-gray-300 cursor-pointer"
                                 onClick={() => toggleMemberSelection(member)}
                             />
-                        ))}
+                        ))} */}
 
 
                             </div>
@@ -356,23 +372,27 @@
 </button>
 
             </div>
-            <ul className="mb-4">
-                {filteredMembers.map(member => (
-                    <li key={member._id} className="flex items-center mb-2 text-sm md:text-base">
-                        <img
-                            src={typeof member.profilePicture === 'string' ? member.profilePicture : member.profilePicture?.url}
-                            alt={member.username}
-                            className="w-8 h-8 rounded-full mr-2"
-                        />
-                        <span>{member.email}</span>
-                        <button
-                            onClick={() => toggleMemberSelection(member)}
-                            className={`ml-auto p-1 border rounded-md text-sm md:text-base ${selectedMembers.some(selected => selected._id === member._id) ? 'bg-red-400' : 'bg-gray-200'}`}
-                        >
-                            {selectedMembers.some(selected => selected._id === member._id) ? 'Selected' : 'Select'}
-                        </button>
-                    </li>
-                ))}
+                        <ul className="mb-4">
+                {searchQuery ? (
+                    filteredMembers.map(member => (
+                        <li key={member._id} className="flex items-center mb-2 text-sm md:text-base">
+                            <img
+                                src={typeof member.profilePicture === 'string' ? member.profilePicture : member.profilePicture?.url}
+                                alt={member.username}
+                                className="w-8 h-8 rounded-full mr-2"
+                            />
+                            <span>{member.email}</span>
+                            <button
+                                onClick={() => toggleMemberSelection(member)}
+                                className={`ml-auto p-1 border rounded-md text-sm md:text-base ${selectedMembers.some(selected => selected._id === member._id) ? 'bg-red-400' : 'bg-gray-200'}`}
+                            >
+                                {selectedMembers.some(selected => selected._id === member._id) ? 'Selected' : 'Select'}
+                            </button>
+                        </li>
+                    ))
+                ) : (
+                    <li className="text-gray-500">No members to display. Please enter an email to search.</li>
+                )}
             </ul>
         </div>
     </div>

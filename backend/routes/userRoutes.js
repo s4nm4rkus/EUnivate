@@ -5,7 +5,7 @@
   import {createProduct, getProducts, deleteProduct, updateProduct  } from '../controllers/addProductsController.js'
   import { updateProject, deleteProject, getProjects, createProject} from '../controllers/addProjectsController.js';
   import { getDashboardStats } from '../controllers/DashboardController.js';
-  import { createSaNewProject, getAllProjects, deleteProjectById, getProjectById, inviteUsersToProject } from '../controllers/saNewProjectController.js';
+  import { createSaNewProject, getAllProjects, getProjectById, inviteUsersToProject } from '../controllers/saNewProjectController.js';
   import {createUser } from '../controllers/userController.js';
   import { loginUser, forgotPassword, resetPassword } from '../controllers/authController.js';
   import {verifyLoginOtp, verifyTwoFactorAuth, resendOtp } from '../controllers/adminAuthentication.js';
@@ -19,14 +19,14 @@
   import { createTask, getTasks, getTaskById, updateTaskStatusById, getTasksByProjectId, deleteTask } from '../controllers/saAddTaskController.js';
   import { findUserByUsername } from '../controllers/findUserNameIDController.js';
   import { assignProjectToUser } from '../controllers/assignUserProjectController.js';
-  import { addProjectsToUsers } from '../controllers/sa-addMember.js';
+  import { addMemberToProject } from '../controllers/sa-addMember.js';
   // Not used any more but save on the future
   // import { getInvitedMembersByUserId } from '../controllers/peopleController.js';
   // import { getMembersAndSuperAdmins } from '../controllers/sa-addMember.js';
     // import { sendCompletionEmail } from '../controllers/quotationController.js';
   // router.get('/members-superadmins', getMembersAndSuperAdmins);
   // router.post('/quotation/send-completion-email', sendCompletionEmail);
-
+// router.delete('/sa-newproject/:id', deleteProjectById);
 const router = express.Router();
 
 // User Authentication Routes
@@ -45,7 +45,6 @@ router.post('/contactEunivate',ContactEunivate );
 router.post('/sa-newproject',protect, createSaNewProject);
 router.post('/sa-invite-users',protect,  inviteUsers);
 router.get('/sa-getnewproject', protect, getAllProjects);
-router.delete('/sa-newproject/:id', deleteProjectById);
 router.get('/sa-getnewproject/:id', protect,  getProjectById)
 router.get('/findByUsername/:username', findUserByUsername);
 
@@ -55,7 +54,7 @@ router.delete('/invited/:id', protect, removeInvitedMember);
 //people Controller
 router.put('/assign-project', protect, assignProjectToUser);
 //add member on the project details on user add icon
-router.post('/add-member-to-project', addProjectsToUsers);
+router.post('/add-member-to-project', addMemberToProject);
 // Task Routes
 router.post('/sa-task', createTask);         
 router.get('/sa-tasks', getTasks);  

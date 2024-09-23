@@ -1,5 +1,45 @@
-import User from "../models/userModels.js";
+import Invited from "../models/saInvitedMember.js";
 import Project from "../models/saNewProject.js";
+
+export const addMemberToProject = async (req, res) => {
+    const { projectId, users } = req.body;
+
+    console.log('Received Project ID:', projectId);
+    console.log('Received Users:', users);
+
+    if (!projectId || !Array.isArray(users) || users.length === 0) {
+        return res.status(400).json({ message: 'Invalid project ID or users array.' });
+    }
+
+    try {
+        // Find the project (optional, based on your requirements)
+        const project = await Project.findById(projectId);
+        if (!project) {
+            console.log('Project not found for ID:', projectId);
+            return res.status(404).json({ message: 'Project not found.' });
+        }
+        console.log('Project found:', project);
+
+        // Update each user to add the project ID to their projects array
+        const result = await Invited.updateMany(
+            { _id: { $in: users } }, // Match users by their IDs
+            { $addToSet: { project: projectId } } // Add projectId to the projects array, avoiding duplicates
+        );
+
+        console.log('Update Result:', result);
+
+        // Optionally fetch the updated users to return them
+        const updatedUsers = await Invited.find({ _id: { $in: users } });
+        
+        console.log('Updated Users:', updatedUsers);
+        res.status(200).json({ message: 'Members added successfully.', invitedUsers: updatedUsers });
+    } catch (error) {
+        console.error('Error adding members to project:', error);
+        res.status(500).json({ message: 'An error occurred while adding members to the project.' });
+    }
+};
+
+
 // //Get members and Superadmin role
 // export const getMembersAndSuperAdmins = async (req, res) => {
 //         try {
@@ -55,37 +95,4 @@ import Project from "../models/saNewProject.js";
 //     }
 // }
 
-export const addProjectsToUsers = async (req, res) => {
-    try {
-        const { projectId, users } = req.body;
-
-        // Ensure projectId and users array are provided
-        if (!projectId || !Array.isArray(users) || users.length === 0) {
-            return res.status(400).json({ message: 'Project ID and users are required' });
-        }
-
-        // Find the project
-        const project = await Project.findById(projectId);
-        if (!project) {
-            return res.status(404).json({ message: 'Project not found' });
-        }
-
-        // Update each user's projects array to include the new project
-        const updatedUsers = await Promise.all(users.map(async (userId) => {
-            const user = await User.findById(userId);
-            if (user) {
-                // Add the project to the user's projects array if it's not already there
-                if (!user.projects.includes(projectId)) {
-                    user.projects.push(projectId);
-                    await user.save();
-                }
-            }
-            return user;
-        }));
-
-        res.status(200).json({ message: 'Users successfully assigned to the project', updatedUsers });
-    } catch (error) {
-        console.error('Error assigning project:', error);
-        res.status(500).json({ message: 'Server error while assigning project' });
-    }
-};
+//Add member to project

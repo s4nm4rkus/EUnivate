@@ -10,25 +10,28 @@ const saInvitedMemberSchema = new mongoose.Schema({
         enum: ['User', 'members', 'admin', 'superadmin'],
         default: 'User',
     },
-    project: {
+    project: [{
         type: String,
-        default: 'N/A',
-    },
+        ref: 'User', 
+    }],
     profilePicture: {
         publicId: {
             type: String,
             required: false,
-            default: 'default', 
         },
         url: {
             type: String,
             required: false,
-            default: 'https://res.cloudinary.com/dzxzc7kwb/image/upload/v1725974053/DefaultProfile/qgtsyl571c1neuls9evd.png',
         },
     },
-    invitedBy: {
+    invitedBy: [{
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'User',
+        required: true,
+    }],
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User', 
         required: true,
     },
 }, {

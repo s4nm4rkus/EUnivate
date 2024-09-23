@@ -23,7 +23,7 @@
         const [addText, setAddText] = useState('');
         const [project, setProject] = useState({});
         const [isImageVisible, setIsImageVisible] = useState(false);
-        const [isVisible, setIsVisible] = useState(false);
+        // const [isVisible, setIsVisible] = useState(false);
  
         const [tasks, setTasks] = useState([]);
 

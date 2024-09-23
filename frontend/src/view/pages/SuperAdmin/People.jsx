@@ -225,7 +225,7 @@ const handleInvite = async () => {
                 throw new Error(`User with email ${userEmail} not found`);
             }
 
-            const response = await fetch(`http://localhost:5000/api/users/${user._id}/role`, {
+            const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/${user._id}/role`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

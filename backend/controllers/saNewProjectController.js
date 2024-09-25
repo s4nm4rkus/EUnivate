@@ -27,18 +27,24 @@ export const createSaNewProject = async (req, res) => {
 //Get all Project
 export const getAllProjects = async (req, res) => {
     try {
-      // Fetch the user along with their projects
-      const user = await User.findById(req.user._id).populate('projects');
+        // Fetch the user along with their projects
+        const user = await User.findById(req.user._id).populate({
+            path: 'projects',
+            populate: {
+                path: 'invitedUsers',
+                select: 'username profilePicture'
+            }
+        });
   
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
   
-      // Fetch projects where the current user is the owner
-      const ownedProjects = await SaNewProject.find({ owner: req.user._id });
-  
-      // Fetch projects where the current user is invited
-      const invitedProjects = await SaNewProject.find({ invitedUsers: req.user._id });
+  // Fetch projects where the current user is the owner
+  const ownedProjects = await SaNewProject.find({ owner: req.user._id }).populate('invitedUsers', 'username profilePicture');
+
+  // Fetch projects where the current user is invited
+  const invitedProjects = await SaNewProject.find({ invitedUsers: req.user._id }).populate('invitedUsers', 'username profilePicture');
   
       // Combine owned projects with invited projects and user's projects
       const allProjects = [...ownedProjects, ...invitedProjects, ...user.projects];
@@ -106,6 +112,7 @@ export const getProjectById = async (req, res) => {
 
 
 // Invite users to a project
+
 export const inviteUsersToProject = async (req, res) => {
     try {
         const { projectId, users } = req.body;

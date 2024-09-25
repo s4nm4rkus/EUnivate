@@ -25,18 +25,28 @@ const ProjectMem = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 relative">
+    <div className="bg-gray-100 min-h-screen p-6">
       {/* Admin Navbar */}
-      <div className="w-full flex justify-between items-center mb-4 relative z-[9999]">
-        <h1 className="text-2xl font-medium text-gray-800">Project</h1>
-        <AdminNavbar
-          isAccountDropdownOpen={isAccountDropdownOpen}
-          toggleAccountDropdown={toggleAccountDropdown}
-        />
-      </div>
+      <div className="w-full flex justify-between items-center">
+        
+      <div className="relative">
+  <h1 className="text-2xl font-medium text-gray-800 hidden md:block">Project</h1>
+  </div>
 
+  <AdminNavbar
+    isAccountDropdownOpen={isAccountDropdownOpen}
+    toggleAccountDropdown={toggleAccountDropdown}
+  />
+  
+</div>
+
+    
       {/* Display Projects */}
-      <div className="mt-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1">
+      <div className="block md:hidden text-black text-2xl font-semibold ml-2">
+                Project
+            </div>
+          {/* Mobile Dashboard Text */}
         {projects.length > 0 ? (
           projects.map((project) => (
             <div

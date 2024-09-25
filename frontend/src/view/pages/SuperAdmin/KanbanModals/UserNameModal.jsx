@@ -33,7 +33,7 @@ const UserNameModal = ({ isOpen, onClose, membersList, onSelect }) => {
   };
 
   return ReactDOM.createPortal(
-    <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center overflow-hidden">
+    <div className="fixed inset-0 bg-gray-500 bg-opacity-75 z-50 flex justify-center items-center overflow-hidden">
       <div className="bg-white p-6 w-100 max-h-[90vh] overflow-auto rounded-lg shadow-lg relative flex flex-col">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">Select Assignee</h2>
@@ -51,7 +51,7 @@ const UserNameModal = ({ isOpen, onClose, membersList, onSelect }) => {
           />
           <button
             onClick={handleConfirmSelection}
-            className="ml-2 bg-blue-500 text-white px-3 py-1 rounded-md"
+            className="ml-2 bg-red-500 text-white px-3 py-1 rounded-md"
           >
             Confirm
           </button>

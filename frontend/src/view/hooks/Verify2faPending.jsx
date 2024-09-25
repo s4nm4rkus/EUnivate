@@ -53,15 +53,29 @@ const Verify2FAPending = () => {
         }
       
         try {
-          const response = await axios.post('http://localhost:5000/api/users/verify-otp', {
-            userId,
-            otp: otpCode,
-          });
+          // Get access token from local storage
+          const storedUser = JSON.parse(localStorage.getItem('user'));
+          const accessToken = storedUser?.accessToken;
       
+          if (!accessToken) {
+            setError('Access token not found. Please log in again.');
+            return;
+          }
+      
+          const response = await axios.post(
+           'http://localhost:5000/api/users/verify-otp',
+            { userId, otp: otpCode },
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`, 
+              },
+            }
+          );
+         
           if (response.status === 200) {
             setSuccess('OTP verified successfully!');
       
-            // Store access token and refresh token in local storage
+            // Store new tokens or update user info
             const {
               _id,
               firstName,
@@ -71,8 +85,7 @@ const Verify2FAPending = () => {
               username,
               phoneNumber,
               profilePicture,
-              accessToken,
-              refreshToken,
+              accessToken: newAccessToken,
               twoFactorToken,
             } = response.data;
       
@@ -85,10 +98,10 @@ const Verify2FAPending = () => {
               phoneNumber,
               profilePicture,
               role,
-              accessToken,
-              refreshToken,
+              accessToken: newAccessToken,
               twoFactorToken,
             }));
+      
       
             // Redirect based on user role after 2 seconds
             setTimeout(() => {

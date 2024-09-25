@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaCalendar, FaPaperclip, FaPlus, FaTimes, FaCheckCircle, FaTrash } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { FaCalendar, FaCheckCircle, FaPlus } from 'react-icons/fa';
+import { useNavigate, useOutletContext } from 'react-router-dom'; 
 import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx';
+import LoadingSpinner from './Loading Style/Fill File Loading/Loader.jsx';
+import ButtonSpinner from './Loading Style/Spinner Loading/ButtonSpinner.jsx';
 
 const Project = () => {
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
@@ -13,22 +15,43 @@ const Project = () => {
   const [team, setTeam] = useState('');
   const [projects, setProjects] = useState([]);
   const [error, setError] = useState('');
-  const [loading, setloading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [loadingProject, setLoadingProject] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
+
   const navigate = useNavigate();
   const [doneTaskCounts, setDoneTaskCounts] = useState({});
+  const { isNavOpen } = useOutletContext();
+
   useEffect(() => {
     const fetchProjects = async () => {
+      setLoading(true); 
       try {
-        const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject');
+        const user = JSON.parse(localStorage.getItem('user'));
+        const accessToken = user ? user.accessToken : null;
+      
+        if (!accessToken) {
+          setError('No access token found. Please log in again.');
+          return;
+        }
+  
+        const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+  
         setProjects(response.data);
       } catch (error) {
         console.error('Error fetching projects:', error);
+        setError('An error occurred while fetching projects.');
+      } finally {
+        setLoading(false);
       }
     };
-
+  
     fetchProjects();
   }, []);
-
   
   const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
   const openModal = () => setIsModalOpen(true);
@@ -72,42 +95,57 @@ const Project = () => {
   };
 
   const handleCreateProject = async () => {
-    setloading(true);
+    setLoading(true);
     if (!imagePreview || !projectName || !team) {
       setError('Please fill out all fields including image, project name, and team.');
+      setLoading(false);
       return;
     }
-
+  
+    const user = JSON.parse(localStorage.getItem('user'));
+    const accessToken = user ? user.accessToken : null;
+  
+    if (!accessToken) {
+      setLoading(false);
+      setError('No access token found. Please log in again.');
+      return;
+    }
+  
     try {
       const thumbnail = await handleSavethumbnail(selectedImage);
       const newProject = {
         projectName,
         thumbnail,
       };
-
-      const response = await axios.post('http://localhost:5000/api/users/sa-newproject', newProject);
+  
+      const response = await axios.post('http://localhost:5000/api/users/sa-newproject', newProject, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+  
       setProjects([...projects, response.data]);
       closeModal();
     } catch (error) {
-        setloading(false);
+      setLoading(false);
       console.error('Error creating project:', error);
       setError('An error occurred while creating the project.');
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    // Fetch done task count for each project
     const fetchDoneTaskCounts = async () => {
       try {
         const counts = {};
         for (let project of projects) {
           try {
             const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}?status=Done`);
-            counts[project._id] = response.data.data.length; // Store count of done tasks
+            counts[project._id] = response.data.data.length;
           } catch (error) {
-            // Handle errors for individual project requests (optional)
             console.error('Error fetching done task count:', error);
-            counts[project._id] = 0; // Set to 0 if there is an error
+            counts[project._id] = 0;
           }
         }
         setDoneTaskCounts(counts);
@@ -121,25 +159,30 @@ const Project = () => {
     }
   }, [projects]);
 
-
   const handleProjectClick = (project) => {
-    navigate(`/superadmin/projects/${project._id}`, { state: { projectId: project._id } });
-    };
-
-  const handleDeleteProject = async (projectId) => {
-    try {
-      await axios.delete(`http://localhost:5000/api/users/sa-newproject/${projectId}`);
-      setProjects(projects.filter((project) => project._id !== projectId));
-    } catch (error) {
-      console.error('Error deleting project:', error);
-      setError('An error occurred while deleting the project.');
-    }
+    setSelectedProject(project);
+    setLoadingProject(true);
+    setTimeout(() => {
+      navigate(`/superadmin/projects/${project._id}`, { state: { projectId: project._id } });
+      setLoadingProject(false);
+    }, 3000);
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 relative">
+    <div className="bg-gray-100 min-h-screen p-6">
+
+      {loadingProject && (
+        <div className="flex flex-col items-center">
+          <LoadingSpinner projectName={selectedProject ? selectedProject.projectName : ''} />
+        </div>
+      )}
+
       <div className="w-full flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-medium text-gray-800">Project</h1>
+        <div className="relative">
+          <h1 className={`text-2xl font-medium text-gray-800 hidden md:block ${isNavOpen ? 'hidden' : ''}`}>
+            Project 
+          </h1>
+        </div>
         <AdminNavbar
           isAccountDropdownOpen={isAccountDropdownOpen}
           toggleAccountDropdown={toggleAccountDropdown}
@@ -147,6 +190,9 @@ const Project = () => {
       </div>
 
       <div className="relative mt-10">
+        <div className={`absolute left-4 top-4 font-semibold text-2xl transform -translate-y-1/2 text-black md:hidden ${isNavOpen ? 'hidden' : ''}`}>
+          Project
+        </div>
         <button
           onClick={openModal}
           className="absolute right-4 flex items-center bg-red-800 text-white px-4 py-2 rounded-md shadow hover:bg-red-600"
@@ -210,28 +256,24 @@ const Project = () => {
               </select>
             </div>
 
-            {error && <p className="text-red-500 mt-4">{error}</p>}
-
             <div className="mt-6 flex justify-center">
               <button
                 onClick={handleCreateProject}
-                className="bg-red-800 text-white px-8 py-3 rounded-md shadow hover:bg-red-900 w-full"
+                className="bg-red-800 text-white px-8 py-3 rounded-md shadow hover:bg-red-900 w-full flex items-center justify-center"
                 disabled={loading}
-             
               >
-              {loading ? 'Creating Project...' : 'Create Project'}
+                {loading ? <ButtonSpinner /> : 'Create Project'}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Display Projects */}
-      <div className="mt-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <div className={`mt-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 ${isNavOpen ? 'mt-28' : 'mt-20'}`}>
         {projects.map((project) => (
           <div
             key={project._id}
-            className="bg-white p-4 rounded-md shadow-md border border-gray-200 mt-4 relative cursor-pointer"
+            className="bg-white p-4 rounded-md shadow-md border border-gray-200 mt-2 relative cursor-pointer w-full"
             onClick={() => handleProjectClick(project)}
           >
             {project.thumbnail && (
@@ -243,23 +285,27 @@ const Project = () => {
             )}
             <h3 className="text-lg font-semibold mt-2">{project.projectName}</h3>
             <div className="flex items-center text-gray-500 mt-2">
+              
               <FaCalendar className="mr-2" />
               <p>{new Date(project.createdAt).toLocaleDateString() || 'No date available'}</p>
               <FaCheckCircle className="ml-5" />
               <p className="ml-2">
                 {doneTaskCounts[project._id] !== undefined ? doneTaskCounts[project._id] : 'Loading...'}
               </p>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation(); // Prevent event from bubbling up
-                  handleDeleteProject(project._id); // Pass project ID for deletion
-                }}
-                className="absolute bottom-14 right-6 bg-red-600 text-white p-3 rounded-full shadow hover:bg-red-700"
-                title="Delete Project"
-              >
-                <FaTrash size={20} />
-              </button>
+              <div className="flex items-center justify-end ml-9 -space-x-4">
+                {project.invitedUsers && project.invitedUsers.slice(0, 3).map(user => (
+                  <img
+                    key={user._id}
+                    src={user.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'} // Ensure it falls back to a default if no picture
+                    alt={user.username || 'Profile Picture'}
+                    className="w-8 h-8 rounded-full object-cover -ml-2 border-2 border-white"
+                  />
+                ))}
+                </div>
             </div>
+
+
+
             <div className="flex items-center mt-4">
               <div className="w-full bg-gray-200 rounded-full h-2 relative">
                 <div
@@ -272,6 +318,7 @@ const Project = () => {
           </div>
         ))}
       </div>
+
     </div>
   );
 };

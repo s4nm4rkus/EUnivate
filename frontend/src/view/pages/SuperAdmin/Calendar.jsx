@@ -130,27 +130,30 @@ const Calendar = ({ project }) => {
   return (
     <div className="p-4">
       <div className="bg-white shadow-lg p-4 rounded-lg">
-        <BigCalendar
-          localizer={localizer}
-          events={events}
-          startAccessor="start"
-          endAccessor="end"
-          style={{ height: 600 }}
-          components={{
-            toolbar: (props) => (
-              <CustomToolbar
-                {...props}
-                label={moment(currentDate).format('MMMM YYYY')} // Display current month and year
-              />
-            ),
-          }}
-          view={Views.MONTH}
-          date={currentDate} // Use state to reflect current date
-          onNavigate={() => {}} // Empty handler
-          eventPropGetter={eventPropGetter} // Apply custom event styles
-          onSelectEvent={handleEventClick} // Handle event click
-        />
+        <div className="overflow-x-auto"> {/* Horizontal scroll wrapper */}
+          <BigCalendar
+            localizer={localizer}
+            events={events}
+            startAccessor="start"
+            endAccessor="end"
+            style={{ height: 600, minWidth: '1000px' }} // Ensure minimum width for scrolling
+            components={{
+              toolbar: (props) => (
+                <CustomToolbar
+                  {...props}
+                  label={moment(currentDate).format('MMMM YYYY')} // Display current month and year
+                />
+              ),
+            }}
+            view={Views.MONTH}
+            date={currentDate} // Use state to reflect current date
+            onNavigate={() => {}} // Empty handler
+            eventPropGetter={eventPropGetter} // Apply custom event styles
+            onSelectEvent={handleEventClick} // Handle event click
+          />
+        </div>
       </div>
+
       <div className="flex justify-end mt-4">
         <button
           onClick={() => handleNavigate('PREV')}
@@ -186,7 +189,7 @@ const Calendar = ({ project }) => {
           ))
         )}
       </div>
-   
+
       {/* Modal for event details */}
       <Modal
         isOpen={modalIsOpen}

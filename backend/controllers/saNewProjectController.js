@@ -55,7 +55,6 @@ export const getAllProjects = async (req, res) => {
   };
   
   
-
 //Get Project by id
 export const getProjectById = async (req, res) => {
     try {

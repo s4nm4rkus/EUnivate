@@ -217,45 +217,46 @@ const handleInvite = async () => {
     }
 };
 
-    const handleRoleChange = async (newRole, userEmail) => {
-        try {
-            const user = allUsers.find((u) => u.email === userEmail);
+const handleRoleChange = async (newRole, userEmail) => {
+    try {
+        const user = allUsers.find((u) => u.email === userEmail);
 
-            if (!user) {
-                throw new Error(`User with email ${userEmail} not found`);
-            }
+        if (!user) {
+            throw new Error(`User with email ${userEmail} not found`);
+        }
 
-            const response = await fetch(`http://localhost:5000/api/users/${user._id}/role`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ role: newRole }),
+        const response = await fetch(`http://localhost:5000/api/users/${user._id}/role`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ role: newRole }),
+        });
+
+        if (response.ok) {
+            const updatedUser = await response.json();
+            console.log('Role change successful:', updatedUser);
+
+            setInvitedUsers((prevUsers) => {
+                const updatedUsers = prevUsers.map((user) =>
+                    user.email === userEmail ? { ...user, role: newRole } : user
+                );
+                localStorage.setItem('invitedUsers', JSON.stringify(updatedUsers));
+                return updatedUsers;
             });
 
-            if (response.ok) {
-                const updatedUser = await response.json();
-                console.log('Role change successful:', updatedUser);
-
-                setInvitedUsers((prevUsers) => {
-                    const updatedUsers = prevUsers.map((user) =>
-                        user.email === userEmail ? { ...user, role: newRole } : user
-                    );
-                    localStorage.setItem('invitedUsers', JSON.stringify(updatedUsers));
-                    return updatedUsers;
-                });
-
-                alert(`Role changed to ${newRole} and email notification sent to ${userEmail}`);
-            } else {
-                const errorResponse = await response.json();
-                console.error('Error updating role:', errorResponse);
-                alert(`Error updating role: ${errorResponse.message}`);
-            }
-        } catch (error) {
-            console.error('Error updating role:', error.message);
-            alert(`An error occurred: ${error.message}`);
+            alert(`Role changed to ${newRole} and email notification sent to ${userEmail}`);
+        } else {
+            const errorResponse = await response.json();
+            console.error('Error updating role:', errorResponse);
+            alert(`Error updating role: ${errorResponse.message}`);
         }
-    };
+    } catch (error) {
+        console.error('Error updating role:', error.message);
+        alert(`An error occurred: ${error.message}`);
+    }
+};
+
     
     const handleRemoveUser = async (userEmail) => {
         const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
@@ -426,7 +427,7 @@ const handleInvite = async () => {
                     <li 
                         key={index} 
                         className="py-2 cursor-pointer hover:bg-gray-100 text-center"
-                        onClick={() => handleProjectChange(project, user.email)}
+                        onClick={() => (project, user.email)}
                     >
                         {project.projectName} {/* Adjust this based on your project data structure */}
                     </li>

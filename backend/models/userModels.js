@@ -54,7 +54,7 @@ const userSchema = new mongoose.Schema({
         type: Date,
     },
     projects:
-     [{ type: mongoose.Schema.Types.ObjectId, ref: 'SaNewProject' }],
+     [{ type: mongoose.Schema.Types.ObjectId, ref: 'saInvitedMember' }],
 
     resetPasswordToken: String,
     resetPasswordExpire: Date,

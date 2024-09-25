@@ -14,7 +14,6 @@ export const getUsers = async (req, res) => {
   
 
 // Invite users with storation to sainvitedUser Schema
-
 export const inviteUsers = async (req, res) => {
     try {
         const { userIds, projects, roles, profilePictures } = req.body;
@@ -42,8 +41,10 @@ export const inviteUsers = async (req, res) => {
 
                     const userProjects = existingUser.projects.map(project => project.toString());
                     const validProjects = projects.filter(project => userProjects.includes(project.toString()));
-
-                    const projectToInvite = validProjects.length > 0 ? validProjects : 'N/A'; // Set to 'N/A' if no valid projects
+                    
+                    // If no valid projects are found, set projectToInvite to an empty array instead of 'N/A'
+                    const projectToInvite = validProjects.length > 0 ? validProjects : [];
+                    
 
                     const newMember = new InviteMember({
                         email: existingUser.email,
@@ -75,18 +76,19 @@ export const inviteUsers = async (req, res) => {
 };
 
 
-
-
-
-
-
 //Get Invited Users
 export const getInvitedUsers = async (req, res) => {
     try {
-        const userId = req.user._id; // Assuming req.user._id from the decoded token
-
-        // Fetch only the invited members where 'invitedBy' matches the current user ID
-        const invitedUsers = await InviteMember.find({ invitedBy: userId });
+        const userId = req.user._id;
+        
+        // Fetch invited users based on some custom logic
+        // Example: Fetch users where 'invitedBy' matches userId or other conditions
+        const invitedUsers = await InviteMember.find({
+            $or: [
+                { invitedBy: userId },
+                // Add other conditions if needed
+            ]
+        });
 
         if (invitedUsers.length === 0) {
             return res.status(404).json({ message: 'No invited users found' });
@@ -127,12 +129,15 @@ export const updateUserRole = async (req, res) => {
             message: `Your account role has been changed to ${role}. Please log in again.`,
         });
 
+        console.log(`Email notification sent to ${user.email}`);
+
         res.status(200).json({ message: 'Role updated successfully and email sent', user });
     } catch (error) {
         console.error('Error updating role:', error.message);
         res.status(500).json({ message: 'Error updating role', error: error.message });
     }
 };
+
 
 //Delete the invited members
 export const removeInvitedMember = async (req, res) => {

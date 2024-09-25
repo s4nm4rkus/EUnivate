@@ -34,11 +34,14 @@ export const getAllProjects = async (req, res) => {
         return res.status(404).json({ message: 'User not found' });
       }
   
-      // Get projects owned by the user
+      // Fetch projects where the current user is the owner
       const ownedProjects = await SaNewProject.find({ owner: req.user._id });
   
-      // Combine owned projects with user's projects
-      const allProjects = [...user.projects, ...ownedProjects];
+      // Fetch projects where the current user is invited
+      const invitedProjects = await SaNewProject.find({ invitedUsers: req.user._id });
+  
+      // Combine owned projects with invited projects and user's projects
+      const allProjects = [...ownedProjects, ...invitedProjects, ...user.projects];
   
       if (allProjects.length === 0) {
         return res.status(404).json({ message: 'No projects found' });
@@ -51,6 +54,8 @@ export const getAllProjects = async (req, res) => {
     }
   };
   
+  
+
 //Get Project by id
 export const getProjectById = async (req, res) => {
     try {

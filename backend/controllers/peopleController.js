@@ -1,7 +1,8 @@
 import User from '../models/userModels.js';
+import mongoose from 'mongoose';
 import sendEmail from '../utils/sendEmail.js';
 import InviteMember from '../models/saInvitedMember.js';
-
+import Project from '../models/addProjects.js';// Import the Project model
 // Fetch all users
 export const getUsers = async (req, res) => {
     try {
@@ -23,7 +24,6 @@ export const inviteUsers = async (req, res) => {
             return res.status(400).json({ message: 'No valid user IDs provided' });
         }
 
-        // Process each user ID
         await Promise.all(
             userIds.map(async (userId, index) => {
                 try {
@@ -33,26 +33,14 @@ export const inviteUsers = async (req, res) => {
                         return;
                     }
 
-                    const existingMember = await InviteMember.findOne({ userId });
-                    if (existingMember) {
-                        console.warn(`User with ID ${userId} has already been invited. Skipping...`);
-                        return;
-                    }
-
-                    const userProjects = existingUser.projects.map(project => project.toString());
-                    const validProjects = projects.filter(project => userProjects.includes(project.toString()));
-                    
-                    // If no valid projects are found, set projectToInvite to an empty array instead of 'N/A'
-                    const projectToInvite = validProjects.length > 0 ? validProjects : [];
-                    
-
+                    // Allow the invitation even if the user is already invited to other projects
                     const newMember = new InviteMember({
                         email: existingUser.email,
-                        role: roles[index] || existingUser.role || 'User', // Use the role from the request, fallback to existingUser role
-                        project: projectToInvite,
+                        role: roles[index] || existingUser.role || 'User',
+                        project: projects.map(project => project.toString()),
                         invitedBy: [inviterId],
                         userId: existingUser._id,
-                        profilePicture: profilePictures[index] || existingUser.profilePicture || {}, // Get profile picture from request or use existing one
+                        profilePicture: profilePictures[index] || existingUser.profilePicture || {},
                     });
 
                     await newMember.save();
@@ -76,19 +64,20 @@ export const inviteUsers = async (req, res) => {
 };
 
 
+
 //Get Invited Users
+
 export const getInvitedUsers = async (req, res) => {
     try {
         const userId = req.user._id;
-        
+
         // Fetch invited users based on some custom logic
-        // Example: Fetch users where 'invitedBy' matches userId or other conditions
         const invitedUsers = await InviteMember.find({
             $or: [
                 { invitedBy: userId },
                 // Add other conditions if needed
             ]
-        });
+        })
 
         if (invitedUsers.length === 0) {
             return res.status(404).json({ message: 'No invited users found' });
@@ -99,6 +88,7 @@ export const getInvitedUsers = async (req, res) => {
         res.status(500).json({ message: 'Error fetching invited users', error: error.message });
     }
 };
+
 
 
 // Update user role
@@ -140,24 +130,49 @@ export const updateUserRole = async (req, res) => {
 
 
 //Delete the invited members
-export const removeInvitedMember = async (req, res) => {
-    try {
-        const { id } = req.params; // This should be the userId from the invitedBy array
-        console.log(`Attempting to remove invited member with userId: ${id}`);
 
-        // Find and delete the invited member using the userId in the invitedBy array
-        const deletedMember = await InviteMember.findOneAndDelete({ 'invitedBy.userId': id });
+
+export const removeInvitedMember = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+        const { id: userId } = req.params; // Expecting the userId
+
+        // Find and delete the invited member using the userId
+        const deletedMember = await InviteMember.findOneAndDelete({ userId }).session(session);
 
         if (!deletedMember) {
-            console.log(`No invited member found with userId: ${id}`);
+            console.log(`No invited member found with userId: ${userId}`);
+            await session.abortTransaction();
             return res.status(404).json({ message: 'Invited member not found' });
         }
+
+        // Remove the user from the 'projects' field of the User model
+        await User.updateMany(
+            { projects: deletedMember._id },
+            { $pull: { projects: deletedMember._id } },
+            { session }
+        );
+
+        // Remove the user from the 'invitedUsers' field of the Project model
+        await Project.updateMany(
+            { invitedUsers: userId },
+            { $pull: { invitedUsers: userId } },
+            { session }
+        );
+
+        await session.commitTransaction();
+        session.endSession();
 
         console.log(`Successfully removed invited member:`, deletedMember);
         res.status(200).json({ message: 'Invited member removed successfully', deletedMember });
     } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
         console.error('Error removing invited member:', error.message);
         res.status(500).json({ message: 'Error removing invited member', error: error.message });
     }
 };
+
 

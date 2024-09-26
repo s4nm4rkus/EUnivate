@@ -18,8 +18,8 @@ const People = () => {
     const [selectedRole, setSelectedRole] = useState('');
     const [selectedEmails, setSelectedEmails] = useState([]);
     const [projects, setProjects] = useState([]);
-    const [selectedProject, setSelectedProject] = useState(null);
-    const dropdownRef = useRef();
+    // const [selectedProject, setSelectedProject] = useState(null);
+    // const dropdownRef = useRef();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [showUsersInModal, setShowUsersInModal] = useState(false); 
@@ -75,13 +75,18 @@ const People = () => {
             if (!invitedUsersResponse.ok) throw new Error('Failed to fetch invited users');
 
             const invitedUsersData = await invitedUsersResponse.json();
+
             const updatedInvitedUsers = invitedUsersData.invitedUsers.map((invitedUser) => {
                 const userFromDB = users.find((user) => user.email === invitedUser.email);
+                const projectNames = invitedUser.project.length > 0 
+                    ? invitedUser.project.map(p => p.projectName).join(', ') 
+                    : '';
+
                 return userFromDB
-                    ? { ...invitedUser, role: userFromDB.role, profilePicture: userFromDB.profilePicture, _id: userFromDB._id }
+                    ? { ...invitedUser, role: userFromDB.role, profilePicture: userFromDB.profilePicture, _id: userFromDB._id, project: projectNames }
                     : invitedUser;
             });
-
+    
             setInvitedUsers(updatedInvitedUsers);
         } catch (error) {
             console.error('Error fetching users:', error);
@@ -94,24 +99,33 @@ const People = () => {
         fetchProjects();
 
         const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            if (!event.target.closest('.role-dropdown') && !event.target.closest('.role-toggle')) {
                 setIsRoleDropdownOpen({});
                 setIsProjectDropdownOpen({});
             }
         };
 
+        // Attach the event listener
         document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            // Cleanup the event listener on component unmount
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
     }, []);
 
     const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
 
     const toggleRoleDropdown = (userEmail) => {
+        console.log(`Toggling dropdown for: ${userEmail}`);
         setIsRoleDropdownOpen((prev) => ({
             ...prev,
             [userEmail]: !prev[userEmail],
         }));
     };
+    
+    
+    
 
     const toggleProjectDropdown = (userEmail) => {
         setIsProjectDropdownOpen((prev) => ({
@@ -170,9 +184,9 @@ const handleInvite = async () => {
         return userFromDB 
             ? { 
                 id: userFromDB._id, 
-                projects: userFromDB.projects.length > 0 ? userFromDB.projects : ['N/A'], // Ensure 'N/A' is an array
-                profilePicture: userFromDB.profilePicture || {}, // Get profilePicture
-                role: userFromDB.role || 'N/A' // Get role, default to 'N/A' if not found
+                projects: userFromDB.projects.length > 0 ? userFromDB.projects : [], // Use empty array instead of ['N/A']
+                profilePicture: userFromDB.profilePicture || {}, 
+                role: userFromDB.role || 'N/A' 
               } 
             : null;
     }).filter((user) => user !== null);
@@ -240,7 +254,7 @@ const handleRoleChange = async (newRole, userEmail) => {
             setInvitedUsers((prevUsers) => {
                 const updatedUsers = prevUsers.map((user) =>
                     user.email === userEmail ? { ...user, role: newRole } : user
-                );
+                );                  
                 localStorage.setItem('invitedUsers', JSON.stringify(updatedUsers));
                 return updatedUsers;
             });
@@ -258,43 +272,43 @@ const handleRoleChange = async (newRole, userEmail) => {
 };
 
     
-    const handleRemoveUser = async (userEmail) => {
-        const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
-    
-        if (!token) {
-            alert('Access token is missing. Please log in again.');
-            return;
+const handleRemoveUser = async (userEmail) => {
+    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+
+    if (!token) {
+        alert('Access token is missing. Please log in again.');
+        return;
+    }
+
+    const invitedMember = invitedUsers.find((u) => u.email === userEmail);
+    if (!invitedMember) {
+        alert('Invited member not found in the list.');
+        return;
+    }
+
+    try {
+        // Use the actual _id from saInvitedMember instead of userId
+        const response = await fetch(`http://localhost:5000/api/users/invited/${invitedMember._id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        if (!response.ok) {
+            const errorResponse = await response.json();
+            throw new Error(errorResponse.message);
         }
-    
-        const invitedMember = invitedUsers.find((u) => u.email === userEmail);
-        if (!invitedMember) {
-            alert('Invited member not found in the list.');
-            return;
-        }
-    
-        try {
-            // Send the actual user ID for deletion
-            const response = await fetch(`http://localhost:5000/api/users/invited/${invitedMember.userId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-    
-            if (!response.ok) {
-                const errorResponse = await response.json();
-                throw new Error(errorResponse.message);
-            }
-    
-            setInvitedUsers((prev) => prev.filter((u) => u.email !== userEmail));
-            alert(`Successfully removed user: ${userEmail}`);
-        } catch (error) {
-            console.error('Error in handleRemoveUser:', error.message);
-            alert(`An error occurred: ${error.message}`);
-        }
-    };
-    
+
+        setInvitedUsers((prev) => prev.filter((u) => u.email !== userEmail));
+        alert(`Successfully removed user: ${userEmail}`);
+    } catch (error) {
+        console.error('Error in handleRemoveUser:', error.message);
+        alert(`An error occurred: ${error.message}`);
+    }
+};
+
     
     
 
@@ -364,7 +378,7 @@ const handleRoleChange = async (newRole, userEmail) => {
         <tbody className="bg-white divide-y divide-gray-200">
             {invitedUsers.length > 0 ? (
                 invitedUsers.map((user, index) => (
-                    <tr key={index} ref={dropdownRef}>
+                    <tr key={index}>
                         <td className="px-6 py-4 whitespace-nowrap flex items-center relative">
                             <div className="relative">
                                 <img
@@ -394,52 +408,56 @@ const handleRoleChange = async (newRole, userEmail) => {
                                     onClick={() => toggleRoleDropdown(user.email)}
                                 />
                             </div>
-                            {isRoleDropdownOpen[user.email] && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                                    <ul className="py-1">
-                                        {['Guest', 'Member', 'Admin', 'Superadmin'].map((role) => (
-                                            <li
-                                                key={role}
-                                                className="px-4 py-2 text-gray-700 cursor-pointer hover:bg-gray-100"
-                                                onClick={() => handleRoleChange(role.toLowerCase(), user.email)}
-                                            >
-                                                {role}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 relative">
-                    <div className="flex items-center">
-                        {user.project}
-                        <FontAwesomeIcon
-                            icon={isProjectDropdownOpen[user.email] ? faChevronDown : faChevronRight}
-                            className="ml-2 cursor-pointer"
-                            onClick={() => toggleProjectDropdown(user.email)}
-                        />
-                    </div>
-                    {isProjectDropdownOpen[user.email] && (
-    <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-        <ul>
-            {projects.length > 0 ? (
-                projects.map((project, index) => (
-                    <li 
-                        key={index} 
-                        className="py-2 cursor-pointer hover:bg-gray-100 text-center"
-                        onClick={() => (project, user.email)}
-                    >
-                        {project.projectName} {/* Adjust this based on your project data structure */}
-                    </li>
-                ))
-            ) : (
-                <p className="text-center">No projects found.</p>
-            )}
-        </ul>
-    </div>
-)}
+                                        {isRoleDropdownOpen[user.email] && (
+                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 role-dropdown">
+                                <ul className="py-1">
+                                    {['Guest', 'Member', 'Admin', 'Superadmin'].map((role) => (
+                                        <li
+                                            key={role}
+                                            className="px-4 py-2 text-gray-700 cursor-pointer hover:bg-gray-100"
+                                            onClick={() => handleRoleChange(role.toLowerCase(), user.email)}
+                                        >
+                                            {role}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
 
-                </td>
+                        </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 relative">
+                                <div className="flex items-center">
+                                    {user.project || 'No Project Assigned'}
+                                    {user.project.length > 0 && (
+                                        <FontAwesomeIcon
+                                            icon={isProjectDropdownOpen[user.email] ? faChevronDown : faChevronRight}
+                                            className="ml-2 cursor-pointer"
+                                            onClick={() => toggleProjectDropdown(user.email)}
+                                        />
+                                    )}
+                                </div>
+                                {isProjectDropdownOpen[user.email] && user.project.length > 0 && (
+                                    <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                                        <ul>
+                                            {projects.length > 0 ? (
+                                                projects.map((project, index) => (
+                                                    <li 
+                                                        key={index} 
+                                                        className="py-2 cursor-pointer hover:bg-gray-100 text-center"
+                                                        onClick={() => (project, user.email)}
+                                                    >
+                                                        {project.projectName}
+                                                    </li>
+                                                ))
+                                            ) : (
+                                                <p className="text-center">No projects found.</p>
+                                            )}
+                                        </ul>
+                                    </div>
+                                )}
+                                  </td>
+
+
                         <td className="px-6 py-4 whitespace-nowrap">
                             <button
                                 className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"

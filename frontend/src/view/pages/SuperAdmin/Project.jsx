@@ -209,7 +209,7 @@ const Project = () => {
               onClick={closeModal}
               className="absolute top-3 right-3 text-gray-600 hover:text-gray-800"
             >
-              <FaTimes />
+              
             </button>
             <h2 className="text-xl font-semibold">New Project</h2>
             <p className="mt-4 text-gray-500">Thumbnail</p>

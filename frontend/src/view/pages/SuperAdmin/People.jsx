@@ -5,6 +5,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { User } from '../../../constants/assets';
 import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const People = () => {
     const [user, setUser] = useState({ profilePicture: { url: '' } });
@@ -164,27 +167,45 @@ const People = () => {
     };
     
 
-const handleInvite = async () => {
-    if (!selectedEmails.length) {
-        alert('Please select at least one email to invite.');
-        return;
-    }
+    const handleInvite = async () => {
+        if (!selectedEmails.length) {
+            toast.error('Please select at least one email to invite.', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: true,
+                className: 'bg-red-600 text-white font-semibold p-3 rounded-lg shadow-lg',
+                icon: false,
+            });
+            return;
+        }
 
-    const user = JSON.parse(localStorage.getItem('user'));
-    const token = user?.accessToken;
+        const user = JSON.parse(localStorage.getItem('user'));
+        const token = user?.accessToken;
 
-    if (!token) {
-        alert('No access token found. Please log in again.');
-        return;
-    }
+        if (!token) {
+            toast.error('No access token found. Please log in again.', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: true,
+                className: 'bg-red-600 text-white font-semibold p-3 rounded-lg shadow-lg',
+                icon: false,
+            });
+            return;
+        }
 
-    // Map selected emails to their corresponding user IDs, projects, profilePicture, and role
-    const selectedUsers = selectedEmails.map((email) => {
+       // Map selected emails to their corresponding user IDs, projects, profilePicture, and role
+       const selectedUsers = selectedEmails.map((email) => {
         const userFromDB = allUsers.find((user) => user.email === email);
         return userFromDB 
             ? { 
                 id: userFromDB._id, 
-                projects: userFromDB.projects.length > 0 ? userFromDB.projects : [], // Use empty array instead of ['N/A']
+                projects: userFromDB.projects.length > 0 ? userFromDB.projects : [], 
                 profilePicture: userFromDB.profilePicture || {}, 
                 role: userFromDB.role || 'N/A' 
               } 
@@ -192,7 +213,16 @@ const handleInvite = async () => {
     }).filter((user) => user !== null);
 
     if (selectedUsers.length === 0) {
-        alert('No valid users found for the selected emails.');
+        toast.error('No valid users found for the selected emails.', {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            className: 'bg-red-600 text-white font-semibold p-3 rounded-lg shadow-lg',
+            icon: false,
+        });
         return;
     }
 
@@ -207,10 +237,10 @@ const handleInvite = async () => {
             },
             body: JSON.stringify({
                 userIds: selectedUsers.map(user => user.id),
-                projects: selectedUsers.map(user => user.projects).flat(), // Flatten the array of project arrays
-                roles: selectedUsers.map(user => user.role), // Pass roles array
-                profilePictures: selectedUsers.map(user => user.profilePicture), // Pass profilePictures array
-                invitedBy: user._id // The ID of the inviter
+                projects: selectedUsers.map(user => user.projects).flat(),
+                roles: selectedUsers.map(user => user.role),
+                profilePictures: selectedUsers.map(user => user.profilePicture),
+                invitedBy: user._id 
             }),
         });
 
@@ -221,11 +251,33 @@ const handleInvite = async () => {
 
         fetchUsers(); // Refresh the user list
 
-        alert('Invitations sent successfully!');
+        toast.success('Invitations sent successfully!', {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            className: 'bg-green-600 text-white font-semibold p-3 rounded-lg shadow-lg',
+            icon: false,
+        });
+
+        toggleModal();
+
+
         toggleModal();
     } catch (error) {
         console.error('Error inviting users:', error.message);
-        alert(`An error occurred: ${error.message}`);
+        toast.error(`An error occurred: ${error.message}`, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            className: 'bg-red-600 text-white font-semibold p-3 rounded-lg shadow-lg',
+            icon: false,
+        });
     } finally {
         setLoading(false);
     }
@@ -276,18 +328,17 @@ const handleRemoveUser = async (userEmail) => {
     const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
 
     if (!token) {
-        alert('Access token is missing. Please log in again.');
+        toast.error('Access token is missing. Please log in again.');
         return;
     }
 
     const invitedMember = invitedUsers.find((u) => u.email === userEmail);
     if (!invitedMember) {
-        alert('Invited member not found in the list.');
+        toast.error('Invited member not found in the list.');
         return;
     }
 
     try {
-        // Use the actual _id from saInvitedMember instead of userId
         const response = await fetch(`http://localhost:5000/api/users/invited/${invitedMember._id}`, {
             method: 'DELETE',
             headers: {
@@ -302,10 +353,10 @@ const handleRemoveUser = async (userEmail) => {
         }
 
         setInvitedUsers((prev) => prev.filter((u) => u.email !== userEmail));
-        alert(`Successfully removed user: ${userEmail}`);
+        toast.success(`Successfully removed user: ${userEmail}`);
     } catch (error) {
         console.error('Error in handleRemoveUser:', error.message);
-        alert(`An error occurred: ${error.message}`);
+        toast.error(`An error occurred: ${error.message}`);
     }
 };
 
@@ -527,6 +578,7 @@ const handleRemoveUser = async (userEmail) => {
                             >
                                 {loading ? 'Inviting ...' : 'Invite'}
                             </button>
+                            <ToastContainer />
                         </div>
 
                         <div className="mt-4 overflow-y-auto max-h-80">

@@ -42,17 +42,9 @@ const Task = () => {
                         <p>Status</p>
                         <p>Project</p> {/* Aligned to the right side of the box */}
                     </div>
-                </div>
-
-                {/* Box on the right side */}
-                <div className="p-6 bg-white border rounded-lg shadow-md w-1/2">
-                    <p className="text-gray-600">This is the second box on the right side.</p>
-                </div>
+                </div>    
             </div>
-
-            {/* Other content */}
             <div>
-                {/* Add your task-related content here */}
             </div>
         </div>
     );

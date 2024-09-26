@@ -5,6 +5,8 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx';
 import LoadingSpinner from './Loading Style/Fill File Loading/Loader.jsx';
 import ButtonSpinner from './Loading Style/Spinner Loading/ButtonSpinner.jsx';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Project = () => {
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
@@ -104,7 +106,7 @@ const Project = () => {
   
     const user = JSON.parse(localStorage.getItem('user'));
     const accessToken = user ? user.accessToken : null;
-  
+
     if (!accessToken) {
       setLoading(false);
       setError('No access token found. Please log in again.');
@@ -117,15 +119,19 @@ const Project = () => {
         projectName,
         thumbnail,
       };
-  
+
       const response = await axios.post('http://localhost:5000/api/users/sa-newproject', newProject, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-  
+
       setProjects([...projects, response.data]);
       closeModal();
+      
+      // Show success toast
+      toast.success('Project created successfully!'); // Add this line
+
     } catch (error) {
       setLoading(false);
       console.error('Error creating project:', error);
@@ -170,6 +176,7 @@ const Project = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen p-6">
+ <ToastContainer />
 
       {loadingProject && (
         <div className="flex flex-col items-center">

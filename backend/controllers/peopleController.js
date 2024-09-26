@@ -23,7 +23,6 @@ export const inviteUsers = async (req, res) => {
             return res.status(400).json({ message: 'No valid user IDs provided' });
         }
 
-        // Process each user ID
         await Promise.all(
             userIds.map(async (userId, index) => {
                 try {
@@ -33,26 +32,14 @@ export const inviteUsers = async (req, res) => {
                         return;
                     }
 
-                    const existingMember = await InviteMember.findOne({ userId });
-                    if (existingMember) {
-                        console.warn(`User with ID ${userId} has already been invited. Skipping...`);
-                        return;
-                    }
-
-                    const userProjects = existingUser.projects.map(project => project.toString());
-                    const validProjects = projects.filter(project => userProjects.includes(project.toString()));
-                    
-                    // If no valid projects are found, set projectToInvite to an empty array instead of 'N/A'
-                    const projectToInvite = validProjects.length > 0 ? validProjects : [];
-                    
-
+                    // Allow the invitation even if the user is already invited to other projects
                     const newMember = new InviteMember({
                         email: existingUser.email,
-                        role: roles[index] || existingUser.role || 'User', // Use the role from the request, fallback to existingUser role
-                        project: projectToInvite,
+                        role: roles[index] || existingUser.role || 'User',
+                        project: projects.map(project => project.toString()),
                         invitedBy: [inviterId],
                         userId: existingUser._id,
-                        profilePicture: profilePictures[index] || existingUser.profilePicture || {}, // Get profile picture from request or use existing one
+                        profilePicture: profilePictures[index] || existingUser.profilePicture || {},
                     });
 
                     await newMember.save();
@@ -74,6 +61,7 @@ export const inviteUsers = async (req, res) => {
         res.status(500).json({ message: 'Error inviting users', error: error.message });
     }
 };
+
 
 
 //Get Invited Users

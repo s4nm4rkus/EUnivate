@@ -94,24 +94,33 @@ const People = () => {
         fetchProjects();
 
         const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            if (!event.target.closest('.role-dropdown') && !event.target.closest('.role-toggle')) {
                 setIsRoleDropdownOpen({});
                 setIsProjectDropdownOpen({});
             }
         };
 
+        // Attach the event listener
         document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            // Cleanup the event listener on component unmount
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
     }, []);
 
     const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
 
     const toggleRoleDropdown = (userEmail) => {
+        console.log(`Toggling dropdown for: ${userEmail}`);
         setIsRoleDropdownOpen((prev) => ({
             ...prev,
             [userEmail]: !prev[userEmail],
         }));
     };
+    
+    
+    
 
     const toggleProjectDropdown = (userEmail) => {
         setIsProjectDropdownOpen((prev) => ({
@@ -364,7 +373,7 @@ const handleRoleChange = async (newRole, userEmail) => {
         <tbody className="bg-white divide-y divide-gray-200">
             {invitedUsers.length > 0 ? (
                 invitedUsers.map((user, index) => (
-                    <tr key={index} ref={dropdownRef}>
+                    <tr key={index}>
                         <td className="px-6 py-4 whitespace-nowrap flex items-center relative">
                             <div className="relative">
                                 <img
@@ -394,21 +403,22 @@ const handleRoleChange = async (newRole, userEmail) => {
                                     onClick={() => toggleRoleDropdown(user.email)}
                                 />
                             </div>
-                            {isRoleDropdownOpen[user.email] && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                                    <ul className="py-1">
-                                        {['Guest', 'Member', 'Admin', 'Superadmin'].map((role) => (
-                                            <li
-                                                key={role}
-                                                className="px-4 py-2 text-gray-700 cursor-pointer hover:bg-gray-100"
-                                                onClick={() => handleRoleChange(role.toLowerCase(), user.email)}
-                                            >
-                                                {role}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
+                                        {isRoleDropdownOpen[user.email] && (
+                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 role-dropdown">
+                                <ul className="py-1">
+                                    {['Guest', 'Member', 'Admin', 'Superadmin'].map((role) => (
+                                        <li
+                                            key={role}
+                                            className="px-4 py-2 text-gray-700 cursor-pointer hover:bg-gray-100"
+                                            onClick={() => handleRoleChange(role.toLowerCase(), user.email)}
+                                        >
+                                            {role}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 relative">
                     <div className="flex items-center">

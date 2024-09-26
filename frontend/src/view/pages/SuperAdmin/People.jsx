@@ -18,8 +18,8 @@ const People = () => {
     const [selectedRole, setSelectedRole] = useState('');
     const [selectedEmails, setSelectedEmails] = useState([]);
     const [projects, setProjects] = useState([]);
-    const [selectedProject, setSelectedProject] = useState(null);
-    const dropdownRef = useRef();
+    // const [selectedProject, setSelectedProject] = useState(null);
+    // const dropdownRef = useRef();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [showUsersInModal, setShowUsersInModal] = useState(false); 
@@ -184,9 +184,9 @@ const handleInvite = async () => {
         return userFromDB 
             ? { 
                 id: userFromDB._id, 
-                projects: userFromDB.projects.length > 0 ? userFromDB.projects : ['N/A'], // Ensure 'N/A' is an array
-                profilePicture: userFromDB.profilePicture || {}, // Get profilePicture
-                role: userFromDB.role || 'N/A' // Get role, default to 'N/A' if not found
+                projects: userFromDB.projects.length > 0 ? userFromDB.projects : [], // Use empty array instead of ['N/A']
+                profilePicture: userFromDB.profilePicture || {}, 
+                role: userFromDB.role || 'N/A' 
               } 
             : null;
     }).filter((user) => user !== null);
@@ -425,35 +425,38 @@ const handleRemoveUser = async (userEmail) => {
                         )}
 
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 relative">
-    <div className="flex items-center">
-        {user.project} {/* This now contains the project name */}
-        <FontAwesomeIcon
-            icon={isProjectDropdownOpen[user.email] ? faChevronDown : faChevronRight}
-            className="ml-2 cursor-pointer"
-            onClick={() => toggleProjectDropdown(user.email)}
-        />
-    </div>
-    {isProjectDropdownOpen[user.email] && (
-        <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-            <ul>
-                {projects.length > 0 ? (
-                    projects.map((project, index) => (
-                        <li 
-                            key={index} 
-                            className="py-2 cursor-pointer hover:bg-gray-100 text-center"
-                            onClick={() => (project, user.email)}
-                        >
-                            {project.projectName}
-                        </li>
-                    ))
-                ) : (
-                    <p className="text-center">No projects found.</p>
-                )}
-            </ul>
-        </div>
-    )}
-</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 relative">
+                                <div className="flex items-center">
+                                    {user.project || 'No Project Assigned'}
+                                    {user.project.length > 0 && (
+                                        <FontAwesomeIcon
+                                            icon={isProjectDropdownOpen[user.email] ? faChevronDown : faChevronRight}
+                                            className="ml-2 cursor-pointer"
+                                            onClick={() => toggleProjectDropdown(user.email)}
+                                        />
+                                    )}
+                                </div>
+                                {isProjectDropdownOpen[user.email] && user.project.length > 0 && (
+                                    <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                                        <ul>
+                                            {projects.length > 0 ? (
+                                                projects.map((project, index) => (
+                                                    <li 
+                                                        key={index} 
+                                                        className="py-2 cursor-pointer hover:bg-gray-100 text-center"
+                                                        onClick={() => (project, user.email)}
+                                                    >
+                                                        {project.projectName}
+                                                    </li>
+                                                ))
+                                            ) : (
+                                                <p className="text-center">No projects found.</p>
+                                            )}
+                                        </ul>
+                                    </div>
+                                )}
+                                  </td>
+
 
                         <td className="px-6 py-4 whitespace-nowrap">
                             <button

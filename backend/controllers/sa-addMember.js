@@ -5,8 +5,6 @@ import User from "../models/userModels.js";
 export const addMemberToProject = async (req, res) => {
     const { projectId, users } = req.body;
 
-    console.log('Received Project ID:', projectId);
-    console.log('Received Users:', users);
 
     if (!projectId || !Array.isArray(users) || users.length === 0) {
         return res.status(400).json({ message: 'Invalid project ID or users array.' });
@@ -19,15 +17,13 @@ export const addMemberToProject = async (req, res) => {
             console.log('Project not found for ID:', projectId);
             return res.status(404).json({ message: 'Project not found.' });
         }
-        console.log('Project found:', project);
+        
 
         // Update each Invited member to add the project ID to their projects array
         const result = await Invited.updateMany(
             { _id: { $in: users } }, // Match users by their IDs in the Invited model
             { $addToSet: { project: projectId } } // Add projectId to the projects array, avoiding duplicates
         );
-
-        console.log('Update Result in Invited:', result);
 
         // Fetch the invited users to update their corresponding User model and Project schema
         const invitedUsers = await Invited.find({ _id: { $in: users } });
@@ -41,7 +37,6 @@ export const addMemberToProject = async (req, res) => {
                 // Add the project ID to the User model's projects array
                 user.projects.addToSet(projectId); // Avoid duplicates with addToSet
                 await user.save(); // Save the updated user
-                console.log(`Project added to user: ${user.email}`);
 
                 // Add the user ID to the project's invitedUsers array
                 project.invitedUsers.addToSet(user._id); // Avoid duplicates with addToSet

@@ -1,7 +1,8 @@
 import User from '../models/userModels.js';
+import mongoose from 'mongoose';
 import sendEmail from '../utils/sendEmail.js';
 import InviteMember from '../models/saInvitedMember.js';
-
+import Project from '../models/addProjects.js';// Import the Project model
 // Fetch all users
 export const getUsers = async (req, res) => {
     try {
@@ -77,7 +78,6 @@ export const getInvitedUsers = async (req, res) => {
                 // Add other conditions if needed
             ]
         })
-        .populate('project', 'projectName') // Populate the 'project' field with 'projectName'
 
         if (invitedUsers.length === 0) {
             return res.status(404).json({ message: 'No invited users found' });
@@ -130,24 +130,50 @@ export const updateUserRole = async (req, res) => {
 
 
 //Delete the invited members
+
+
 export const removeInvitedMember = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     try {
-        const { id: userId } = req.params; // Expecting the userId
+        const { id: userId } = req.params; // This is the userId, not the _id of saInvitedMember
 
         // Find and delete the invited member using the userId
-        const deletedMember = await InviteMember.findOneAndDelete({ userId });
+        const deletedMember = await InviteMember.findOneAndDelete({ userId }).session(session);
 
         if (!deletedMember) {
             console.log(`No invited member found with userId: ${userId}`);
+            await session.abortTransaction();
             return res.status(404).json({ message: 'Invited member not found' });
         }
 
-        console.log(`Successfully removed invited member:`, deletedMember);
+        // Remove the project reference from the User model
+        await User.updateMany(
+            { _id: userId },
+            { $pull: { projects: { $in: deletedMember.project } } },
+            { session }
+        );
+
+        // Remove the user from the 'invitedUsers' field of the Project model
+        await Project.updateMany(
+            { _id: { $in: deletedMember.project } },
+            { $pull: { invitedUsers: userId } },
+            { session }
+        );
+
+        await session.commitTransaction();
+        session.endSession();
+
+     
         res.status(200).json({ message: 'Invited member removed successfully', deletedMember });
     } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
         console.error('Error removing invited member:', error.message);
         res.status(500).json({ message: 'Error removing invited member', error: error.message });
     }
 };
+
 
 

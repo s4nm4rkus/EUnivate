@@ -12,6 +12,7 @@ const projectSchema = new mongoose.Schema({
       required: true,
     }
   },
+  
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, 
   invitedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 

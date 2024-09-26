@@ -18,11 +18,10 @@ const People = () => {
     const [selectedRole, setSelectedRole] = useState('');
     const [selectedEmails, setSelectedEmails] = useState([]);
     const [projects, setProjects] = useState([]);
-    const [selectedProject, setSelectedProject] = useState(null);
-    const dropdownRef = useRef();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [showUsersInModal, setShowUsersInModal] = useState(false); 
+    const [showUsersInModal, setShowUsersInModal] = useState(false);
+
     const fetchProjects = async () => {
         try {
             const user = JSON.parse(localStorage.getItem('user'));
@@ -123,9 +122,6 @@ const People = () => {
             [userEmail]: !prev[userEmail],
         }));
     };
-    
-    
-    
 
     const toggleProjectDropdown = (userEmail) => {
         setIsProjectDropdownOpen((prev) => ({
@@ -133,7 +129,6 @@ const People = () => {
             [userEmail]: !prev[userEmail],
         }));
     };
-
 
     const toggleModal = () => {
         setIsModalOpen((prev) => !prev);
@@ -148,13 +143,13 @@ const People = () => {
             setShowUsersInModal(true); 
         }
     };
-    
+
     const handleRoleFilter = (role) => {
         setSelectedRole(role);
         const filteredByRole = role 
             ? allUsers.filter((user) => user.role.toLowerCase() === role.toLowerCase()) 
             : allUsers;
-    
+
         setFilteredUsers(filteredByRole.filter((user) => {
             const searchQuery = document.querySelector('input[placeholder="Search email"]').value.toLowerCase();
             return user.email.toLowerCase().includes(searchQuery) ||
@@ -162,162 +157,157 @@ const People = () => {
                    user.lastName.toLowerCase().includes(searchQuery);
         }));
     };
-    
 
-const handleInvite = async () => {
-    if (!selectedEmails.length) {
-        alert('Please select at least one email to invite.');
-        return;
-    }
-
-    const user = JSON.parse(localStorage.getItem('user'));
-    const token = user?.accessToken;
-
-    if (!token) {
-        alert('No access token found. Please log in again.');
-        return;
-    }
-
-    // Map selected emails to their corresponding user IDs, projects, profilePicture, and role
-    const selectedUsers = selectedEmails.map((email) => {
-        const userFromDB = allUsers.find((user) => user.email === email);
-        return userFromDB 
-            ? { 
-                id: userFromDB._id, 
-                projects: userFromDB.projects.length > 0 ? userFromDB.projects : ['N/A'], // Ensure 'N/A' is an array
-                profilePicture: userFromDB.profilePicture || {}, // Get profilePicture
-                role: userFromDB.role || 'N/A' // Get role, default to 'N/A' if not found
-              } 
-            : null;
-    }).filter((user) => user !== null);
-
-    if (selectedUsers.length === 0) {
-        alert('No valid users found for the selected emails.');
-        return;
-    }
-
-    setLoading(true);
-
-    try {
-        const response = await fetch('http://localhost:5000/api/users/invite', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-                userIds: selectedUsers.map(user => user.id),
-                projects: selectedUsers.map(user => user.projects).flat(), // Flatten the array of project arrays
-                roles: selectedUsers.map(user => user.role), // Pass roles array
-                profilePictures: selectedUsers.map(user => user.profilePicture), // Pass profilePictures array
-                invitedBy: user._id // The ID of the inviter
-            }),
-        });
-
-        if (!response.ok) {
-            const errorResponse = await response.json();
-            throw new Error(errorResponse.message);
+    const handleInvite = async () => {
+        if (!selectedEmails.length) {
+            alert('Please select at least one email to invite.');
+            return;
         }
 
-        fetchUsers(); // Refresh the user list
+        const user = JSON.parse(localStorage.getItem('user'));
+        const token = user?.accessToken;
 
-        alert('Invitations sent successfully!');
-        toggleModal();
-    } catch (error) {
-        console.error('Error inviting users:', error.message);
-        alert(`An error occurred: ${error.message}`);
-    } finally {
-        setLoading(false);
-    }
-};
-
-const handleRoleChange = async (newRole, userEmail) => {
-    try {
-        const user = allUsers.find((u) => u.email === userEmail);
-
-        if (!user) {
-            throw new Error(`User with email ${userEmail} not found`);
+        if (!token) {
+            alert('No access token found. Please log in again.');
+            return;
         }
 
-        const response = await fetch(`http://localhost:5000/api/users/${user._id}/role`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ role: newRole }),
-        });
+        // Map selected emails to their corresponding user IDs, projects, profilePicture, and role
+        const selectedUsers = selectedEmails.map((email) => {
+            const userFromDB = allUsers.find((user) => user.email === email);
+            return userFromDB 
+                ? { 
+                    id: userFromDB._id, 
+                    projects: userFromDB.projects.length > 0 ? userFromDB.projects : [], // Use empty array instead of ['N/A']
+                    profilePicture: userFromDB.profilePicture || {}, 
+                    role: userFromDB.role || 'N/A' 
+                  } 
+                : null;
+        }).filter((user) => user !== null);
 
-        if (response.ok) {
-            const updatedUser = await response.json();
-            console.log('Role change successful:', updatedUser);
+        if (selectedUsers.length === 0) {
+            alert('No valid users found for the selected emails.');
+            return;
+        }
 
-            setInvitedUsers((prevUsers) => {
-                const updatedUsers = prevUsers.map((user) =>
-                    user.email === userEmail ? { ...user, role: newRole } : user
-                );                  
-                localStorage.setItem('invitedUsers', JSON.stringify(updatedUsers));
-                return updatedUsers;
+        setLoading(true);
+
+        try {
+            const response = await fetch('http://localhost:5000/api/users/invite', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    userIds: selectedUsers.map(user => user.id),
+                    projects: selectedUsers.map(user => user.projects).flat(), // Flatten the array of project arrays
+                    roles: selectedUsers.map(user => user.role), // Pass roles array
+                    profilePictures: selectedUsers.map(user => user.profilePicture), // Pass profilePictures array
+                    invitedBy: user._id // The ID of the inviter
+                }),
             });
 
-            alert(`Role changed to ${newRole} and email notification sent to ${userEmail}`);
-        } else {
-            const errorResponse = await response.json();
-            console.error('Error updating role:', errorResponse);
-            alert(`Error updating role: ${errorResponse.message}`);
+            if (!response.ok) {
+                const errorResponse = await response.json();
+                throw new Error(errorResponse.message);
+            }
+
+            fetchUsers(); // Refresh the user list
+
+            alert('Invitations sent successfully!');
+            toggleModal();
+        } catch (error) {
+            console.error('Error inviting users:', error.message);
+            alert(`An error occurred: ${error.message}`);
+        } finally {
+            setLoading(false);
         }
-    } catch (error) {
-        console.error('Error updating role:', error.message);
-        alert(`An error occurred: ${error.message}`);
-    }
-};
+    };
 
-    
-const handleRemoveUser = async (userEmail) => {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const handleRoleChange = async (newRole, userEmail) => {
+        try {
+            const user = allUsers.find((u) => u.email === userEmail);
 
-    if (!token) {
-        alert('Access token is missing. Please log in again.');
-        return;
-    }
+            if (!user) {
+                throw new Error(`User with email ${userEmail} not found`);
+            }
 
-    const invitedMember = invitedUsers.find((u) => u.email === userEmail);
-    if (!invitedMember) {
-        alert('Invited member not found in the list.');
-        return;
-    }
+            const response = await fetch(`http://localhost:5000/api/users/${user._id}/role`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ role: newRole }),
+            });
 
-    try {
-        // Use the actual _id from saInvitedMember instead of userId
-        const response = await fetch(`http://localhost:5000/api/users/invited/${invitedMember._id}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-        });
+            if (response.ok) {
+                const updatedUser = await response.json();
+                console.log('Role change successful:', updatedUser);
 
-        if (!response.ok) {
-            const errorResponse = await response.json();
-            throw new Error(errorResponse.message);
+                setInvitedUsers((prevUsers) => {
+                    const updatedUsers = prevUsers.map((user) =>
+                        user.email === userEmail ? { ...user, role: newRole } : user
+                    );                  
+                    localStorage.setItem('invitedUsers', JSON.stringify(updatedUsers));
+                    return updatedUsers;
+                });
+
+                alert(`Role changed to ${newRole} and email notification sent to ${userEmail}`);
+            } else {
+                const errorResponse = await response.json();
+                console.error('Error updating role:', errorResponse);
+                alert(`Error updating role: ${errorResponse.message}`);
+            }
+        } catch (error) {
+            console.error('Error updating role:', error.message);
+            alert(`An error occurred: ${error.message}`);
+        }
+    };
+
+    const handleRemoveUser = async (userEmail) => {
+        const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+
+        if (!token) {
+            alert('Access token is missing. Please log in again.');
+            return;
         }
 
-        setInvitedUsers((prev) => prev.filter((u) => u.email !== userEmail));
-        alert(`Successfully removed user: ${userEmail}`);
-    } catch (error) {
-        console.error('Error in handleRemoveUser:', error.message);
-        alert(`An error occurred: ${error.message}`);
-    }
-};
+        const invitedMember = invitedUsers.find((u) => u.email === userEmail);
+        if (!invitedMember) {
+            alert('Invited member not found in the list.');
+            return;
+        }
 
-    
-    
+        try {
+            // Use the actual _id from saInvitedMember instead of userId
+            const response = await fetch(`http://localhost:5000/api/users/invited/${invitedMember._id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                const errorResponse = await response.json();
+                throw new Error(errorResponse.message);
+            }
+
+            setInvitedUsers((prev) => prev.filter((u) => u.email !== userEmail));
+            alert(`Successfully removed user: ${userEmail}`);
+        } catch (error) {
+            console.error('Error in handleRemoveUser:', error.message);
+            alert(`An error occurred: ${error.message}`);
+        }
+    };
 
     const handleSearch = (e) => {
         const searchQuery = e.target.value.toLowerCase();
         const roleFilteredUsers = selectedRole 
             ? allUsers.filter((user) => user.role.toLowerCase() === selectedRole.toLowerCase()) 
             : allUsers;
-    
+
         const filtered = roleFilteredUsers.filter(
             (user) =>
                 user.email.toLowerCase().includes(searchQuery) ||
@@ -338,151 +328,146 @@ const handleRemoveUser = async (userEmail) => {
         setClickedEmail(email === clickedEmail ? null : email); // Toggle email display
     };
 
-        
-        return (
-            <div className="bg-gray-100 min-h-screen p-6">
-                <div className="w-full flex justify-between items-center mb-16">
-        <div className="relative">
-        <h1 className="text-2xl font-medium text-gray-800 hidden md:block">
-            People 
-        </h1>
-    </div>
-            <AdminNavbar
-            isAccountDropdownOpen={isAccountDropdownOpen}
-            toggleAccountDropdown={toggleAccountDropdown}
-            />
-        </div>
+    return (
+        <div className="bg-gray-100 min-h-screen p-6">
+            <div className="w-full flex justify-between items-center mb-16">
+                <div className="relative">
+                    <h1 className="text-2xl font-medium text-gray-800 hidden md:block">
+                        People 
+                    </h1>
+                </div>
+                <AdminNavbar
+                    isAccountDropdownOpen={isAccountDropdownOpen}
+                    toggleAccountDropdown={toggleAccountDropdown}
+                />
+            </div>
 
-<div className="bg-white border border-gray-200 rounded-lg p-6 shadow-md mb-6 text-sm sm:text-base">
-  <div className="flex justify-between items-center">
-    <p className="text-lg sm:text-2xl font-semibold text-gray-700">Invited Members</p>
-    <button
-      className="bg-red-800 text-white px-3 py-1 rounded flex items-center hover:bg-red-900 sm:px-4 sm:py-2"
-      onClick={toggleModal}
-    >
-      <i className="fas fa-user-plus mr-1 sm:mr-2"></i>
-      Add Members
-    </button>
-  </div>
-</div>
-<div className="relative">
-    <table className="min-w-full bg-white divide-y divide-gray-200">
-        <thead className="bg-gray-100">
-            <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profile</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-            </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-            {invitedUsers.length > 0 ? (
-                invitedUsers.map((user, index) => (
-                    <tr key={index}>
-                        <td className="px-6 py-4 whitespace-nowrap flex items-center relative">
-                            <div className="relative">
-                                <img
-                                    src={user.profilePicture?.url || user.profilePicture || User}
-                                    alt="Profile"
-                                    className="w-12 h-12 rounded-full mr-4 object-cover cursor-pointer"
-                                    onClick={() => handleAvatarClick(user.email)}
-                                />
-                                {/* Display email on mobile when avatar is clicked */}
-                                {clickedEmail === user.email && (
-                                    <div className="absolute left-0 top-full mt-2 px-2 py-1 bg-white border border-gray-200 rounded-lg shadow-lg text-gray-900 text-sm z-50">
-                                        {user.email}
-                                    </div>
-                                )}
-                            </div>
-                            <div className="hidden sm:block">
-                                <div className="text-sm font-medium text-gray-900">{user.email}</div>
-                                <div className="text-xs text-gray-500">{user.email}</div>
-                            </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 relative">
-                            <div className="flex items-center">
-                                {user.role}
-                                <FontAwesomeIcon
-                                    icon={isRoleDropdownOpen[user.email] ? faChevronDown : faChevronRight}
-                                    className="ml-2 cursor-pointer"
-                                    onClick={() => toggleRoleDropdown(user.email)}
-                                />
-                            </div>
+            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-md mb-6 text-sm sm:text-base">
+                <div className="flex justify-between items-center">
+                    <p className="text-lg sm:text-2xl font-semibold text-gray-700">Invited Members</p>
+                    <button
+                        className="bg-red-800 text-white px-3 py-1 rounded flex items-center hover:bg-red-900 sm:px-4 sm:py-2"
+                        onClick={toggleModal}
+                    >
+                        <i className="fas fa-user-plus mr-1 sm:mr-2"></i>
+                        Add Members
+                    </button>
+                </div>
+            </div>
+
+            <div className="relative">
+                <table className="min-w-full bg-white divide-y divide-gray-200">
+                    <thead className="bg-gray-100">
+                        <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profile</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                        {invitedUsers.length > 0 ? (
+                            invitedUsers.map((user, index) => (
+                                <tr key={index}>
+                                    <td className="px-6 py-4 whitespace-nowrap flex items-center relative">
+                                        <div className="relative">
+                                            <img
+                                                src={user.profilePicture?.url || user.profilePicture || User}
+                                                alt="Profile"
+                                                className="w-12 h-12 rounded-full mr-4 object-cover cursor-pointer"
+                                                onClick={() => handleAvatarClick(user.email)}
+                                            />
+                                            {/* Display email on mobile when avatar is clicked */}
+                                            {clickedEmail === user.email && (
+                                                <div className="absolute left-0 top-full mt-2 px-2 py-1 bg-white border border-gray-200 rounded-lg shadow-lg text-gray-900 text-sm z-50">
+                                                    {user.email}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="hidden sm:block">
+                                            <div className="text-sm font-medium text-gray-900">{user.email}</div>
+                                            <div className="text-xs text-gray-500">{user.email}</div>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 relative">
+                                        <div className="flex items-center">
+                                            {user.role}
+                                            <FontAwesomeIcon
+                                                icon={isRoleDropdownOpen[user.email] ? faChevronDown : faChevronRight}
+                                                className="ml-2 cursor-pointer"
+                                                onClick={() => toggleRoleDropdown(user.email)}
+                                            />
+                                        </div>
                                         {isRoleDropdownOpen[user.email] && (
-                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 role-dropdown">
-                                <ul className="py-1">
-                                    {['Guest', 'Member', 'Admin', 'Superadmin'].map((role) => (
-                                        <li
-                                            key={role}
-                                            className="px-4 py-2 text-gray-700 cursor-pointer hover:bg-gray-100"
-                                            onClick={() => handleRoleChange(role.toLowerCase(), user.email)}
+                                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 role-dropdown">
+                                                <ul className="py-1">
+                                                    {['Guest', 'Member', 'Admin', 'Superadmin'].map((role) => (
+                                                        <li
+                                                            key={role}
+                                                            className="px-4 py-2 text-gray-700 cursor-pointer hover:bg-gray-100"
+                                                            onClick={() => handleRoleChange(role.toLowerCase(), user.email)}
+                                                        >
+                                                            {role}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 relative">
+                                        <div className="flex items-center">
+                                            {user.project || 'No Project Assigned'}
+                                            {Array.isArray(user.project) && user.project.length > 0 && (
+                                                <FontAwesomeIcon
+                                                    icon={isProjectDropdownOpen[user.email] ? faChevronDown : faChevronRight}
+                                                    className="ml-2 cursor-pointer"
+                                                    onClick={() => toggleProjectDropdown(user.email)}
+                                                />
+                                            )}
+                                        </div>
+                                        {isProjectDropdownOpen[user.email] && Array.isArray(user.project) && user.project.length > 0 && (
+                                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                                                <ul>
+                                                    {projects.length > 0 ? (
+                                                        projects.map((project, index) => (
+                                                            <li 
+                                                                key={index} 
+                                                                className="py-2 cursor-pointer hover:bg-gray-100 text-center"
+                                                                onClick={() => (project, user.email)}
+                                                            >
+                                                                {project.projectName}
+                                                            </li>
+                                                        ))
+                                                    ) : (
+                                                        <p className="text-center">No projects found.</p>
+                                                    )}
+                                                </ul>
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <button
+                                            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                                            onClick={() => handleRemoveUser(user.email)}
                                         >
-                                            {role}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
+                                            Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="4" className="px-6 py-4 text-center text-gray-500">
+                                    No invited users found.
+                                </td>
+                            </tr>
                         )}
+                    </tbody>
+                </table>
+            </div>
 
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 relative">
-    <div className="flex items-center">
-        {user.project} {/* This now contains the project name */}
-        <FontAwesomeIcon
-            icon={isProjectDropdownOpen[user.email] ? faChevronDown : faChevronRight}
-            className="ml-2 cursor-pointer"
-            onClick={() => toggleProjectDropdown(user.email)}
-        />
-    </div>
-    {isProjectDropdownOpen[user.email] && (
-        <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-            <ul>
-                {projects.length > 0 ? (
-                    projects.map((project, index) => (
-                        <li 
-                            key={index} 
-                            className="py-2 cursor-pointer hover:bg-gray-100 text-center"
-                            onClick={() => (project, user.email)}
-                        >
-                            {project.projectName}
-                        </li>
-                    ))
-                ) : (
-                    <p className="text-center">No projects found.</p>
-                )}
-            </ul>
-        </div>
-    )}
-</td>
-
-                        <td className="px-6 py-4 whitespace-nowrap">
-                            <button
-                                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-                                onClick={() => handleRemoveUser(user.email)}
-                            >
-                                Remove
-                            </button>
-                        </td>
-                    </tr>
-                ))
-            ) : (
-                <tr>
-                    <td colSpan="4" className="px-6 py-4 text-center text-gray-500">
-                        No invited users found.
-                    </td>
-                </tr>
-            )}
-        </tbody>
-    </table>
-</div>
-
-
-
-
-
-
-    {/* Modal */}
-                {isModalOpen && (
+            {/* Modal */}
+            {isModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="absolute inset-0 bg-gray-800 opacity-50"></div>
                     <div className="relative bg-white w-full max-w-sm rounded-lg p-4 sm:p-5 lg:p-6 z-60 mt-21">
@@ -527,40 +512,40 @@ const handleRemoveUser = async (userEmail) => {
                         </div>
 
                         <div className="mt-4 overflow-y-auto max-h-80">
-    {filteredUsers.length > 0 ? (
-        <ul>
-            {filteredUsers.map((user, index) => (
-                <li
-                    key={index}
-                    className={`flex items-center justify-between p-2 border-b text-xs sm:text-sm ${selectedEmails.includes(user.email) ? 'bg-gray-200' : ''}`}
-                    onClick={() => handleEmailSelect(user.email)}
-                >
-                    <div className="flex items-center">
-                        <img
-                            src={user.profilePicture?.url || user.profilePicture || User}
-                            alt="Profile"
-                            className="w-6 h-6 rounded-full mr-2 object-cover"
-                        />
-                        <div>
-                            <div className="text-xs sm:text-sm text-gray-800">
-                                {user.firstName} {user.lastName}
-                            </div>
-                            <div className="text-xs text-gray-600">{user.email}</div>
+                            {filteredUsers.length > 0 ? (
+                                <ul>
+                                    {filteredUsers.map((user, index) => (
+                                        <li
+                                            key={index}
+                                            className={`flex items-center justify-between p-2 border-b text-xs sm:text-sm ${selectedEmails.includes(user.email) ? 'bg-gray-200' : ''}`}
+                                            onClick={() => handleEmailSelect(user.email)}
+                                        >
+                                            <div className="flex items-center">
+                                                <img
+                                                    src={user.profilePicture?.url || user.profilePicture || User}
+                                                    alt="Profile"
+                                                    className="w-6 h-6 rounded-full mr-2 object-cover"
+                                                />
+                                                <div>
+                                                    <div className="text-xs sm:text-sm text-gray-800">
+                                                        {user.firstName} {user.lastName}
+                                                    </div>
+                                                    <div className="text-xs text-gray-600">{user.email}</div>
+                                                </div>
+                                            </div>
+                                            <div className="text-xs text-gray-500">{user.role}</div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className="text-center text-gray-500 text-xs sm:text-sm">No users found.</p>
+                            )}
                         </div>
-                    </div>
-                    <div className="text-xs text-gray-500">{user.role}</div>
-                </li>
-            ))}
-        </ul>
-    ) : (
-        <p className="text-center text-gray-500 text-xs sm:text-sm">No users found.</p>
-    )}
-</div>
                     </div>
                 </div>
             )}
-            </div>
-        );
-    };
+        </div>
+    );
+};
 
-    export default People;
+export default People;

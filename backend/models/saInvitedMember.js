@@ -14,6 +14,7 @@ const saInvitedMemberSchema = new mongoose.Schema({
     project: [{
         type: String,
         ref: 'User', 
+    
     }],
     profilePicture: {
         publicId: {

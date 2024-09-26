@@ -65,18 +65,19 @@ export const inviteUsers = async (req, res) => {
 
 
 //Get Invited Users
+
 export const getInvitedUsers = async (req, res) => {
     try {
         const userId = req.user._id;
-        
+
         // Fetch invited users based on some custom logic
-        // Example: Fetch users where 'invitedBy' matches userId or other conditions
         const invitedUsers = await InviteMember.find({
             $or: [
                 { invitedBy: userId },
                 // Add other conditions if needed
             ]
-        });
+        })
+        .populate('project', 'projectName') // Populate the 'project' field with 'projectName'
 
         if (invitedUsers.length === 0) {
             return res.status(404).json({ message: 'No invited users found' });
@@ -87,6 +88,7 @@ export const getInvitedUsers = async (req, res) => {
         res.status(500).json({ message: 'Error fetching invited users', error: error.message });
     }
 };
+
 
 
 // Update user role
@@ -130,14 +132,13 @@ export const updateUserRole = async (req, res) => {
 //Delete the invited members
 export const removeInvitedMember = async (req, res) => {
     try {
-        const { id } = req.params; // This should be the userId from the invitedBy array
-        console.log(`Attempting to remove invited member with userId: ${id}`);
+        const { id: userId } = req.params; // Expecting the userId
 
-        // Find and delete the invited member using the userId in the invitedBy array
-        const deletedMember = await InviteMember.findOneAndDelete({ 'invitedBy.userId': id });
+        // Find and delete the invited member using the userId
+        const deletedMember = await InviteMember.findOneAndDelete({ userId });
 
         if (!deletedMember) {
-            console.log(`No invited member found with userId: ${id}`);
+            console.log(`No invited member found with userId: ${userId}`);
             return res.status(404).json({ message: 'Invited member not found' });
         }
 
@@ -148,4 +149,5 @@ export const removeInvitedMember = async (req, res) => {
         res.status(500).json({ message: 'Error removing invited member', error: error.message });
     }
 };
+
 

@@ -18,6 +18,8 @@ const People = () => {
     const [selectedRole, setSelectedRole] = useState('');
     const [selectedEmails, setSelectedEmails] = useState([]);
     const [projects, setProjects] = useState([]);
+    // const [selectedProject, setSelectedProject] = useState(null);
+    // const dropdownRef = useRef();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [showUsersInModal, setShowUsersInModal] = useState(false);
@@ -172,18 +174,18 @@ const People = () => {
             return;
         }
 
-        // Map selected emails to their corresponding user IDs, projects, profilePicture, and role
-        const selectedUsers = selectedEmails.map((email) => {
-            const userFromDB = allUsers.find((user) => user.email === email);
-            return userFromDB 
-                ? { 
-                    id: userFromDB._id, 
-                    projects: userFromDB.projects.length > 0 ? userFromDB.projects : [], // Use empty array instead of ['N/A']
-                    profilePicture: userFromDB.profilePicture || {}, 
-                    role: userFromDB.role || 'N/A' 
-                  } 
-                : null;
-        }).filter((user) => user !== null);
+    // Map selected emails to their corresponding user IDs, projects, profilePicture, and role
+    const selectedUsers = selectedEmails.map((email) => {
+        const userFromDB = allUsers.find((user) => user.email === email);
+        return userFromDB 
+            ? { 
+                id: userFromDB._id, 
+                projects: userFromDB.projects.length > 0 ? userFromDB.projects : [], // Use empty array instead of ['N/A']
+                profilePicture: userFromDB.profilePicture || {}, 
+                role: userFromDB.role || 'N/A' 
+              } 
+            : null;
+    }).filter((user) => user !== null);
 
         if (selectedUsers.length === 0) {
             alert('No valid users found for the selected emails.');
@@ -399,72 +401,80 @@ const People = () => {
                                             />
                                         </div>
                                         {isRoleDropdownOpen[user.email] && (
-                                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 role-dropdown">
-                                                <ul className="py-1">
-                                                    {['Guest', 'Member', 'Admin', 'Superadmin'].map((role) => (
-                                                        <li
-                                                            key={role}
-                                                            className="px-4 py-2 text-gray-700 cursor-pointer hover:bg-gray-100"
-                                                            onClick={() => handleRoleChange(role.toLowerCase(), user.email)}
-                                                        >
-                                                            {role}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        )}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 relative">
-                                        <div className="flex items-center">
-                                            {user.project || 'No Project Assigned'}
-                                            {Array.isArray(user.project) && user.project.length > 0 && (
-                                                <FontAwesomeIcon
-                                                    icon={isProjectDropdownOpen[user.email] ? faChevronDown : faChevronRight}
-                                                    className="ml-2 cursor-pointer"
-                                                    onClick={() => toggleProjectDropdown(user.email)}
-                                                />
-                                            )}
-                                        </div>
-                                        {isProjectDropdownOpen[user.email] && Array.isArray(user.project) && user.project.length > 0 && (
-                                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                                                <ul>
-                                                    {projects.length > 0 ? (
-                                                        projects.map((project, index) => (
-                                                            <li 
-                                                                key={index} 
-                                                                className="py-2 cursor-pointer hover:bg-gray-100 text-center"
-                                                                onClick={() => (project, user.email)}
-                                                            >
-                                                                {project.projectName}
-                                                            </li>
-                                                        ))
-                                                    ) : (
-                                                        <p className="text-center">No projects found.</p>
-                                                    )}
-                                                </ul>
-                                            </div>
-                                        )}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <button
-                                            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-                                            onClick={() => handleRemoveUser(user.email)}
+                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 role-dropdown">
+                                <ul className="py-1">
+                                    {['Guest', 'Member', 'Admin', 'Superadmin'].map((role) => (
+                                        <li
+                                            key={role}
+                                            className="px-4 py-2 text-gray-700 cursor-pointer hover:bg-gray-100"
+                                            onClick={() => handleRoleChange(role.toLowerCase(), user.email)}
                                         >
-                                            Remove
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="4" className="px-6 py-4 text-center text-gray-500">
-                                    No invited users found.
-                                </td>
-                            </tr>
+                                            {role}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
                         )}
-                    </tbody>
-                </table>
-            </div>
+
+                        </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 relative">
+                                <div className="flex items-center">
+                                    {user.project || 'No Project Assigned'}
+                                    {user.project.length > 0 && (
+                                        <FontAwesomeIcon
+                                            icon={isProjectDropdownOpen[user.email] ? faChevronDown : faChevronRight}
+                                            className="ml-2 cursor-pointer"
+                                            onClick={() => toggleProjectDropdown(user.email)}
+                                        />
+                                    )}
+                                </div>
+                                {isProjectDropdownOpen[user.email] && user.project.length > 0 && (
+                                    <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                                        <ul>
+                                            {projects.length > 0 ? (
+                                                projects.map((project, index) => (
+                                                    <li 
+                                                        key={index} 
+                                                        className="py-2 cursor-pointer hover:bg-gray-100 text-center"
+                                                        onClick={() => (project, user.email)}
+                                                    >
+                                                        {project.projectName}
+                                                    </li>
+                                                ))
+                                            ) : (
+                                                <p className="text-center">No projects found.</p>
+                                            )}
+                                        </ul>
+                                    </div>
+                                )}
+                                  </td>
+
+
+                        <td className="px-6 py-4 whitespace-nowrap">
+                            <button
+                                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                                onClick={() => handleRemoveUser(user.email)}
+                            >
+                                Remove
+                            </button>
+                        </td>
+                    </tr>
+                ))
+            ) : (
+                <tr>
+                    <td colSpan="4" className="px-6 py-4 text-center text-gray-500">
+                        No invited users found.
+                    </td>
+                </tr>
+            )}
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
 
             {/* Modal */}
             {isModalOpen && (

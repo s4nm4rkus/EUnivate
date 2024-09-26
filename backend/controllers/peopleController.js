@@ -148,6 +148,23 @@ export const removeInvitedMember = async (req, res) => {
             return res.status(404).json({ message: 'Invited member not found' });
         }
 
+        // Remove the user from the 'projects' field of the User model
+        await User.updateMany(
+            { projects: deletedMember._id },
+            { $pull: { projects: deletedMember._id } },
+            { session }
+        );
+
+        // Remove the user from the 'invitedUsers' field of the Project model
+        await Project.updateMany(
+            { invitedUsers: userId },
+            { $pull: { invitedUsers: userId } },
+            { session }
+        );
+
+        await session.commitTransaction();
+        session.endSession();
+
         // Remove the project reference from the User model
         await User.updateMany(
             { _id: userId },

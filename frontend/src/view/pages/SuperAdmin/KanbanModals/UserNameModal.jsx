@@ -15,8 +15,9 @@ const UserNameModal = ({ isOpen, onClose, membersList, onSelect }) => {
   );
 
   const handleSelect = (member) => {
-    setSelectedMembers(prevSelected => {
-      if (prevSelected.find(selected => selected._id === member._id)) {
+    setSelectedMembers((prevSelected) => {
+      const isAlreadySelected = prevSelected.some(selected => selected._id === member._id);
+      if (isAlreadySelected) {
         // If already selected, remove it (deselecting)
         return prevSelected.filter(selected => selected._id !== member._id);
       } else {
@@ -25,7 +26,8 @@ const UserNameModal = ({ isOpen, onClose, membersList, onSelect }) => {
       }
     });
   };
-
+  
+  
   const handleConfirmSelection = () => {
     // Pass all selected members instead of just one
     onSelect(selectedMembers);
@@ -56,13 +58,14 @@ const UserNameModal = ({ isOpen, onClose, membersList, onSelect }) => {
             Confirm
           </button>
         </div>
-        <ul className="flex-grow overflow-auto">
+                <ul className="flex-grow overflow-auto">
           {filteredMembers.length > 0 ? (
-            filteredMembers.map((member) => (
+            filteredMembers.map((member, index) => (
               <li
-                key={member._id}
+                key={`${member._id}-${index}`} // Ensuring the key is unique
                 className="flex items-center py-2 border-b border-gray-200"
               >
+
                 <div className="flex-grow flex items-center justify-between">
                   <div className="flex-grow">
                     <span className="block font-medium">{member.username}</span>

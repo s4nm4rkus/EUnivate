@@ -145,6 +145,7 @@ export const removeInvitedMember = async (req, res) => {
         if (!deletedMember) {
             console.log(`No invited member found with userId: ${userId}`);
             await session.abortTransaction();
+            session.endSession();
             return res.status(404).json({ message: 'Invited member not found' });
         }
 
@@ -162,30 +163,12 @@ export const removeInvitedMember = async (req, res) => {
             { session }
         );
 
-        await session.commitTransaction();
+        await session.commitTransaction(); // Commit the transaction once after all operations are successful
         session.endSession();
 
-        // Remove the project reference from the User model
-        await User.updateMany(
-            { _id: userId },
-            { $pull: { projects: { $in: deletedMember.project } } },
-            { session }
-        );
-
-        // Remove the user from the 'invitedUsers' field of the Project model
-        await Project.updateMany(
-            { _id: { $in: deletedMember.project } },
-            { $pull: { invitedUsers: userId } },
-            { session }
-        );
-
-        await session.commitTransaction();
-        session.endSession();
-
-     
         res.status(200).json({ message: 'Invited member removed successfully', deletedMember });
     } catch (error) {
-        await session.abortTransaction();
+        await session.abortTransaction(); // Abort the transaction in case of an error
         session.endSession();
         console.error('Error removing invited member:', error.message);
         res.status(500).json({ message: 'Error removing invited member', error: error.message });

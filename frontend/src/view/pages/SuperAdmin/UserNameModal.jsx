@@ -15,6 +15,7 @@ const UserNameModal = ({ isOpen, onClose, user, onSelectName }) => {
         const users = await response.json();
         // Store both names and profile pictures
         setUserNames(users.map(u => ({
+          id: u._id,  // Assuming users have unique _id
           name: `${u.firstName} ${u.lastName}`,
           profilePicture: u.profilePicture?.url || u.profilePicture || ''
         })));
@@ -32,14 +33,15 @@ const UserNameModal = ({ isOpen, onClose, user, onSelectName }) => {
 
   // Combine fetched names and avatars with the current user's name and avatar
   const currentUserData = {
+    id: 'currentUser',  // Assign a unique id for the current user
     name: `${user.firstName} ${user.lastName}`,
     profilePicture: user.profilePicture?.url || user.profilePicture || ''
   };
   const allUserData = [currentUserData, ...userNames];
 
   // Handle the name selection with avatar
-  const handleNameSelect = (name, avatar) => {
-    onSelectName(name, avatar); // Pass the selected name and avatar back to the parent
+  const handleNameSelect = (userData) => {
+    onSelectName(userData.name); // Pass the selected name back to the parent
     onClose(); // Close the modal
   };
 
@@ -56,11 +58,11 @@ const UserNameModal = ({ isOpen, onClose, user, onSelectName }) => {
           </button>
         </div>
         <ul className="mt-4 space-y-2">
-          {allUserData.map((userData, index) => (
+          {allUserData.map((userData) => (
             <li 
-              key={index} 
+              key={userData.id}  // Use the unique id as the key
               className="flex items-center text-gray-700 cursor-pointer hover:bg-gray-200 p-2 rounded"
-              onClick={() => handleNameSelect(userData.name, userData.profilePicture)}
+              onClick={() => handleNameSelect(userData)}
             >
               {/* Display avatar */}
               <img 

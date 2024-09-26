@@ -16,7 +16,7 @@
   import { inviteUsers, updateUserRole, getInvitedUsers, removeInvitedMember, getUsers} from '../controllers/peopleController.js';
   import { createEvent, getEvents, updateEvent, deleteEvent } from '../controllers/addEventsController.js';
   import { getQuotations, deleteQuotation, checkNotifications } from '../controllers/getQuotationAdminController.js';
-  import { createTask, getTasks, getTaskById, updateTaskStatusById, getTasksByProjectId, deleteTask } from '../controllers/saAddTaskController.js';
+  import { getAddedMembers, createTask, getTasks, getTaskById, updateTaskStatusById, getTasksByProjectId, deleteTask } from '../controllers/saAddTaskController.js';
   import { findUserByUsername } from '../controllers/findUserNameIDController.js';
   import { assignProjectToUser } from '../controllers/assignUserProjectController.js';
   import { addMemberToProject } from '../controllers/sa-addMember.js';
@@ -24,7 +24,6 @@
   // import { getInvitedMembersByUserId } from '../controllers/peopleController.js';
   // import { getMembersAndSuperAdmins } from '../controllers/sa-addMember.js';
     // import { sendCompletionEmail } from '../controllers/quotationController.js';
-  // router.get('/members-superadmins', getMembersAndSuperAdmins);
   // router.post('/quotation/send-completion-email', sendCompletionEmail);
 // router.delete('/sa-newproject/:id', deleteProjectById);
 const router = express.Router();
@@ -56,7 +55,8 @@ router.put('/assign-project', protect, assignProjectToUser);
 //add member on the project details on user add icon
 router.post('/add-member-to-project', addMemberToProject);
 // Task Routes
-router.post('/sa-task', createTask);         
+router.get('/get-assignee', getAddedMembers);
+router.post('/sa-task', createTask,);         
 router.get('/sa-tasks', getTasks);  
 router.get('/sa-tasks/:projectId', getTasksByProjectId); 
 router.get('/sa-tasks/:id', getTaskById);     

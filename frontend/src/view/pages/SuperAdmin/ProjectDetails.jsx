@@ -47,15 +47,15 @@
             const fetchProjectDetails = async () => {
                 try {
                     const user = JSON.parse(localStorage.getItem('user'));
-                    const accessToken = user?.accessToken;
+                    const token = user?.accessToken;
 
-                    if (!accessToken) {
+                    if (!token) {
                         setError('No access token found. Please log in again.');
                         return;
                     }
 
                     const response = await axios.get(`http://localhost:5000/api/users/sa-getnewproject/${projectId}`, {
-                        headers: { Authorization: `Bearer ${accessToken}` },
+                        headers: { Authorization: `Bearer ${token}` },
                     });
 
                     
@@ -162,7 +162,7 @@
                     projectId: project._id,
                     users: userIds
                 }, {
-                    headers: { Authorization: `Bearer ${accessToken}` }
+                    headers: { Authorization: `Bearer ${accessToken}` } 
                 });
         
                 // Handle response
@@ -170,8 +170,8 @@
                 setSelectedMembers([]);
                 setIsUserModalOpen(false);
             } catch (error) {
-                const errorMessage = error.response?.data?.message || error.message || 'An error occurred while adding members.';
-                console.error('Error adding members:', errorMessage);
+                    const errorMessage = error.response?.data?.message || error.message || 'An error occurred while adding members.';
+                    console.error('Error adding members:', errorMessage);
                 setError(errorMessage); // Set error message to state
             }
         };

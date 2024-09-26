@@ -66,7 +66,18 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
 
   const fetchProjectDetails = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/users/sa-getnewproject/${projectId}`);
+      const user = JSON.parse(localStorage.getItem('user'));
+
+      const token = user?.accessToken;
+
+      if (!token) {
+        throw new Error('No access token found. Please log in again.');
+    }
+    const response = await axios.get(`http://localhost:5000/api/users/sa-getnewproject/${projectId}`, {
+      headers: {
+          Authorization: `Bearer ${token}`  
+      }
+  });
       setProject(response.data);
     } catch (error) {
       console.error('Error fetching project details:', error);
@@ -75,12 +86,13 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/users/members-superadmins');
-      setMembersList(response.data);
+      const response = await axios.get(`http://localhost:5000/api/users/get-assignee?projectId=${projectId}`);
+      setMembersList(response.data.invitedUsers); // Assuming the response structure
     } catch (error) {
       console.error('Error fetching users:', error);
     }
   };
+  
 
   const handleSaveattachment = async (file) => {
     const formData = new FormData();
@@ -106,14 +118,14 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
       alert('Please fill in all fields before submitting.');
       return;
     }
-
+  
     if (new Date(dueDate) < new Date(startDate)) {
       alert('Due Date cannot be earlier than Start Date.');
       return;
     }
-
+  
     let uploadedImages = [];
-
+  
     // Upload selected files to Cloudinary
     for (const file of selectedFiles) {
       try {
@@ -128,17 +140,17 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
         return;
       }
     }
-
+  
     try {
-      const assigneeIds = selectedName.split(', ').map(async (name) => {
-        const userResponse = await axios.get(`http://localhost:5000/api/users/findByUsername/${name}`);
-        return userResponse.data._id;
+      const assigneeIds = selectedName.split(', ').map(name => {
+        const user = membersList.find(member => member.username === name);
+        return user?.id;
       });
-
+  
       const newTask = {
         taskName,
         objectives,
-        assignee: await Promise.all(assigneeIds),
+        assignee: assigneeIds,
         status,
         priority,
         startDate,
@@ -148,11 +160,11 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
         questionUpdate: question,
         project: projectId,
       };
-
+  
       const response = await axios.post('http://localhost:5000/api/users/sa-task', newTask);
       console.log('Task created:', response.data);
       onTaskSubmit(newTask);
-
+  
       // Clear the fields
       setTaskName('');
       setDescription('');
@@ -165,14 +177,14 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
       setQuestion('');
       setSelectedFiles([]);
       onClose();
-
+  
     } catch (error) {
       setLoading(false);
       console.error('Error saving task:', error);
       alert('Failed to save task.');
     }
   };
-
+  
   const toggleUserNameVisibility = () => {
     setIsUserNameModalOpen(true);
   };
@@ -181,6 +193,7 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
     const memberNames = members.map(member => member.username).join(', ');
     setSelectedName(memberNames);  
   };
+  
 
   const handleClickFileInput = () => {
     fileInputRef.current.click();

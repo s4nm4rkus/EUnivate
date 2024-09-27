@@ -1,7 +1,7 @@
-import Product from "../models/addProducts.js";
-import Event from "../models/addEvents.js";
-import Project from "../models/addProjects.js";
-import Quotation from "../models/quotationModel.js";
+import Product from "../../models/Admin/addProducts.js";
+import Event from "../../models/Admin/addEvents.js";
+import Project from "../../models/Admin/addProjects.js";
+import Quotation from "../../models/SuperAdmin/quotationModel.js";
 
 export const getDashboardStats = async (req, res) => {
     try {

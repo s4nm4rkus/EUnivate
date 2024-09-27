@@ -1,5 +1,5 @@
 import express from 'express';
-import { getMessages, sendMessage, updateMessage, deleteMessage } from '../controllers/chatMessageController.js';
+import { getMessages, sendMessage, updateMessage, deleteMessage } from '../controllers/SuperAdmin/Message/chatMessageController.js';
 
 const router = express.Router();
 

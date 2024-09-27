@@ -1,4 +1,4 @@
-import Quotation from "../models/quotationModel.js";
+import Quotation from "../../models/SuperAdmin/quotationModel.js";
 
 // Get all quotations
 export const getQuotations = async (req, res) => {

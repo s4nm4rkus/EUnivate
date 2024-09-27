@@ -1,6 +1,6 @@
-import Invited from "../models/saInvitedMember.js";
-import Project from "../models/saNewProject.js";
-import User from "../models/userModels.js";
+import Invited from "../../../models/SuperAdmin/saInvitedMember.js";
+import Project from "../../../models/SuperAdmin/saNewProject.js";
+import User from "../../../models/Client/userModels.js";
 
 export const addMemberToProject = async (req, res) => {
     const { projectId, users } = req.body;

@@ -4,7 +4,7 @@ import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
 import cors from 'cors';
 import chatMessageRoutes from './routes/chatMessageRoutes.js'; // Ensure this path is correct
-import { confirmQuotationEmail } from './controllers/quotationController.js'; // Adjust the path as needed
+import { confirmQuotationEmail } from './controllers/Client/quotationController.js'; // Adjust the path as needed
 
 dotenv.config();
 connectDB();

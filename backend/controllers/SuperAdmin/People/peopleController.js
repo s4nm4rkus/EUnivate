@@ -1,8 +1,8 @@
-import User from '../models/userModels.js';
+import User from '../../../models/Client/userModels.js';
 import mongoose from 'mongoose';
-import sendEmail from '../utils/sendEmail.js';
-import InviteMember from '../models/saInvitedMember.js';
-import Project from '../models/addProjects.js';// Import the Project model
+import sendEmail from '../../../utils/sendEmail.js';
+import InviteMember from '../../../models/SuperAdmin/saInvitedMember.js';
+import Project from '../../../models/Admin/addProjects.js';// Import the Project model
 // Fetch all users
 export const getUsers = async (req, res) => {
     try {

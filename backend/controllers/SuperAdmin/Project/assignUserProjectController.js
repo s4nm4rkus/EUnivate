@@ -1,5 +1,5 @@
-import User from "../models/userModels.js";
-import Project from "../models/saNewProject.js";
+import User from "../../../models/Client/userModels.js";
+import Project from "../../../models/SuperAdmin/saNewProject.js";
 
 export const assignProjectToUser = async (req, res) => {
     const { userId, projectId, updateData } = req.body; // Assuming updateData is the new data for the project

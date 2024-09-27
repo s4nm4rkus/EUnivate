@@ -1,8 +1,8 @@
-import User from '../models/userModels.js';
+import User from '../../models/Client/userModels.js';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
-import { generateAccessToken, generateRefreshToken } from '../utils/jwtUtils.js';
+import { generateAccessToken, generateRefreshToken } from '../../utils/jwtUtils.js';
 
 // Generate an OTP for 2FA with numbers only
 const generateNumericOtp = (length) => {

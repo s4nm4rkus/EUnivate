@@ -1,6 +1,6 @@
-import User from '../models/userModels.js';
-import { generateAccessToken, generateRefreshToken } from '../utils/jwtUtils.js';
-import sendEmail from '../utils/sendEmail.js';
+import User from '../../models/Client/userModels.js';
+import { generateAccessToken, generateRefreshToken } from '../../utils/jwtUtils.js';
+import sendEmail from '../../utils/sendEmail.js';
 
 // Controller to verify OTP during two-factor authentication
 export const verifyTwoFactorAuth = async (req, res) => {

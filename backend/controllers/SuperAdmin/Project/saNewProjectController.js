@@ -1,6 +1,5 @@
-import SaNewProject from '../models/saNewProject.js';
-import saAddTask from '../models/saAddTask.js'; 
-import User from '../models/userModels.js';
+import SaNewProject from '../../../models/SuperAdmin/saNewProject.js';
+import User from '../../../models/Client/userModels.js';
 
 
 

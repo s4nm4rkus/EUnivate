@@ -1,8 +1,8 @@
-import User from '../models/userModels.js';
+import User from '../../models/Client/userModels.js';
 import bcrypt from 'bcrypt';
 
-import sendEmail from '../utils/sendEmail.js'; 
-import { generateRefreshToken, generateAccessToken } from '../utils/jwtUtils.js';
+import sendEmail from '../../utils/sendEmail.js'; 
+import { generateRefreshToken, generateAccessToken } from '../../utils/jwtUtils.js';
 
 
 const generateNumericOtp = (length) => {

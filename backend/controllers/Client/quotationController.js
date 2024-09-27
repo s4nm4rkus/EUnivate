@@ -1,8 +1,8 @@
-import Quotation from '../models/quotationModel.js';
-import quotationTokenModel from "../models/quotationTokenModel.js";
+import Quotation from '../../models/SuperAdmin/quotationModel.js';
+import quotationTokenModel from "../../models/SuperAdmin/quotationTokenModel.js";
 import nodemailer from 'nodemailer';
 import crypto from "crypto";
-import verifyQuotationEmail from '../utils/jwtUtils.js';
+import verifyQuotationEmail from '../../utils/jwtUtils.js';
 
 
 // Create and save quotation, generate token, and send verification email

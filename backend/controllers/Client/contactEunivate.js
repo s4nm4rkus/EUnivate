@@ -1,4 +1,4 @@
-import userMessage from '../models/userMessage.js';
+import userMessage from '../../models/SuperAdmin/userMessage.js';
 import nodemailer from 'nodemailer';
 
 // Controller to handle contact requests

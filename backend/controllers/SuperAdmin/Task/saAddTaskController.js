@@ -1,6 +1,6 @@
-import saAddTask from '../models/saAddTask.js'; 
-import Project from '../models/saNewProject.js';
-
+import saAddTask from '../../../models/SuperAdmin/saAddTask.js'; 
+import Project from '../../../models/SuperAdmin/saNewProject.js';
+import saInvitedMember from '../../../models/SuperAdmin/saInvitedMember.js';
 //getAddedMembers
   export const getAddedMembers = async (req, res) => {
     try {

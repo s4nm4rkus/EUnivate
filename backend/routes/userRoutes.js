@@ -1,31 +1,27 @@
   import express from 'express';
 
-  import { createQuotation, confirmQuotationEmail, checkVerificationStatus } from '../controllers/quotationController.js'
+  import { createQuotation, confirmQuotationEmail, checkVerificationStatus } from '../controllers/Client/quotationController.js'
   import upload from '../middlewares/multerMiddleware.js';
-  import {createProduct, getProducts, deleteProduct, updateProduct  } from '../controllers/addProductsController.js'
-  import { updateProject, deleteProject, getProjects, createProject} from '../controllers/addProjectsController.js';
-  import { getDashboardStats } from '../controllers/DashboardController.js';
-  import { createSaNewProject, getAllProjects, getProjectById, inviteUsersToProject } from '../controllers/saNewProjectController.js';
-  import {createUser } from '../controllers/userController.js';
-  import { loginUser, forgotPassword, resetPassword } from '../controllers/authController.js';
-  import {verifyLoginOtp, verifyTwoFactorAuth, resendOtp } from '../controllers/adminAuthentication.js';
+  import {createProduct, getProducts, deleteProduct, updateProduct  } from '../controllers/AdminControllers/addProductsController.js'
+  import { updateProject, deleteProject, getProjects, createProject} from '../controllers/AdminControllers/addProjectsController.js';
+  import { getDashboardStats } from '../controllers/AdminControllers/DashboardController.js';
+  import { createSaNewProject, getAllProjects, getProjectById, inviteUsersToProject } from '../controllers/SuperAdmin/Project/saNewProjectController.js';
+  import {createUser } from '../controllers/UserAccounts/userController.js'
+  import { loginUser, forgotPassword, resetPassword } from '../controllers/UserAccounts/authController.js';
+  import {verifyLoginOtp, verifyTwoFactorAuth, resendOtp } from '../controllers/SuperAdmin/adminAuthentication.js';
   import { refreshToken } from '../utils/jwtUtils.js';
   import { protect, verifySuperAdmin } from '../middlewares/middleware.js';
-  import { ContactEunivate } from '../controllers/contactEunivate.js';
-  import { updateUser, updateUserPassword } from '../controllers/updateUserInformation.js';
-  import { inviteUsers, updateUserRole, getInvitedUsers, removeInvitedMember, getUsers} from '../controllers/peopleController.js';
-  import { createEvent, getEvents, updateEvent, deleteEvent } from '../controllers/addEventsController.js';
-  import { getQuotations, deleteQuotation, checkNotifications } from '../controllers/getQuotationAdminController.js';
-  import { getAddedMembers, createTask, getTasks, getTaskById, updateTaskStatusById, getTasksByProjectId, deleteTask } from '../controllers/saAddTaskController.js';
+  import { ContactEunivate } from '../controllers/Client/contactEunivate.js'
+  import { updateUser, updateUserPassword } from '../controllers/UserAccounts/updateUserInformation.js'
+  import { inviteUsers, updateUserRole, getInvitedUsers, removeInvitedMember, getUsers} from '../controllers/SuperAdmin/People/peopleController.js';
+  import { createEvent, getEvents, updateEvent, deleteEvent } from '../controllers/AdminControllers/addEventsController.js';
+  import { getQuotations, deleteQuotation, checkNotifications } from '../controllers/Client/getQuotationAdminController.js';
+  import { getAddedMembers, createTask, getTasks, getTaskById, updateTaskStatusById, getTasksByProjectId, deleteTask } from '../controllers/SuperAdmin/Task/saAddTaskController.js';
   import { findUserByUsername } from '../controllers/findUserNameIDController.js';
-  import { assignProjectToUser } from '../controllers/assignUserProjectController.js';
-  import { addMemberToProject } from '../controllers/sa-addMember.js';
-  // Not used any more but save on the future
-  // import { getInvitedMembersByUserId } from '../controllers/peopleController.js';
-  // import { getMembersAndSuperAdmins } from '../controllers/sa-addMember.js';
-    // import { sendCompletionEmail } from '../controllers/quotationController.js';
-  // router.post('/quotation/send-completion-email', sendCompletionEmail);
-// router.delete('/sa-newproject/:id', deleteProjectById);
+  import { assignProjectToUser } from '../controllers/SuperAdmin/Project/assignUserProjectController.js';
+  import { addMemberToProject } from '../controllers/SuperAdmin/Project/sa-addMember.js';
+
+
 const router = express.Router();
 
 // User Authentication Routes

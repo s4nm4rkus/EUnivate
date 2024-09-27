@@ -8,6 +8,10 @@ import StatusDropdown from './StatusDropdown';
 import PriorityDropdown from './PriorityDropdown';
 import AttachmentSection from './AttachmentSection';
 import Dates from './Dates';
+import BarLoading from '../Loading Style/Bar Loading/Barloader';
+import { toast, ToastContainer } from 'react-toastify'; // Importing toast and ToastContainer
+import 'react-toastify/dist/ReactToastify.css'; // Import the CSS for the toast notifications
+
 
 const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
   const [taskName, setTaskName] = useState('');
@@ -115,19 +119,22 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
   const handleSubmit = async () => {
     setLoading(true);
     if (!taskName || !startDate || !dueDate || !status || !priority || !selectedName) {
-      alert('Please fill in all fields before submitting.');
+      toast.error('Please fill in all fields before submitting.'); // Show error toast
+      setLoading(false);
       return;
     }
   
     if (new Date(dueDate) < new Date(startDate)) {
-      alert('Due Date cannot be earlier than Start Date.');
+      toast.error('Due Date cannot be earlier than Start Date.'); // Show error toast
+      setLoading(false);
       return;
     }
   
     let uploadedImages = [];
   
-    // Upload selected files to Cloudinary
-    for (const file of selectedFiles) {
+  
+     // Upload selected files to Cloudinary
+     for (const file of selectedFiles) {
       try {
         const result = await handleSaveattachment(file);
         uploadedImages.push({
@@ -136,7 +143,8 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
         });
       } catch (error) {
         console.error('Error uploading image:', error);
-        alert('Failed to upload one or more images.');
+        toast.error('Failed to upload one or more images.'); // Show error toast
+        setLoading(false);
         return;
       }
     }
@@ -164,6 +172,7 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
       const response = await axios.post('http://localhost:5000/api/users/sa-task', newTask);
       console.log('Task created:', response.data);
       onTaskSubmit(newTask);
+      toast.success('Task submitted successfully!'); // Show success toast
   
       // Clear the fields
       setTaskName('');
@@ -181,7 +190,7 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
     } catch (error) {
       setLoading(false);
       console.error('Error saving task:', error);
-      alert('Failed to save task.');
+      toast.error('Failed to save task.'); // Show error toast
     }
   };
   
@@ -315,14 +324,15 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
         </div>
 
         <div className="flex justify-end space-x-4 mt-4">
-          <button
-            onClick={handleSubmit}
-            className="bg-red-600 w-full text-white px-4 py-2 rounded hover:bg-red-700"
-            
-          >
-                  {loading ? 'Submitting ...' : 'Submit'}
-          </button>
-        </div>
+  <button
+    onClick={handleSubmit}
+    className="bg-red-600 w-full text-white px-4 py-2 rounded hover:bg-red-700 flex justify-center items-center"
+    disabled={loading}
+  >
+    {loading ? <BarLoading  /> : 'Submit'}
+  </button>
+</div>
+
         {isUserNameModalOpen && (
           <UserNameModal
             isOpen={isUserNameModalOpen}
@@ -332,6 +342,17 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
           />
         )}
       </div>
+      <ToastContainer 
+        position="top-left" // Set the position for the toast notifications
+        autoClose={5000} // Duration before the toast auto-closes
+        hideProgressBar={false} // Show the progress bar
+        newestOnTop={false} // Show newest toast on top
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>,
     document.body
   );

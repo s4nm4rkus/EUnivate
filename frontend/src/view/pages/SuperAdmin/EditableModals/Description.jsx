@@ -10,7 +10,16 @@ const Description = ({ description, isEditing, onEdit, onSave }) => {
 
   return (
     <div className="mb-4">
-      <div className="text-gray-500 font-semibold">Description:</div>
+      <div className="text-gray-500 font-semibold flex justify-between items-center">
+        <span>Description:</span>
+        {!isEditing && (
+          <FaEdit
+            className="cursor-pointer text-gray-500 hover:text-gray-700"
+            size={18}
+            onClick={onEdit}
+          />
+        )}
+      </div>
       {isEditing ? (
         <div>
           <textarea
@@ -26,14 +35,7 @@ const Description = ({ description, isEditing, onEdit, onSave }) => {
           </button>
         </div>
       ) : (
-        <div className="relative">
-          <p className="mt-2 text-gray-500 text-sm">{description}</p>
-          <FaEdit
-            className="absolute top-0 right-0 cursor-pointer text-gray-500 hover:text-gray-700"
-            size={18}
-            onClick={onEdit}
-          />
-        </div>
+        <p className="mt-2 text-gray-500 text-sm">{description}</p>
       )}
     </div>
   );

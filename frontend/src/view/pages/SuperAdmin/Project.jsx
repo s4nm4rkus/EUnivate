@@ -273,7 +273,7 @@ const Project = () => {
   </button>
   <button
     onClick={closeModal}
-    className="bg-gray-00 text-white px-8 py-3 rounded-md shadow hover:bg-gray-600 w-full flex items-center justify-center"
+    className="bg-gray-500 text-white px-8 py-3 rounded-md shadow hover:bg-gray-600 w-full flex items-center justify-center"
   >
     Close
   </button>

@@ -228,6 +228,22 @@ const handleSaveDescription = async () => {
     }
   };
 
+    const handleAddAssignee = (newAssignee) => {
+    if (!editedAssignees.some(assignee => assignee._id === newAssignee._id)) {
+      setEditedAssignees([...editedAssignees, newAssignee]);
+    }
+  };
+
+  const handleRemoveAssignee = (assigneeToRemove) => {
+    const updatedAssignees = editedAssignees.filter(assignee => assignee._id !== assigneeToRemove._id);
+    setEditedAssignees(updatedAssignees);
+  };
+
+  const handleSaveAssignees = async () => {
+    const updatedTask = { ...task, assignee: editedAssignees.map(assignee => assignee._id) };
+    onUpdateTask(updatedTask);
+    await updateTaskInDatabase(updatedTask);
+  };
   return (
     <Modal
     isOpen={isOpen}
@@ -240,7 +256,7 @@ const handleSaveDescription = async () => {
 
       <div className="flex items-center mb-4">
         <div className={`w-6 h-6 rounded-full flex items-center justify-center ${task.status === 'Done' ? 'bg-green-500' : 'bg-gray-300'}`}>
-          {task.status === 'Done' ? <FaCheckCircle className="text-white" size={16} /> : <FaCircle className="text-gray-600" size={16} />}
+          {task.status === 'Done' ? <FaCheckCircle className="text-white" size={20} /> : <FaCircle className="text-white" size={20} />}
         </div>
         <div className="ml-2">
           <h2 className="text-sm text-gray-500 font-semibold">{projectName}</h2>

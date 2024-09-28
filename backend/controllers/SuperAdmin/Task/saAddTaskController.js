@@ -36,69 +36,76 @@ import saInvitedMember from '../../../models/SuperAdmin/saInvitedMember.js';
 
 
        // Create Task Controller
-        export const createTask = async (req, res) => {
-          try {
-            const {
-               taskName, 
-               assignee, 
-               startDate, 
-               dueDate, 
-               priority, 
-               status, 
-               description, 
-               objectives, 
-               questionUpdate, 
-               attachment,
-               project 
-              } = req.body;
-
-            // Fetch invited users for the project
-            const invitedUsers = await saInvitedMember.find({ project }).select('userId');
-            const invitedUserIds = invitedUsers.map(user => user.userId.toString());
-
-            // Check if all assignees are invited users
-            const invalidAssignees = assignee.filter(userId => !invitedUserIds.includes(userId.toString()));
-
-            if (invalidAssignees.length > 0) {
-              return res.status(400).json({
-                success: false,
-                message: 'Some assignees are not invited members of this project.',
-                invalidAssignees
-              });
-            }
-
-            // Create a new task document
-            const newTask = new saAddTask({
-              taskName,
-              assignee,
-              startDate,
-              dueDate,
-              priority,
-              status,
-              description,
-              objectives,
-              questionUpdate,
-              attachment,
-              project,
-            });
-
-            // Save to the database
-            const savedTask = await newTask.save();
-
-            res.status(201).json({
-              success: true,
-              message: 'Task created successfully!',
-              data: savedTask
-            });
-          } catch (error) {
-            console.error(error);
-            res.status(500).json({
+       export const createTask = async (req, res) => {
+        try {
+          const {
+            taskName, 
+            assignee, 
+            startDate, 
+            dueDate, 
+            priority, 
+            status, 
+            description, 
+            objectives,  // Array of { text: String, done: Boolean }
+            questionUpdate, 
+            attachment,
+            project 
+          } = req.body;
+      
+          // Fetch invited users for the project
+          const invitedUsers = await saInvitedMember.find({ project }).select('userId');
+          const invitedUserIds = invitedUsers.map(user => user.userId.toString());
+      
+          // Check if all assignees are invited users
+          const invalidAssignees = assignee.filter(userId => !invitedUserIds.includes(userId.toString()));
+      
+          if (invalidAssignees.length > 0) {
+            return res.status(400).json({
               success: false,
-              message: 'Server Error. Could not create task.',
-              error: error.message
+              message: 'Some assignees are not invited members of this project.',
+              invalidAssignees
             });
           }
-        };
+      
+          // Prepare objectives with the default `done` status as false if not provided
+          const preparedObjectives = objectives.map(obj => ({
+            text: obj.text,
+            done: obj.done || false
+          }));
+      
+          // Create a new task document
+          const newTask = new saAddTask({
+            taskName,
+            assignee,
+            startDate,
+            dueDate,
+            priority,
+            status,
+            description,
+            objectives: preparedObjectives,
+            questionUpdate,
+            attachment,
+            project,
+          });
+      
+          // Save to the database
+          const savedTask = await newTask.save();
+      
+          res.status(201).json({
+            success: true,
+            message: 'Task created successfully!',
+            data: savedTask
+          });
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({
+            success: false,
+            message: 'Server Error. Could not create task.',
+            error: error.message
+          });
+        }
+      };
+      
 
         // Get All Tasks Controller
         export const getTasks = async (req, res) => {

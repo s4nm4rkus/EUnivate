@@ -20,8 +20,18 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, onUpdateTask }) =
   const [isEditingTaskName, setIsEditingTaskName] = useState(false);
   const [editedTaskName, setEditedTaskName] = useState(task.taskName);
   const [showSaveButton, setShowSaveButton] = useState(false);
+  const [isEditingStartDate, setIsEditingStartDate] = useState(false);
+  const [isEditingDueDate, setIsEditingDueDate] = useState(false);
+  const [showSaveStartDateButton, setShowSaveStartDateButton] = useState(false);
+  const [showSaveDueDateButton, setShowSaveDueDateButton] = useState(false);
+  const [selectedPriority, setSelectedPriority] = useState(task.priority);  // Store selected priority
+  const [selectedStatus, setSelectedStatus] = useState(task.status);      
   const [showPriorityDropdown, setShowPriorityDropdown] = useState(false);
-  const [showStatusDropdown, setShowStatusDropdown] = useState(false);  
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const [isEditingPriority, setIsEditingPriority] = useState(false);
+  const [isEditingStatus, setIsEditingStatus] = useState(false);
+  const [showSavePriorityButton, setShowSavePriorityButton] = useState(false);
+  const [showSaveStatusButton, setShowSaveStatusButton] = useState(false);
 
   const handleTaskNameClick = () => {
     setIsEditingTaskName(true);
@@ -57,11 +67,32 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, onUpdateTask }) =
     setIsEditingTaskName(false);
   };
 
+  const handleSaveStartDate = () => {
+    const updatedTask = { ...task, startDate };
+    onUpdateTask(updatedTask); // Update the UI state
+    updateTaskInDatabase(updatedTask); // Send update to the backend
+    setIsEditingStartDate(false);
+    setShowSaveStartDateButton(false);
+};
+
+const handleSaveDueDate = () => {
+    const updatedTask = { ...task, dueDate };
+    onUpdateTask(updatedTask); // Update the UI state
+    updateTaskInDatabase(updatedTask); // Send update to the backend
+    setIsEditingDueDate(false);
+    setShowSaveDueDateButton(false);
+};
+
   const handleTaskNameChange = (e) => {
     setEditedTaskName(e.target.value);
     setShowSaveButton(true); // Show save button when input changes
   };
-
+  const handleSavePriority = () => {
+    const updatedTask = { ...task, priority: task.priority };
+    onUpdateTask(updatedTask); // Update the UI state
+    updateTaskInDatabase(updatedTask); // Send update to the backend
+    setShowSavePriorityButton(false);
+  };
   const handlePriorityClick = () => {
     setShowPriorityDropdown(!showPriorityDropdown);
   };
@@ -69,8 +100,10 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, onUpdateTask }) =
   const handlePriorityChange = (newPriority) => {
     const updatedTask = { ...task, priority: newPriority };
     onUpdateTask(updatedTask);
+    setShowSavePriorityButton(true);
     setShowPriorityDropdown(false);
   };
+
 
   const priorities = [
     { label: 'Easy', value: 'easy', color: 'text-green-500' },
@@ -86,6 +119,7 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, onUpdateTask }) =
     { label: 'Backlog', value: 'backlog' }
   ];
 
+
   const handleStatusClick = () => {
     setShowStatusDropdown(!showStatusDropdown);
   };
@@ -93,18 +127,25 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, onUpdateTask }) =
   const handleStatusChange = (newStatus) => {
     const updatedTask = { ...task, status: newStatus };
     onUpdateTask(updatedTask);
+    setShowSaveStatusButton(true);
     setShowStatusDropdown(false);
+  };
+  const handleSaveStatus = () => {
+    const updatedTask = { ...task, status: task.status };
+    onUpdateTask(updatedTask); // Update the UI state
+    updateTaskInDatabase(updatedTask); // Send update to the backend
+    setShowSaveStatusButton(false);
   };
 
   const handleDateChange = (dateType, date) => {
     if (dateType === 'start') {
-      setStartDate(date);
-      onUpdateTask({ ...task, startDate: date });
+        setStartDate(date);
+        setShowSaveStartDateButton(true); // Show save button when date changes
     } else {
-      setDueDate(date);
-      onUpdateTask({ ...task, dueDate: date });
+        setDueDate(date);
+        setShowSaveDueDateButton(true); // Show save button when date changes
     }
-  };
+};
 
   const handleFileUpload = (event) => {
     const files = Array.from(event.target.files);
@@ -219,11 +260,12 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, onUpdateTask }) =
           </div>
         </div>
 
+
         {/* Assignees */}
         <div className="mb-4 flex items-center">
           <strong className="mr-2 text-gray-500 font-semibold">Assignees:</strong>
           <div className='flex -space-x-2'> 
-            {task.assignees && task.assignees.map((member, index) => (
+            {task.assignee && task.assignee.map((member, index) => (
               <img 
                 key={index} 
                 src={member.profilePicture} 
@@ -235,37 +277,54 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, onUpdateTask }) =
           </div>
         </div>
 
-        {/* Dates */}
-        <div className="mb-4 flex items-center text-gray-500">
-          <div className='text-gray-500 font-semibold'>Start Date:</div>
-          <DatePicker
-            selected={startDate}
-            onChange={(date) => handleDateChange('start', date)}
-            className="ml-2 p-1 bg-transparent" 
-            dateFormat="MM/dd/yyyy"
-            popperClassName="bg-white"
-          />
-        </div>
 
-        <div className="mb-4 flex items-center text-gray-500">
-          <div className='text-gray-500 font-semibold'>Due Date:</div>
-          <DatePicker
-            selected={dueDate}
-            onChange={(date) => handleDateChange('due', date)}
-            className="ml-2 p-1 bg-transparent" 
-            dateFormat="MM/dd/yyyy"
-            popperClassName="bg-white"
-          />
-        </div>
+            {/* Start Date */}
+          <div className="mb-4 flex items-center text-gray-500 relative">
+              <div className='text-gray-500 font-semibold'>Start Date:</div>
+              <DatePicker
+                  selected={startDate}
+                  onChange={(date) => handleDateChange('start', date)}
+                  className="ml-2 p-1 bg-transparent"
+                  dateFormat="MM/dd/yyyy"
+                  popperClassName="bg-white"
+              />
+              {showSaveStartDateButton && (
+                  <button
+                      className="bg-red-500 text-white py-1 px-2 rounded ml-2"
+                      onClick={handleSaveStartDate}
+                  >
+                      Save
+                  </button>
+              )}
+          </div>
 
-        {/* Priority */}
-        <div className="mb-4 flex items-center text-gray-500 relative">
+          {/* Due Date */}
+          <div className="mb-4 flex items-center text-gray-500 relative">
+              <div className='text-gray-500 font-semibold'>Due Date:</div>
+              <DatePicker
+                  selected={dueDate}
+                  onChange={(date) => handleDateChange('due', date)}
+                  className="ml-2 p-1 bg-transparent"
+                  dateFormat="MM/dd/yyyy"
+                  popperClassName="bg-white"
+              />
+              {showSaveDueDateButton && (
+                  <button
+                      className="bg-red-500 text-white py-1 px-2 rounded ml-2"
+                      onClick={handleSaveDueDate}
+                  >
+                      Save
+                  </button>
+              )}
+          </div>
+
+
+   {/* Priority */}
+   <div className="mb-4 flex items-center text-gray-500 relative">
           <div className="text-gray-500 font-semibold">Priority:</div>
           <div className="ml-9 flex items-center cursor-pointer" onClick={handlePriorityClick}>
-            <FaFlag className={getPriorityColor(task.priority)} />
-            <span className={`ml-2 ${getPriorityColor(task.priority)}`}>
-              {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-            </span>
+            <FaFlag className={getPriorityColor(selectedPriority)} /> {/* Updated to selectedPriority */}
+            <span className={`ml-2 ${getPriorityColor(selectedPriority)}`}>{selectedPriority.charAt(0).toUpperCase() + selectedPriority.slice(1)}</span>
           </div>
 
           {showPriorityDropdown && (
@@ -284,15 +343,18 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, onUpdateTask }) =
               </ul>
             </div>
           )}
+          {showSavePriorityButton && (
+            <button className="bg-red-500 text-white py-1 px-2 rounded ml-2" onClick={handleSavePriority}>
+              Save
+            </button>
+          )}
         </div>
 
         {/* Status */}
         <div className="mb-4 flex items-center text-gray-500 relative">
           <div className="text-gray-500 font-semibold">Status:</div>
           <div className="ml-9 flex items-center cursor-pointer" onClick={handleStatusClick}>
-            <span className="ml-2">
-              {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
-            </span>
+            <span className="ml-2">{selectedStatus.charAt(0).toUpperCase() + selectedStatus.slice(1)}</span> {/* Updated to selectedStatus */}
           </div>
 
           {showStatusDropdown && (
@@ -310,7 +372,13 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, onUpdateTask }) =
               </ul>
             </div>
           )}
+          {showSaveStatusButton && (
+            <button className="bg-red-500 text-white py-1 px-2 rounded ml-2" onClick={handleSaveStatus}>
+              Save
+            </button>
+          )}
         </div>
+
 
         {/* Description */}
         <div className="mb-4">

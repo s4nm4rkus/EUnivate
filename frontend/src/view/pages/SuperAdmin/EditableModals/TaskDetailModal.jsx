@@ -4,6 +4,7 @@ import { FaTimes, FaCircle, FaUser, FaFlag, FaEdit, FaTrash, FaPlus, FaCheckCirc
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
+import { io } from 'socket.io-client';
 import UserNameModal from '../KanbanModals/UserNameModal';
 
 
@@ -59,206 +60,214 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpda
   //SaveButton
   const [showSaveButton, setShowSaveButton] = useState(false);
 
+  //Socket.io
+  const socket = io('http://localhost:5000'); // Replace with your server URL
+
+    const handleTaskNameClick = () => {
+      setIsEditingTaskName(true);
+      setShowSaveButton(false); // Hide save button initially
+    };
 
 
-  const handleTaskNameClick = () => {
-    setIsEditingTaskName(true);
-    setShowSaveButton(false); // Hide save button initially
-  };
+    useEffect(() => {
+      if (isOpen) {
+        fetchUsers();
+      }   
+       socket.on('objectiveUpdated', (updatedTask) => {
+        if (updatedTask._id === task._id) {
+          onUpdateTask(updatedTask);
+        }
+      });
+    
+      return () => {
+        socket.off('objectiveUpdated');
+      };
+    }, [isOpen, task._id]);
+
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/users/get-assignee?projectId=${projectId}`);
+        setMembersList(response.data.invitedUsers); // Adjust based on the response structure
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+
+    const handleAddAssignee = (members) => {
+      setEditedAssignees(members);
+      setIsUserNameModalOpen(false);
+    };
 
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchUsers();
-    }
-  }, [isOpen]);
+    const updateTaskInDatabase = async (updatedTask) => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/users/sa-tasks/${task._id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedTask),
+        });
 
-  const fetchUsers = async () => {
-    try {
-      const response = await axios.get(`http://localhost:5000/api/users/get-assignee?projectId=${projectId}`);
-      setMembersList(response.data.invitedUsers); // Adjust based on the response structure
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    }
-  };
+        const data = await response.json();
 
-  const handleAddAssignee = (members) => {
-    setEditedAssignees(members);
-    setIsUserNameModalOpen(false);
-  };
+        if (response.ok) {
+          console.log('Task updated successfully:', data);
+        } else {
+          console.error('Error updating task:', data.message);
+        }
+      } catch (error) {
+        console.error('Error updating task:', error);
+      }
+    };
+
+      const handleSaveTaskName = () => {
+        const updatedTask = { ...task, taskName: editedTaskName };
+        onUpdateTask(updatedTask); // Update the UI state
+        updateTaskInDatabase(updatedTask); // Send update to the backend
+        setIsEditingTaskName(false);
+      };
+
+      const handleSaveStartDate = () => {
+        const updatedTask = { ...task, startDate };
+        onUpdateTask(updatedTask); // Update the UI state
+        updateTaskInDatabase(updatedTask); // Send update to the backend
+        setIsEditingStartDate(false);
+        setShowSaveStartDateButton(false);
+    };
+
+    const handleSaveDueDate = () => {
+        const updatedTask = { ...task, dueDate };
+        onUpdateTask(updatedTask); // Update the UI state
+        updateTaskInDatabase(updatedTask); // Send update to the backend
+        setIsEditingDueDate(false);
+        setShowSaveDueDateButton(false);
+    };
+
+      const handleTaskNameChange = (e) => {
+        setEditedTaskName(e.target.value);
+        setShowSaveButton(true); // Show save button when input changes
+      };
+    const handleSavePriority = () => {
+      const updatedTask = { ...task, priority: selectedPriority };
+      onUpdateTask(updatedTask);
+      updateTaskInDatabase(updatedTask);
+      setShowSavePriorityButton(false);
+    };
+    const handlePriorityClick = () => {
+      setShowPriorityDropdown(!showPriorityDropdown);
+    };
+
+    const handlePriorityChange = (newPriority) => {
+      setSelectedPriority(newPriority);
+      setShowSavePriorityButton(true);
+      setShowPriorityDropdown(false);
+    };
 
 
-  const updateTaskInDatabase = async (updatedTask) => {
-    try {
-      const response = await fetch(`http://localhost:5000/api/users/sa-tasks/${task._id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedTask),
+
+
+    const handleStatusClick = () => {
+      setShowStatusDropdown(!showStatusDropdown);
+    };
+
+    const handleStatusChange = (newStatus) => {
+      setSelectedStatus(newStatus);
+      setShowSaveStatusButton(true);
+      setShowStatusDropdown(false);
+    
+      // Update the task's status in the UI immediately
+      const updatedTask = { ...task, status: newStatus };
+      onUpdateTask(updatedTask);
+    };
+
+    const handleSaveStatus = async () => {
+      const updatedTask = { ...task, status: selectedStatus };
+      console.log("Saving status:", updatedTask.status); // Debugging output
+      
+      // Update UI state
+      onUpdateTask(updatedTask);
+    
+      // Update the database
+      await updateTaskInDatabase(updatedTask);
+    
+      // Close save button
+      setShowSaveStatusButton(false);
+    };
+
+
+
+    const handleDateChange = (dateType, date) => {
+      if (dateType === 'start') {
+        setStartDate(date);
+        setShowSaveStartDateButton(true);
+      } else {
+        setDueDate(date);
+        setShowSaveDueDateButton(true);
+      }
+    };
+
+    const handleFileUpload = (event) => {
+      const files = Array.from(event.target.files);
+      const newFiles = [];
+      const newUrls = [];
+
+      files.forEach(file => {
+        const url = URL.createObjectURL(file);
+        newUrls.push(url);
+        newFiles.push(file);
       });
 
-      const data = await response.json();
+        setAttachmentPreviewUrls([...attachmentPreviewUrls, ...newUrls]);
+        setNewAttachmentFiles([...newAttachmentFiles, ...newFiles]);
+        setShowSaveAttachmentButton(true);
+      };
 
-      if (response.ok) {
-        console.log('Task updated successfully:', data);
-      } else {
-        console.error('Error updating task:', data.message);
+     const getPriorityColor = (priority) => {
+      switch (priority.toLowerCase()) {
+        case 'easy':
+          return 'text-green-500';
+        case 'medium':
+          return 'text-yellow-500';
+        case 'hard':
+          return 'text-red-500';
+        default:
+            return 'text-gray-500';
+        }
+      };
+
+      const handleEditClick = () => {
+        setIsEditing(true);
+      };
+
+      const handleEditDescription = () => {
+        setIsEditing(true);
+    };
+
+    const handleSaveDescription = async () => {
+        const updatedTask = { ...task, description: editedDescription };
+        console.log("Saving description:", updatedTask.description); // Debugging output
+        
+        // Update UI state
+        onUpdateTask(updatedTask);
+        const response = await updateTaskInDatabase(updatedTask);
+        // Update the database
+        await updateTaskInDatabase(updatedTask);
+      
+        // Stop editing mode
+        setIsEditing(false);
+    };
+
+
+    const handleAddObjective = () => {
+      if (newObjective) {
+        const updatedObjectives = [...task.objectives, { text: newObjective, done: false }];
+        onUpdateTask({ ...task, objectives: updatedObjectives });
+        updateTaskInDatabase({ ...task, objectives: updatedObjectives });
+        setNewObjective('');
+        setIsAddingObjective(false);
       }
-    } catch (error) {
-      console.error('Error updating task:', error);
-    }
-  };
-
-  const handleSaveTaskName = () => {
-    const updatedTask = { ...task, taskName: editedTaskName };
-    onUpdateTask(updatedTask); // Update the UI state
-    updateTaskInDatabase(updatedTask); // Send update to the backend
-    setIsEditingTaskName(false);
-  };
-
-  const handleSaveStartDate = () => {
-    const updatedTask = { ...task, startDate };
-    onUpdateTask(updatedTask); // Update the UI state
-    updateTaskInDatabase(updatedTask); // Send update to the backend
-    setIsEditingStartDate(false);
-    setShowSaveStartDateButton(false);
-};
-
-const handleSaveDueDate = () => {
-    const updatedTask = { ...task, dueDate };
-    onUpdateTask(updatedTask); // Update the UI state
-    updateTaskInDatabase(updatedTask); // Send update to the backend
-    setIsEditingDueDate(false);
-    setShowSaveDueDateButton(false);
-};
-
-  const handleTaskNameChange = (e) => {
-    setEditedTaskName(e.target.value);
-    setShowSaveButton(true); // Show save button when input changes
-  };
-  const handleSavePriority = () => {
-    const updatedTask = { ...task, priority: selectedPriority };
-    onUpdateTask(updatedTask);
-    updateTaskInDatabase(updatedTask);
-    setShowSavePriorityButton(false);
-  };
-  const handlePriorityClick = () => {
-    setShowPriorityDropdown(!showPriorityDropdown);
-  };
-
-  const handlePriorityChange = (newPriority) => {
-    setSelectedPriority(newPriority);
-    setShowSavePriorityButton(true);
-    setShowPriorityDropdown(false);
-  };
-
-
-
-
-  const handleStatusClick = () => {
-    setShowStatusDropdown(!showStatusDropdown);
-  };
-
-  const handleStatusChange = (newStatus) => {
-    setSelectedStatus(newStatus);
-    setShowSaveStatusButton(true);
-    setShowStatusDropdown(false);
-  
-    // Update the task's status in the UI immediately
-    const updatedTask = { ...task, status: newStatus };
-    onUpdateTask(updatedTask);
-  };
-
-  const handleSaveStatus = async () => {
-    const updatedTask = { ...task, status: selectedStatus };
-    console.log("Saving status:", updatedTask.status); // Debugging output
-    
-    // Update UI state
-    onUpdateTask(updatedTask);
-  
-    // Update the database
-    await updateTaskInDatabase(updatedTask);
-  
-    // Close save button
-    setShowSaveStatusButton(false);
-  };
-
-
-
-  const handleDateChange = (dateType, date) => {
-    if (dateType === 'start') {
-      setStartDate(date);
-      setShowSaveStartDateButton(true);
-    } else {
-      setDueDate(date);
-      setShowSaveDueDateButton(true);
-    }
-  };
-
-  const handleFileUpload = (event) => {
-    const files = Array.from(event.target.files);
-    const newFiles = [];
-    const newUrls = [];
-
-    files.forEach(file => {
-      const url = URL.createObjectURL(file);
-      newUrls.push(url);
-      newFiles.push(file);
-    });
-
-    setAttachmentPreviewUrls([...attachmentPreviewUrls, ...newUrls]);
-    setNewAttachmentFiles([...newAttachmentFiles, ...newFiles]);
-    setShowSaveAttachmentButton(true);
-  };
-
-  const getPriorityColor = (priority) => {
-    switch (priority.toLowerCase()) {
-      case 'easy':
-        return 'text-green-500';
-      case 'medium':
-        return 'text-yellow-500';
-      case 'hard':
-        return 'text-red-500';
-      default:
-        return 'text-gray-500';
-    }
-  };
-
-  const handleEditClick = () => {
-    setIsEditing(true);
-  };
-
-  const handleEditDescription = () => {
-    setIsEditing(true);
-};
-
-const handleSaveDescription = async () => {
-    const updatedTask = { ...task, description: editedDescription };
-    console.log("Saving description:", updatedTask.description); // Debugging output
-    
-    // Update UI state
-    onUpdateTask(updatedTask);
-    const response = await updateTaskInDatabase(updatedTask);
-    // Update the database
-    await updateTaskInDatabase(updatedTask);
-  
-    // Stop editing mode
-    setIsEditing(false);
-};
-  const handleDeleteObjective = (objective) => {
-    const updatedObjectives = task.objectives.filter(obj => obj !== objective);
-    onUpdateTask({ ...task, objectives: updatedObjectives });
-  };
-
-  const handleAddObjective = () => {
-    if (newObjective) {
-      const updatedObjectives = [...task.objectives, newObjective];
-      onUpdateTask({ ...task, objectives: updatedObjectives });
-      setNewObjective('');
-      setIsAddingObjective(false);
-    }
-  };
+    };
 
   // const handleDeleteAttachment = (attachmentUrl) => {
   //   const updatedAttachments = task.attachment.filter(att => att.url !== attachmentUrl);
@@ -292,6 +301,7 @@ const handleSaveDescription = async () => {
       }
     }
     
+    
     // Update the task with the new attachments
     const updatedTask = { ...task, attachment: updatedAttachments };
     onUpdateTask(updatedTask);
@@ -302,7 +312,39 @@ const handleSaveDescription = async () => {
     setShowSaveAttachmentButton(false);
   };
   
-
+  const handleToggleObjective = async (index) => {
+    const updatedObjectives = task.objectives.map((obj, i) => {
+      if (i === index) {
+        return { ...obj, done: !obj.done };
+      }
+      return obj;
+    });
+  
+    const updatedTask = { ...task, objectives: updatedObjectives };
+    onUpdateTask(updatedTask);
+  
+    try {
+      await updateTaskInDatabase(updatedTask);
+      socket.emit('objectiveUpdated', updatedTask); // Emit to server after updating
+    } catch (error) {
+      console.error('Failed to update objective:', error);
+    }
+  };
+  
+  const handleDeleteObjective = async (objective) => {
+    const updatedObjectives = task.objectives.filter(obj => obj !== objective);
+    const updatedTask = { ...task, objectives: updatedObjectives };
+  
+    onUpdateTask(updatedTask); // This will immediately update the UI
+  
+    try {
+      await updateTaskInDatabase(updatedTask);
+      socket.emit('objectiveUpdated', updatedTask); // Emit to server after updating
+    } catch (error) {
+      console.error('Failed to delete objective:', error);
+    }
+  };
+  
   
   const handleCommentSubmit = () => {
     if (comment.trim()) {
@@ -530,65 +572,59 @@ const handleSaveDescription = async () => {
 </div>
 
            {/* Objectives */}
-              <div className="mb-4">
-                <div className="mb-4 flex justify-between items-center">
-                  <div className="text-gray-500 font-semibold">Objectives:</div>
-                  <FaPlus className="cursor-pointer text-gray-500 hover:text-black" onClick={() => setIsAddingObjective(!isAddingObjective)} />
-                </div>
-                {task.objectives && task.objectives.length > 0 ? (
-                  <ul className="list-none">
-                    {task.objectives.map((objective, index) => (
-                      <li
-                        key={index}
-                        className={`mt-1 flex justify-between items-center text-sm ${
-                          objective.done ? 'text-gray-400' : 'text-black'
-                        }`}
-                      >
-                        {/* Render checkbox on the left side and handle the toggle */}
-                        <div
-                          className="flex items-center cursor-pointer p-2 rounded-lg"
-                          onClick={() => handleToggleObjective(index)}
-                          style={{ width: '100%' }}
-                        >
-                          {objective.done ? (
-                            <FaCheckSquare className="mr-2 text-green-500" size={16} />
-                          ) : (
-                            <FaRegSquare className="mr-2 text-gray-500" size={16} />
-                          )}
-                          {/* Underline and gray out if the objective is done */}
-                          <span
-                            className={`flex-1 ${
-                              objective.done ? 'line-through' : ''
-                            }`}
-                          >
-                            {objective.text}
-                          </span>
-                        </div>
-                        <FaTimes
-                          className="ml-2 cursor-pointer text-red-500 hover:text-red-700"
-                          onClick={() => handleDeleteObjective(objective)}
-                        />
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <span className="text-gray-500 text-sm">No objectives defined</span>
-                )}
-                {isAddingObjective && (
-                  <div className="mt-2 flex">
-                    <input
-                      type="text"
-                      className="w-full p-2 border border-gray-300 rounded text-sm"
-                      placeholder="New objective"
-                      value={newObjective}
-                      onChange={(e) => setNewObjective(e.target.value)}
-                    />
-                    <button className="ml-2 bg-red-700 text-white py-1 px-4 rounded text-sm" onClick={handleAddObjective}>
-                      Add
-                    </button>
+           <div className="mb-4">
+          <div className="mb-4 flex justify-between items-center">
+            <div className="text-gray-500 font-semibold">Objectives:</div>
+            <FaPlus className="cursor-pointer text-gray-500 hover:text-black" onClick={() => setIsAddingObjective(!isAddingObjective)} />
+          </div>
+          {task.objectives && task.objectives.length > 0 ? (
+            <ul className="list-none">
+              {task.objectives.map((objective, index) => (
+                <li
+                  key={index}
+                  className={`mt-1 flex justify-between items-center text-sm ${objective.done ? 'text-gray-400' : 'text-black'}`}
+                >
+                  <div
+                    className="flex items-center cursor-pointer p-2 rounded-lg"
+                    onClick={() => handleToggleObjective(index)}
+                    style={{ width: '100%' }}
+                  >
+                    {objective.done ? (
+                      <FaCheckSquare className="mr-2 text-green-500" size={16} />
+                    ) : (
+                      <FaRegSquare className="mr-2 text-gray-500" size={16} />
+                    )}
+                    <span
+                      className={`flex-1 ${objective.done ? 'line-through' : ''}`}
+                    >
+                      {objective.text}
+                    </span>
                   </div>
-                )}
-              </div>
+                  <FaTimes
+                    className="ml-2 cursor-pointer text-red-500 hover:text-red-700"
+                    onClick={() => handleDeleteObjective(objective)}
+                  />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <span className="text-gray-500 text-sm">No objectives defined</span>
+          )}
+          {isAddingObjective && (
+            <div className="mt-2 flex">
+              <input
+                type="text"
+                className="w-full p-2 border border-gray-300 rounded text-sm"
+                placeholder="New objective"
+                value={newObjective}
+                onChange={(e) => setNewObjective(e.target.value)}
+              />
+              <button className="ml-2 bg-red-700 text-white py-1 px-4 rounded text-sm" onClick={handleAddObjective}>
+                Add
+              </button>
+            </div>
+          )}
+        </div>
 
 
         {/* Attachments */}

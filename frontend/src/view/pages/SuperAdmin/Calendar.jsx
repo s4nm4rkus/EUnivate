@@ -39,28 +39,36 @@ const CustomToolbar = ({ onView, label }) => (
   </div>
 );
 
-const Calendar = ({ project }) => {
+const Calendar = ({ projectId }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [tasks, setTasks] = useState([]);
   const [events, setEvents] = useState([]);
-  const [selectedEvent, setSelectedEvent] = useState(null); // State for selected event
-  const [modalIsOpen, setModalIsOpen] = useState(false); // State for modal visibility
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [view, setView] = useState(Views.MONTH); // State for controlling the view
 
-  // Fetch tasks from local storage
   useEffect(() => {
-    if (project?.name) {
-      const storedTasks = JSON.parse(localStorage.getItem(`kanban-${project.name}`)) || [];
-      setTasks(storedTasks);
-    }
-  }, [project?.name]);
+    const fetchTasks = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/users/sa-tasks/${projectId}`);
+        const data = await response.json();
+        setTasks(data);
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      }
+    };
 
-  // Create calendar events from tasks
+    if (projectId) {
+      fetchTasks();
+    }
+  }, [projectId]);
+
   useEffect(() => {
     const newEvents = tasks.map((task) => ({
-      id: task.id,
+      id: task._id,
       title: task.taskName,
-      start: new Date(task.startDate), // Convert start date to Date object
-      end: new Date(task.dueDate),     // Convert due date to Date object
+      start: new Date(task.startDate),
+      end: new Date(task.dueDate),
       status: task.status,
     }));
     setEvents(newEvents);
@@ -76,25 +84,23 @@ const Calendar = ({ project }) => {
     setCurrentDate(newDate);
   };
 
-  // Helper to get the status color
   const getStatusColor = (status) => {
     switch (status) {
       case 'Ongoing':
-        return '#F59E0B'; // yellow-500
+        return '#F59E0B';
       case 'Done':
-        return '#10B981'; // green-500
+        return '#10B981';
       case 'Pending':
-        return '#6B7280'; // gray-500
+        return '#6B7280';
       case 'Todo':
-        return '#EC4899'; // pink-500
+        return '#EC4899';
       case 'Backlogs':
-        return '#EF4444'; // red-500
+        return '#EF4444';
       default:
-        return '#9CA3AF'; // gray-400
+        return '#9CA3AF';
     }
   };
 
-  // Event prop getter to apply custom styles
   const eventPropGetter = (event) => {
     const backgroundColor = getStatusColor(event.status);
     return {
@@ -104,52 +110,56 @@ const Calendar = ({ project }) => {
         opacity: 0.8,
         color: 'white',
         border: 'none',
-        height: '30px', // Smaller height for better visibility
+        height: '30px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: '0.75rem', // Smaller font size
-        zIndex: 0, // Ensure proper stacking of overlapping events
-        padding: '2px', // Add some padding to prevent overlapping text
+        fontSize: '0.75rem',
+        zIndex: 0,
+        padding: '2px',
       },
     };
   };
 
-  // Handle event click to open modal
   const handleEventClick = (event) => {
     setSelectedEvent(event);
     setModalIsOpen(true);
   };
 
-  // Close modal
   const closeModal = () => {
     setModalIsOpen(false);
     setSelectedEvent(null);
   };
 
+  const handleViewChange = (newView) => {
+    setView(newView);
+  };
+
   return (
     <div className="p-4">
       <div className="bg-white shadow-lg p-4 rounded-lg">
-        <div className="overflow-x-auto"> {/* Horizontal scroll wrapper */}
+        <div className="overflow-x-auto">
           <BigCalendar
             localizer={localizer}
             events={events}
             startAccessor="start"
             endAccessor="end"
-            style={{ height: 600, minWidth: '1000px' }} // Ensure minimum width for scrolling
+            style={{ height: 600, minWidth: '1000px' }}
             components={{
               toolbar: (props) => (
                 <CustomToolbar
                   {...props}
-                  label={moment(currentDate).format('MMMM YYYY')} // Display current month and year
+                  label={moment(currentDate).format('MMMM YYYY')}
+                  onView={handleViewChange} // Pass onView handler to the toolbar
                 />
               ),
             }}
-            view={Views.MONTH}
-            date={currentDate} // Use state to reflect current date
-            onNavigate={() => {}} // Empty handler
-            eventPropGetter={eventPropGetter} // Apply custom event styles
-            onSelectEvent={handleEventClick} // Handle event click
+            view={view} // Controlled view
+            date={currentDate}
+            onNavigate={() => {}}
+            onView={handleViewChange} // Handler for view changes
+            eventPropGetter={eventPropGetter}
+            onSelectEvent={handleEventClick}
           />
         </div>
       </div>
@@ -176,10 +186,10 @@ const Calendar = ({ project }) => {
         ) : (
           tasks.map((task) => (
             <div
-              key={task.id}
+              key={task._id}
               className="bg-white shadow-md rounded-lg p-4 mb-4 flex items-center"
             >
-              <FaCircle className={`mr-2`} style={{ color: getStatusColor(task.status) }} />
+              <FaCircle className="mr-2" style={{ color: getStatusColor(task.status) }} />
               <span className="mr-4 font-semibold">{task.taskName}</span>
               <span className="text-gray-500">
                 {task.startDate ? moment(task.startDate).format('MMM DD') : 'No start date'}
@@ -190,13 +200,12 @@ const Calendar = ({ project }) => {
         )}
       </div>
 
-      {/* Modal for event details */}
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
         contentLabel="Event Details"
-        className="bg-white p-6 rounded-lg shadow-lg w-1/3 mx-auto mt-20 relative z-50" // Ensure modal is on top
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-40" // Ensure overlay is behind modal
+        className="bg-white p-6 rounded-lg shadow-lg w-1/3 mx-auto mt-20 relative z-50"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-40"
       >
         {selectedEvent && (
           <div className="flex flex-col">

@@ -1,42 +1,88 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
-import { FaTimes, FaCircle, FaFlag, FaEdit, FaTrash, FaPlus, FaCheckCircle } from 'react-icons/fa';
+import { FaTimes, FaCircle, FaUser, FaFlag, FaEdit, FaTrash, FaPlus, FaCheckCircle } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import axios from 'axios';
+import UserNameModal from '../KanbanModals/UserNameModal';
 
-const TaskDetailModal = ({ isOpen, onClose, task, projectName, onUpdateTask }) => {
+
+
+const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpdateTask }) => {
   if (!task) return null;
 
   // State hooks for managing form inputs and other data
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedDescription, setEditedDescription] = useState(task.description);
-  const [newObjective, setNewObjective] = useState('');
-  const [newAttachmentUrl, setNewAttachmentUrl] = useState('');
-  const [comment, setComment] = useState('');
-  const [isAddingObjective, setIsAddingObjective] = useState(false);
-  const [commentsList, setCommentsList] = useState([]);
-  const [startDate, setStartDate] = useState(new Date(task.startDate));
-  const [dueDate, setDueDate] = useState(new Date(task.dueDate));
+  //taskname
   const [isEditingTaskName, setIsEditingTaskName] = useState(false);
   const [editedTaskName, setEditedTaskName] = useState(task.taskName);
-  const [showSaveButton, setShowSaveButton] = useState(false);
+
+  //Assignee
+  const [editedAssignees, setEditedAssignees] = useState(task.assignee || [])
+  const [membersList, setMembersList] = useState([]);
+  const [isUserNameModalOpen, setIsUserNameModalOpen] = useState(false);
+
+  //StartDate and DueDate
+  const [startDate, setStartDate] = useState(new Date(task.startDate));
+  const [dueDate, setDueDate] = useState(new Date(task.dueDate));
   const [isEditingStartDate, setIsEditingStartDate] = useState(false);
   const [isEditingDueDate, setIsEditingDueDate] = useState(false);
   const [showSaveStartDateButton, setShowSaveStartDateButton] = useState(false);
   const [showSaveDueDateButton, setShowSaveDueDateButton] = useState(false);
+
+  //Priority
   const [selectedPriority, setSelectedPriority] = useState(task.priority);  // Store selected priority
-  const [selectedStatus, setSelectedStatus] = useState(task.status);      
   const [showPriorityDropdown, setShowPriorityDropdown] = useState(false);
-  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
-  const [isEditingPriority, setIsEditingPriority] = useState(false);
-  const [isEditingStatus, setIsEditingStatus] = useState(false);
   const [showSavePriorityButton, setShowSavePriorityButton] = useState(false);
+
+  // Status
   const [showSaveStatusButton, setShowSaveStatusButton] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState(task.status); 
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false); 
+
+  //Description
+  const [editedDescription, setEditedDescription] = useState(task.description);
+  const [isEditing, setIsEditing] = useState(false);
+
+  //objectives
+  const [newObjective, setNewObjective] = useState('');
+  const [isAddingObjective, setIsAddingObjective] = useState(false);
+
+  //Attachment
+  const [newAttachmentUrl, setNewAttachmentUrl] = useState('');
+  const [comment, setComment] = useState('');
+  const [commentsList, setCommentsList] = useState([]);
+
+  //SaveButton
+  const [showSaveButton, setShowSaveButton] = useState(false);
+
+
 
   const handleTaskNameClick = () => {
     setIsEditingTaskName(true);
     setShowSaveButton(false); // Hide save button initially
   };
+
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchUsers();
+    }
+  }, [isOpen]);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/users/get-assignee?projectId=${projectId}`);
+      setMembersList(response.data.invitedUsers); // Adjust based on the response structure
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+
+  const handleAddAssignee = (members) => {
+    setEditedAssignees(members);
+    setIsUserNameModalOpen(false);
+  };
+
 
   const updateTaskInDatabase = async (updatedTask) => {
     try {
@@ -228,29 +274,15 @@ const handleSaveDescription = async () => {
     }
   };
 
-    const handleAddAssignee = (newAssignee) => {
-    if (!editedAssignees.some(assignee => assignee._id === newAssignee._id)) {
-      setEditedAssignees([...editedAssignees, newAssignee]);
-    }
-  };
 
-  const handleRemoveAssignee = (assigneeToRemove) => {
-    const updatedAssignees = editedAssignees.filter(assignee => assignee._id !== assigneeToRemove._id);
-    setEditedAssignees(updatedAssignees);
-  };
-
-  const handleSaveAssignees = async () => {
-    const updatedTask = { ...task, assignee: editedAssignees.map(assignee => assignee._id) };
-    onUpdateTask(updatedTask);
-    await updateTaskInDatabase(updatedTask);
-  };
   return (
     <Modal
     isOpen={isOpen}
     onRequestClose={onClose}
+    
     className="flex items-center justify-center"
     overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-end"
-  >
+     >
     <div className="bg-white rounded-lg shadow-lg p-6 w-96 h-[100vh] max-h-[100vh] overflow-y-auto relative">
       <FaTimes className="absolute top-4 right-4 cursor-pointer text-gray-600 hover:text-gray-800" size={20} onClick={onClose} />
 
@@ -276,6 +308,7 @@ const handleSaveDescription = async () => {
                 </button>
               )}
             </div>
+        
           ) : (
             <h2
               className="text-xl font-semibold text-gray-500 cursor-pointer"
@@ -289,19 +322,29 @@ const handleSaveDescription = async () => {
 
 
         {/* Assignees */}
-        <div className="mb-4 flex items-center">
-          <strong className="mr-2 text-gray-500 font-semibold">Assignees:</strong>
-          <div className='flex -space-x-2'> 
-            {task.assignee && task.assignee.map((member, index) => (
-              <img 
-                key={index} 
-                src={member.profilePicture} 
-                alt={member.name} 
-                className="w-8 h-8 rounded-full border-2 border-white" 
-                title={member.name} 
-              />
-            ))}
-          </div>
+                <div className="mb-4">
+          <button
+            className="flex items-center space-x-2 bg-transparent border-none outline-none focus:outline-none"
+            onClick={() => setIsUserNameModalOpen(true)}
+          >
+            <span className="text-gray-700 text-sm font-semibold flex justify-normal -space-x-4">Assignee</span>
+            {editedAssignees.length > 0 ? (
+              // Display the first assignee's profile image if available
+              editedAssignees[0].profilePicture.url ? (
+                <img
+                  src={editedAssignees[0].profilePicture.url}
+                  alt={editedAssignees[0].username}
+                  className="w-8 h-8 rounded-full border"
+                />
+              ) : (
+                // Fallback to FaUser icon if no profile image is available
+                <FaUser className="text-gray-500 text-lg bg-transparent rounded-lg border" />
+              )
+            ) : (
+              // If no assignee is selected, show the default "Assign to" text
+              <span className='text-sm text-gray-500'>Assign to</span>
+            )}
+          </button>
         </div>
 
 
@@ -548,9 +591,22 @@ const handleSaveDescription = async () => {
             )}
           </div>
         </div>
+        {isUserNameModalOpen && (
+          <UserNameModal
+            isOpen={isUserNameModalOpen}
+            onClose={() => setIsUserNameModalOpen(false)}
+            membersList={membersList}
+            onSelect={handleAddAssignee} 
+            
+          />
+        )}
+        
       </div>
+      
     </Modal>
+    
   );
+
 };
 
 export default TaskDetailModal;

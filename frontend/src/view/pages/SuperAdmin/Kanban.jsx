@@ -142,7 +142,7 @@ const Kanban = ({ projectId, projectName }) => {
             {task.assignee && task.assignee.map((member, index) => (
               <img
                 key={index}
-                src={member.profilePicture}
+                src={member.profilePicture?.url}
                 alt={member.name}
                 className="w-8 h-8 rounded-full border-2 border-white"
                 title={member.name}
@@ -210,6 +210,7 @@ const Kanban = ({ projectId, projectName }) => {
       task={selectedTask} 
       projectName={projectName} // Pass the project name here
       onUpdateTask={handleUpdateTask} // Pass the update task handler to the modal
+      projectId={projectId} 
     />
   </DndProvider>
   );

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
-import { FaTimes, FaCircle, FaUser, FaFlag, FaEdit, FaTrash, FaPlus, FaCheckCircle } from 'react-icons/fa';
+import { FaTimes, FaCircle, FaUser, FaFlag, FaEdit, FaTrash, FaPlus, FaCheckCircle, FaRegSquare, FaCheckSquare } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
@@ -303,6 +303,7 @@ const handleSaveDescription = async () => {
   };
   
 
+  
   const handleCommentSubmit = () => {
     if (comment.trim()) {
       const newComment = {
@@ -528,42 +529,68 @@ const handleSaveDescription = async () => {
   )}
 </div>
 
-        {/* Objectives */}
-        <div className="mb-4">
-          <div className="mb-4 flex justify-between items-center">
-            <div className="text-gray-500 font-semibold">Objectives:</div>
-            <FaPlus className="cursor-pointer text-gray-500 hover:text-black" onClick={() => setIsAddingObjective(!isAddingObjective)} />
-          </div>
-          {task.objectives && task.objectives.length > 0 ? (
-  <ul className="list-disc list-inside">
-    {task.objectives.map((objective, index) => (
-      <li key={index} className="mt-1 flex justify-between items-center text-gray-500 text-sm">
-        {/* Access the correct field of the objective object */}
-        {typeof objective === 'string' ? objective : objective.text} 
-        <FaTrash
-          className="ml-2 cursor-pointer text-red-500 hover:text-red-700"
-          onClick={() => handleDeleteObjective(objective)}
-        />
-      </li>
-    ))}
-  </ul>
-) : (
-  <span className="text-gray-500 text-sm">No objectives defined</span>
-)}
-          {isAddingObjective && (
-            <div className="mt-2 flex">
-              <input
-                type="text"
-                className="w-full p-2 border border-gray-300 rounded text-sm"
-                placeholder="New objective"
-                value={newObjective}
-                onChange={(e) => setNewObjective(e.target.value)}
-              />
-              <button className="ml-2 bg-red-700 text-white py-1 px-4 rounded text-sm" onClick={handleAddObjective}>Add</button>
-            </div>
-          )}
-        </div>
-        
+           {/* Objectives */}
+              <div className="mb-4">
+                <div className="mb-4 flex justify-between items-center">
+                  <div className="text-gray-500 font-semibold">Objectives:</div>
+                  <FaPlus className="cursor-pointer text-gray-500 hover:text-black" onClick={() => setIsAddingObjective(!isAddingObjective)} />
+                </div>
+                {task.objectives && task.objectives.length > 0 ? (
+                  <ul className="list-none">
+                    {task.objectives.map((objective, index) => (
+                      <li
+                        key={index}
+                        className={`mt-1 flex justify-between items-center text-sm ${
+                          objective.done ? 'text-gray-400' : 'text-black'
+                        }`}
+                      >
+                        {/* Render checkbox on the left side and handle the toggle */}
+                        <div
+                          className="flex items-center cursor-pointer p-2 rounded-lg"
+                          onClick={() => handleToggleObjective(index)}
+                          style={{ width: '100%' }}
+                        >
+                          {objective.done ? (
+                            <FaCheckSquare className="mr-2 text-green-500" size={16} />
+                          ) : (
+                            <FaRegSquare className="mr-2 text-gray-500" size={16} />
+                          )}
+                          {/* Underline and gray out if the objective is done */}
+                          <span
+                            className={`flex-1 ${
+                              objective.done ? 'line-through' : ''
+                            }`}
+                          >
+                            {objective.text}
+                          </span>
+                        </div>
+                        <FaTimes
+                          className="ml-2 cursor-pointer text-red-500 hover:text-red-700"
+                          onClick={() => handleDeleteObjective(objective)}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <span className="text-gray-500 text-sm">No objectives defined</span>
+                )}
+                {isAddingObjective && (
+                  <div className="mt-2 flex">
+                    <input
+                      type="text"
+                      className="w-full p-2 border border-gray-300 rounded text-sm"
+                      placeholder="New objective"
+                      value={newObjective}
+                      onChange={(e) => setNewObjective(e.target.value)}
+                    />
+                    <button className="ml-2 bg-red-700 text-white py-1 px-4 rounded text-sm" onClick={handleAddObjective}>
+                      Add
+                    </button>
+                  </div>
+                )}
+              </div>
+
+
         {/* Attachments */}
         <div className="mb-4">
           <div className="flex justify-between items-center">

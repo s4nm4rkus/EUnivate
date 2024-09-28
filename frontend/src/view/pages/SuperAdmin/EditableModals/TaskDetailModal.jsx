@@ -260,59 +260,47 @@ const handleSaveDescription = async () => {
     }
   };
 
-  const handleDeleteAttachment = (attachmentUrl) => {
-    // Filter out the attachment to be deleted
-    const updatedAttachments = task.attachment.filter(att => att.url !== attachmentUrl);
-
-    // Update the attachment preview URLs state
-    setAttachmentPreviewUrls(updatedAttachments.map(att => att.url));
-
-    // Update the task's attachment array
-    onUpdateTask({ ...task, attachment: updatedAttachments });
-
-    // Show the save button to allow the user to save changes
-    setShowSaveAttachmentButton(true);
-};
+  // const handleDeleteAttachment = (attachmentUrl) => {
+  //   const updatedAttachments = task.attachment.filter(att => att.url !== attachmentUrl);
+  //   onUpdateTask({ ...task, attachment: updatedAttachments });
+  // };
 
 
 
-
-const handleSaveAttachments = async () => {
-  // If there are new files to upload, handle them
-  const updatedAttachments = [...task.attachment];
-  
-  for (const file of newAttachmentFiles) {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'EunivateImage');
-    formData.append('cloud_name', 'dzxzc7kwb');
-  
-    try {
-      const response = await axios.post(
-        'https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload',
-        formData
-      );
-      
-      // Add the response data (including public_id) to the updatedAttachments array
-      updatedAttachments.push({
-        publicId: response.data.public_id,
-        url: response.data.secure_url,
-      });
-    } catch (error) {
-      console.error('Error uploading file:', error);
+  const handleSaveAttachments = async () => {
+    const updatedAttachments = [...task.attachment];
+    
+    for (const file of newAttachmentFiles) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'EunivateImage');
+      formData.append('cloud_name', 'dzxzc7kwb');
+    
+      try {
+        const response = await axios.post(
+          'https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload',
+          formData
+        );
+        
+        // Add the response data (including public_id) to the updatedAttachments array
+        updatedAttachments.push({
+          publicId: response.data.public_id,  // Make sure this matches your schema's requirements
+          url: response.data.secure_url,
+        });
+      } catch (error) {
+        console.error('Error uploading file:', error);
+      }
     }
-  }
-  
-  // Update the task with the new attachments
-  const updatedTask = { ...task, attachment: updatedAttachments };
-  onUpdateTask(updatedTask);
-  await updateTaskInDatabase(updatedTask);
-  
-  // Reset states
-  setNewAttachmentFiles([]);
-  setShowSaveAttachmentButton(false);
-};
-
+    
+    // Update the task with the new attachments
+    const updatedTask = { ...task, attachment: updatedAttachments };
+    onUpdateTask(updatedTask);
+    await updateTaskInDatabase(updatedTask);
+    
+    // Reset states
+    setNewAttachmentFiles([]);
+    setShowSaveAttachmentButton(false);
+  };
   
 
   const handleCommentSubmit = () => {
@@ -597,24 +585,21 @@ const handleSaveAttachments = async () => {
               {attachmentPreviewUrls.map((url, index) => (
                 <div key={index} className="relative">
                   <img src={url} alt={`Attachment ${index + 1}`} className="w-32 h-32 object-cover rounded-md" />
-                  <FaTrash
-                    className="absolute top-1 right-1 cursor-pointer text-red-500 hover:text-red-700"
-                    onClick={() => handleDeleteAttachment(url)}
-                  />
+      
                 </div>
               ))}
             </div>
           ) : (
             <span className="text-gray-500">No attachments</span>
           )}
-            {showSaveAttachmentButton && (
-                <button
-                    className="mt-2 bg-red-500 text-white py-1 px-4 rounded text-sm hover:bg-red-600 transition-all duration-200"
-                    onClick={handleSaveAttachments}
-                >
-                    Save Attachments
-                </button>
-            )}
+          {showSaveAttachmentButton && (
+            <button
+              className="mt-2 bg-red-500 text-white py-1 px-4 rounded text-sm hover:bg-red-600 transition-all duration-200"
+              onClick={handleSaveAttachments}
+            >
+              Save Attachments
+            </button>
+          )}
         </div>
 
 

@@ -33,6 +33,9 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, onUpdateTask }) =
   const [showSavePriorityButton, setShowSavePriorityButton] = useState(false);
   const [showSaveStatusButton, setShowSaveStatusButton] = useState(false);
 
+  const [editedAssignees, setEditedAssignees] = useState(task.assignee || [])
+
+
   const handleTaskNameClick = () => {
     setIsEditingTaskName(true);
     setShowSaveButton(false); // Hide save button initially
@@ -228,7 +231,7 @@ const handleSaveDescription = async () => {
     }
   };
 
-    const handleAddAssignee = (newAssignee) => {
+  const handleAddAssignee = (newAssignee) => {
     if (!editedAssignees.some(assignee => assignee._id === newAssignee._id)) {
       setEditedAssignees([...editedAssignees, newAssignee]);
     }
@@ -244,6 +247,7 @@ const handleSaveDescription = async () => {
     onUpdateTask(updatedTask);
     await updateTaskInDatabase(updatedTask);
   };
+
   return (
     <Modal
     isOpen={isOpen}
@@ -292,7 +296,7 @@ const handleSaveDescription = async () => {
         <div className="mb-4 flex items-center">
           <strong className="mr-2 text-gray-500 font-semibold">Assignees:</strong>
           <div className='flex -space-x-2'> 
-            {task.assignee && task.assignee.map((member, index) => (
+            {editedAssignees.map((member, index) => (
               <img 
                 key={index} 
                 src={member.profilePicture} 
@@ -301,8 +305,20 @@ const handleSaveDescription = async () => {
                 title={member.name} 
               />
             ))}
+            <FaPlus 
+              className="cursor-pointer text-gray-500 hover:text-black ml-2"
+              onClick={() => {/* logic to show modal or dropdown to add assignee */}} 
+            />
           </div>
         </div>
+        
+        {/* Add a button to save assignees */}
+        <button 
+          className="bg-red-500 text-white py-1 px-2 rounded ml-2" 
+          onClick={handleSaveAssignees}
+        >
+          Save Assignees
+        </button>
 
 
             {/* Start Date */}
@@ -415,9 +431,16 @@ const handleSaveDescription = async () => {
           </div>
 
 
-        {/* Description */}
-        <div className="mb-4">
-  <div className="text-gray-500 font-semibold">Description:</div>
+      {/* Description */}
+<div className="mb-4">
+  <div className="flex justify-between items-center">
+    <div className="text-gray-500 font-semibold">Description:</div>
+    <FaEdit
+      className="cursor-pointer text-gray-500 hover:text-gray-700"
+      size={18}
+      onClick={handleEditDescription}
+    />
+  </div>
   {isEditing ? (
     <div>
       <textarea
@@ -435,14 +458,10 @@ const handleSaveDescription = async () => {
   ) : (
     <div className="relative">
       <p className="mt-2 text-gray-500 text-sm">{task.description}</p>
-      <FaEdit
-        className="absolute top-0 right-0 cursor-pointer text-gray-500 hover:text-gray-700"
-        size={18}
-        onClick={handleEditDescription}
-      />
     </div>
   )}
 </div>
+
 
         {/* Objectives */}
         <div className="mb-4">
@@ -500,7 +519,11 @@ const handleSaveDescription = async () => {
             <div className="flex overflow-x-auto space-x-2 py-2">
               {task.attachment.map((attachment, index) => (
                 <div key={index} className="relative">
-                  <img src={attachment.url} alt={`Attachment ${index + 1}`} className="w-32 h-32 object-cover rounded-md" />
+
+                  <img src={attachment.url} 
+                  alt={`Attachment ${index + 1}`} 
+                  className="w-32 h-32 object-cover rounded-md" />
+
                   <FaTrash
                     className="absolute top-1 right-1 cursor-pointer text-red-500 hover:text-red-700"
                     onClick={() => handleDeleteAttachment(attachment.url)}
@@ -535,7 +558,12 @@ const handleSaveDescription = async () => {
               <ul className="list-disc list-inside">
                 {commentsList.map((cmt, index) => (
                   <li key={index} className="mt-1 flex items-start text-gray-500">
-                    <img src={cmt.avatar} alt={cmt.name} className="w-8 h-8 rounded-full mr-2" />
+
+                    <img 
+                    src={cmt.avatar}
+                    alt={cmt.name} 
+                    className="w-8 h-8 rounded-full mr-2" />
+                    
                     <div>
                       <strong>{cmt.name}</strong>
                       <p>{cmt.text}</p>

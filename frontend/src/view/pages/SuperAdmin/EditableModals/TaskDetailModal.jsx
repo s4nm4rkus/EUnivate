@@ -3,9 +3,11 @@ import Modal from 'react-modal';
 import { FaTimes, FaCircle, FaUser, FaFlag, FaEdit, FaTrash, FaPlus, FaCheckCircle, FaRegSquare, FaCheckSquare } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import socket from '../../../../utilis/socket';
 import axios from 'axios';
-import { io } from 'socket.io-client';
+
 import UserNameModal from '../KanbanModals/UserNameModal';
+
 
 
 
@@ -60,8 +62,7 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpda
   //SaveButton
   const [showSaveButton, setShowSaveButton] = useState(false);
 
-  //Socket.io
-  const socket = io('http://localhost:5000'); // Replace with your server URL
+  
 
     const handleTaskNameClick = () => {
       setIsEditingTaskName(true);
@@ -72,18 +73,26 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpda
     useEffect(() => {
       if (isOpen) {
         fetchUsers();
-      }   
-       socket.on('objectiveUpdated', (updatedTask) => {
+      }
+      
+      const handleObjectiveUpdate = (updatedTask) => {
         if (updatedTask._id === task._id) {
           onUpdateTask(updatedTask);
         }
-      });
-    
-      return () => {
-        socket.off('objectiveUpdated');
       };
-    }, [isOpen, task._id]);
+      
+      socket.on('taskUpdated', (updatedTaskData) => {
+        if (updatedTaskData._id === task._id) {
+          setUpdatedTask(updatedTaskData);
+          onUpdateTask(updatedTaskData); // Update the parent state if necessary
+        }
+      });
 
+      
+      return () => {
+        socket.off('taskUpdated');
+      };
+    },  [isOpen, task._id, onUpdateTask]);
     const fetchUsers = async () => {
       try {
         const response = await axios.get(`http://localhost:5000/api/users/get-assignee?projectId=${projectId}`);
@@ -321,15 +330,19 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpda
     });
   
     const updatedTask = { ...task, objectives: updatedObjectives };
-    onUpdateTask(updatedTask);
-  
+    onUpdateTask(updatedTask);  // Update the UI immediately
+    
     try {
+      // Update the task in the database
       await updateTaskInDatabase(updatedTask);
-      socket.emit('objectiveUpdated', updatedTask); // Emit to server after updating
+  
+      // Emit the update via socket to inform other clients
+      socket.emit('objectiveUpdated', updatedTask);
     } catch (error) {
       console.error('Failed to update objective:', error);
     }
   };
+  
   
   const handleDeleteObjective = async (objective) => {
     const updatedObjectives = task.objectives.filter(obj => obj !== objective);

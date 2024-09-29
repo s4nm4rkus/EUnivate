@@ -7,7 +7,7 @@ import chatMessageRoutes from './routes/chatMessageRoutes.js'; // Ensure this pa
 import { confirmQuotationEmail } from './controllers/Client/quotationController.js'; // Adjust the path as needed
 import { createServer } from 'http'; // Import to create HTTP server
 import { Server } from 'socket.io'; // Import Socket.IO
-
+import { getTaskById } from './controllers/SuperAdmin/Task/saAddTaskController.js';
 dotenv.config();
 connectDB();
 
@@ -40,8 +40,8 @@ io.on('connection', (socket) => {
 
 // After updating the database
 socket.on('updateObjective', async (data) => {
-  // Optionally, fetch the latest data from the database if necessary
-  const updatedTask = await getTaskFromDatabase(data.taskId);
+      // Fetch the updated task using the getTaskById function
+      const updatedTask = await getTaskById({ params: { id: data.taskId } });
   io.emit('objectiveUpdated', updatedTask); // Broadcast the latest task
 });
 

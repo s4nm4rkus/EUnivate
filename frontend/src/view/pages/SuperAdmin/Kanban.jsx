@@ -4,6 +4,7 @@ import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import Modal from './KanbanModals/Modal';
 import TaskDetailModal from './EditableModals/TaskDetailModal'; // New modal for task details
+import socket from '../../../utilis/socket';
 import axios from 'axios';
 
 const ItemType = {
@@ -30,7 +31,20 @@ const Kanban = ({ projectId, projectName }) => {
       }
     };
     fetchTasks();
+
+        // Listen for real-time updates from Socket.IO
+        socket.on('objectiveUpdated', (updatedTask) => {
+          setTasks((prevTasks) =>
+            prevTasks.map((task) => (task._id === updatedTask._id ? updatedTask : task))
+          );
+        });
+
+         // Cleanup on component unmount
+    return () => {
+      socket.off('objectiveUpdated');
+    };
   }, [projectId]);
+
 
   const handleOpenModal = () => {
     setModalOpen(true);

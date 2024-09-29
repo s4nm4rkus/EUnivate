@@ -343,12 +343,25 @@
             </div>
 
             <div className="mt-6 border-gray-200">
-            {selectedView === 'Kanban' && <Kanban projectId={projectId} projectName={project.projectName} setTasks={setTasks} />}
-            {selectedView === 'List' && <List tasks={tasks} />} {/* Pass tasks here */}
-            {selectedView === 'Calendar' && <Calendar project={project} />}
-            {selectedView === 'GanttChart' && <GanttChart projectId={projectId} />}
-            {selectedView === 'RaciMatrix' && <RaciMatrix projectId={projectId} />}
-        </div>
+    {selectedView === 'Kanban' && 
+        <Kanban 
+            projectId={projectId} 
+            projectName={project.projectName} 
+            setTasks={setTasks}
+            members={addedMembers} // Pass members to Kanban
+        />
+    }
+    {selectedView === 'List' && <List tasks={tasks} />} {/* Pass tasks here */}
+    {selectedView === 'Calendar' && 
+        <Calendar 
+            tasks={tasks} // Pass tasks to Calendar
+            members={addedMembers} // Pass members to Calendar
+        />
+    }
+    {selectedView === 'GanttChart' && <GanttChart projectId={projectId} />}
+    {selectedView === 'RaciMatrix' && <RaciMatrix projectId={projectId} />}
+</div>
+
 
             {isUserModalOpen && (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-500 bg-opacity-50">

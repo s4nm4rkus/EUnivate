@@ -48,9 +48,10 @@ const List = ({ tasks }) => {
 
                                 {/* Hidden fields on mobile */}
                                 <div className="hidden sm:block col-span-1">
-                                    <p className="text-xs text-gray-400 mb-4">Description</p>
-                                    <p className="text-sm">{task.description}</p>
-                                </div>
+    <p className="text-xs text-gray-400 mb-4">Description</p>
+    <p className="text-xs truncate overflow-hidden whitespace-nowrap">{task.description}</p>
+</div>
+
                                 <div className="hidden sm:block col-span-1">
                                     <p className="text-xs text-gray-400 mb-4">Priority</p>
                                     <div className="flex items-center">

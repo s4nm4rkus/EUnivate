@@ -39,6 +39,30 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpda
 
   // Status
   const [showSaveStatusButton, setShowSaveStatusButton] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState(task.status); 
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false); 
+
+  //Description
+  const [editedDescription, setEditedDescription] = useState(task.description);
+  const [isEditing, setIsEditing] = useState(false);
+
+  //objectives
+  const [newObjective, setNewObjective] = useState('');
+  const [isAddingObjective, setIsAddingObjective] = useState(false);
+
+  //Attachment
+  const [newAttachmentFiles, setNewAttachmentFiles] = useState([]);
+  const [showSaveAttachmentButton, setShowSaveAttachmentButton] = useState(false);
+  const [attachmentPreviewUrls, setAttachmentPreviewUrls] = useState(task.attachment.map(att => att.url));
+
+  //Comments
+  const [comment, setComment] = useState('');
+  const [commentsList, setCommentsList] = useState([]);
+
+  //SaveButton
+  const [showSaveButton, setShowSaveButton] = useState(false);
+
+  
 
     const handleTaskNameClick = () => {
       setIsEditingTaskName(true);
@@ -78,7 +102,11 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpda
       }
     };
 
- 
+    const handleAddAssignee = (members) => {
+      setEditedAssignees(members);
+      setIsUserNameModalOpen(false);
+    };
+
 
     const updateTaskInDatabase = async (updatedTask) => {
       try {
@@ -343,22 +371,6 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpda
     }
   };
 
-  const handleAddAssignee = (newAssignee) => {
-    if (!editedAssignees.some(assignee => assignee._id === newAssignee._id)) {
-      setEditedAssignees([...editedAssignees, newAssignee]);
-    }
-  };
-
-  const handleRemoveAssignee = (assigneeToRemove) => {
-    const updatedAssignees = editedAssignees.filter(assignee => assignee._id !== assigneeToRemove._id);
-    setEditedAssignees(updatedAssignees);
-  };
-
-  const handleSaveAssignees = async () => {
-    const updatedTask = { ...task, assignee: editedAssignees.map(assignee => assignee._id) };
-    onUpdateTask(updatedTask);
-    await updateTaskInDatabase(updatedTask);
-  };
 
   return (
     <Modal
@@ -407,32 +419,30 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpda
 
 
         {/* Assignees */}
-        <div className="mb-4 flex items-center">
-          <strong className="mr-2 text-gray-500 font-semibold">Assignees:</strong>
-          <div className='flex -space-x-2'> 
-            {editedAssignees.map((member, index) => (
-              <img 
-                key={index} 
-                src={member.profilePicture} 
-                alt={member.name} 
-                className="w-8 h-8 rounded-full border-2 border-white" 
-                title={member.name} 
-              />
-            ))}
-            <FaPlus 
-              className="cursor-pointer text-gray-500 hover:text-black ml-2"
-              onClick={() => {/* logic to show modal or dropdown to add assignee */}} 
-            />
-          </div>
+                <div className="mb-4">
+          <button
+            className="flex items-center space-x-2 bg-transparent border-none outline-none focus:outline-none"
+            onClick={() => setIsUserNameModalOpen(true)}
+          >
+            <span className="text-gray-700 text-sm font-semibold flex justify-normal -space-x-4">Assignee</span>
+            {editedAssignees.length > 0 ? (
+              // Display the first assignee's profile image if available
+              editedAssignees[0].profilePicture.url ? (
+                <img
+                  src={editedAssignees[0].profilePicture.url}
+                  alt={editedAssignees[0].username}
+                  className="w-8 h-8 rounded-full border"
+                />
+              ) : (
+                // Fallback to FaUser icon if no profile image is available
+                <FaUser className="text-gray-500 text-lg bg-transparent rounded-lg border" />
+              )
+            ) : (
+              // If no assignee is selected, show the default "Assign to" text
+              <span className='text-sm text-gray-500'>Assign to</span>
+            )}
+          </button>
         </div>
-        
-        {/* Add a button to save assignees */}
-        <button 
-          className="bg-red-500 text-white py-1 px-2 rounded ml-2" 
-          onClick={handleSaveAssignees}
-        >
-          Save Assignees
-        </button>
 
 
             {/* Start Date */}
@@ -545,16 +555,9 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpda
           </div>
 
 
-      {/* Description */}
-<div className="mb-4">
-  <div className="flex justify-between items-center">
-    <div className="text-gray-500 font-semibold">Description:</div>
-    <FaEdit
-      className="cursor-pointer text-gray-500 hover:text-gray-700"
-      size={18}
-      onClick={handleEditDescription}
-    />
-  </div>
+        {/* Description */}
+        <div className="mb-4">
+  <div className="text-gray-500 font-semibold">Description:</div>
   {isEditing ? (
     <div>
       <textarea
@@ -572,10 +575,14 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpda
   ) : (
     <div className="relative">
       <p className="mt-2 text-gray-500 text-sm">{task.description}</p>
+      <FaEdit
+        className="absolute top-0 right-0 cursor-pointer text-gray-500 hover:text-gray-700"
+        size={18}
+        onClick={handleEditDescription}
+      />
     </div>
   )}
 </div>
-
 
            {/* Objectives */}
            <div className="mb-4">
@@ -653,15 +660,8 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpda
             <div className="flex overflow-x-auto space-x-2 py-2">
               {attachmentPreviewUrls.map((url, index) => (
                 <div key={index} className="relative">
-
-                  <img src={attachment.url} 
-                  alt={`Attachment ${index + 1}`} 
-                  className="w-32 h-32 object-cover rounded-md" />
-
-                  <FaTrash
-                    className="absolute top-1 right-1 cursor-pointer text-red-500 hover:text-red-700"
-                    onClick={() => handleDeleteAttachment(attachment.url)}
-                  />
+                  <img src={url} alt={`Attachment ${index + 1}`} className="w-32 h-32 object-cover rounded-md" />
+      
                 </div>
               ))}
             </div>
@@ -701,12 +701,7 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpda
               <ul className="list-disc list-inside">
                 {commentsList.map((cmt, index) => (
                   <li key={index} className="mt-1 flex items-start text-gray-500">
-
-                    <img 
-                    src={cmt.avatar}
-                    alt={cmt.name} 
-                    className="w-8 h-8 rounded-full mr-2" />
-                    
+                    <img src={cmt.avatar} alt={cmt.name} className="w-8 h-8 rounded-full mr-2" />
                     <div>
                       <strong>{cmt.name}</strong>
                       <p>{cmt.text}</p>

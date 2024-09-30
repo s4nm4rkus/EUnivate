@@ -2,35 +2,69 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlag, faImage } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios'; // Import Axios for fetching data
+import { format, startOfWeek, addDays, addWeeks, subWeeks } from 'date-fns';
 
-const GanttChart = () => {
+const GanttChart = ({ projectId }) => {
   const [tasks, setTasks] = useState([]);
+  const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 })); // Week starts on Monday
   const location = useLocation();
   const projectName = location.state?.project?.name;
 
   useEffect(() => {
-    if (projectName) {
+    const fetchTasks = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${projectId}`);
+        setTasks(response.data.data); // Set tasks fetched from the backend
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      }
+    };
+
+    if (projectId) {
+      fetchTasks();
+    } else if (projectName) {
       const storedTasks = JSON.parse(localStorage.getItem(`kanban-${projectName}`)) || [];
       setTasks(storedTasks);
     }
-  }, [projectName]);
+  }, [projectId, projectName]);
 
-  const months = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-  ];
+  const handleNextWeek = () => setCurrentWeekStart(addWeeks(currentWeekStart, 1));
+  const handlePrevWeek = () => setCurrentWeekStart(subWeeks(currentWeekStart, 1));
 
-  const getMonthIndex = (date) => new Date(date).getMonth();
+  const getDaysOfCurrentWeek = (start) => {
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      days.push(format(addDays(start, i), 'EEE dd')); // 'EEE' gives three-letter abbreviation (Mon, Tue, etc.)
+    }
+    return days;
+  };
 
-  const calculateTaskWidth = (startDate, dueDate) => {
-    const startMonthIndex = getMonthIndex(startDate);
-    const endMonthIndex = getMonthIndex(dueDate);
-    return ((endMonthIndex - startMonthIndex + 1) / 12) * 100;
+  const daysOfCurrentWeek = getDaysOfCurrentWeek(currentWeekStart);
+
+  const getDaysDifference = (startDate, dueDate) => {
+    const diffTime = Math.abs(new Date(dueDate) - new Date(startDate));
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Difference in days
   };
 
   const calculateTaskLeft = (startDate) => {
-    const startMonthIndex = getMonthIndex(startDate);
-    return (startMonthIndex / 12) * 100;
+    const weekStart = startOfWeek(currentWeekStart, { weekStartsOn: 1 });
+    const daysFromWeekStart = Math.floor((new Date(startDate) - weekStart) / (1000 * 60 * 60 * 24));
+    return daysFromWeekStart > 0 ? (daysFromWeekStart / 7) * 100 : 0;
+  };
+
+  const calculateTaskWidth = (startDate, dueDate) => {
+    const totalDaysInWeek = 7;
+    const weekEnd = addDays(currentWeekStart, totalDaysInWeek);
+
+    if (new Date(dueDate) < currentWeekStart || new Date(startDate) > weekEnd) {
+      return 0; // Task is outside the current week
+    }
+
+    const taskStart = Math.max(new Date(startDate), currentWeekStart);
+    const taskEnd = Math.min(new Date(dueDate), weekEnd);
+    const taskDurationWithinWeek = getDaysDifference(taskStart, taskEnd);
+    return (taskDurationWithinWeek / totalDaysInWeek) * 100;
   };
 
   const getStatusIconColor = (status) => {
@@ -50,19 +84,6 @@ const GanttChart = () => {
     }
   };
 
-  const getDifficultyColor = (difficulty) => {
-    switch (difficulty) {
-      case 'High':
-        return 'text-red-500'; // Red for High
-      case 'Medium':
-        return 'text-yellow-500'; // Yellow for Medium
-      case 'Easy':
-        return 'text-green-500'; // Green for Easy
-      default:
-        return 'text-gray-500'; // Default color if difficulty is unknown
-    }
-  };
-  
   const countImages = (task) => {
     return ['image1', 'image2'].reduce((count, imageKey) => {
       return task[imageKey] ? count + 1 : count;
@@ -71,30 +92,35 @@ const GanttChart = () => {
 
   const allStatuses = ['Document', 'Todo', 'Ongoing', 'Done', 'Backlogs'];
 
-  const SMALL_TEXT_THRESHOLD = 10; // percentage width
-  const MAX_TASK_HEIGHT = 4; // maximum height of each task pin in rem
-  const TASK_SPACING = 1; // spacing between tasks in rem
+  const SMALL_TEXT_THRESHOLD = 10;
+  const MAX_TASK_HEIGHT = 4;
+  const TASK_SPACING = 1;
 
   const groupedTasks = allStatuses.map((status) => {
     const filteredTasks = tasks.filter(task => (status === 'Document' && task.status === 'Pending') || task.status === status);
     const totalHeight = filteredTasks.length * (MAX_TASK_HEIGHT + TASK_SPACING);
     const shrinkFactor = totalHeight > MAX_TASK_HEIGHT * 5 ? (MAX_TASK_HEIGHT * 5) / totalHeight : 1;
 
-    return {
-      status,
-      tasks: filteredTasks,
-      shrinkFactor,
-    };
+    return { status, tasks: filteredTasks, shrinkFactor };
   });
 
   return (
     <div className="p-4 sm:p-8 bg-white shadow-lg rounded-lg overflow-x-auto">
-      <div className="relative min-w-[1000px]"> {/* Ensure horizontal scrolling */}
+      {/* Navigation buttons and current week */}
+      <div className="flex justify-between items-center mb-4">
+        <button onClick={handlePrevWeek} className="bg-blue-500 text-white px-4 py-2 rounded">Prev</button>
+        <h2 className="text-lg font-semibold">
+          {format(currentWeekStart, 'MMMM d')} – {format(addDays(currentWeekStart, 6), 'MMMM d')}
+        </h2>
+        <button onClick={handleNextWeek} className="bg-blue-500 text-white px-4 py-2 rounded">Next Week</button>
+      </div>
+
+      <div className="relative w-full">
         <div className="flex items-center border-b border-gray-300">
           <div className="w-36 min-w-[1rem] border-r border-gray-300 p-2 text-center -ml-28"></div>
-          {months.map((month) => (
-            <div key={month} className="flex-1 min-w-[5%] text-center border-r border-gray-300 p-2">
-              {month}
+          {daysOfCurrentWeek.map((day) => (
+            <div key={day} className="flex-1 text-center border-r border-gray-300 p-2">
+              {day}
             </div>
           ))}
         </div>
@@ -115,48 +141,56 @@ const GanttChart = () => {
               <div className="relative flex-1">
                 {tasks.map((task, index) => {
                   const taskWidth = calculateTaskWidth(task.startDate, task.dueDate);
-                  const textSizeClass = taskWidth < SMALL_TEXT_THRESHOLD ? 'text-xs' : 'text-sm';
-                  const imageCount = countImages(task);
+                  const taskLeft = calculateTaskLeft(task.startDate);
                   const taskHeight = MAX_TASK_HEIGHT * shrinkFactor;
+                  const textSizeClass = taskWidth < SMALL_TEXT_THRESHOLD ? 'text-xs' : 'text-sm';
 
                   return (
                     <div
-                      key={task.id}
-                      className={`absolute ${getStatusIconColor(task.status)} text-white p-2 rounded`}
-                      style={{
-                        width: `${taskWidth}%`,
-                        left: `${calculateTaskLeft(task.startDate)}%`,
-                        whiteSpace: 'nowrap',
-                        top: `${index * (taskHeight + TASK_SPACING)}rem`,
-                        height: `${taskHeight}rem`,
-                        lineHeight: `${taskHeight}rem`,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <div className={`text-black ${textSizeClass}`}>
-                        {task.taskName}
-                        {imageCount > 0 && (
-                          <div className="flex items-center mt-1 text-xs">
-                            <FontAwesomeIcon
-                              icon={faImage}
-                              className="mr-1 text-gray-700"
-                            />
-                            <span>{imageCount} {imageCount === 1 ? 'Image' : 'Images'}</span>
-                          </div>
-                        )}
+                    key={task.id}
+                    className={`absolute ${getStatusIconColor(task.status)} text-white p-2 rounded`}
+                    style={{
+                      width: `${taskWidth}%`,
+                      left: `${taskLeft}%`,
+                      top: `${index * (taskHeight + TASK_SPACING)}rem`,
+                      height: `${taskHeight}rem`,
+                      lineHeight: `${taskHeight}rem`,
+                      display: taskWidth > 0 ? 'flex' : 'none',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {/* Task content with assignee avatars on the left and task name on the right */}
+                    <div className="flex items-center">
+                      {/* Assignee avatars */}
+                      <div className="flex -space-x-3 mr-2">
+                        {task.assignee && task.assignee.map((member, index) => (
+                          <img
+                            key={index}
+                            src={member.profilePicture}
+                            alt={member.name}
+                            className="w-6 h-6 rounded-full border-2 border-white"
+                            title={member.name}
+                          />
+                        ))}
                       </div>
-                      <div className={`flex items-center mt-1 text-xs ${getDifficultyColor(task.difficulty)}`}>
-                        <FontAwesomeIcon
-                          icon={faFlag}
-                          className="mr-1"
-                        />
-                        <span className="px-2 py-1 text-black">
-                          {task.difficulty}
-                        </span>
+                      {/* Task name */}
+                      <div className={`text-black font-semibold ${textSizeClass}`}>
+                        {task.taskName}
                       </div>
                     </div>
+                  
+                    {/* Display other details like images */}
+                    <div className={`flex items-center mt-1 text-xs ${textSizeClass}`}>
+                      {task.attachment && task.attachment.length > 0 && (
+                        <div className="flex items-center text-xs">
+                          <FontAwesomeIcon icon={faImage} className="mr-1 text-gray-700" />
+                          <span>{task.attachment.length}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
                   );
                 })}
               </div>

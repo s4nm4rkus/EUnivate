@@ -116,11 +116,11 @@ const GanttChart = ({ projectId }) => {
     <div className="p-4 sm:p-8 bg-white shadow-lg rounded-lg overflow-x-auto">
       {/* Navigation buttons and current week */}
       <div className="flex justify-between items-center mb-4">
-        <button onClick={handlePrevWeek} className="bg-blue-500 text-white px-4 py-2 rounded">Prev</button>
+        <button onClick={handlePrevWeek} className="bg-red-700 text-white px-4 py-2 rounded">Prev</button>
         <h2 className="text-lg font-semibold">
           {format(currentWeekStart, 'MMMM d')} – {format(addDays(currentWeekStart, 6), 'MMMM d')}
         </h2>
-        <button onClick={handleNextWeek} className="bg-blue-500 text-white px-4 py-2 rounded">Next</button>
+        <button onClick={handleNextWeek} className="bg-red-700 text-white px-4 py-2 rounded">Next</button>
       </div>
 
       <div className="relative w-full">

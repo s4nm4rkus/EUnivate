@@ -290,3 +290,54 @@ export const deleteTask = async (req, res) => {
   }
 };
 
+
+// Controller to add a comment to a task
+export const addCommentToTask = async (req, res) => {
+  try {
+    const { taskId } = req.params; // Get task ID from URL
+    const { userId, userName, profilePicture, text } = req.body; // Extract data from request body
+
+    if (!taskId || !userId || !text) {
+      return res.status(400).json({
+        success: false,
+        message: 'Task ID, user ID, and comment text are required.'
+      });
+    }
+
+    // Find the task and add the comment
+    const updatedTask = await saAddTask.findByIdAndUpdate(
+      taskId,
+      {
+        $push: {
+          comments: {
+            userId,
+            userName,
+            profilePicture,
+            text
+          }
+        }
+      },
+      { new: true, runValidators: true } // Return the updated document
+    );
+
+    if (!updatedTask) {
+      return res.status(404).json({
+        success: false,
+        message: 'Task not found.'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: updatedTask.comments // Return the updated comments array
+    });
+  } catch (error) {
+    console.error('Error adding comment to task:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server Error. Could not add comment.',
+      error: error.message
+    });
+  }
+};
+

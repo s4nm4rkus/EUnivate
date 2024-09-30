@@ -359,17 +359,51 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpda
   };
   
   
-  const handleCommentSubmit = () => {
+  const handleCommentSubmit = async () => {
     if (comment.trim()) {
+ 
+      const members = task.members && task.members.length > 0 ? task.members[0] : null;
+  
+      if (!members) {
+        console.error('No assignee found for this task. Cannot submit a comment.');
+        return;
+      }
+  
+         // Ensure the userName is either from username or name
+    const userName = members.username || members.name;
+    if (!userName) {
+      console.error('members does not have a username or name.');
+      return;
+    }
+
+      console.log('members: ', members);
+  
+      // Prepare the comment data using the assigned user
       const newComment = {
-        text: comment,
-        name: "Your Name",
-        avatar: "path/to/your/avatar.jpg"
+        userId: members._id, 
+        userName,
+        profilePicture: members.profilePicture.url, 
+        text: comment 
       };
-      setCommentsList([...commentsList, newComment]);
-      setComment('');
+  
+      try {
+        // Send POST request to add comment
+        const response = await axios.post(`http://localhost:5000/api/users/sa-tasks/${task._id}/comments`, newComment);
+  
+        if (response.data.success) {
+          // Update comments list with the response data
+          setCommentsList([...commentsList, ...response.data.data]);
+          setComment(''); // Clear the comment input
+        } else {
+          console.error('Failed to add comment:', response.data.message);
+        }
+      } catch (error) {
+        console.error('Error submitting comment:', error);
+      }
     }
   };
+  
+  
 
 
   return (

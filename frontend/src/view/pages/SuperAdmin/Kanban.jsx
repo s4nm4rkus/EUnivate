@@ -226,6 +226,7 @@ const Kanban = ({ projectId, projectName }) => {
       projectName={projectName} // Pass the project name here
       onUpdateTask={handleUpdateTask} // Pass the update task handler to the modal
       projectId={projectId} 
+      
     />
   </DndProvider>
   );

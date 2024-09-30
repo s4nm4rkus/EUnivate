@@ -147,50 +147,49 @@ const GanttChart = ({ projectId }) => {
 
                   return (
                     <div
-                    key={task.id}
-                    className={`absolute ${getStatusIconColor(task.status)} text-white p-2 rounded`}
-                    style={{
-                      width: `${taskWidth}%`,
-                      left: `${taskLeft}%`,
-                      top: `${index * (taskHeight + TASK_SPACING)}rem`,
-                      height: `${taskHeight}rem`,
-                      lineHeight: `${taskHeight}rem`,
-                      display: taskWidth > 0 ? 'flex' : 'none',
-                      flexDirection: 'column',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    {/* Task content with assignee avatars on the left and task name on the right */}
-                    <div className="flex items-center">
-                      {/* Assignee avatars */}
-                      <div className="flex -space-x-3 mr-2">
-                        {task.assignee && task.assignee.map((member, index) => (
-                          <img
-                            key={index}
-                            src={member.profilePicture}
-                            alt={member.name}
-                            className="w-6 h-6 rounded-full border-2 border-white"
-                            title={member.name}
-                          />
-                        ))}
-                      </div>
-                      {/* Task name */}
-                      <div className={`text-black font-semibold ${textSizeClass}`}>
-                        {task.taskName}
-                      </div>
-                    </div>
-                  
-                    {/* Display other details like images */}
-                    <div className={`flex items-center mt-1 text-xs ${textSizeClass}`}>
-                      {task.attachment && task.attachment.length > 0 && (
-                        <div className="flex items-center text-xs">
-                          <FontAwesomeIcon icon={faImage} className="mr-1 text-gray-700" />
-                          <span>{task.attachment.length}</span>
+                      key={task.id}
+                      className={`absolute ${getStatusIconColor(task.status)} text-white p-2 rounded`}
+                      style={{
+                        width: `${taskWidth}%`,
+                        left: `${taskLeft}%`,
+                        top: `${index * (taskHeight + TASK_SPACING)}rem`,
+                        height: `${taskHeight}rem`,
+                        lineHeight: `${taskHeight}rem`,
+                        display: taskWidth > 0 ? 'flex' : 'none',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      {/* Task content with assignee avatars on the left and task name on the right */}
+                      <div className="flex items-center">
+                        {/* Assignee avatars */}
+                        <div className="flex -space-x-3 mr-2">
+                          {task.assignee && task.assignee.map((member, index) => (
+                            <img
+                              key={index}
+                              src={member.profilePicture?.url || '/path/to/default/avatar.png'}
+                              alt={member.name}
+                              className="w-6 h-6 rounded-full border-2 border-white"
+                              title={member.name}
+                            />
+                          ))}
                         </div>
-                      )}
+                        {/* Task name */}
+                        <div className={`text-black font-semibold ${textSizeClass}`}>
+                          {task.taskName}
+                        </div>
+                      </div>
+                    
+                      {/* Display other details like images */}
+                      <div className={`flex items-center mt-1 text-xs ${textSizeClass}`}>
+                        {task.attachment && task.attachment.length > 0 && (
+                          <div className="flex items-center text-xs">
+                            <FontAwesomeIcon icon={faImage} className="mr-1 text-gray-700" />
+                            <span>{task.attachment.length}</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  
                   );
                 })}
               </div>

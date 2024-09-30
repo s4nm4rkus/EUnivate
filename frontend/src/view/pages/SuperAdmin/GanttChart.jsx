@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFlag, faImage } from '@fortawesome/free-solid-svg-icons';
-import axios from 'axios'; // Import Axios for fetching data
+import { faFlag, faPaperclip, faCheck } from '@fortawesome/free-solid-svg-icons'; // Import the check icon
+import axios from 'axios';
 import { format, startOfWeek, addDays, addWeeks, subWeeks } from 'date-fns';
+import filterIcon from '../../../assets/Filter.png';  // Import the image here
 
 const GanttChart = ({ projectId }) => {
   const [tasks, setTasks] = useState([]);
@@ -69,28 +70,35 @@ const GanttChart = ({ projectId }) => {
 
   const getStatusIconColor = (status) => {
     switch (status) {
-      case 'Ongoing':
-        return 'bg-yellow-500';
-      case 'Done':
-        return 'bg-green-500';
-      case 'Pending':
-        return 'bg-gray-500';
+      case 'Document':
+        return 'bg-[#DDFBC5]'; // Light green
       case 'Todo':
-        return 'bg-pink-500';
-      case 'Backlogs':
-        return 'bg-red-500';
+        return 'bg-[#CFE8FF]'; // Light blue
+      case 'Ongoing':
+        return 'bg-[#FCE9C0]'; // Light yellow
+      case 'Done':
+        return 'bg-[#DBDBDBFF]'; // Light gray
+      case 'Backlog':
+        return 'bg-[#FED5F2]'; // Light pink
       default:
-        return 'bg-gray-500';
+        return 'bg-gray-500'; // Default gray for unknown statuses
     }
   };
 
-  const countImages = (task) => {
-    return ['image1', 'image2'].reduce((count, imageKey) => {
-      return task[imageKey] ? count + 1 : count;
-    }, 0);
+  const getPriorityIconColor = (priority) => {
+    switch (priority) {
+      case 'easy':
+        return 'text-green-500'; // Green flag for Easy
+      case 'medium':
+        return 'text-yellow-500'; // Yellow flag for Medium
+      case 'hard':
+        return 'text-red-500'; // Red flag for Hard
+      default:
+        return 'text-gray-500'; // Default gray flag if priority is undefined
+    }
   };
 
-  const allStatuses = ['Document', 'Todo', 'Ongoing', 'Done', 'Backlogs'];
+  const allStatuses = ['Document', 'Todo', 'Ongoing', 'Done', 'Backlog'];
 
   const SMALL_TEXT_THRESHOLD = 10;
   const MAX_TASK_HEIGHT = 4;
@@ -112,7 +120,7 @@ const GanttChart = ({ projectId }) => {
         <h2 className="text-lg font-semibold">
           {format(currentWeekStart, 'MMMM d')} – {format(addDays(currentWeekStart, 6), 'MMMM d')}
         </h2>
-        <button onClick={handleNextWeek} className="bg-blue-500 text-white px-4 py-2 rounded">Next Week</button>
+        <button onClick={handleNextWeek} className="bg-blue-500 text-white px-4 py-2 rounded">Next</button>
       </div>
 
       <div className="relative w-full">
@@ -139,60 +147,86 @@ const GanttChart = ({ projectId }) => {
                 </div>
               </div>
               <div className="relative flex-1">
-                {tasks.map((task, index) => {
-                  const taskWidth = calculateTaskWidth(task.startDate, task.dueDate);
-                  const taskLeft = calculateTaskLeft(task.startDate);
-                  const taskHeight = MAX_TASK_HEIGHT * shrinkFactor;
-                  const textSizeClass = taskWidth < SMALL_TEXT_THRESHOLD ? 'text-xs' : 'text-sm';
+  {tasks.map((task, index) => {
+    const taskWidth = calculateTaskWidth(task.startDate, task.dueDate);
+    const taskLeft = calculateTaskLeft(task.startDate);
+    const taskHeight = MAX_TASK_HEIGHT * shrinkFactor;
+    const textSizeClass = taskWidth < SMALL_TEXT_THRESHOLD ? 'text-xs' : 'text-sm';
 
-                  return (
-                    <div
-                      key={task.id}
-                      className={`absolute ${getStatusIconColor(task.status)} text-white p-2 rounded`}
-                      style={{
-                        width: `${taskWidth}%`,
-                        left: `${taskLeft}%`,
-                        top: `${index * (taskHeight + TASK_SPACING)}rem`,
-                        height: `${taskHeight}rem`,
-                        lineHeight: `${taskHeight}rem`,
-                        display: taskWidth > 0 ? 'flex' : 'none',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      {/* Task content with assignee avatars on the left and task name on the right */}
-                      <div className="flex items-center">
-                        {/* Assignee avatars */}
-                        <div className="flex -space-x-3 mr-2">
-                          {task.assignee && task.assignee.map((member, index) => (
-                            <img
-                              key={index}
-                              src={member.profilePicture?.url || '/path/to/default/avatar.png'}
-                              alt={member.name}
-                              className="w-6 h-6 rounded-full border-2 border-white"
-                              title={member.name}
-                            />
-                          ))}
-                        </div>
-                        {/* Task name */}
-                        <div className={`text-black font-semibold ${textSizeClass}`}>
-                          {task.taskName}
-                        </div>
-                      </div>
-                    
-                      {/* Display other details like images */}
-                      <div className={`flex items-center mt-1 text-xs ${textSizeClass}`}>
-                        {task.attachment && task.attachment.length > 0 && (
-                          <div className="flex items-center text-xs">
-                            <FontAwesomeIcon icon={faImage} className="mr-1 text-gray-700" />
-                            <span>{task.attachment.length}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+    return (
+      <div
+        key={task.id}
+        className={`absolute ${getStatusIconColor(task.status)} text-white p-2 rounded-xl`}
+        style={{
+          width: `${taskWidth}%`,
+          left: `${taskLeft}%`,
+          top: `${index * (taskHeight + TASK_SPACING)}rem`,
+          height: `${taskHeight}rem`,
+          lineHeight: `${taskHeight}rem`,
+          display: taskWidth > 0 ? 'flex' : 'none',
+          flexDirection: 'column',
+          justifyContent: 'center',
+        }}
+      >
+        {/* Task content with assignee avatars on the left, task name, and objectives */}
+        <div className="flex items-center justify-between w-full pl-2"> {/* Added pl-2 for slight right shift */}
+          {/* Assignee avatars */}
+          <div className="flex -space-x-3 mr-2">
+            {task.assignee && task.assignee.map((member, index) => (
+              <img
+                key={index}
+                src={member.profilePicture?.url || '/path/to/default/avatar.png'}
+                alt={member.name}
+                className="w-6 h-6 rounded-full border-2 border-white"
+                title={member.name}
+              />
+            ))}
+          </div>
+
+          {/* Task name and Objectives */}
+          <div className="flex flex-col items-start flex-grow">
+            <div className={`text-black font-semibold ${textSizeClass}`}>
+              {task.taskName}
+            </div>
+            <div className="flex items-center w-full">
+              {/* Icon for Objectives and Objectives text */}
+              <div className="flex items-center text-xs text-black font-semibold mr-2">
+                <img src={filterIcon} alt="Objectives Icon" className="w-4 h-4 mr-1" />
+                {task.objectives ? task.objectives.length : 0} Objectives
               </div>
+
+              {/* Paperclip icon and attachment count */}
+              <div className="flex items-center text-xs text-black mx-2">
+                <FontAwesomeIcon icon={faPaperclip} className="text-xs mr-1 text-gray-700" />
+                <span>{task.attachment && task.attachment.length > 0 ? task.attachment.length : '-'}</span>
+              </div>
+
+              {/* Priority flag icon and text */}
+              <div className="flex items-center text-xs text-black ml-2">
+                <FontAwesomeIcon
+                  icon={faFlag}
+                  className={`${getPriorityIconColor(task.priority)} mr-1`}
+                />
+                {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Circle with a checkmark for 'Done' tasks */}
+        {task.status === 'Done' && (
+          <div
+            className="absolute right-5 top-1/2 transform -translate-y-1/2 bg-green-500 text-white w-7 h-7 flex items-center justify-center rounded-full"
+          >
+            <FontAwesomeIcon icon={faCheck} className="w-4 h-4" />
+          </div>
+        )}
+      </div>
+    );
+  })}
+</div>
+
+
             </div>
           ))}
         </div>

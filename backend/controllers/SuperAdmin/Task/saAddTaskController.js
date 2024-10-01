@@ -1,7 +1,7 @@
 import saAddTask from '../../../models/SuperAdmin/saAddTask.js'; 
 import Project from '../../../models/SuperAdmin/saNewProject.js';
 import saInvitedMember from '../../../models/SuperAdmin/saInvitedMember.js';
-
+import User from '../../../models/Client/userModels.js';
           //getAddedMembers
         export const getAddedMembers = async (req, res) => {
           try {
@@ -292,10 +292,11 @@ export const deleteTask = async (req, res) => {
 
 
 // Controller to add a comment to a task
+
 export const addCommentToTask = async (req, res) => {
   try {
     const { taskId } = req.params; // Get task ID from URL
-    const { userId, userName, profilePicture, text } = req.body; // Extract data from request body
+    const { userId, text } = req.body; // Only receive userId and text from the request
 
     if (!taskId || !userId || !text) {
       return res.status(400).json({
@@ -304,15 +305,24 @@ export const addCommentToTask = async (req, res) => {
       });
     }
 
-    // Find the task and add the comment
+    // Find the user to get the userName and profilePicture
+    const user = await User.findById(userId).select('username profilePicture');
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found.'
+      });
+    }
+
+    // Find the task and add the comment with the fetched user details
     const updatedTask = await saAddTask.findByIdAndUpdate(
       taskId,
       {
         $push: {
           comments: {
             userId,
-            userName,
-            profilePicture,
+            userName: user.username,
+            profilePicture: user.profilePicture,
             text
           }
         }
@@ -340,4 +350,3 @@ export const addCommentToTask = async (req, res) => {
     });
   }
 };
-

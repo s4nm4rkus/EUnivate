@@ -25,7 +25,7 @@ const List = ({ tasks }) => {
 
     return (
         <div className="p-4">
-            {['Document', 'Todo', 'Ongoing', 'Done', 'Backlogs'].map((status) => (
+            {['Document', 'Todo', 'Ongoing', 'Done', 'Backlog'].map((status) => (
                 <div key={status} className="mb-6">
                     <h2 className="text-2xl font-bold mb-4">{status}</h2>
                     {getTasksByStatus(status).length > 0 ? (
@@ -48,9 +48,9 @@ const List = ({ tasks }) => {
 
                                 {/* Hidden fields on mobile */}
                                 <div className="hidden sm:block col-span-1">
-    <p className="text-xs text-gray-400 mb-4">Description</p>
-    <p className="text-xs truncate overflow-hidden whitespace-nowrap">{task.description}</p>
-</div>
+                                    <p className="text-xs text-gray-400 mb-4">Description</p>
+                                    <p className="text-xs truncate overflow-hidden whitespace-nowrap">{task.description}</p>
+                                </div>
 
                                 <div className="hidden sm:block col-span-1">
                                     <p className="text-xs text-gray-400 mb-4">Priority</p>
@@ -59,6 +59,7 @@ const List = ({ tasks }) => {
                                         <span className="text-sm text-gray-700 ml-2">{task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</span>
                                     </div>
                                 </div>
+
                                 <div className="hidden sm:block col-span-1">
                                     <p className="text-xs text-gray-400 mb-4">Status</p>
                                     <p className={`text-sm ${getStatusColor(task.status)}`}>{task.status}</p>
@@ -67,13 +68,22 @@ const List = ({ tasks }) => {
                                 {/* Assignee (right on mobile) */}
                                 <div className="col-span-1 text-right">
                                     <p className="text-xs text-gray-400 mb-4 hidden sm:block">Assigned</p> {/* Hidden on mobile */}
-                                    <div className="flex justify-end items-center">
+                                    <div className="flex justify-end items-center -space-x-5">
                                         {task.assignee && task.assignee.length > 0 ? (
-                                            <img src={task.assignee[0].profilePicture} alt="Assignee Avatar" className="w-7 h-7 rounded-full object-cover mr-2" />
+                                            // Loop through each assignee and display profile picture and name
+                                            task.assignee.map((member, index) => (
+                                                <div key={index} className="flex items-center">
+                                                    <img
+                                                        src={member.profilePicture?.url || '/path/to/default/avatar.png'}
+                                                        alt={member.name || 'Default Avatar'}
+                                                        className="w-7 h-7 rounded-full object-cover mr-2"
+                                                    />
+                                                    <p className="text-sm text-gray-700">{member.name}</p>
+                                                </div>
+                                            ))
                                         ) : (
-                                            <img src="/path/to/default/avatar.png" alt="Default Avatar" className="w-7 h-7 rounded-full object-cover mr-2" />
+                                            <p className="text-sm text-gray-500">Unassigned</p>
                                         )}
-                                        <p>{task.assignee ? task.assignee.map(member => member.name).join(', ') : 'Unassigned'}</p>
                                     </div>
                                 </div>
                             </div>

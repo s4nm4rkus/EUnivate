@@ -8,12 +8,16 @@ const objectiveSchema = new mongoose.Schema({
 
 // Define the schema for each comment
 const commentSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // ID of the user who commented
-  userName: { type: String, required: true }, // Username of the commenter
-  profilePicture: { type: String, required: true }, // Profile picture URL of the commenter
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // User ID
+  userName: { type: String, required: true }, // Name of the commenter
+  profilePicture: {
+    publicId: { type: String, required: true },
+    url: { type: String, required: true }
+  },
   text: { type: String, required: true }, // The comment text
-  createdAt: { type: Date, default: Date.now } // Timestamp for when the comment was made
+  createdAt: { type: Date, default: Date.now } // Timestamp
 });
+
 
 const saAddTaskSchema = new mongoose.Schema({
   taskName: { type: String, required: true },

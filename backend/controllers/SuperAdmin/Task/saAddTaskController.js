@@ -1,7 +1,7 @@
 import saAddTask from '../../../models/SuperAdmin/saAddTask.js'; 
 import Project from '../../../models/SuperAdmin/saNewProject.js';
 import saInvitedMember from '../../../models/SuperAdmin/saInvitedMember.js';
-
+import User from '../../../models/Client/userModels.js';
           //getAddedMembers
         export const getAddedMembers = async (req, res) => {
           try {
@@ -290,3 +290,90 @@ export const deleteTask = async (req, res) => {
   }
 };
 
+
+// Controller to add a comment to a task
+
+export const addCommentToTask = async (req, res) => {
+  try {
+    const { taskId } = req.params; // Get task ID from URL
+    const { userId, text } = req.body; // Only receive userId and text from the request
+
+    if (!taskId || !userId || !text) {
+      return res.status(400).json({
+        success: false,
+        message: 'Task ID, user ID, and comment text are required.'
+      });
+    }
+
+    // Find the user to get the userName and profilePicture
+    const user = await User.findById(userId).select('username profilePicture');
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found.'
+      });
+    }
+
+    // Find the task and add the comment with the fetched user details
+    const updatedTask = await saAddTask.findByIdAndUpdate(
+      taskId,
+      {
+        $push: {
+          comments: {
+            userId,
+            userName: user.username,
+            profilePicture: user.profilePicture,
+            text
+          }
+        }
+      },
+      { new: true, runValidators: true } // Return the updated document
+    );
+
+    if (!updatedTask) {
+      return res.status(404).json({
+        success: false,
+        message: 'Task not found.'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: updatedTask.comments // Return the updated comments array
+    });
+  } catch (error) {
+    console.error('Error adding comment to task:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server Error. Could not add comment.',
+      error: error.message
+    });
+  }
+};
+
+//GetComments
+export const getTaskComments = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const task = await saAddTask.findById(taskId).select('comments');
+
+    if (!task) {
+      return res.status(404).json({
+        success: false,
+        message: 'Task not found.'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: task.comments
+    });
+  } catch (error) {
+    console.error('Error fetching comments:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server Error. Could not fetch comments.',
+      error: error.message
+    });
+  }
+};

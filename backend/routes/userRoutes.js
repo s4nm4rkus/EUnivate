@@ -20,6 +20,7 @@
   import { findUserByUsername } from '../controllers/findUserNameIDController.js';
   import { assignProjectToUser } from '../controllers/SuperAdmin/Project/assignUserProjectController.js';
   import { addMemberToProject } from '../controllers/SuperAdmin/Project/sa-addMember.js';
+  import { addNewWorkspace } from '../controllers/SuperAdmin/workspaceController.js';
 
 
 const router = express.Router();
@@ -32,6 +33,9 @@ router.post('/verify-otp', protect, verifyTwoFactorAuth);
 router.post('/verify-login-otp',  verifyLoginOtp);  
 router.post('/resend-otp',  resendOtp);  
 router.post('/refresh-token', refreshToken);
+
+//Workspace
+router.post('/workspace', addNewWorkspace);
 
 //User Messages Related
 router.post('/contactEunivate',ContactEunivate );

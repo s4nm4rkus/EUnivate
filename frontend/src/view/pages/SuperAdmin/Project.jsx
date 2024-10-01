@@ -264,20 +264,20 @@ const Project = () => {
             </div>
 
             <div className="mt-6 flex flex-col justify-center">
-  <button
-    onClick={handleCreateProject}
-    className="bg-red-800 text-white px-8 py-3 rounded-md shadow hover:bg-red-900 w-full mb-2 flex items-center justify-center"
-    disabled={loading}
-  >
-    {loading ? <ButtonSpinner /> : 'Create Project'}
-  </button>
-  <button
-    onClick={closeModal}
-    className="bg-gray-500 text-white px-8 py-3 rounded-md shadow hover:bg-gray-600 w-full flex items-center justify-center"
-  >
-    Close
-  </button>
-</div>
+              <button
+                onClick={handleCreateProject}
+                className="bg-red-800 text-white px-8 py-3 rounded-md shadow hover:bg-red-900 w-full mb-2 flex items-center justify-center"
+                disabled={loading}
+              >
+                {loading ? <ButtonSpinner /> : 'Create Project'}
+              </button>
+              <button
+                onClick={closeModal}
+                className="bg-gray-500 text-white px-8 py-3 rounded-md shadow hover:bg-gray-600 w-full flex items-center justify-center"
+              >
+                Close
+              </button>
+            </div>
 
           </div>
         </div>

@@ -58,16 +58,31 @@ const Calendar = ({ tasks }) => {
 
     const TaskEvent = ({ event }) => (
         <div className="flex items-center p-1">
-            <div className="mr-2">
-                {event.task.assignee && event.task.assignee.length > 0 ? (
-                    <img src={event.task.assignee[0].profilePicture.url} alt="Assignee Avatar" className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-md" />
-                ) : (
-                    <img src="/path/to/default/avatar.png" alt="Default Avatar" className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-md" />
-                )}
-            </div>
-            <div className="font-semibold">{event.title}</div>
+          {/* Assignee avatars */}
+          <div className="flex -space-x-3 mr-2">
+            {event.task.assignee && event.task.assignee.length > 0 ? (
+              event.task.assignee.map((member, index) => (
+                <img
+                  key={index}
+                  src={member.profilePicture?.url || '/path/to/default/avatar.png'}
+                  alt={member.name}
+                  className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-md"
+                  title={member.name}
+                />
+              ))
+            ) : (
+              <img
+                src="/path/to/default/avatar.png"
+                alt="Default Avatar"
+                className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-md"
+              />
+            )}
+          </div>
+          {/* Task Name */}
+          <div className="font-semibold">{event.title}</div>
         </div>
-    );
+      );
+      
 
     return (
         <div className="p-6 bg-white shadow-lg rounded-lg border border-gray-200 relative">

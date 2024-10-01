@@ -142,7 +142,7 @@ const Kanban = ({ projectId, projectName }) => {
             {task.assignee && task.assignee.map((member, index) => (
               <img
                 key={index}
-                src={member.profilePicture.url}
+                src={member.profilePicture?.url}
                 alt={member.name}
                 className="w-8 h-8 rounded-full border-2 border-white"
                 title={member.name}
@@ -158,7 +158,7 @@ const Kanban = ({ projectId, projectName }) => {
               {task.attachment.map((attachment, index) => (
                 <img
                   key={index}
-                  src={attachment.url}
+                  src={attachment?.url}
                   alt={`Attachment ${index + 1}`}
                   className="w-full sm:w-40 h-48 sm:h-36 object-cover rounded-md"
                 />

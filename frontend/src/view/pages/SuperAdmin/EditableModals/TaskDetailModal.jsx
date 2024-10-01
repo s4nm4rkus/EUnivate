@@ -385,8 +385,7 @@
     
         // Prepare the comment data with only userId and text
         const newComment = {
-          userId: assignee._id,
-           // Ensure this is the correct `id`
+          userId: assignee._id,  // Ensure this is the correct `id`
           text: comment,
         };
     
@@ -394,7 +393,8 @@
           const response = await axios.post(`http://localhost:5000/api/users/sa-tasks/${task._id}/comments`, newComment);
     
           if (response.data.success) {
-            setCommentsList([...commentsList, ...response.data.data]);
+            // If the API returns the full list of comments, replace the state with the new list
+            setCommentsList(response.data.data);  // Assuming response.data.data contains the full list of comments
             setComment(''); // Clear the comment input
           } else {
             console.error('Failed to add comment:', response.data.message);
@@ -405,9 +405,6 @@
       }
     };
     
-    
-    
-      
 
 
     return (
@@ -456,31 +453,38 @@
         </div>
 
 
-          {/* Assignees */}
-                  <div className="mb-4">
-            <button
-              className="flex items-center space-x-2 bg-transparent border-none outline-none focus:outline-none"
-              onClick={() => setIsUserNameModalOpen(true)}
-            >
-              <span className="text-gray-700 text-sm font-semibold flex justify-normal -space-x-4">Assignee</span>
-              {editedAssignees.length > 0 ? (
-                // Display the first assignee's profile image if available
-                editedAssignees[0].profilePicture.url ? (
-                  <img
-                    src={editedAssignees[0].profilePicture.url}
-                    alt={editedAssignees[0].username}
-                    className="w-8 h-8 rounded-full border"
-                  />
+                  {/* Assignees */}
+            <div className="mb-4">
+              <button
+                className="flex items-center space-x-2 bg-transparent border-none outline-none focus:outline-none"
+                onClick={() => setIsUserNameModalOpen(true)}
+              >
+                <span className="text-gray-700 text-sm font-semibold flex justify-normal">Assignees</span>
+                {editedAssignees.length > 0 ? (
+                  // Loop through all assignees and display their profile pictures or fallback icon
+                  <div className="flex -space-x-5">
+                    {editedAssignees.map((assignee, index) => (
+                      <div key={index} className="flex items-center">
+                        {assignee.profilePicture?.url ? (
+                          <img
+                            src={assignee.profilePicture.url}
+                            alt={assignee.username}
+                            className="w-8 h-8 rounded-full border"
+                          />
+                        ) : (
+                          // Fallback to FaUser icon if no profile image is available
+                          <FaUser className="text-gray-500 text-lg bg-transparent rounded-lg border" />
+                        )}
+                        <span className="ml-2 text-sm text-gray-500">{assignee.username}</span>
+                      </div>
+                    ))}
+                  </div>
                 ) : (
-                  // Fallback to FaUser icon if no profile image is available
-                  <FaUser className="text-gray-500 text-lg bg-transparent rounded-lg border" />
-                )
-              ) : (
-                // If no assignee is selected, show the default "Assign to" text
-                <span className='text-sm text-gray-500'>Assign to</span>
-              )}
-            </button>
-          </div>
+                  // If no assignees are selected, show the default "Assign to" text
+                  <span className="text-sm text-gray-500">Assign to</span>
+                )}
+              </button>
+            </div>
 
 
               {/* Start Date */}
@@ -717,7 +721,6 @@
           </div>
 
 
-          {/* Comments */}
           {/* Comments Section */}
           <div className="mb-4">
           <textarea
@@ -740,9 +743,9 @@
               <ul className="list-disc list-inside">
                 {commentsList.map((cmt, index) => (
                   <li key={index} className="mt-1 flex items-start text-gray-500">
-                    <img src={cmt.avatar} alt={cmt.name} className="w-8 h-8 rounded-full mr-2" />
+                    <img src={cmt.profilePicture?.url} alt={cmt.username} className="w-8 h-8 rounded-full mr-2" />
                     <div>
-                      <strong>{cmt.name}</strong>
+                      <strong>{cmt.userName}</strong>
                       <p>{cmt.text}</p>
                     </div>
                   </li>

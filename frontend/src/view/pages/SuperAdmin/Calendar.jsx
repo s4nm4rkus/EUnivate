@@ -60,7 +60,7 @@ const Calendar = ({ tasks }) => {
         <div className="flex items-center p-1">
             <div className="mr-2">
                 {event.task.assignee && event.task.assignee.length > 0 ? (
-                    <img src={event.task.assignee[0].profilePicture} alt="Assignee Avatar" className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-md" />
+                    <img src={event.task.assignee[0].profilePicture.url} alt="Assignee Avatar" className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-md" />
                 ) : (
                     <img src="/path/to/default/avatar.png" alt="Default Avatar" className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-md" />
                 )}

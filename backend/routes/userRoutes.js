@@ -22,7 +22,7 @@
       import { addMemberToProject } from '../controllers/SuperAdmin/Project/sa-addMember.js';
       import { assignProjectToUser } from '../controllers/SuperAdmin/Project/assignUserProjectController.js';
       import { createSaNewProject, getAllProjects, getProjectById, inviteUsersToProject } from '../controllers/SuperAdmin/Project/saNewProjectController.js';
-      import { getAddedMembers, createTask, getTasks, getTaskById, updateTask, addCommentToTask, getTasksByProjectId, deleteTask } from '../controllers/SuperAdmin/Task/saAddTaskController.js';  
+      import { getAddedMembers, createTask, getTasks, getTaskById, updateTask, addCommentToTask, getTaskComments, getTasksByProjectId, deleteTask } from '../controllers/SuperAdmin/Task/saAddTaskController.js';  
       import { protect, verifySuperAdmin } from '../middlewares/middleware.js'; 
       import { inviteUsers, updateUserRole, getInvitedUsers, removeInvitedMember, getUsers} from '../controllers/SuperAdmin/People/peopleController.js';
 
@@ -70,7 +70,7 @@
       router.patch('/sa-tasks/:id', updateTask);
       router.delete('/sa-tasks/:id', deleteTask);
       router.post('/sa-tasks/:taskId/comments', addCommentToTask);
-
+      router.get('/sa-tasks/:taskId/comments', getTaskComments);
       // quotation route  
       router.post('/quotation',createQuotation);
       router.get('/quotation/confirm/:quotationToken', confirmQuotationEmail);

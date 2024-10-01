@@ -350,3 +350,30 @@ export const addCommentToTask = async (req, res) => {
     });
   }
 };
+
+//GetComments
+export const getTaskComments = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const task = await saAddTask.findById(taskId).select('comments');
+
+    if (!task) {
+      return res.status(404).json({
+        success: false,
+        message: 'Task not found.'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: task.comments
+    });
+  } catch (error) {
+    console.error('Error fetching comments:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server Error. Could not fetch comments.',
+      error: error.message
+    });
+  }
+};

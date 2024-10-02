@@ -3,6 +3,7 @@ import axios from 'axios';
 import '../../../admin.css';
 import AdminNavbar from '../../components/SuperAdmin/AdminNavbar';
 import { FaFlag, FaCheckCircle } from 'react-icons/fa'; // Importing the flag and check icons
+import BoxLoader from './Loading Style/Box Loading/BoxLoader';
 
 const Task = () => {
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
@@ -24,18 +25,18 @@ const Task = () => {
             try {
                 const user = JSON.parse(localStorage.getItem('user'));
                 const accessToken = user ? user.accessToken : null;
-
+    
                 if (!accessToken) {
                     console.error('No access token found. Please log in again.');
                     return;
                 }
-
+    
                 const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
                 });
-
+    
                 const tasksList = [];
                 await Promise.all(
                     response.data.map(async (project) => {
@@ -48,17 +49,21 @@ const Task = () => {
                         tasksList.push(...tasksWithProject);
                     })
                 );
-
-                setTasks(tasksList);
+    
+                // Simulate a longer loading time by delaying the loading completion
+                setTimeout(() => {
+                    setTasks(tasksList);
+                    setLoading(false);
+                }, 2000); // 2000ms (2 seconds) delay for the loader
             } catch (error) {
                 console.error('Error fetching tasks:', error);
-            } finally {
                 setLoading(false);
             }
         };
-
+    
         fetchTasks();
     }, []);
+    
 
     const openModal = (task) => {
         setSelectedTask(task);
@@ -104,54 +109,75 @@ const Task = () => {
                     toggleAccountDropdown={toggleAccountDropdown}
                 />
             </div>
-
             <div className="mt-4">
-                <h2 className="text-md font-medium text-gray-700 text-left">
+                <h2 className="text-md md:text-xl font-medium text-gray-700 text-left">
                     Assignee
                 </h2>
             </div>
 
             <div className="mt-4 flex gap-4">
                 <div className="p-6 bg-white border rounded-lg shadow-md w-full">
-                    <div className="text-gray-600 text-sm">
-                        <div className="grid grid-cols-6 gap-4 font-medium mb-2">
-                            <p>Task</p>
-                            <p className="text-center">Due Date</p>
-                            <p className="text-center">Priority</p>
-                            <p className="text-center">Objective</p>
-                            <p className="text-center">Status</p>
-                            <p className="text-right">Project</p>
+                    <div className="text-gray-600 text-sm md:text-base">
+                        {/* Responsive header for mobile and desktop */}
+                        <div className="grid grid-cols-3 md:grid-cols-6 gap-4 font-medium mb-2">
+                            {/* Task column: visible on all screen sizes */}
+                            <p className="text-xs md:text-sm">Task</p>
+
+                            {/* These columns are hidden on mobile but visible on larger screens */}
+                            <p className="hidden md:block text-center">Due Date</p>
+
+                            <p className="hidden md:block text-center">Priority</p>
+
+                            <p className="hidden md:block text-center">Objective</p>
+
+                            {/* Status column: centered on mobile, left on desktop */}
+                            <p className="text-center text-xs md:text-sm">Status</p>
+                            
+                            {/* Project column: aligned right on desktop */}
+                            <p className="text-right text-xs md:text-sm">Project</p>
                         </div>
 
                         {loading ? (
-                            <p>Loading...</p>
+                            <div className="flex justify-center">
+                                <BoxLoader /> {/* Loading spinner displayed here */}
+                            </div>
                         ) : (
-                        <ul className="space-y-2">
-    {tasks.map((task) => (
-        <li 
-            key={task._id} 
-            className="grid grid-cols-6 gap-4 items-center mb-1 p-4 bg-white rounded-lg cursor-pointer hover:bg-gray-200 hover:shadow-md hover:scale-[1.02] hover:w-full transition-all duration-300 ease-in-out"
-            onClick={() => openModal(task)}
-        >
-            <div className="flex items-center">
-                {/* Status icon (check for "done", empty circle otherwise) */}
-                {renderStatusIcon(task.status)}
-                <p className="ml-2 font-bold">{task.taskName}</p>
-            </div>
-            <p className="text-center">{formatDate(task.dueDate)}</p>
-            <div className="flex items-center justify-center">
-                {/* Flag icon with color based on priority */}
-                <FaFlag className={`mr-1 text-sm ${getPriorityColor(task.priority)}`} /> 
-                <p>{task.priority}</p>
-            </div>
-            <p className="text-center">{task.objectiveCount} Objective</p>
-            <p className="text-center">{task.status}</p>
-            <p className="text-right">{task.projectName}</p>
-        </li>
-    ))}
-</ul>
-
+                            <ul className="space-y-2">
+                                {tasks.map((task) => (
+                                    <li
+                                        key={task._id}
+                                        className="relative grid grid-cols-3 md:grid-cols-6 gap-4 items-center mb-1 py-4 bg-white rounded-lg cursor-pointer transition-all duration-300 ease-in-out"
+                                        onClick={() => openModal(task)}
+                                    >
+                                        {/* Extend hover effect using ::before */}
+                                        <div className="absolute inset-0 bg-transparent hover:bg-gray-200 hover:shadow-md hover:scale-[1.02] transition-all duration-300 ease-in-out -mx-4 py-4"></div>
                         
+                                        {/* Task column: visible on all screen sizes */}
+                                        <div className="flex items-center relative z-10">
+                                            {renderStatusIcon(task.status)}
+                                            <p className="ml-2 font-bold text-sm md:text-base">{task.taskName}</p>
+                                        </div>
+                        
+                                        
+                        
+                                       
+                                        {/* Hidden on mobile but visible on larger screens */}
+                                        <p className="hidden md:block text-center relative z-10">{formatDate(task.dueDate)}</p>
+                                        <div className="hidden md:flex items-center justify-center relative z-10">
+                                            <FaFlag className={`mr-1 text-xs md:text-sm ${getPriorityColor(task.priority)}`} />
+                                            <p className="text-xs md:text-sm">{task.priority}</p>
+                                        </div>
+
+                                        <p className="hidden md:block text-center relative z-10">{task.objectiveCount} Objective</p>
+
+                                        {/* Status column: centered on mobile */}
+                                        <p className="text-center relative z-10 text-sm md:text-base">{task.status}</p>
+
+                                         {/* Project column: aligned right on larger screens */}
+                                         <p className="text-right relative z-10 text-sm md:text-base">{task.projectName}</p>
+                                    </li>
+                                ))}
+                            </ul>
                         )}
                     </div>
                 </div>

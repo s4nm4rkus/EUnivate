@@ -20,9 +20,9 @@ const Project = () => {
   const [loading, setLoading] = useState(false);
   const [loadingProject, setLoadingProject] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [taskCounts, setTaskCounts] = useState({}); // Store total and done tasks count per project
 
   const navigate = useNavigate();
-  const [doneTaskCounts, setDoneTaskCounts] = useState({});
   const { isNavOpen } = useOutletContext();
 
   useEffect(() => {
@@ -36,13 +36,13 @@ const Project = () => {
           setError('No access token found. Please log in again.');
           return;
         }
-  
+
         const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-  
+
         setProjects(response.data);
       } catch (error) {
         console.error('Error fetching projects:', error);
@@ -51,10 +51,35 @@ const Project = () => {
         setLoading(false);
       }
     };
-  
+
     fetchProjects();
   }, []);
-  
+
+  // Fetch task counts (total and done) for each project
+  useEffect(() => {
+    const fetchTaskCounts = async () => {
+      const counts = {};
+      for (let project of projects) {
+        try {
+          const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}`);
+          const totalTasks = response.data.data.length;
+          const doneTasks = response.data.data.filter(task => task.status === 'Done').length;
+          counts[project._id] = {
+            totalTasks,
+            doneTasks,
+          };
+        } catch (error) {
+          console.error('Error fetching task counts:', error);
+        }
+      }
+      setTaskCounts(counts);
+    };
+
+    if (projects.length) {
+      fetchTaskCounts();
+    }
+  }, [projects]);
+
   const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
@@ -141,30 +166,6 @@ const Project = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchDoneTaskCounts = async () => {
-      try {
-        const counts = {};
-        for (let project of projects) {
-          try {
-            const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}?status=Done`);
-            counts[project._id] = response.data.data.length;
-          } catch (error) {
-            console.error('Error fetching done task count:', error);
-            counts[project._id] = 0;
-          }
-        }
-        setDoneTaskCounts(counts);
-      } catch (error) {
-        console.error('Error fetching done task counts:', error);
-      }
-    };
-
-    if (projects.length) {
-      fetchDoneTaskCounts();
-    }
-  }, [projects]);
-
   const handleProjectClick = (project) => {
     setSelectedProject(project);
     setLoadingProject(true);
@@ -174,9 +175,14 @@ const Project = () => {
     }, 3000);
   };
 
+  const calculateProgress = (projectId) => {
+    const { totalTasks, doneTasks } = taskCounts[projectId] || { totalTasks: 0, doneTasks: 0 };
+    return totalTasks > 0 ? (doneTasks / totalTasks) * 100 : 0;
+  };
+
   return (
     <div className="bg-gray-100 min-h-screen p-6">
- <ToastContainer />
+      <ToastContainer />
 
       {loadingProject && (
         <div className="flex flex-col items-center">
@@ -264,21 +270,20 @@ const Project = () => {
             </div>
 
             <div className="mt-6 flex flex-col justify-center">
-  <button
-    onClick={handleCreateProject}
-    className="bg-red-800 text-white px-8 py-3 rounded-md shadow hover:bg-red-900 w-full mb-2 flex items-center justify-center"
-    disabled={loading}
-  >
-    {loading ? <ButtonSpinner /> : 'Create Project'}
-  </button>
-  <button
-    onClick={closeModal}
-    className="bg-gray-500 text-white px-8 py-3 rounded-md shadow hover:bg-gray-600 w-full flex items-center justify-center"
-  >
-    Close
-  </button>
-</div>
-
+              <button
+                onClick={handleCreateProject}
+                className="bg-red-800 text-white px-8 py-3 rounded-md shadow hover:bg-red-900 w-full mb-2 flex items-center justify-center"
+                disabled={loading}
+              >
+                {loading ? <ButtonSpinner /> : 'Create Project'}
+              </button>
+              <button
+                onClick={closeModal}
+                className="bg-gray-500 text-white px-8 py-3 rounded-md shadow hover:bg-gray-600 w-full flex items-center justify-center"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -304,7 +309,7 @@ const Project = () => {
               <p>{new Date(project.createdAt).toLocaleDateString() || 'No date available'}</p>
               <FaCheckCircle className="ml-5" />
               <p className="ml-2">
-                {doneTaskCounts[project._id] !== undefined ? doneTaskCounts[project._id] : 'Loading...'}
+                {taskCounts[project._id] ? taskCounts[project._id].doneTasks : 'Loading...'}
               </p>
               <div className="flex items-center justify-end ml-9 -space-x-4">
                 {project.invitedUsers && project.invitedUsers.slice(0, 3).map(user => (
@@ -318,16 +323,17 @@ const Project = () => {
                 </div>
             </div>
 
-
-
+            {/* Progress Bar */}
             <div className="flex items-center mt-4">
               <div className="w-full bg-gray-200 rounded-full h-2 relative">
                 <div
                   className="bg-green-500 h-2 rounded-full"
-                  style={{ width: '5%' }} // Adjust this as needed
+                  style={{ width: `${calculateProgress(project._id)}%` }} // Dynamically set progress width
                 ></div>
               </div>
-              <p className="ml-2 text-gray-500">5%</p>
+              <p className="ml-2 text-gray-500">
+                {`${Math.floor(calculateProgress(project._id))}%`}
+              </p>
             </div>
           </div>
         ))}

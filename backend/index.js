@@ -7,7 +7,8 @@ import chatMessageRoutes from './routes/chatMessageRoutes.js'; // Ensure this pa
 import { confirmQuotationEmail } from './controllers/Client/quotationController.js'; // Adjust the path as needed
 import { createServer } from 'http'; // Import to create HTTP server
 import { Server } from 'socket.io'; // Import Socket.IO
-import { getTaskById } from './controllers/SuperAdmin/Task/saAddTaskController.js';
+// import { getTaskById } from './controllers/SuperAdmin/Task/saAddTaskController.js';
+
 dotenv.config();
 connectDB();
 
@@ -34,22 +35,6 @@ app.get('/quotation-complete', (req, res) => {
 res.redirect('http://localhost:5173/quotation-complete');
 });
 
-// Socket.IO event handling
-io.on('connection', (socket) => {
-  console.log('A user connected');
-
-// After updating the database
-socket.on('updateObjective', async (data) => {
-      // Fetch the updated task using the getTaskById function
-      const updatedTask = await getTaskById({ params: { id: data.taskId } });
-  io.emit('objectiveUpdated', updatedTask); // Broadcast the latest task
-});
-
-
-  socket.on('disconnect', () => {
-      console.log('A user disconnected');
-  });
-});
 
 
 // Error handling middleware
@@ -66,4 +51,4 @@ res.send('Welcome to the API');
 });
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

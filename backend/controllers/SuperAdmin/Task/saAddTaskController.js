@@ -2,7 +2,7 @@
     import Project from '../../../models/SuperAdmin/saNewProject.js';
     import saInvitedMember from '../../../models/SuperAdmin/saInvitedMember.js';
     import User from '../../../models/Client/userModels.js';
-    
+    import { io } from '../../../index.js';
 
       //getAddedMembers
         export const getAddedMembers = async (req, res) => {
@@ -221,6 +221,47 @@
               });
             }
           };
+
+          export const updateTaskObjectives = async (req, res) => {
+            try {
+              const { id } = req.params; // Task ID
+              const { objectives } = req.body; // Only objectives should be updated
+          
+              if (!objectives || !Array.isArray(objectives)) {
+                return res.status(400).json({
+                  success: false,
+                  message: 'Objectives must be an array and are required for this operation.',
+                });
+              }
+          
+              // Update only the objectives field in the task document
+              const updatedTask = await saAddTask.findByIdAndUpdate(
+                id,
+                { $set: { objectives } }, // Only update the objectives field
+                { new: true, runValidators: true }
+              );
+          
+              if (!updatedTask) {
+                return res.status(404).json({ message: 'Task not found' });
+              }
+          
+              // Emit the task-updated event for real-time updates (if using Socket.IO)
+              io.emit('task-updated', updatedTask);
+          
+              res.status(200).json({
+                message: 'Task objectives updated successfully',
+                data: updatedTask,
+              });
+            } catch (error) {
+              console.error('Error updating task objectives:', error);
+              res.status(500).json({
+                success: false,
+                message: 'Server error. Could not update task objectives.',
+                error: error.message,
+              });
+            }
+          };
+          
 
         // Update Task Controller
         export const updateTask = async (req, res) => {

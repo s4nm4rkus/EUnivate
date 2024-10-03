@@ -22,7 +22,7 @@
       import { addMemberToProject } from '../controllers/SuperAdmin/Project/sa-addMember.js';
       import { assignProjectToUser } from '../controllers/SuperAdmin/Project/assignUserProjectController.js';
       import { createSaNewProject, getAllProjects, getProjectById, inviteUsersToProject } from '../controllers/SuperAdmin/Project/saNewProjectController.js';
-      import { getAddedMembers, createTask, getTasks, getTaskById, updateTask, addCommentToTask, getTaskComments, getTasksByProjectId, deleteTask } from '../controllers/SuperAdmin/Task/saAddTaskController.js';  
+      import { getAddedMembers, createTask, getTasks, getTaskById, updateTask, updateTaskObjectives, addCommentToTask, getTaskComments, getTasksByProjectId, deleteTask } from '../controllers/SuperAdmin/Task/saAddTaskController.js';  
       import { protect, verifySuperAdmin } from '../middlewares/middleware.js'; 
       import { inviteUsers, updateUserRole, getInvitedUsers, removeInvitedMember, getUsers} from '../controllers/SuperAdmin/People/peopleController.js';
 
@@ -68,6 +68,7 @@
       router.get('/sa-tasks/:projectId', getTasksByProjectId);
       router.get('/sa-tasks/:id', getTaskById);
       router.patch('/sa-tasks/:id', updateTask);
+      router.patch('/sa-tasks/:id/objectives', updateTaskObjectives);
       router.delete('/sa-tasks/:id', deleteTask);
       router.post('/sa-tasks/:taskId/comments', addCommentToTask);
       router.get('/sa-tasks/:taskId/comments', getTaskComments);

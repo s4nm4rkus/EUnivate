@@ -3,12 +3,9 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
 import cors from 'cors';
-import chatMessageRoutes from './routes/chatMessageRoutes.js'; // Ensure this path is correct
-import { confirmQuotationEmail } from './controllers/Client/quotationController.js'; // Adjust the path as needed
-import { createServer } from 'http'; // Import to create HTTP server
-import { Server } from 'socket.io'; // Import Socket.IO
-// import { getTaskById } from './controllers/SuperAdmin/Task/saAddTaskController.js';
-
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import saAddTask from './models/SuperAdmin/saAddTask.js';
 dotenv.config();
 connectDB();
 
@@ -16,40 +13,50 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const server = createServer(app); // Create HTTP server with Express app
+const server = createServer(app);
 const io = new Server(server, {
-    cors: {
-        origin: "http://localhost:5173", // Replace with your client's URL
-        methods: ["GET", "POST", "DELETE", "PATCH", "UPDATE"]
+  cors: {
+    origin: "http://localhost:5173", // Client URL
+    methods: ["GET", "POST", "DELETE", "PATCH", "UPDATE"]
+  }
+});
+
+// Objective socket handler
+io.on('connection', (socket) => {
+  console.log('New client connected');
+
+  socket.on('task-updated', async ({ taskId, objectives }) => {
+    try {
+      const updatedTask = await saAddTask.findByIdAndUpdate(taskId, { objectives }, { new: true });
+      io.emit('task-updated', updatedTask); // Broadcast the update to all clients
+    } catch (error) {
+      console.error('Error updating objectives:', error);
     }
+  });
+  
+  
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
 });
-// Use user routes
+export { io };
+
+// Routes
 app.use('/api/users', userRoutes);
-
-// Chat message routes
-app.use('/api/messages', chatMessageRoutes); // Ensure this path is correct
-app.get('/api/users/quotation/confirm/', confirmQuotationEmail);
-
-app.get('/quotation-complete', (req, res) => {
-// res.send('Quotation verification complete');
-res.redirect('http://localhost:5173/quotation-complete');
-});
-
-
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-console.error(err.stack);
-res.status(500).json({
-  message: 'Something went wrong on the server!',
-  error: process.env.NODE_ENV === 'production' ? {} : err.message, // Hide detailed error messages in production
-});
+  console.error(err.stack);
+  res.status(500).json({
+    message: 'Something went wrong on the server!',
+    error: process.env.NODE_ENV === 'production' ? {} : err.message,
+  });
 });
 
 app.get('/', (req, res) => {
-res.send('Welcome to the API');
+  res.send('Welcome to the API');
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

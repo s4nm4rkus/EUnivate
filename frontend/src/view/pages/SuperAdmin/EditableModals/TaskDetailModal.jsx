@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
-import { FaTimes, FaCircle, FaUser, FaFlag, FaEdit, FaTrash, FaPlus, FaCheckCircle, FaRegSquare, FaCheckSquare } from 'react-icons/fa';
+import { FaTimes, FaCircle, FaUser, FaFlag, FaEdit, FaTrash, FaPlus, FaCheckCircle  } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
-
+import { io } from 'socket.io-client';
 import UserNameModal from '../KanbanModals/UserNameModal';
 
 
 
+
+const socket = io('http://localhost:5000');
 
 const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpdateTask }) => {
   if (!task) return null;
@@ -48,7 +50,7 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpda
   //objectives
   const [newObjective, setNewObjective] = useState('');
   const [isAddingObjective, setIsAddingObjective] = useState(false);
-
+  const [updatedTask, setUpdatedTask] = useState(task);
   //Attachment
   const [newAttachmentFiles, setNewAttachmentFiles] = useState([]);
   const [showSaveAttachmentButton, setShowSaveAttachmentButton] = useState(false);
@@ -61,8 +63,9 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpda
   //SaveButton
   const [showSaveButton, setShowSaveButton] = useState(false);
 
-  
 
+
+  
     const handleTaskNameClick = () => {
       setIsEditingTaskName(true);
       setShowSaveButton(false); // Hide save button initially
@@ -70,12 +73,28 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpda
 
 
     useEffect(() => {
+        // Establish socket connection
+
+
       if (isOpen) {
+        console.log('Socket connected?', socket.connected); 
         fetchUsers();
         fetchComments(); // Fetch comments when the modal opens
+    
+        socket.on('task-updated', (updatedTask) => {
+          if (updatedTask._id === task._id) {
+            console.log('Received task update:', updatedTask); // Debug received update
+            setUpdatedTask(updatedTask);  
+            onUpdateTask(updatedTask);  
+          }
+        });
       }
-      
-    },  [isOpen, task._id, onUpdateTask]);
+    
+      return () => {
+        socket.off('task-updated');
+      };
+    }, [isOpen, task._id, onUpdateTask]);
+    
     
     const fetchUsers = async () => {
       try {
@@ -117,6 +136,7 @@ const fetchComments = async () => {
         });
 
         const data = await response.json();
+        socket.emit('task-updated', { taskId: updatedTask._id, objectives: updatedTask.objectives });
 
         if (response.ok) {
           console.log('Task updated successfully:', data);
@@ -327,32 +347,35 @@ const fetchComments = async () => {
       return obj;
     });
   
-    const updatedTask = { ...task, objectives: updatedObjectives };
-    onUpdateTask(updatedTask);  // Update the UI immediately
-    
+    // Only send objectives to the backend
     try {
-      // Update the task in the database
-      await updateTaskInDatabase(updatedTask);
-
+      const response = await axios.patch(`http://localhost:5000/api/users/sa-tasks/${task._id}/objectives`, {
+        objectives: updatedObjectives
+      });
+  
+      if (response.data.success) {
+        setUpdatedTask(response.data.data); // Update the task in the UI
+        onUpdateTask(response.data.data);   // Call the parent function to update the UI
+      }
     } catch (error) {
-      console.error('Failed to update objective:', error);
+      console.error('Failed to update objectives:', error);
     }
   };
   
   
-  const handleDeleteObjective = async (objective) => {
-    const updatedObjectives = task.objectives.filter(obj => obj !== objective);
-    const updatedTask = { ...task, objectives: updatedObjectives };
+  // const handleDeleteObjective = async (objective) => {
+  //   const updatedObjectives = task.objectives.filter(obj => obj !== objective);
+  //   const updatedTask = { ...task, objectives: updatedObjectives };
   
-    onUpdateTask(updatedTask); // This will immediately update the UI
+  //   onUpdateTask(updatedTask); // This will immediately update the UI
   
-    try {
-      await updateTaskInDatabase(updatedTask);
-
-    } catch (error) {
-      console.error('Failed to delete objective:', error);
-    }
-  };
+  //   try {
+  //     await updateTaskInDatabase(updatedTask);
+  //   } catch (error) {
+  //     console.error('Failed to delete objective:', error);
+  //   }
+  // };
+  
   
   
   const handleCommentSubmit = async () => {
@@ -608,59 +631,39 @@ const fetchComments = async () => {
 </div>
 
           {/* Objectives */}
+   
           <div className="mb-4">
-          <div className="mb-4 flex justify-between items-center">
-            <div className="text-gray-500 font-semibold">Objectives:</div>
-            <FaPlus className="cursor-pointer text-gray-500 hover:text-black" onClick={() => setIsAddingObjective(!isAddingObjective)} />
+  <div className="text-gray-500 font-semibold mb-2">Objectives:</div>
+  <ul className="list-none">
+    {task.objectives.map((objective, index) => (
+      <li
+        key={index}
+        className={`flex justify-between items-center mt-2 text-sm ${objective.done ? 'text-gray-400' : 'text-black'}`}
+      >
+        <div
+          className="flex items-center cursor-pointer p-2 rounded-lg"
+          onClick={() => handleToggleObjective(index)}
+          style={{ width: '100%' }}
+        >
+          {/* Objective Status Icon - Similar to Task Status */}
+          <div className={`w-5 h-5 rounded-full flex items-center justify-center ${objective.done ? 'bg-green-500' : 'bg-gray-300'}`}>
+            {objective.done ? (
+              <FaCheckCircle className="text-white" size={16} />
+            ) : (
+              <FaCircle className="text-white" size={16} />
+            )}
           </div>
-          {task.objectives && task.objectives.length > 0 ? (
-            <ul className="list-none">
-              {task.objectives.map((objective, index) => (
-                <li
-                  key={index}
-                  className={`mt-1 flex justify-between items-center text-sm ${objective.done ? 'text-gray-400' : 'text-black'}`}
-                >
-                  <div
-                    className="flex items-center cursor-pointer p-2 rounded-lg"
-                    onClick={() => handleToggleObjective(index)}
-                    style={{ width: '100%' }}
-                  >
-                    {objective.done ? (
-                      <FaCheckSquare className="mr-2 text-green-500" size={16} />
-                    ) : (
-                      <FaRegSquare className="mr-2 text-gray-500" size={16} />
-                    )}
-                    <span
-                      className={`flex-1 ${objective.done ? 'line-through' : ''}`}
-                    >
-                      {objective.text}
-                    </span>
-                  </div>
-                  <FaTimes
-                    className="ml-2 cursor-pointer text-red-500 hover:text-red-700"
-                    onClick={() => handleDeleteObjective(objective)}
-                  />
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <span className="text-gray-500 text-sm">No objectives defined</span>
-          )}
-          {isAddingObjective && (
-            <div className="mt-2 flex">
-              <input
-                type="text"
-                className="w-full p-2 border border-gray-300 rounded text-sm"
-                placeholder="New objective"
-                value={newObjective}
-                onChange={(e) => setNewObjective(e.target.value)}
-              />
-              <button className="ml-2 bg-red-700 text-white py-1 px-4 rounded text-sm" onClick={handleAddObjective}>
-                Add
-              </button>
-            </div>
-          )}
+
+          {/* Objective Text */}
+          <span className={`ml-3 flex-1 ${objective.done ? 'line-through' : ''}`}>
+            {objective.text}
+          </span>
         </div>
+      </li>
+    ))}
+  </ul>
+        </div>
+
 
 
         {/* Attachments */}

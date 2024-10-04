@@ -2,10 +2,13 @@ import express from 'express';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
+import chatMessageRoutes from './routes/chatMessageRoutes.js'; 
 import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import saAddTask from './models/SuperAdmin/saAddTask.js';
+import { confirmQuotationEmail } from './controllers/Client/quotationController.js';
+
 dotenv.config();
 connectDB();
 
@@ -44,6 +47,16 @@ export { io };
 
 // Routes
 app.use('/api/users', userRoutes);
+
+// // Chat message routes
+app.use('/api/messages', chatMessageRoutes); // Ensure this path is correct
+app.get('/api/users/quotation/confirm/', confirmQuotationEmail);
+
+app.get('/quotation-complete', (req, res) => {
+// res.send('Quotation verification complete');
+res.redirect('http://localhost:5173/quotation-complete');
+});
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {

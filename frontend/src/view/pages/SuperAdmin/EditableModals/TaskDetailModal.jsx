@@ -380,7 +380,8 @@ const fetchComments = async () => {
   const handleCommentSubmit = async () => {
     if (comment.trim()) {
       const assignee = editedAssignees && editedAssignees.length > 0 ? editedAssignees[0] : null;
-  
+      const user = JSON.parse(localStorage.getItem('user'));
+      const currentUserId = user?._id;
       if (!assignee) {
         console.error('No assignee selected');
         return;
@@ -388,7 +389,7 @@ const fetchComments = async () => {
   
       // Prepare the comment data with only userId and text
       const newComment = {
-        userId: assignee._id,  // Ensure this is the correct `id`
+        userId: currentUserId,  // Ensure this is the correct `id`
         text: comment,
       };
   

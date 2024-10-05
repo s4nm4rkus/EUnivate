@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 const saInvitedMemberSchema = new mongoose.Schema({
     email: {
         type: String,
-        unique: true, 
         require:true,
     },
     role: {

@@ -33,17 +33,35 @@ export const inviteUsers = async (req, res) => {
                         return;
                     }
 
-                    // Allow the invitation even if the user is already invited to other projects
-                    const newMember = new InviteMember({
-                        email: existingUser.email,
-                        role: roles[index] || existingUser.role || 'User',
-                        project: projects.map(project => project.toString()),
-                        invitedBy: [inviterId],
-                        userId: existingUser._id,
-                        profilePicture: profilePictures[index] || existingUser.profilePicture || {},
-                    });
+                    // Check if the user is already invited
+                    const invitedUser = await InviteMember.findOne({ email: existingUser.email });
+                    if (invitedUser) {
+                        // Update the `invitedBy` field by adding the new inviter's ID if it's not already present
+                        if (!invitedUser.invitedBy.includes(inviterId)) {
+                            invitedUser.invitedBy.push(inviterId);
+                        }
 
-                    await newMember.save();
+                        // Optionally update other fields like role, projects, etc.
+                        invitedUser.role = roles[index] || invitedUser.role;
+                        invitedUser.project = [...new Set([...invitedUser.project, ...projects.map(project => project.toString())])];
+                        invitedUser.profilePicture = profilePictures[index] || invitedUser.profilePicture;
+
+                        await invitedUser.save();
+
+                        console.log(`User with email ${existingUser.email} was already invited, but updated with a new inviter.`);
+                    } else {
+                        // Create a new invitation if the user is not already invited
+                        const newMember = new InviteMember({
+                            email: existingUser.email,
+                            role: roles[index] || existingUser.role || 'User',
+                            project: projects.map(project => project.toString()),
+                            invitedBy: [inviterId],
+                            userId: existingUser._id,
+                            profilePicture: profilePictures[index] || existingUser.profilePicture || {},
+                        });
+
+                        await newMember.save();
+                    }
 
                     await sendEmail({
                         email: existingUser.email,
@@ -62,6 +80,7 @@ export const inviteUsers = async (req, res) => {
         res.status(500).json({ message: 'Error inviting users', error: error.message });
     }
 };
+
 
 
 

@@ -11,8 +11,8 @@ const saInvitedMemberSchema = new mongoose.Schema({
         default: 'User',
     },      
     project: [{
-        type: String,
-        ref: 'User', 
+        type: mongoose.Schema.Types.ObjectId,  // Store project IDs as ObjectId
+        ref: 'SaNewProject',  // Reference the Project model
     
     }],
     profilePicture: {

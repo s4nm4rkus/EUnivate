@@ -4,7 +4,6 @@ import AdminNavbar from '../../components/SuperAdmin/AdminNavbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { User } from '../../../constants/assets';
-import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -21,31 +20,10 @@ const People = () => {
     const [selectedRole, setSelectedRole] = useState('');
     const [selectedEmails, setSelectedEmails] = useState([]);
     const [projects, setProjects] = useState([]);
-    // const [selectedProject, setSelectedProject] = useState(null);
-    // const dropdownRef = useRef();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [showUsersInModal, setShowUsersInModal] = useState(false);
 
-    const fetchProjects = async () => {
-        try {
-            const user = JSON.parse(localStorage.getItem('user'));
-            const accessToken = user?.accessToken;
-
-            if (!accessToken) {
-                throw new Error('No access token found. Please log in again.');
-            }
-
-            const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
-                headers: { Authorization: `Bearer ${accessToken}` },
-            });
-
-            setProjects(response.data);
-        } catch (error) {
-            console.error('Error fetching projects:', error);
-            setError('An error occurred while fetching projects.');
-        }
-    };
 
     const fetchUsers = async () => {
         try {
@@ -69,6 +47,8 @@ const People = () => {
             setAllUsers(users);
             setFilteredUsers(users);
 
+               // Fetch invited users
+
             const invitedUsersResponse = await fetch('http://localhost:5000/api/users/invited', {
                 headers: {
                     'Content-Type': 'application/json',
@@ -80,28 +60,23 @@ const People = () => {
 
             const invitedUsersData = await invitedUsersResponse.json();
 
-            const updatedInvitedUsers = invitedUsersData.invitedUsers.map((invitedUser) => {
-                const userFromDB = users.find((user) => user.email === invitedUser.email);
-                const projectNames = invitedUser.project.length > 0 
-                    ? invitedUser.project.map(p => p.projectName).join(', ') 
-                    : '';
+             const updatedInvitedUsers = invitedUsersData.invitedUsers.map((invitedUser) => {
+            const userFromDB = users.find((user) => user.email === invitedUser.email);
+            
+                        return userFromDB
+                            ? { ...invitedUser, role: userFromDB.role, profilePicture: userFromDB.profilePicture, _id: userFromDB._id }
+                            : invitedUser;
+                    });
 
-                return userFromDB
-                    ? { ...invitedUser, role: userFromDB.role, profilePicture: userFromDB.profilePicture, _id: userFromDB._id, project: projectNames }
-                    : invitedUser;
-            });
-    
-            setInvitedUsers(updatedInvitedUsers);
-        } catch (error) {
-            console.error('Error fetching users:', error);
-            setError(error.message);
-        }
-    };
+                    setInvitedUsers(updatedInvitedUsers);
+                } catch (error) {
+                    console.error('Error fetching users:', error);
+                    setError(error.message);
+                }
+            };
 
     useEffect(() => {
         fetchUsers();
-        fetchProjects();
-
         const handleClickOutside = (event) => {
             if (!event.target.closest('.role-dropdown') && !event.target.closest('.role-toggle')) {
                 setIsRoleDropdownOpen({});
@@ -471,37 +446,41 @@ const People = () => {
                         )}
 
                         </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 relative">
-                                <div className="flex items-center">
-                                    {user.project || 'No Project Assigned'}
-                                    {user.project.length > 0 && (
-                                        <FontAwesomeIcon
-                                            icon={isProjectDropdownOpen[user.email] ? faChevronDown : faChevronRight}
-                                            className="ml-2 cursor-pointer"
-                                            onClick={() => toggleProjectDropdown(user.email)}
-                                        />
-                                    )}
-                                </div>
-                                {isProjectDropdownOpen[user.email] && user.project.length > 0 && (
-                                    <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                                        <ul>
-                                            {projects.length > 0 ? (
-                                                projects.map((project, index) => (
-                                                    <li 
-                                                        key={index} 
-                                                        className="py-2 cursor-pointer hover:bg-gray-100 text-center"
-                                                        onClick={() => (project, user.email)}
-                                                    >
-                                                        {project.projectName}
-                                                    </li>
-                                                ))
-                                            ) : (
-                                                <p className="text-center">No projects found.</p>
-                                            )}
-                                        </ul>
-                                    </div>
-                                )}
-                                  </td>
+                
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 relative">
+    <div className="flex items-center">
+        {/* Safely check if user.project is an array and display the first project name only */}
+        {Array.isArray(user.project) && user.project.length > 0 
+            ? user.project[0].projectName  // Display the first project name
+            : 'No Project Assigned'}
+
+        {Array.isArray(user.project) && user.project.length > 1 && (  // Show dropdown icon if more than one project
+            <FontAwesomeIcon
+                icon={isProjectDropdownOpen[user.email] ? faChevronDown : faChevronRight}
+                className="ml-2 cursor-pointer"
+                onClick={() => toggleProjectDropdown(user.email)}
+            />
+        )}
+    </div>
+
+    {/* Dropdown for all projects */}
+    {isProjectDropdownOpen[user.email] && Array.isArray(user.project) && user.project.length > 1 && (
+        <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+            <ul>
+                {user.project.map((project) => (
+                    <li 
+                        key={project._id} 
+                        className="py-2 cursor-pointer hover:bg-gray-100 text-center"
+                        onClick={() => console.log('Selected project:', project.projectName, 'for', user.email)}
+                    >
+                        {project.projectName}
+                    </li>
+                ))}
+            </ul>
+        </div>
+    )}
+</td>
+
 
 
                         <td className="px-6 py-4 whitespace-nowrap">

@@ -82,8 +82,6 @@ export const inviteUsers = async (req, res) => {
 };
 
 
-
-
 //Get Invited Users
 
 export const getInvitedUsers = async (req, res) => {
@@ -193,6 +191,3 @@ export const removeInvitedMember = async (req, res) => {
         res.status(500).json({ message: 'Error removing invited member', error: error.message });
     }
 };
-
-
-

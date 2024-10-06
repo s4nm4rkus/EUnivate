@@ -18,91 +18,92 @@ const Dashboard = () => {
     const [taskDetails, setTaskDetails] = useState({}); 
     const navigate = useNavigate();
 
-    // Retrieve selected project name and task counts from localStorage if available
-    const [selectedProjectName, setSelectedProjectName] = useState(
-        localStorage.getItem('selectedProjectName') || 'Projects'
-    );
-    const [selectedProjectTaskCounts, setSelectedProjectTaskCounts] = useState(
-        JSON.parse(localStorage.getItem('selectedProjectTaskCounts')) || {
-            assignedTask: 0,
-            taskComplete: 0,
-            objectiveComplete: 0,
-            projectComplete: 0
-        }
-    );
+    const [selectedProjectName, setSelectedProjectName] = useState('Projects');
+    const [selectedProjectTaskCounts, setSelectedProjectTaskCounts] = useState({
+        assignedTask: 0,
+        taskComplete: 0,
+        objectiveComplete: 0,
+        projectComplete: 0
+    });
+    
 
-    const handleProjectClick = (projectId, projectName) => {
+    const handleProjectClick = async (projectId, projectName) => {
         // Update the selected project name
         setSelectedProjectName(projectName);
-        localStorage.setItem('selectedProjectName', projectName); // Save selected project to localStorage
     
-        // Get the task details for the selected project
-        const projectTasks = taskDetails[projectId]?.tasks || [];
-        const assignedTaskCount = projectTasks.length;
-        const taskCompleteCount = projectTasks.filter(task => task.status === 'Done').length;
-        const objectiveCompleteCount = projectTasks.reduce((total, task) => total + (task.objectives?.length || 0), 0);
+        // Fetch task details for the selected project from the backend API
+        try {
+            const taskResponse = await axios.get(`http://localhost:5000/api/users/sa-tasks/${projectId}`);
+            const tasks = taskResponse.data.data;
     
-        // Set the new counts based on the selected project's task data
-    const newTaskCounts = {
-        assignedTask: assignedTaskCount,
-        taskComplete: taskCompleteCount,
-        objectiveComplete: objectiveCompleteCount,
-        projectComplete: calculateProgress(projectId) // No decimal percentages
+            const assignedTaskCount = tasks.length;
+            const taskCompleteCount = tasks.filter(task => task.status === 'Done').length;
+            const objectiveCompleteCount = tasks.reduce((total, task) => total + (task.doneObjectivesCount || 0), 0);
+    
+            // Set the new counts based on the selected project's task data
+            const newTaskCounts = {
+                assignedTask: assignedTaskCount,
+                taskComplete: taskCompleteCount,
+                objectiveComplete: objectiveCompleteCount,
+                projectComplete: calculateProgress(projectId) // Calculate progress based on done tasks
+            };
+    
+            // Update the state with the fetched task counts
+            setSelectedProjectTaskCounts(newTaskCounts);
+    
+            // Close the dropdown after selecting a project
+            setIsProjectDropdownOpen(false);
+        } catch (error) {
+            console.error('Error fetching task details:', error);
+        }
     };
-    setSelectedProjectTaskCounts(newTaskCounts);
+    
 
-    // Save the task counts to localStorage for persistence
-    localStorage.setItem('selectedProjectTaskCounts', JSON.stringify(newTaskCounts));
-
-    // Close the dropdown after selecting a project
-    setIsProjectDropdownOpen(false);
-    };
-
-    // Fetch projects and task details
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const user = JSON.parse(localStorage.getItem('user'));
+                const user = JSON.parse(localStorage.getItem('user')); // You may want to fetch user from your auth system instead of localStorage
                 const accessToken = user ? user.accessToken : null;
-
+    
                 const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
                 });
-
+           
                 setProjects(response.data);
-
+    
                 const taskDetailsPromises = response.data.map(async (project) => {
                     const taskResponse = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}`);
                     const tasks = taskResponse.data.data;
-
+    
                     const attachmentsCount = tasks.reduce((total, task) => total + (task.attachment?.length || 0), 0);
                     const objectivesCount = tasks.reduce((total, task) => total + (task.objectives?.length || 0), 0);
-
-                    return { 
-                        projectId: project._id, 
-                        attachmentsCount, 
+    
+                    return {
+                        projectId: project._id,
+                        attachmentsCount,
                         objectivesCount,
                         tasks
                     };
                 });
-
+    
                 const details = await Promise.all(taskDetailsPromises);
-
+    
                 const taskDetailsMap = details.reduce((acc, { projectId, attachmentsCount, objectivesCount, tasks }) => {
                     acc[projectId] = { attachmentsCount, objectivesCount, tasks };
                     return acc;
                 }, {});
-
+    
                 setTaskDetails(taskDetailsMap);
             } catch (error) {
                 console.error('Error fetching projects:', error);
             }
         };
-
+    
         fetchProjects();
     }, []);
+    
 
     const toggleProjectDropdown = () => setIsProjectDropdownOpen(!isProjectDropdownOpen);
     const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
@@ -191,35 +192,34 @@ const Dashboard = () => {
     ))}
 </div>
 
-            <div className="block md:hidden">
-                <Slider {...sliderSettings}>
-                    {[{ title: "Assigned Task", icon: i1, count: projects.length },
-                      { title: "Task Complete", icon: i2 },
-                      { title: "Objective Complete", icon: i3 },
-                      { title: "Project Complete", icon: i4 }
-                    ].map(({ title, icon, count }, index) => (
-                        <div key={index} className="p-4 flex flex-col items-start justify-center">
-                            <div
-                                className="bg-white p-4 border border-gray-300 rounded-lg shadow-sm flex flex-col items-start justify-start"
-                                style={{
-                                    minWidth: '150px',
-                                    height: '200px',
-                                    backgroundImage: `url(${icon})`,
-                                    backgroundSize: '60px 60px',
-                                    backgroundRepeat: 'no-repeat',
-                                    backgroundPosition: 'left 24px top 20px',
-                                }}
-                            >
-                                <div className="ml-2 mt-20 text-left">
-                                    <div className="text-gray-800 font-semibold mb-1 text-xl">{title}</div>
-                                    <div className="text-2xl font-bold">{count || 0}</div>
+                <div className="block md:hidden">
+                    <Slider {...sliderSettings}>
+                        {[{ title: "Assigned Task", icon: i1, count: selectedProjectTaskCounts.assignedTask },
+                        { title: "Task Complete", icon: i2, count: selectedProjectTaskCounts.taskComplete },
+                        { title: "Objective Complete", icon: i3, count: selectedProjectTaskCounts.objectiveComplete },
+                        { title: "Project Complete", icon: i4, count: `${selectedProjectTaskCounts.projectComplete}%` } // Add percentage
+                        ].map(({ title, icon, count }, index) => (
+                            <div key={index} className="p-4 flex flex-col items-start justify-center">
+                                <div
+                                    className="bg-white p-4 border border-gray-300 rounded-lg shadow-sm flex flex-col items-start justify-start"
+                                    style={{
+                                        minWidth: '150px',
+                                        height: '200px',
+                                        backgroundImage: `url(${icon})`,
+                                        backgroundSize: '60px 60px',
+                                        backgroundRepeat: 'no-repeat',
+                                        backgroundPosition: 'left 24px top 20px',
+                                    }}
+                                >
+                                    <div className="ml-2 mt-20 text-left">
+                                        <div className="text-gray-800 font-semibold mb-1 text-xl">{title}</div>
+                                        <div className="text-2xl font-bold">{count || 0}</div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
-                </Slider>
-            </div>
-
+                        ))}
+                    </Slider>
+                </div>
             {/* Today Task, Activity, and Ongoing Projects Section */}
             <div className="flex flex-col md:flex-row mb-2 gap-4">
                 {/* Today Task */}

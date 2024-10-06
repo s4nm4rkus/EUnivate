@@ -5,7 +5,6 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import axios from 'axios';
 
-// Modal component to view images in full screen
 const ImageModal = ({ src, onClose }) => (
   <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
     <div className="relative">
@@ -26,8 +25,8 @@ const MessageContent = () => {
   const [editingMessageId, setEditingMessageId] = useState(null);
   const [replyingTo, setReplyingTo] = useState(null);
   const messagesEndRef = useRef(null);
-  const fileInputRef = useRef(null); // Create a ref for the file input
-  const [imageModalSrc, setImageModalSrc] = useState(null); // State for image modal
+  const fileInputRef = useRef(null);  
+  const [imageModalSrc, setImageModalSrc] = useState(null); 
 
 
   const startRecording = () => {
@@ -46,21 +45,21 @@ const MessageContent = () => {
   };
 
   const handleFileChange = (event) => {
-    setFile(event.target.files[0]); // Capture the selected file
+    setFile(event.target.files[0]); 
   };
 
   const removeFile = () => {
-    setFile(null); // Clear the attached file
+    setFile(null);  
   };
 
   const handleAttachmentClick = () => {
     if (fileInputRef.current) {
-      fileInputRef.current.click(); // Trigger file input click
+      fileInputRef.current.click();  
     }
   };
 
     const cancelReply = () => {
-      setReplyingTo(null); // Reset the reply state
+      setReplyingTo(null);  
     };
   
   
@@ -69,7 +68,7 @@ const MessageContent = () => {
         const cleanMessage = message.replace(/<\/?p>/g, '').replace(/<br\s*\/?>/g, '').trim();
     
         if (editingMessageId) {
-          // Editing an existing message
+          
           const updatedMessage = {
             content: cleanMessage,
             file: file ? { name: file.name, type: file.type, url: URL.createObjectURL(file) } : null,
@@ -77,17 +76,17 @@ const MessageContent = () => {
           };
     
           try {
-            // Call the editMessage function to update the message on the backend
+             
             await editMessage(editingMessageId, updatedMessage.content, updatedMessage.file, updatedMessage.time);
     
-            // Update the message in the state
+          
             setMessages((prevMessages) =>
               prevMessages.map((msg) =>
                 msg._id === editingMessageId ? { ...msg, ...updatedMessage, edited: true } : msg
               )
             );
     
-            // Clear the editing state and input fields
+             
             setEditingMessageId(null);
             setReplyingTo(null);
             setMessage('');
@@ -96,7 +95,7 @@ const MessageContent = () => {
             console.error('Error updating message:', error);
           }
         } else {
-          // Sending a new message
+          
           const newMessage = {
             content: cleanMessage,
             sender: { name: 'You', avatar: 'https://via.placeholder.com/40' },
@@ -290,13 +289,15 @@ const handleDelete = async (messageId) => {
             }`}
           >
             {msg.sender.name !== 'You' && (
-              <img src={msg.sender.avatar} alt={msg.sender.name} className="rounded-full w-10 h-10 mt-2" />
+              <img src={msg.sender.avatar} 
+              alt={msg.sender.name} 
+              className="rounded-full w-10 h-10 mt-2" />
             )}
             <div className={`p-3 rounded-lg shadow-md  ${
                 msg.sender.name === 'You' ? 'bg-blue-200 text-gray-800' : 'bg-red-100 text-gray-800'
               } max-w-[60%] border border-blue relative ${editingMessageId === msg._id ? 'border-blue-500' : ''}`}
             >
-              <div className="message-header flex items-center flex space-x-12 justify-between mb-4">
+              <div className="message-header  items-center flex space-x-12 justify-between mb-4">
   <div className="flex items-center">
     <p className={`text-sm font-semibold ${msg.sender.name === 'You' ? 'text-blue-800' : 'text-gray-800'}`}>
       {msg.sender.name}
@@ -411,12 +412,21 @@ const handleDelete = async (messageId) => {
           <div className="absolute right-2 top-0 flex flex-col items-center space-y-2 z-10">
             {/* Attachment Icon */}
             <label className="cursor-pointer">
-              <input type="file" className="hidden" onChange={handleFileChange} />
-              <button onClick={handleAttachmentClick} className="mr-2 text-gray-600 hover:text-blue-600 transition duration-300">
+              <input type="file" 
+              className="hidden" 
+              onChange={handleFileChange} />
+
+              <button onClick={handleAttachmentClick} 
+              className="mr-2 text-gray-600 hover:text-blue-600 transition duration-300">
+
   <FontAwesomeIcon icon={faPaperclip} />
-  <input type="file" accept="*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
+  <input type="file" 
+  accept="*" 
+  ref={fileInputRef} 
+  onChange={handleFileChange} 
+  className="hidden" />
 </button>
-              {/* Microphone Icon */}
+               
               <button
                 onClick={isRecording ? stopRecording : startRecording}
                 className={`p-2 hover:text-blue-600 transition duration-300 ${isRecording ? 'bg-red-500 text-white' : 'text-gray-600'}`}
@@ -426,7 +436,7 @@ const handleDelete = async (messageId) => {
             </label>
           </div>
 
-          {/* Send Message Button */}
+           
           <button
             onClick={sendMessage}
             className="absolute right-2 bottom-2 p-2 text-blue-500 hover:text-blue-600 transition duration-300"
@@ -435,8 +445,7 @@ const handleDelete = async (messageId) => {
           </button>
         </div>
 
-
-        {/* File Preview Section */}
+ 
 {file && (
   <div className="file-preview flex items-center bg-gray-50 p-4 rounded-lg shadow-lg border border-gray-200">
     {file.type.startsWith('image/') ? (

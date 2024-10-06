@@ -139,6 +139,11 @@ const Activity = () => {
         return changes;
     };
 
+    // Sort tasks by their update date (most recent first)
+    const sortedTasks = (tasks) => {
+        return tasks.slice().sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    };
+
     return (
         <div className="bg-gray-100 min-h-screen p-6">
             {/* Header */}
@@ -172,7 +177,7 @@ const Activity = () => {
                             </div>
                             <ul className="mt-2 relative">
                                 {taskDetails[project._id] && taskDetails[project._id].length > 0 ? (
-                                    taskDetails[project._id].map((task) => {
+                                    sortedTasks(taskDetails[project._id]).map((task) => {
                                         const taskChanges = getTaskChanges(task);
 
                                         if (taskChanges.length === 0) return null;

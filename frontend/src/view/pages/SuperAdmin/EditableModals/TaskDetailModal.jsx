@@ -284,114 +284,129 @@ const fetchComments = async () => {
         setIsEditing(false);
     };
 
+      // Objective input toggle
+      const handleToggleAddObjective = () => {
+        setIsAddingObjective(!isAddingObjective);
+      };
+  // Function to handle the "Enter" key for adding objective
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      handleAddObjective(); // Add objective on Enter key press
+    }
+  };
 
-    const handleAddObjective = () => {
-      if (newObjective) {
-        const updatedObjectives = [...task.objectives, { text: newObjective, done: false }];
-        onUpdateTask({ ...task, objectives: updatedObjectives });
-        updateTaskInDatabase({ ...task, objectives: updatedObjectives });
-        setNewObjective('');
-        setIsAddingObjective(false);
+
+      const handleAddObjective = () => {
+        if (newObjective) {
+          const updatedObjectives = [...task.objectives, { text: newObjective, done: false }];
+          onUpdateTask({ ...task, objectives: updatedObjectives });
+          updateTaskInDatabase({ ...task, objectives: updatedObjectives });
+          setNewObjective('');
+          setIsAddingObjective(false);
+        }
+      };
+
+    // const handleDeleteAttachment = (attachmentUrl) => {
+    //   const updatedAttachments = task.attachment.filter(att => att.url !== attachmentUrl);
+    //   onUpdateTask({ ...task, attachment: updatedAttachments });
+    // };
+
+
+
+    const handleSaveAttachments = async () => {
+      const updatedAttachments = [...task.attachment];
+      
+      for (const file of newAttachmentFiles) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', 'EunivateImage');
+        formData.append('cloud_name', 'dzxzc7kwb');
+      
+        try {
+          const response = await axios.post(
+            'https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload',
+            formData
+          );
+          
+          // Add the response data (including public_id) to the updatedAttachments array
+          updatedAttachments.push({
+            publicId: response.data.public_id,  // Make sure this matches your schema's requirements
+            url: response.data.secure_url,
+          });
+        } catch (error) {
+          console.error('Error uploading file:', error);
+        }
+      }
+      
+      
+      // Update the task with the new attachments
+      const updatedTask = { ...task, attachment: updatedAttachments };
+      onUpdateTask(updatedTask);
+      await updateTaskInDatabase(updatedTask);
+      
+      // Reset states
+      setNewAttachmentFiles([]);
+      setShowSaveAttachmentButton(false);
+    };
+    
+    const handleToggleObjective = async (index) => {
+      const updatedObjectives = task.objectives.map((obj, i) => {
+        if (i === index) {
+          return { ...obj, done: !obj.done };
+        }
+        return obj;
+      });
+    
+      // Only send objectives to the backend
+      try {
+        const response = await axios.patch(`http://localhost:5000/api/users/sa-tasks/${task._id}/objectives`, {
+          objectives: updatedObjectives
+        });
+    
+        if (response.data.success) {
+          setUpdatedTask(response.data.data); // Update the task in the UI
+          onUpdateTask(response.data.data);   // Call the parent function to update the UI
+        }
+      } catch (error) {
+        console.error('Failed to update objectives:', error);
       }
     };
-
-  // const handleDeleteAttachment = (attachmentUrl) => {
-  //   const updatedAttachments = task.attachment.filter(att => att.url !== attachmentUrl);
-  //   onUpdateTask({ ...task, attachment: updatedAttachments });
-  // };
-
-
-
-  const handleSaveAttachments = async () => {
-    const updatedAttachments = [...task.attachment];
     
-    for (const file of newAttachmentFiles) {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', 'EunivateImage');
-      formData.append('cloud_name', 'dzxzc7kwb');
     
+    const handleRemoveObjective = async (objectiveToRemove) => {
+      // Filter out the objective you want to remove
+      const updatedObjectives = task.objectives.filter((obj) => obj !== objectiveToRemove);
+      const updatedTask = { ...task, objectives: updatedObjectives };
+    
+      // Update the UI state
+      onUpdateTask(updatedTask);
+    
+      // Sync with backend (update task with new objectives array)
       try {
-        const response = await axios.post(
-          'https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload',
-          formData
-        );
-        
-        // Add the response data (including public_id) to the updatedAttachments array
-        updatedAttachments.push({
-          publicId: response.data.public_id,  // Make sure this matches your schema's requirements
-          url: response.data.secure_url,
-        });
+        await updateTaskInDatabase(updatedTask);  // Send the updated task to the backend
+        console.log('Objective removed successfully');
       } catch (error) {
-        console.error('Error uploading file:', error);
+        console.error('Failed to remove objective:', error);
       }
-    }
+    };
     
     
-    // Update the task with the new attachments
-    const updatedTask = { ...task, attachment: updatedAttachments };
-    onUpdateTask(updatedTask);
-    await updateTaskInDatabase(updatedTask);
     
-    // Reset states
-    setNewAttachmentFiles([]);
-    setShowSaveAttachmentButton(false);
-  };
-  
-  const handleToggleObjective = async (index) => {
-    const updatedObjectives = task.objectives.map((obj, i) => {
-      if (i === index) {
-        return { ...obj, done: !obj.done };
-      }
-      return obj;
-    });
-  
-    // Only send objectives to the backend
-    try {
-      const response = await axios.patch(`http://localhost:5000/api/users/sa-tasks/${task._id}/objectives`, {
-        objectives: updatedObjectives
-      });
-  
-      if (response.data.success) {
-        setUpdatedTask(response.data.data); // Update the task in the UI
-        onUpdateTask(response.data.data);   // Call the parent function to update the UI
-      }
-    } catch (error) {
-      console.error('Failed to update objectives:', error);
-    }
-  };
-  
-  
-  // const handleDeleteObjective = async (objective) => {
-  //   const updatedObjectives = task.objectives.filter(obj => obj !== objective);
-  //   const updatedTask = { ...task, objectives: updatedObjectives };
-  
-  //   onUpdateTask(updatedTask); // This will immediately update the UI
-  
-  //   try {
-  //     await updateTaskInDatabase(updatedTask);
-  //   } catch (error) {
-  //     console.error('Failed to delete objective:', error);
-  //   }
-  // };
-  
-  
-  
-  const handleCommentSubmit = async () => {
-    if (comment.trim()) {
-      const assignee = editedAssignees && editedAssignees.length > 0 ? editedAssignees[0] : null;
-      const user = JSON.parse(localStorage.getItem('user'));
-      const currentUserId = user?._id;
-      if (!assignee) {
-        console.error('No assignee selected');
-        return;
-      }
-  
-      // Prepare the comment data with only userId and text
-      const newComment = {
-        userId: currentUserId,  // Ensure this is the correct `id`
-        text: comment,
-      };
+    const handleCommentSubmit = async () => {
+      if (comment.trim()) {
+        const assignee = editedAssignees && editedAssignees.length > 0 ? editedAssignees[0] : null;
+        const user = JSON.parse(localStorage.getItem('user'));
+        const currentUserId = user?._id;
+        if (!assignee) {
+          console.error('No assignee selected');
+          return;
+        }
+    
+        // Prepare the comment data with only userId and text
+        const newComment = {
+          userId: currentUserId,  // Ensure this is the correct `id`
+          text: comment,
+        };
   
       try {
         const response = await axios.post(`http://localhost:5000/api/users/sa-tasks/${task._id}/comments`, newComment);
@@ -415,7 +430,6 @@ const fetchComments = async () => {
     <Modal
     isOpen={isOpen}
     onRequestClose={onClose}
-    
     className="flex items-center justify-center"
     overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-end"
     >
@@ -601,68 +615,102 @@ const fetchComments = async () => {
           </div>
 
 
-        {/* Description */}
-        <div className="mb-4">
-  <div className="text-gray-500 font-semibold">Description:</div>
-  {isEditing ? (
-    <div>
-      <textarea
-        className="w-full mt-2 p-2 border border-gray-300 rounded text-sm"
-        value={editedDescription}
-        onChange={(e) => setEditedDescription(e.target.value)}
-      />
-      <button
-        className="mt-2 bg-red-500 text-white py-1 px-4 rounded text-sm hover:bg-red-600 transition-all duration-200"
-        onClick={handleSaveDescription}
-      >
-        Save
-      </button>
+       {/* Description Section */}
+    <div className="mb-6">
+      <div className="text-gray-500 font-semibold">Description:</div>
+      {isEditing ? (
+        <div>
+          <textarea
+            className="w-full mt-2 p-2 border border-gray-300 rounded text-sm"
+            value={editedDescription}
+            onChange={(e) => setEditedDescription(e.target.value)}
+          />
+          <button
+            className="mt-2 bg-red-500 text-white py-1 px-4 rounded text-sm hover:bg-red-600 transition-all duration-200"
+            onClick={handleSaveDescription}
+          >
+            Save
+          </button>
+        </div>
+      ) : (
+        <div className="relative">
+          <p className="mt-2 text-gray-500 text-sm">{task.description}</p>
+          <FaEdit
+            className="absolute top-0 right-0 cursor-pointer text-gray-500 hover:text-gray-700"
+            size={18}
+            onClick={handleEditDescription}
+          />
+        </div>
+      )}
     </div>
-  ) : (
-    <div className="relative">
-      <p className="mt-2 text-gray-500 text-sm">{task.description}</p>
-      <FaEdit
-        className="absolute top-0 right-0 cursor-pointer text-gray-500 hover:text-gray-700"
-        size={18}
-        onClick={handleEditDescription}
-      />
-    </div>
-  )}
-</div>
 
-          {/* Objectives */}
-   
-          <div className="mb-4">
-  <div className="text-gray-500 font-semibold mb-2">Objectives:</div>
-  <ul className="list-none">
-    {task.objectives.map((objective, index) => (
-      <li
-        key={index}
-        className={`flex justify-between items-center mt-2 text-sm ${objective.done ? 'text-gray-400' : 'text-black'}`}
-      >
-        <div
-          className="flex items-center cursor-pointer p-2 rounded-lg"
-          onClick={() => handleToggleObjective(index)}
-          style={{ width: '100%' }}
+              {/* Objectives Section */}
+    <div className="mb-6">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-gray-500 font-semibold">Objectives</span>
+        <button
+          onClick={handleToggleAddObjective}
+          className="flex items-center text-gray-500 hover:text-gray-700"
         >
-          {/* Objective Status Icon - Similar to Task Status */}
-          <div className={`w-5 h-5 rounded-full flex items-center justify-center ${objective.done ? 'bg-green-500' : 'bg-gray-300'}`}>
-            {objective.done ? (
-              <FaCheckCircle className="text-white" size={16} />
-            ) : (
-              <FaCircle className="text-white" size={16} />
-            )}
-          </div>
+          <FaPlus className="text-gray-500" />
+        </button>
+      </div>
 
-          {/* Objective Text */}
-          <span className={`ml-3 flex-1 ${objective.done ? 'line-through' : ''}`}>
-            {objective.text}
-          </span>
+      {/* New Objective Input */}
+      {isAddingObjective && (
+        <div className="flex items-center mb-4">
+          <input
+            type="text"
+            className="border border-gray-300 p-2 w-full rounded text-sm"
+            placeholder="Enter new objective"
+            value={newObjective}
+            onChange={(e) => setNewObjective(e.target.value)}
+            onKeyDown={handleKeyDown}
+            autoFocus
+          />
+          <button
+            onClick={handleAddObjective}
+            className="ml-2 bg-red-500 text-white py-1 px-4 rounded text-sm hover:bg-red-600 transition-all duration-200"
+          >
+            Add
+          </button>
         </div>
-      </li>
-    ))}
-  </ul>
-        </div>
+      )}
+
+      {/* List of Objectives */}
+      <ul className="list-none">
+        {task.objectives.length > 0 ? (
+          task.objectives.map((objective, index) => (
+            <li key={index} className={`flex items-center mt-2 text-sm ${objective.done ? 'text-gray-400' : 'text-black'}`}>
+              <div
+                className={`w-5 h-5 rounded-full flex items-center justify-center mr-2 cursor-pointer ${objective.done ? 'bg-green-500' : 'bg-gray-300'}`}
+                onClick={() => handleToggleObjective(index)}
+              >
+                {objective.done ? (
+                  <FaCheckCircle className="text-white" size={14} />
+                ) : (
+                  <FaCircle className="text-white" size={14} />
+                )}
+              </div>
+              <span className={`flex-1 cursor-pointer ${objective.done ? 'line-through' : ''}`}>
+                {objective.text || 'New Objective'}
+              </span>
+              <button
+                onClick={() => handleRemoveObjective(objective)}
+                className="ml-2 text-red-500 hover:text-red-700"
+                title="Delete"
+              >
+                <FaTimes />
+              </button>
+            </li>
+          ))
+        ) : (
+          <li className="text-gray-500">No objectives added yet.</li>
+        )}
+      </ul>
+    </div>
+
+
 
 
 

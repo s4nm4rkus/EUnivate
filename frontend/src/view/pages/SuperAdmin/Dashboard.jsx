@@ -197,7 +197,7 @@ const Dashboard = () => {
                         {[{ title: "Assigned Task", icon: i1, count: selectedProjectTaskCounts.assignedTask },
                         { title: "Task Complete", icon: i2, count: selectedProjectTaskCounts.taskComplete },
                         { title: "Objective Complete", icon: i3, count: selectedProjectTaskCounts.objectiveComplete },
-                        { title: "Project Complete", icon: i4, count: `${selectedProjectTaskCounts.projectComplete}%` } // Add percentage
+                        { title: "Project Complete", icon: i4, count: `${selectedProjectTaskCounts.projectComplete}%` }
                         ].map(({ title, icon, count }, index) => (
                             <div key={index} className="p-4 flex flex-col items-start justify-center">
                                 <div

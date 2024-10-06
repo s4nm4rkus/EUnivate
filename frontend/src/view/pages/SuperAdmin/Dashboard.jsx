@@ -236,7 +236,7 @@ const Dashboard = () => {
 
                 {/* Activity Section */}
                 <div className="w-full md:w-2/5">
-                    <h2 className="text-medium font-semibold text-gray-800 mb-2">Activity</h2>
+                    
                     <Activity_Task 
                         projects={projects}
                         taskDetails={taskDetails}

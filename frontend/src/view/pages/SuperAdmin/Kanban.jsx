@@ -181,7 +181,8 @@ const Kanban = ({ projectId, projectName }) => {
           </div>
           <div className="flex items-center space-x-2 flex-shrink-0">
             <FaCheckCircle className="text-gray-400" />
-            <p>{task.objectives ? task.objectives.length : 0}</p>
+            <p>{task.doneObjectivesCount || 0}</p>
+
           </div>
         </div>
       </div>

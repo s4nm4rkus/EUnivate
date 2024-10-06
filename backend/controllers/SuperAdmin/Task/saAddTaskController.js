@@ -205,12 +205,18 @@
 
               // Fetch tasks based on the query
               const tasks = await saAddTask.find(query).populate('assignee', 'name profilePicture');
-              console.log('Tasks found:', tasks); // Debug log
+              // console.log('Tasks found:', tasks); // Debug log
 
+              const tasksWithDoneObjectivesCount = tasks.map(task => ({
+                ...task._doc, // Spread the original task object
+                doneObjectivesCount: task.objectives.filter(obj => obj.done).length // Count done objectives
+              }));
+
+              
               // Return tasks, even if none are found
               res.status(200).json({
                 success: true,
-                data: tasks
+              data: tasksWithDoneObjectivesCount
               });
             } catch (error) {
               console.error('Error fetching tasks by projectId:', error); // Debug log

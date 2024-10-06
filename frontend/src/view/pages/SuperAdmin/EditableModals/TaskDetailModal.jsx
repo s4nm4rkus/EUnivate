@@ -5,7 +5,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
 import { io } from 'socket.io-client';
-import UserNameModal from '../KanbanModals/UserNameModal';
+import AssigneeModal from './AssigneeModal';
 
 
 
@@ -23,7 +23,7 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpda
   //Assignee
   const [editedAssignees, setEditedAssignees] = useState(task.assignee || [])
   const [membersList, setMembersList] = useState([]);
-  const [isUserNameModalOpen, setIsUserNameModalOpen] = useState(false);
+  const [isAssigneeModalOpen, setIsAssigneeModalOpen] = useState(false);
 
   //StartDate and DueDate
   const [startDate, setStartDate] = useState(new Date(task.startDate));
@@ -101,6 +101,7 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpda
         setMembersList(response.data.invitedUsers); // Adjust based on the response structure
       } catch (error) {
         console.error('Error fetching users:', error);
+        setMembersList([]);
       }
     };
 
@@ -118,10 +119,15 @@ const fetchComments = async () => {
   }
 };
 
-    const handleAddAssignee = (members) => {
-      setEditedAssignees(members);
-      setIsUserNameModalOpen(false);
-    };
+        const handleConfirmAssignees = (selectedMembers) => {
+        
+          const assigneeIds = selectedMembers.map((member) => member.id);
+
+          const updatedTask = { ...task, assignee: assigneeIds };
+          setEditedAssignees(assigneeIds);  // Update the local state with the selected assignee IDs
+          onUpdateTask(updatedTask);  // Update the UI
+          updateTaskInDatabase(updatedTask);  // Sync with the backend
+        };
 
 
     const updateTaskInDatabase = async (updatedTask) => {
@@ -209,7 +215,7 @@ const fetchComments = async () => {
 
     const handleSaveStatus = async () => {
       const updatedTask = { ...task, status: selectedStatus };
-      console.log("Saving status:", updatedTask.status); // Debugging output
+      // console.log("Saving status:", updatedTask.status); // Debugging output
       
       // Update UI state
       onUpdateTask(updatedTask);
@@ -288,12 +294,12 @@ const fetchComments = async () => {
       const handleToggleAddObjective = () => {
         setIsAddingObjective(!isAddingObjective);
       };
-  // Function to handle the "Enter" key for adding objective
-  const handleKeyDown = (event) => {
-    if (event.key === 'Enter') {
-      handleAddObjective(); // Add objective on Enter key press
-    }
-  };
+      // Function to handle the "Enter" key for adding objective
+      const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+          handleAddObjective(); // Add objective on Enter key press
+        }
+      };
 
 
       const handleAddObjective = () => {
@@ -310,7 +316,6 @@ const fetchComments = async () => {
     //   const updatedAttachments = task.attachment.filter(att => att.url !== attachmentUrl);
     //   onUpdateTask({ ...task, attachment: updatedAttachments });
     // };
-
 
 
     const handleSaveAttachments = async () => {
@@ -471,38 +476,30 @@ const fetchComments = async () => {
       </div>
 
 
-                {/* Assignees */}
-          <div className="mb-4">
-            <button
-              className="flex items-center space-x-2 bg-transparent border-none outline-none focus:outline-none"
-              onClick={() => setIsUserNameModalOpen(true)}
-            >
-              <span className="text-gray-700 text-sm font-semibold flex justify-normal">Assignees</span>
-              {editedAssignees.length > 0 ? (
-                // Loop through all assignees and display their profile pictures or fallback icon
-                <div className="flex -space-x-5">
-                  {editedAssignees.map((assignee, index) => (
-                    <div key={index} className="flex items-center">
-                      {assignee.profilePicture?.url ? (
-                        <img
-                          src={assignee.profilePicture.url}
-                          alt={assignee.username}
-                          className="w-8 h-8 rounded-full border"
-                        />
-                      ) : (
-                        // Fallback to FaUser icon if no profile image is available
-                        <FaUser className="text-gray-500 text-lg bg-transparent rounded-lg border" />
-                      )}
-                      <span className="ml-2 text-sm text-gray-500">{assignee.username}</span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                // If no assignees are selected, show the default "Assign to" text
-                <span className="text-sm text-gray-500">Assign to</span>
-              )}
-            </button>
-          </div>
+                      {/* Assignees */}
+        <div className="mb-4">
+          <button className="flex items-center space-x-2 bg-transparent border-none outline-none focus:outline-none" onClick={() => setIsAssigneeModalOpen(true)}>
+            <span className="text-gray-700 text-sm font-semibold flex justify-normal">Assignees</span>
+            {editedAssignees.length > 0 ? (
+              <div className="flex -space-x-5">
+                {editedAssignees.map((assignee, index) => (
+                  <div key={index} className="flex items-center">
+                    {assignee.profilePicture?.url ? (
+                      <img src={assignee.profilePicture?.url} alt={assignee.username} className="w-8 h-8 rounded-full border" />
+                    ) : (
+                      <FaUser className="text-gray-500 text-lg bg-transparent  rounded-3xl " />
+                    )}
+                    <span className="ml-2 text-sm text-gray-500">{assignee.username}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <span className="text-sm text-gray-500">Assign to</span>
+            )}
+          </button>
+        </div>
+
+
 
 
             {/* Start Date */}
@@ -788,12 +785,12 @@ const fetchComments = async () => {
           )}
         </div>
       </div>
-        {isUserNameModalOpen && (
-          <UserNameModal
-            isOpen={isUserNameModalOpen}
-            onClose={() => setIsUserNameModalOpen(false)}
-            membersList={membersList}
-            onSelect={handleAddAssignee} 
+        {isAssigneeModalOpen && (
+          <AssigneeModal
+            isOpen={isAssigneeModalOpen}
+            onClose={() => setIsAssigneeModalOpen(false)}
+            members={membersList}
+            onConfirm={handleConfirmAssignees}
             
           />
         )}

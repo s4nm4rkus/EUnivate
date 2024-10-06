@@ -283,6 +283,7 @@
               startDate,
               dueDate,
               attachment,
+              assignee ,
             } = req.body; // Extract the task details from the request body
         
             // Find the task by ID and update it with the new values
@@ -297,6 +298,7 @@
                 startDate,
                 dueDate,
                 attachment,
+                assignee ,
               },
               { new: true, runValidators: true } // Return the updated document
             );

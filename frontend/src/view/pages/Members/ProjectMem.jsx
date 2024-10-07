@@ -79,7 +79,7 @@ const ProjectMem = () => {
     setSelectedProject(project);
     setLoadingProject(true);
     setTimeout(() => {
-      navigate(`/superadmin/projects/${project._id}`, { state: { projectId: project._id } });
+      navigate(`/member/projects/${project._id}`, { state: { projectId: project._id } });
       setLoadingProject(false);
     }, 2000); // Adjust timeout as needed
   };

@@ -118,23 +118,23 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
 
   const handleSubmit = async () => {
     setLoading(true);
+  
+    // Validation checks
     if (!taskName || !startDate || !dueDate || !status || !priority || !selectedName) {
-      toast.error('Please fill in all fields before submitting.'); // Show error toast
+      toast.error('Please fill in all fields before submitting.');
       setLoading(false);
       return;
     }
   
     if (new Date(dueDate) < new Date(startDate)) {
-      toast.error('Due Date cannot be earlier than Start Date.'); // Show error toast
+      toast.error('Due Date cannot be earlier than Start Date.');
       setLoading(false);
       return;
     }
   
+    // Upload selected files to Cloudinary
     let uploadedImages = [];
-  
-  
-     // Upload selected files to Cloudinary
-     for (const file of selectedFiles) {
+    for (const file of selectedFiles) {
       try {
         const result = await handleSaveattachment(file);
         uploadedImages.push({
@@ -143,7 +143,7 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
         });
       } catch (error) {
         console.error('Error uploading image:', error);
-        toast.error('Failed to upload one or more images.'); // Show error toast
+        toast.error('Failed to upload one or more images.');
         setLoading(false);
         return;
       }
@@ -157,7 +157,7 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
   
       const newTask = {
         taskName,
-        objectives,
+        objectives, // Now passed as an array of objects
         assignee: assigneeIds,
         status,
         priority,
@@ -172,7 +172,7 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
       const response = await axios.post('http://localhost:5000/api/users/sa-task', newTask);
       console.log('Task created:', response.data);
       onTaskSubmit(newTask);
-      toast.success('Task submitted successfully!'); // Show success toast
+      toast.success('Task submitted successfully!');
   
       // Clear the fields
       setTaskName('');
@@ -190,9 +190,10 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
     } catch (error) {
       setLoading(false);
       console.error('Error saving task:', error);
-      toast.error('Failed to save task.'); // Show error toast
+      toast.error('Failed to save task.');
     }
   };
+  
   
   const toggleUserNameVisibility = () => {
     setIsUserNameModalOpen(true);

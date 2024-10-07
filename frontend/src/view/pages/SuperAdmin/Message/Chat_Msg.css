@@ -1,0 +1,10 @@
+/* Custom styles for hidden scrollbar */
+.hidden-scrollbar {
+    overflow-y: scroll; /* Allows vertical scrolling */
+    scrollbar-width: none; /* For Firefox */
+  }
+  
+  .hidden-scrollbar::-webkit-scrollbar {
+    display: none; /* For Chrome, Safari, and Edge */
+  }
+  

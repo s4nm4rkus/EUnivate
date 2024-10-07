@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 const saInvitedMemberSchema = new mongoose.Schema({
     email: {
         type: String,
-        unique: true, 
         require:true,
     },
     role: {
@@ -12,8 +11,8 @@ const saInvitedMemberSchema = new mongoose.Schema({
         default: 'User',
     },      
     project: [{
-        type: String,
-        ref: 'User', 
+        type: mongoose.Schema.Types.ObjectId,  // Store project IDs as ObjectId
+        ref: 'SaNewProject',  // Reference the Project model
     
     }],
     profilePicture: {

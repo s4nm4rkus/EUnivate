@@ -76,9 +76,13 @@ const Kanban = ({ projectId, projectName }) => {
     const updatedTasks = tasks.map(task =>
       task._id === updatedTask._id ? updatedTask : task
     );
-    setTasks(updatedTasks); // Update the state with the new task list
-  };
+    setTasks(updatedTasks); // Update the tasks array
   
+    // Check if the updated task is the currently selected task
+    if (selectedTask && selectedTask._id === updatedTask._id) {
+      setSelectedTask(updatedTask); // Update selectedTask
+    }
+  };
 
   const Column = ({ status, children }) => {
     const [, drop] = useDrop({
@@ -142,7 +146,7 @@ const Kanban = ({ projectId, projectName }) => {
             {task.assignee && task.assignee.map((member, index) => (
               <img
                 key={index}
-                src={member.profilePicture}
+                src={member.profilePicture?.url}
                 alt={member.name}
                 className="w-8 h-8 rounded-full border-2 border-white"
                 title={member.name}
@@ -158,7 +162,7 @@ const Kanban = ({ projectId, projectName }) => {
               {task.attachment.map((attachment, index) => (
                 <img
                   key={index}
-                  src={attachment.url}
+                  src={attachment?.url}
                   alt={`Attachment ${index + 1}`}
                   className="w-full sm:w-40 h-48 sm:h-36 object-cover rounded-md"
                 />
@@ -210,6 +214,8 @@ const Kanban = ({ projectId, projectName }) => {
       task={selectedTask} 
       projectName={projectName} // Pass the project name here
       onUpdateTask={handleUpdateTask} // Pass the update task handler to the modal
+      projectId={projectId} 
+      
     />
   </DndProvider>
   );

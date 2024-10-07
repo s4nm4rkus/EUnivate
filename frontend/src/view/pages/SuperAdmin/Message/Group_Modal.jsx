@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify'; // Import toast for notifications
 
 const Group_Modal = ({ toggleModal, invitedUsers, nonInvitedUsers, onCreateGroup }) => {
   const [groupName, setGroupName] = useState('');
@@ -25,21 +26,22 @@ const Group_Modal = ({ toggleModal, invitedUsers, nonInvitedUsers, onCreateGroup
 
   // Handle form submission
   const handleSubmit = () => {
-    if (!groupName) {
-      alert('Please enter a group name');
+    // Validate the inputs (name, members, and image)
+    if (!groupName || selectedMembers.length === 0 || !image) {
+      toast.error('Please provide a group name, select members, and upload an image.'); // Show toast if validation fails
       return;
     }
-  
+
     // Create the new group object dynamically based on user inputs
     const newGroup = {
       groupName,
       imagePreview, // This contains the image URL or null if no image is uploaded
       selectedMembers, // Store full selected member objects
     };
-  
+
     // Pass the newly created group data to the parent (Messages component)
     onCreateGroup(newGroup);
-  
+
     toggleModal(); // Close the modal after submission
   };
 
@@ -97,7 +99,7 @@ const Group_Modal = ({ toggleModal, invitedUsers, nonInvitedUsers, onCreateGroup
         {/* Add Members Button */}
         <button
           onClick={() => setShowMembers(!showMembers)}
-          className="w-full bg-blue-500 text-white px-4 py-2 rounded-md mb-4"
+          className="w-full bg-red-500 text-white px-4 py-2 rounded-md mb-4"
         >
           Add Members
         </button>

@@ -39,15 +39,7 @@ const ProjectMem = () => {
   />
   
 </div>
-
-    
-      {/* Display Projects */}
-      <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1">
-      <div className="block md:hidden text-black text-2xl font-semibold ml-2">
-                Project
-            </div>
-      
-      </div>
+   
     </div>
   );
 };

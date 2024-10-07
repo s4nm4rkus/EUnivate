@@ -3,7 +3,7 @@
     import saInvitedMember from '../../../models/SuperAdmin/saInvitedMember.js';
     import User from '../../../models/Client/userModels.js';
     import { io } from '../../../index.js';
-
+    
       //getAddedMembers
         export const getAddedMembers = async (req, res) => {
             try {
@@ -202,21 +202,27 @@
               if (status) {
                 query.status = status; // Filter by status if provided
               }
-
+              
               // Fetch tasks based on the query
-              const tasks = await saAddTask.find(query).populate('assignee', 'name profilePicture');
+              const tasks = await saAddTask.find(query)
+              .populate('assignee', 'username profilePicture')
+              .populate('history.modifiedBy', 'username profilePicture');
               // console.log('Tasks found:', tasks); // Debug log
 
-              const tasksWithDoneObjectivesCount = tasks.map(task => ({
-                ...task._doc, // Spread the original task object
-                doneObjectivesCount: task.objectives.filter(obj => obj.done).length // Count done objectives
-              }));
-
+            
+        const tasksWithAdditionalInfo = tasks.map(task => ({
+          ...task._doc, // Spread the original task object
+          doneObjectivesCount: task.objectives.filter(obj => obj.done).length, // Count done objectives
+          assignees: task.assignee.map(assignee => ({
+              username: assignee.username, // Store assignee's username
+              profilePicture: assignee.profilePicture // Store profile picture URL if needed
+          }))
+      }));
               
               // Return tasks, even if none are found
               res.status(200).json({
                 success: true,
-              data: tasksWithDoneObjectivesCount
+              data: tasksWithAdditionalInfo
               });
             } catch (error) {
               console.error('Error fetching tasks by projectId:', error); // Debug log
@@ -269,50 +275,111 @@
           };
           
 
-        // Update Task Controller
-        export const updateTask = async (req, res) => {
-          try {
-            const { id } = req.params; // Extract the task ID from the URL parameters
-            const updatedData = req.body;
-            const {
-              taskName,
-              description,
-              objectives,
-              priority,
-              status,
-              startDate,
-              dueDate,
-              attachment,
-              assignee ,
-            } = req.body; // Extract the task details from the request body
-        
-            // Find the task by ID and update it with the new values
-            const updatedTask = await saAddTask.findByIdAndUpdate(
-              id,
-              {
-                taskName,
-                description,
-                objectives,
-                priority,
-                status,
-                startDate,
-                dueDate,
-                attachment,
-                assignee ,
-              },
-              { new: true, runValidators: true } // Return the updated document
-            );
-        
-            if (!updatedTask) {
-              return res.status(404).json({ message: 'Task not found' });
-            }
-        
-            res.status(200).json({ message: 'Task updated successfully', data: updatedTask });
-          } catch (error) {
-            console.error('Error updating task:', error);
-            res.status(500).json({ message: 'Server error. Could not update task.', error: error.message });
+          // Update Task Controller
+          export const updateTask = async (req, res) => {
+            try {
+              const { id } = req.params; // Extract the task ID  from the URL parameters
+              const userId = req.body.modifiedBy;  // Get the user ID who is modifying the task
+          
+              // Log the user ID who is modifying the task
+              console.log(`Task is being modified by user with ID: ${userId}`);
+          
+              const updatedData = req.body; // Get the new task data from the request body
+          
+          
+              // Find the existing task by ID (this is required to compare the changes)
+              const task = await saAddTask.findById(id).populate('assignee', 'username profilePicture');;
+              if (!task) {
+                return res.status(404).json({ message: 'Task not found' });
+              }
+          
+              // Initialize an object to track changes
+          const changes = {};
+
+          // Loop through the updatedData keys
+          for (let key in updatedData) {
+              if (updatedData.hasOwnProperty(key)) {
+                  switch (key) {
+                      case 'taskName':
+                          if (updatedData[key] !== task.taskName) {
+                              changes.taskName = updatedData[key];
+                          }
+                          break;
+                      case 'description':
+                          if (updatedData[key] !== task.description) {
+                              changes.description = updatedData[key];
+                          }
+                          break;
+                      case 'objectives':
+                          if (JSON.stringify(updatedData[key]) !== JSON.stringify(task.objectives)) {
+                              changes.objectives = updatedData[key];
+                          }
+                          break;
+                      case 'priority':
+                          if (updatedData[key] !== task.priority) {
+                              changes.priority = updatedData[key];
+                          }
+                          break;
+                      case 'status':
+                          if (updatedData[key] !== task.status) {
+                              changes.status = updatedData[key];
+                          }
+                          break;
+                      case 'startDate':
+                          if (updatedData[key] !== task.startDate) {
+                              changes.startDate = updatedData[key];
+                          }
+                          break;
+                      case 'dueDate':
+                          if (updatedData[key] !== task.dueDate) {
+                              changes.dueDate = updatedData[key];
+                          }
+                          break;
+                      case 'attachment':
+                          if (JSON.stringify(updatedData[key]) !== JSON.stringify(task.attachment)) {
+                              changes.attachment = updatedData[key];
+                          }
+                          break;
+                      case 'assignee':
+                          if (JSON.stringify(updatedData[key]) !== JSON.stringify(task.assignee)) {
+                              changes.assignee = updatedData[key];
+                          }
+                          break;
+                      default:
+                          break;
+                  }
+              }
           }
-        };
+
+              // Log changes in the task history if there are any
+              if (Object.keys(changes).length > 0) {
+                task.history.push({
+                  modifiedBy: userId, // The user who modified the task
+                  modifiedAt: new Date(), // Timestamp of the change
+                  changes: JSON.stringify(changes), // Log the changes made as a JSON string
+                });
+                    // Save the task with the updated history
+              await task.save();
+              }
+          
+              // Now, perform the actual update in the database
+              const updatedTask = await saAddTask.findByIdAndUpdate(
+                id,
+                { $set: changes },
+                { new: true, runValidators: true } // Return the updated document
+              ).populate('assignee', 'username profilePicture');
+          
+              if (!updatedTask) {
+                return res.status(404).json({ message: 'Task not found' });
+              }
+          
+              res.status(200).json({ message: 'Task updated successfully', data: updatedTask });
+            } catch (error) {
+              console.error('Error updating task:', error);
+              res.status(500).json({ message: 'Server error. Could not update task.', error: error.message });
+            }
+          };
+        
 
         // Delete Task Controller
         export const deleteTask = async (req, res) => {

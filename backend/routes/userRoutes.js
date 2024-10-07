@@ -25,7 +25,7 @@
       import { getAddedMembers, createTask, getTasks, getTaskById, updateTask, updateTaskObjectives, addCommentToTask, getTaskComments, getTasksByProjectId, deleteTask } from '../controllers/SuperAdmin/Task/saAddTaskController.js';  
       import { protect, verifySuperAdmin } from '../middlewares/middleware.js'; 
       import { inviteUsers, updateUserRole, getInvitedUsers, removeInvitedMember, getUsers} from '../controllers/SuperAdmin/People/peopleController.js';
-
+      import { getAssignees } from '../controllers/findUserNameIDController.js';
       // User Authentication Routes
       router.post('/login', loginUser);
       router.post('/forgot-password', forgotPassword);
@@ -60,7 +60,8 @@
       router.put('/assign-project', protect, assignProjectToUser);
       //add member on the project details on user add icon
       router.post('/add-member-to-project', addMemberToProject);
-
+      // Activity Controller
+      router.get('/assignee', getAssignees); 
       // Task Routes
       router.get('/get-assignee', getAddedMembers);
       router.post('/sa-task', createTask);

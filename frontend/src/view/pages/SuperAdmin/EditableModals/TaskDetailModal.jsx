@@ -106,86 +106,98 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpda
     };
 
      // Fetch comments for the task
-const fetchComments = async () => {
-  try {
-    const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${task._id}/comments`);
-    if (response.data.success) {
-      setCommentsList(response.data.data); // Populate commentsList with fetched comments
-    } else {
-      console.error('Failed to fetch comments:', response.data.message);
-    }
-  } catch (error) {
-    console.error('Error fetching comments:', error);
-  }
-};
-
-        const handleConfirmAssignees = (selectedMembers) => {
-        
-          const assigneeIds = selectedMembers.map((member) => member.id);
-
-          const updatedTask = { ...task, assignee: assigneeIds };
-          setEditedAssignees(assigneeIds);  // Update the local state with the selected assignee IDs
-          onUpdateTask(updatedTask);  // Update the UI
-          updateTaskInDatabase(updatedTask);  // Sync with the backend
+        const fetchComments = async () => {
+          try {
+            const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${task._id}/comments`);
+            if (response.data.success) {
+              setCommentsList(response.data.data); // Populate commentsList with fetched comments
+            } else {
+              console.error('Failed to fetch comments:', response.data.message);
+            }
+          } catch (error) {
+            console.error('Error fetching comments:', error);
+          }
         };
 
 
-    const updateTaskInDatabase = async (updatedTask) => {
-      try {
-        const response = await fetch(`http://localhost:5000/api/users/sa-tasks/${task._id}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updatedTask),
-        });
+            const handleConfirmAssignees = (selectedMembers) => {
+              const assigneeIds = selectedMembers.map((member) => member.id);
+              const changes = { assignee: assigneeIds };
 
-        const data = await response.json();
-        socket.emit('task-updated', { taskId: updatedTask._id, objectives: updatedTask.objectives });
+              setEditedAssignees(assigneeIds);  
+              onUpdateTask({ ...task, ...changes });  
+              updateTaskInDatabase(changes);  
+            };
 
-        if (response.ok) {
-          console.log('Task updated successfully:', data);
-        } else {
-          console.error('Error updating task:', data.message);
-        }
-      } catch (error) {
-        console.error('Error updating task:', error);
-      }
-    };
+        const updateTaskInDatabase = async (changes) => {
+          try {
+            // Retrieve user information from localStorage
+            const user = JSON.parse(localStorage.getItem('user'));
+            const currentUserId = user?._id;
+        
+            // Add the userId to the updated task object
+            const taskData = {
+              ...changes,
+              modifiedBy: currentUserId,  // Add userId to the request body
+            };
+        
+            const response = await fetch(`http://localhost:5000/api/users/sa-tasks/${task._id}`, {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(taskData), // Send the updated task data including the userId
+            });
+        
+            const data = await response.json();
+            socket.emit('task-updated', { taskId: task._id, ...changes});
+        
+            if (response.ok) {
+              console.log('Task updated successfully:', data);
+            } else {
+              console.error('Error updating task:', data.message);
+            }
+          } catch (error) {
+            console.error('Error updating task:', error);
+          }
+        };
+        
 
-      const handleSaveTaskName = () => {
-        const updatedTask = { ...task, taskName: editedTaskName };
-        onUpdateTask(updatedTask); // Update the UI state
-        updateTaskInDatabase(updatedTask); // Send update to the backend
-        setIsEditingTaskName(false);
+        const handleSaveTaskName = () => {
+          const changes = { taskName: editedTaskName };
+          onUpdateTask({ ...task, ...changes });
+          updateTaskInDatabase(changes);
+          setIsEditingTaskName(false);
       };
-
+      
       const handleSaveStartDate = () => {
-        const updatedTask = { ...task, startDate };
-        onUpdateTask(updatedTask); // Update the UI state
-        updateTaskInDatabase(updatedTask); // Send update to the backend
+        const changes = { startDate };
+        onUpdateTask({ ...task, ...changes });
+        updateTaskInDatabase(changes);
         setIsEditingStartDate(false);
         setShowSaveStartDateButton(false);
     };
-
+    
     const handleSaveDueDate = () => {
-        const updatedTask = { ...task, dueDate };
-        onUpdateTask(updatedTask); // Update the UI state
-        updateTaskInDatabase(updatedTask); // Send update to the backend
-        setIsEditingDueDate(false);
-        setShowSaveDueDateButton(false);
-    };
+      const changes = { dueDate };
+      onUpdateTask({ ...task, ...changes });
+      updateTaskInDatabase(changes);
+      setIsEditingDueDate(false);
+      setShowSaveDueDateButton(false);
+  };
+  
 
       const handleTaskNameChange = (e) => {
         setEditedTaskName(e.target.value);
         setShowSaveButton(true); // Show save button when input changes
       };
-    const handleSavePriority = () => {
-      const updatedTask = { ...task, priority: selectedPriority };
-      onUpdateTask(updatedTask);
-      updateTaskInDatabase(updatedTask);
-      setShowSavePriorityButton(false);
+      const handleSavePriority = () => {
+        const changes = { priority: selectedPriority };
+        onUpdateTask({ ...task, ...changes });
+        updateTaskInDatabase(changes);
+        setShowSavePriorityButton(false);
     };
+    
     const handlePriorityClick = () => {
       setShowPriorityDropdown(!showPriorityDropdown);
     };
@@ -213,19 +225,13 @@ const fetchComments = async () => {
       onUpdateTask(updatedTask);
     };
 
-    const handleSaveStatus = async () => {
-      const updatedTask = { ...task, status: selectedStatus };
-      // console.log("Saving status:", updatedTask.status); // Debugging output
-      
-      // Update UI state
-      onUpdateTask(updatedTask);
-    
-      // Update the database
-      await updateTaskInDatabase(updatedTask);
-    
-      // Close save button
-      setShowSaveStatusButton(false);
-    };
+const handleSaveStatus = async () => {
+    const changes = { status: selectedStatus }; 
+    onUpdateTask({ ...task, ...changes }); 
+    await updateTaskInDatabase(changes); 
+    setShowSaveStatusButton(false); 
+  };
+
 
 
 
@@ -277,18 +283,12 @@ const fetchComments = async () => {
     };
 
     const handleSaveDescription = async () => {
-        const updatedTask = { ...task, description: editedDescription };
-        console.log("Saving description:", updatedTask.description); // Debugging output
-        
-        // Update UI state
-        onUpdateTask(updatedTask);
-        const response = await updateTaskInDatabase(updatedTask);
-        // Update the database
-        await updateTaskInDatabase(updatedTask);
-      
-        // Stop editing mode
-        setIsEditing(false);
-    };
+      const changes = { description: editedDescription };
+      onUpdateTask({ ...task, ...changes });
+      await updateTaskInDatabase(changes);
+      setIsEditing(false);
+  };
+  
 
       // Objective input toggle
       const handleToggleAddObjective = () => {
@@ -304,13 +304,15 @@ const fetchComments = async () => {
 
       const handleAddObjective = () => {
         if (newObjective) {
-          const updatedObjectives = [...task.objectives, { text: newObjective, done: false }];
-          onUpdateTask({ ...task, objectives: updatedObjectives });
-          updateTaskInDatabase({ ...task, objectives: updatedObjectives });
-          setNewObjective('');
-          setIsAddingObjective(false);
+            const updatedObjectives = [...task.objectives, { text: newObjective, done: false }];
+            const changes = { objectives: updatedObjectives };
+            onUpdateTask({ ...task, ...changes });
+            updateTaskInDatabase(changes);
+            setNewObjective('');
+            setIsAddingObjective(false);
         }
-      };
+    };
+    
 
     // const handleDeleteAttachment = (attachmentUrl) => {
     //   const updatedAttachments = task.attachment.filter(att => att.url !== attachmentUrl);
@@ -345,9 +347,9 @@ const fetchComments = async () => {
       
       
       // Update the task with the new attachments
-      const updatedTask = { ...task, attachment: updatedAttachments };
-      onUpdateTask(updatedTask);
-      await updateTaskInDatabase(updatedTask);
+      const changes = { attachment: updatedAttachments };
+      onUpdateTask({ ...task, ...changes });
+      await updateTaskInDatabase(changes);
       
       // Reset states
       setNewAttachmentFiles([]);
@@ -381,19 +383,20 @@ const fetchComments = async () => {
     const handleRemoveObjective = async (objectiveToRemove) => {
       // Filter out the objective you want to remove
       const updatedObjectives = task.objectives.filter((obj) => obj !== objectiveToRemove);
-      const updatedTask = { ...task, objectives: updatedObjectives };
-    
+      const changes = { objectives: updatedObjectives };
+  
       // Update the UI state
-      onUpdateTask(updatedTask);
-    
+      onUpdateTask({ ...task, ...changes });
+  
       // Sync with backend (update task with new objectives array)
       try {
-        await updateTaskInDatabase(updatedTask);  // Send the updated task to the backend
-        console.log('Objective removed successfully');
+          await updateTaskInDatabase(changes);  // Send only the updated objectives to the backend
+          console.log('Objective removed successfully');
       } catch (error) {
-        console.error('Failed to remove objective:', error);
+          console.error('Failed to remove objective:', error);
       }
-    };
+  };
+  
     
     
     
@@ -489,7 +492,7 @@ const fetchComments = async () => {
                     ) : (
                       <FaUser className="text-gray-500 text-lg bg-transparent  rounded-3xl " />
                     )}
-                    <span className="ml-2 text-sm text-gray-500">{assignee.username}</span>
+                    {/* <span className="ml-2 text-sm text-gray-500">{assignee.username}</span> */}
                   </div>
                 ))}
               </div>

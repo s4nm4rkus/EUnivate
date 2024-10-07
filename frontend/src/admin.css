@@ -65,7 +65,6 @@
     color: white;
     font-family: "Manrope", sans-serif;
     text-decoration: none;
-    display: flex;
     justify-content: space-between; 
     position: absolute;
     bottom: 10rem;
@@ -75,8 +74,13 @@
 .side-nav-admin .faPlusWorkspace{
   transition: background-color 0.1s ease;
   margin-left: 6rem;
-}
+  padding: 0;
+  color:  white;
 
+}
+.side-nav-admin .workspaceSelect{
+  width: 12rem;
+}
 .side-nav-admin .faPlusWorkspace:hover{
     color: #980808;
     background-color: white;
@@ -84,6 +88,19 @@
     margin-bottom: -4px;
     border-radius: 3px;
     margin-left: 5.8rem;
+}
+
+.side-nav-admin .workspaceDropdown{
+  font-size: 14px;
+  margin: 1rem 1rem 0 1rem;
+}
+.side-nav-admin .faChevronWS{
+  position: absolute;
+  right: .05rem;
+}
+
+.side-nav-admin .workspaceList{
+  width: 95%;
 }
 
 

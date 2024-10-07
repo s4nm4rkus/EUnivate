@@ -1,8 +1,8 @@
 // frontend/src/components/SideNav.js
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import axios from 'axios'; // Import Axios
 import { 
@@ -27,6 +27,25 @@ const SideNav = ({ isNavOpen }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [workspaceTitle, setWorkspaceTitle] = useState('');
     const [error, setError] = useState('');
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [selectedWorkspace, setSelectedWorkspace] = useState('Select Workspace'); 
+    const [workspaces, setWorkspaces] = useState([]); // State to store workspaces
+
+    useEffect(() => {
+        // Fetch workspaces when the component mounts
+        const fetchWorkspaces = async () => {
+            try {
+                const response = await axios.get('http://localhost:5000/api/users/workspaces'); // Adjust the URL accordingly
+                setWorkspaces(response.data); // Set the fetched workspaces into state
+            } catch (err) {
+                console.error("Error fetching workspaces:", err);
+                setError('Failed to load workspaces');
+            }
+        };
+
+        fetchWorkspaces(); // Call the function to fetch workspaces
+    }, []); // Empty dependency array means this will run once when the component mounts
+
 
     const closeModal = () => {
         setIsModalOpen(false);
@@ -47,6 +66,10 @@ const SideNav = ({ isNavOpen }) => {
                 workspaceTitle,
             });
 
+            if (response.status === 201) {
+                window.location.reload(); // Refresh the page
+            }
+
             console.log("Workspace created:", response.data);
             // Optionally, you can update the UI or state with the new workspace
             // For example, you might have a state that holds all workspaces
@@ -58,6 +81,13 @@ const SideNav = ({ isNavOpen }) => {
             setError(err.response?.data?.error || 'An error occurred while creating the workspace');
         }
     };
+
+    const handleWorkspaceSelect = (workspace) => {
+        setSelectedWorkspace(workspace.workspaceTitle); 
+        setIsDropdownOpen(false); // Close dropdown after selection
+    };
+
+    
 
     return (
         <div
@@ -106,6 +136,7 @@ const SideNav = ({ isNavOpen }) => {
                     </li>
                 ))} 
             </ul>
+            
             <div className="add-workspace">
             <p className="font-size">Workspace 
                 <button onClick={() => {
@@ -115,12 +146,40 @@ const SideNav = ({ isNavOpen }) => {
                         <FontAwesomeIcon icon={faPlus} className="faPlusWorkspace"/>
                 </button>
              </p>   
-            </div>
+             <div className="workspaceSelect relative inline-block">
+                <button
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className="workspaceDropdown flex items-center justify-between bg-transparent text-white"
+                >
+                    <span>{selectedWorkspace}</span>
+                    <FontAwesomeIcon icon={isDropdownOpen ? faChevronUp : faChevronDown} className='faChevronWS' />
+                </button>
+
+                {isDropdownOpen && (
+                        <ul className="workspaceList absolute z-10 mt-2 ms-2 bg-white text-black rounded-md shadow">
+                            {workspaces.length > 0 ? (
+                                workspaces.map((workspace) => (
+                                    <li
+                                        key={workspace._id} // Use unique identifier
+                                        onClick={() => handleWorkspaceSelect(workspace)}
+                                        className="p-2 hover:bg-gray-400 cursor-pointer"
+                                    >
+                                        {workspace.workspaceTitle}
+                                    </li>
+                                ))
+                            ) : (
+                                <li className="p-2 text-gray-500">No workspaces available</li>
+                            )}
+                        </ul>
+                    )}
+                </div>
+
+            </div> 
 
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 bg-gray-800 bg-opacity-50 flex ">
                     <div
-                        className="addWorkspaceModal ml-1 bg-white p-2 rounded-md shadow-lg absolute bottom-10 h-50 w-60 z-60"
+                        className="addWorkspaceModal ml-1 bg-white p-2 rounded-md shadow-lg absolute bottom-20 h-50 w-60 z-60"
                         role="dialog"
                         aria-modal="true"
                     >

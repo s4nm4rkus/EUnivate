@@ -61,88 +61,88 @@
             fetchProjectsAndTasks();
         }, []);
 
-        // Function to determine what to display based on task changes
-        const getTaskChanges = (task) => {
-            let changes = [];
-        
-            task.history.forEach((change) => {
-                const parsedChanges = JSON.parse(change.changes);
-        
-                // Loop through each change and create a formatted change entry
-                Object.keys(parsedChanges).forEach((key) => {
-                    let changeType = '';
-                    let newValue = parsedChanges[key];
-        
-                    // Set specific labels for the type of change
-                    switch (key) {
-                        case 'taskName':
-                            changeType = 'changed task name to';
-                            break;
-                        case 'description':
-                            changeType = 'added new description';
-                            newValue = parsedChanges[key];
-                            break;
-                        case 'objectives':
-                            changeType = 'added new objective';
-                            break;
-                        case 'priority':
-                            changeType = 'changed the priority to';
-                            break;
-                        case 'status':
-                            changeType = 'changed the status to';
-                            break;
-                        case 'startDate':
-                            changeType = 'changed start date to';
-                            // Format the newValue (startDate) using date-fns
-                            newValue = format(new Date(parsedChanges[key]), 'MMM d, yyyy hh:mm a');
-                            break;
-                        case 'dueDate':
-                            changeType = 'changed due date to';
-                            // Format the newValue (dueDate) using date-fns
-                            newValue = format(new Date(parsedChanges[key]), 'MMM d, yyyy hh:mm a');
-                            break;
-                            case 'attachment':
-                                changeType = 'added new attachment';
-                            
-                                // Check if the attachment is an array (it looks like it based on the image)
-                                if (Array.isArray(parsedChanges[key])) {
-                                    newValue = parsedChanges[key].map((attachment, index) => (
-                                        <div key={index}>
-                                            <a href={attachment.url} target="_blank" rel="noopener noreferrer">
-                                                {attachment.publicId} {/* You can display either publicId or another identifier */}
-                                            </a>
-                                        </div>
-                                    ));
-                                } else {
-                                    newValue = (
-                                        <a href={parsedChanges[key].url} target="_blank" rel="noopener noreferrer">
-                                            {parsedChanges[key].url}
-                                        </a>
-                                    );
-                                }
-                                break;
-                        case 'assignee':
-                            changeType = task.assignee && task.assignee._id === parsedChanges.assignee
-                                ? 'reassigned to'
-                                : 'assigned to';
-                            break;
-                        default:
-                            changeType = 'made an update';
-                            break;
-                    }
-        
-                    changes.push({
-                        modifiedBy: change.modifiedBy, // The user who modified the task
-                        type: changeType, // e.g., 'changed due date'
-                        newValue, // The new value after the change (formatted date or other values)
-                        modifiedAt: change.modifiedAt, // Timestamp of when the change was made
-                    });
-                });
+    // Function to determine what to display based on task changes
+    const getTaskChanges = (task) => {
+        let changes = [];
+
+        const isTaskNew = task.createdAt === task.updatedAt;
+
+        // Detect if the task was just created
+        if (isTaskNew) {
+            changes.push({
+                type: 'created',
+                label: 'Add task',
+                value: task.taskName
             });
-        
-            // Sort changes by modifiedAt date
-            return changes.sort((a, b) => new Date(b.modifiedAt) - new Date(a.modifiedAt));
-        };
+        }
+
+        // Check if the start date was changed
+        if (task.startDate && !isTaskNew && task.startDate !== task.previousStartDate) {
+            changes.push({
+                type: 'startDate',
+                label: 'Change start date to',
+                value: format(new Date(task.startDate), 'MMM dd, yyyy')
+            });
+        } else if (task.startDate && isTaskNew) {
+            changes.push({
+                type: 'startDate',
+                label: 'Add start date',
+                value: format(new Date(task.startDate), 'MMM dd, yyyy')
+            });
+        }
+
+        // Check if the due date was changed
+        if (task.dueDate && !isTaskNew && task.dueDate !== task.previousDueDate) {
+            changes.push({
+                type: 'dueDate',
+                label: 'Change due date to',
+                value: format(new Date(task.dueDate), 'MMM dd, yyyy')
+            });
+        } else if (task.dueDate && isTaskNew) {
+            changes.push({
+                type: 'dueDate',
+                label: 'Add due date',
+                value: format(new Date(task.dueDate), 'MMM dd, yyyy')
+            });
+        }
+
+        // Check if the priority was changed
+        if (task.priority && !isTaskNew && task.priority !== task.previousPriority) {
+            changes.push({
+                type: 'priority',
+                label: 'Change priority to',
+                value: task.priority
+            });
+        } else if (task.priority && isTaskNew) {
+            changes.push({
+                type: 'priority',
+                label: 'Add priority to',
+                value: task.priority
+            });
+        }
+
+        // Check if the status was changed
+        if (task.status && !isTaskNew && task.status !== task.previousStatus) {
+            changes.push({
+                type: 'status',
+                label: 'Change status to',
+                value: task.status
+            });
+        } else if (task.status && isTaskNew) {
+            changes.push({
+                type: 'status',
+                label: 'Add status to',
+                value: task.status
+            });
+        }
+
+        return changes;
+    };
+
+    // Sort tasks by their update date (most recent first)
+    const sortedTasks = (tasks) => {
+        return tasks.slice().sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    };
 
         return (
             <div className="bg-gray-100 min-h-screen p-6">
@@ -159,21 +159,26 @@
                     />
                 </div>
 
-                {/* Project and Task Content */}
-                <div className="bg-white p-4 md:p-6 border border-gray-300 rounded-lg shadow-sm">
-                    {/* Render each group of task changes */}
-                    {projects.length > 0 ? (
-                        projects.map((project) => (
-                            <div key={project._id} className="mb-6">
-                                <div className="flex items-center">
-                                    <h2 className="text-lg md:text-2xs text-gray-800">
-                                        {project.projectName}
-                                    </h2>
+            {/* Project and Task Content */}
+            <div className="bg-white p-4 md:p-6 border border-gray-300 rounded-lg shadow-sm">
+                {projects.length > 0 ? (
+                    projects.map((project) => (
+                        <div key={project._id} className="mb-6">
+                            <div className="flex items-center">
+                                <h2 className="text-lg md:text-2xs text-gray-800">
+                                    {project.projectName}
+                                </h2>
+                                <div className="text-gray-500 text-xs md:text-sm flex items-center ml-2">
+                                    <span>&#8226;</span> {/* Bullet Point */}
+                                    <span className="ml-2 ">
+                                        {format(new Date(project.createdAt), 'MMM dd, yyyy')}
+                                    </span> {/* Date */}
                                 </div>
-                                <ul className="mt-2 relative">
-                                    {taskDetails[project._id] && taskDetails[project._id].length > 0 ? (
-                                        taskDetails[project._id].map((task) => {
-                                            const taskChanges = getTaskChanges(task);
+                            </div>
+                            <ul className="mt-2 relative">
+                                {taskDetails[project._id] && taskDetails[project._id].length > 0 ? (
+                                    sortedTasks(taskDetails[project._id]).map((task) => {
+                                        const taskChanges = getTaskChanges(task);
 
                                             if (taskChanges.length === 0) return null;
 

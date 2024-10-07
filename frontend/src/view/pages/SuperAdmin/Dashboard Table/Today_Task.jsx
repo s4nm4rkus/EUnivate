@@ -35,7 +35,11 @@ const Today_Task = ({ projects, taskDetails }) => {
 
         return projects.map((project) => {
             const { tasks = [] } = taskDetails[project._id] || {};
-            return tasks.length > 0 ? tasks.map((task, index) => (
+            
+            // Only display projects that have tasks
+            if (tasks.length === 0) return null;
+
+            return tasks.map((task, index) => (
                 <div 
                     key={index} 
                     className="relative flex items-start mb-4 pb-4 border-b border-gray-300"
@@ -103,18 +107,7 @@ const Today_Task = ({ projects, taskDetails }) => {
                         </div>
                     )}
                 </div>
-            )) : (
-                <div 
-                    key={project._id} 
-                    className="flex items-start mb-4 pb-4 border-b border-gray-300"
-                >
-                    <FaRegCircle className="text-gray-400 text-3xl mr-3 relative top-2" />
-                    <div>
-                        <h3 className="text-sm font-bold text-gray-800 mb-1">{project.projectName}</h3>
-                        <div>No tasks available</div>
-                    </div>
-                </div>
-            );
+            ));
         });
     };
 

@@ -10,6 +10,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Today_Task from './Dashboard Table/Today_Task';
 import Ongoing_Project from './Dashboard Table/Ongoing_Project';
+import Activity_Task from './Dashboard Table/Activity_Task'; // Import Activity_Task component
 
 const Dashboard = () => {
     const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
@@ -17,6 +18,12 @@ const Dashboard = () => {
     const [projects, setProjects] = useState([]);  
     const [taskDetails, setTaskDetails] = useState({}); 
     const navigate = useNavigate();
+    
+    // Retrieve user profile details
+    const user = JSON.parse(localStorage.getItem('user'));
+    const profilePicture = user?.profilePicture;
+    const userName = user?.name;
+    const defaultProfilePictureUrl = 'path-to-default-image.jpg'; // Add the path to your default image
 
     const [selectedProjectName, setSelectedProjectName] = useState('Projects');
     const [selectedProjectTaskCounts, setSelectedProjectTaskCounts] = useState({
@@ -222,17 +229,21 @@ const Dashboard = () => {
                 </div>
             {/* Today Task, Activity, and Ongoing Projects Section */}
             <div className="flex flex-col md:flex-row mb-2 gap-4">
-                {/* Today Task */}
+                   {/* Today Task */}
                 <div className="w-full md:w-3/5">
                     <Today_Task projects={projects} taskDetails={taskDetails} />
                 </div>
 
                 {/* Activity Section */}
                 <div className="w-full md:w-2/5">
-                    <h2 className="text-medium font-semibold text-gray-800 mb-2">Activity</h2>
-                    <div className="bg-white p-4 border border-gray-300 rounded-lg shadow-sm activity-div">
-                        <p>Content for Activity goes here...</p>
-                    </div>
+                    
+                    <Activity_Task 
+                        projects={projects}
+                        taskDetails={taskDetails}
+                        profilePicture={profilePicture}
+                        userName={userName}
+                        defaultProfilePictureUrl={defaultProfilePictureUrl}
+                    />
                 </div>
             </div>
 
@@ -247,6 +258,7 @@ const Dashboard = () => {
                 </div>
             </div>
         </div>
+       
     );
 };
 

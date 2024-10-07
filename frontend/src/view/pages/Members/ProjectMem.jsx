@@ -93,60 +93,18 @@ const ProjectMem = () => {
     <div className="bg-gray-100 min-h-screen p-6">
       {/* Admin Navbar */}
       <div className="w-full flex justify-between items-center">
-        <div className="relative">
-          <h1 className="text-2xl font-medium text-gray-800 hidden md:block">Project</h1>
-        </div>
-        <AdminNavbar
-          isAccountDropdownOpen={isAccountDropdownOpen}
-          toggleAccountDropdown={toggleAccountDropdown}
-        />
-      </div>
+        
+      <div className="relative">
+  <h1 className="text-2xl font-medium text-gray-800 hidden md:block">Project</h1>
+  </div>
 
-      {/* Display Projects */}
-      <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {error && <p className="text-red-500">{error}</p>}
-        {projects.length > 0 ? (
-          projects.map((project) => (
-            <div
-              key={project._id}
-              className="bg-white p-4 rounded-md shadow-md border border-gray-200 mt-2 relative cursor-pointer"
-              onClick={() => handleProjectClick(project)} // Navigate to project details
-            >
-              {project.thumbnail && (
-                <img
-                  src={project.thumbnail.url}
-                  alt={project.projectName}
-                  className="w-full h-32 object-cover rounded-md"
-                />
-              )}
-              <h3 className="text-lg font-semibold mt-2">{project.projectName}</h3>
-              <div className="flex items-center text-gray-500 mt-2">
-                <FaCalendar className="mr-2" />
-                <p>{new Date(project.createdAt).toLocaleDateString()}</p>
-                <FaCheckCircle className="ml-5" />
-                <p className="ml-2">
-                  {taskCounts[project._id] ? taskCounts[project._id].doneTasks : 'Loading...'}
-                </p>
-              </div>
-
-              {/* Progress Bar */}
-              <div className="flex items-center mt-4">
-                <div className="w-full bg-gray-200 rounded-full h-2 relative">
-                  <div
-                    className="bg-green-500 h-2 rounded-full"
-                    style={{ width: `${calculateProgress(project._id)}%` }} // Dynamically set progress width
-                  ></div>
-                </div>
-                <p className="ml-2 text-gray-500">
-                  {`${Math.floor(calculateProgress(project._id))}%`}
-                </p>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p className="text-gray-500">No projects available for this user.</p>
-        )}
-      </div>
+  <AdminNavbar
+    isAccountDropdownOpen={isAccountDropdownOpen}
+    toggleAccountDropdown={toggleAccountDropdown}
+  />
+  
+</div>
+   
     </div>
   );
 };

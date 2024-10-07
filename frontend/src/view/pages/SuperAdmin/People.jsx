@@ -432,7 +432,7 @@ const People = () => {
                                         {isRoleDropdownOpen[user.email] && (
                             <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 role-dropdown">
                                 <ul className="py-1">
-                                    {['Guest', 'Member', 'Admin', 'Superadmin'].map((role) => (
+                                    {['Guest', 'members', 'admin', 'superadmin'].map((role) => (
                                         <li
                                             key={role}
                                             className="px-4 py-2 text-gray-700 cursor-pointer hover:bg-gray-100"

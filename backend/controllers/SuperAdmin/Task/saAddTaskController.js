@@ -10,7 +10,7 @@
                 const { projectId } = req.query;
 
 
-                if (!projectId) {
+                if (!projectId) { 
                     return res.status(400).json({ message: 'Project ID is required' });
                 }
 

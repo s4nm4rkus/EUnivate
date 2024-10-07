@@ -209,13 +209,13 @@
                                                                                 Array.isArray(change.newValue) ? (
                                                                                     change.newValue.map((user, idx) => (
                                                                                         <span key={idx} className="text-blue-500 ml-1">
-                                                                                            {user.username || 'Other User'} {/* Display username */}
+                                                                                            {user}
                                                                                     
                                                                                         </span>
                                                                                     ))
                                                                                 ) : (
                                                                                     <span className="text-blue-500 ml-1">
-                                                                                        {change.newValue.username || 'Other User'}
+                                                                                        {change.newValue.username}
                                                                                     </span>
                                                                                 )
                                                                             ) : (

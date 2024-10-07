@@ -19,11 +19,11 @@
   });
 
   //Track every chnages to the project
-  const historySchema = new mongoose.Schema({
-    modifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    modifiedAt: { type: Date, default: Date.now },
-    changes: { type: String }
-  });
+    const historySchema = new mongoose.Schema({
+      modifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      modifiedAt: { type: Date, default: Date.now },
+      changes: { type: String }
+    });
 
   const saAddTaskSchema = new mongoose.Schema({
     taskName: { type: String, required: true },

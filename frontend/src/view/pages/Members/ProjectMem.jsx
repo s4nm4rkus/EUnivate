@@ -46,43 +46,7 @@ const ProjectMem = () => {
       <div className="block md:hidden text-black text-2xl font-semibold ml-2">
                 Project
             </div>
-          {/* Mobile Dashboard Text */}
-        {projects.length > 0 ? (
-          projects.map((project) => (
-            <div
-              key={project._id}
-              className="bg-white p-4 rounded-md shadow-md border border-gray-200 mt-4 relative cursor-pointer"
-            >
-              {project.thumbnail && (
-                <img
-                  src={project.thumbnail.url}
-                  alt={project.projectName}
-                  className="w-full h-32 object-cover rounded-md"
-                />
-              )}
-              <h3 className="text-lg font-semibold mt-2">{project.projectName}</h3>
-              <div className="flex items-center text-gray-500 mt-2">
-                <FaCalendar className="mr-2" />
-                <p>{new Date(project.createdAt).toLocaleDateString() || 'No date available'}</p>
-                <FaPaperclip className="ml-5" />
-                <p className="ml-2">0</p>
-                <FaCheckCircle className="ml-5" />
-                <p className="ml-2">0</p>
-              </div>
-              <div className="flex items-center mt-4">
-                <div className="w-full bg-gray-200 rounded-full h-2 relative">
-                  <div
-                    className="bg-green-500 h-2 rounded-full"
-                    style={{ width: '5%' }}
-                  ></div>
-                </div>
-                <p className="ml-2 text-gray-500">5%</p>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>No projects available.</p>
-        )}
+      
       </div>
     </div>
   );

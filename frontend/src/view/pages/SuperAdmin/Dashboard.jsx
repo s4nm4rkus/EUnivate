@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaCalendarAlt, FaPaperclip, FaCheckCircle } from 'react-icons/fa';
 import { i1, i2, i3, i4 } from '../../../constants/assets';
 import Slider from "react-slick";
 import { useNavigate } from 'react-router-dom';
@@ -23,7 +22,7 @@ const Dashboard = () => {
     const user = JSON.parse(localStorage.getItem('user'));
     const profilePicture = user?.profilePicture;
     const userName = user?.name;
-    const defaultProfilePictureUrl = 'path-to-default-image.jpg'; // Add the path to your default image
+    const defaultProfilePictureUrl = 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'; // Add the path to your default image
 
     const [selectedProjectName, setSelectedProjectName] = useState('Projects');
     const [selectedProjectTaskCounts, setSelectedProjectTaskCounts] = useState({

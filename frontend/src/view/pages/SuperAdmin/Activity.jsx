@@ -12,7 +12,6 @@ const Activity = () => {
     const [profilePicture, setProfilePicture] = useState('');
 
     const defaultProfilePictureUrl = 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'; // Default avatar image
-
     const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
 
     // Fetch project and task details
@@ -22,14 +21,7 @@ const Activity = () => {
                 const user = JSON.parse(localStorage.getItem('user'));
                 const accessToken = user ? user.accessToken : null;
 
-                // Fetch username and profile picture
-                setUserName(`${user.firstName} ${user.lastName}`);
-                if (user.profilePicture && user.profilePicture.url) {
-                    setProfilePicture(user.profilePicture.url);
-                } else {
-                    setProfilePicture(defaultProfilePictureUrl);
-                }
-
+    
                 const projectResponse = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
@@ -205,7 +197,7 @@ const Activity = () => {
                                                         <div className="ml-6">
                                                         <div className="flex items-center">
                                                             <img
-                                                            src={(change.modifiedBy?.profilePicture?.url) || defaultProfilePictureUrl} // Use optional chaining here
+                                                            src={(change.modifiedBy?.profilePicture?.url || change.modifiedBy?.profilePicture ) || defaultProfilePictureUrl} // Use optional chaining here
                                                             alt="Profile"
                                                             className="w-8 h-8 rounded-full"
                                                             />

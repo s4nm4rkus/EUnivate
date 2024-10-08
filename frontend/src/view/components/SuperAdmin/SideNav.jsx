@@ -156,7 +156,7 @@ const SideNav = ({ isNavOpen }) => {
                 </button>
 
                 {isDropdownOpen && (
-                        <ul className="workspaceList absolute z-10 mt-2 ms-2 bg-white text-black rounded-md shadow">
+                        <ul className="workspaceList absolute z-10 mt-2 ms-2 bg-white text-black shadow">
                             {workspaces.length > 0 ? (
                                 workspaces.map((workspace) => (
                                     <li

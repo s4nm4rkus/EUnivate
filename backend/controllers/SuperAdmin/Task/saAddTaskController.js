@@ -339,12 +339,16 @@
                           if (JSON.stringify(updatedData[key]) !== JSON.stringify(task.attachment)) {
                               changes.attachment = updatedData[key];
                           }
-                          break;
-                      case 'assignee':
-                          if (JSON.stringify(updatedData[key]) !== JSON.stringify(task.assignee)) {
-                              changes.assignee = updatedData[key];
-                          }
-                          break;
+                          case 'assignee':
+                            if (JSON.stringify(updatedData[key]) !== JSON.stringify(task.assignee)) {
+                              // Fetch full assignee information (with usernames) for history storage
+                              const fullAssignees = await User.find({
+                                _id: { $in: updatedData[key] }
+                              }).select('username');
+                
+                              changes.assignee = fullAssignees; // Store the array of assignee objects with usernames
+                            }
+                            break;
                       default:
                           break;
                   }

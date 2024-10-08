@@ -40,7 +40,7 @@ const Ongoing_Project = ({ projects, taskDetails, calculateProgress }) => {
                                         {project.invitedUsers && project.invitedUsers.slice(0, 3).map((user, i) => (
                                             <img
                                                 key={i}
-                                                src={user.profilePicture?.url || 'https://via.placeholder.com/32'}
+                                                src={user.profilePicture?.url || user.profilePicture}
                                                 alt={user.username || 'User'}
                                                 className="w-8 h-8 rounded-full object-cover border border-white -ml-3"
                                             />

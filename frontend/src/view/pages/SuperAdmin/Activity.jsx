@@ -12,7 +12,6 @@ const Activity = () => {
     const [profilePicture, setProfilePicture] = useState('');
 
     const defaultProfilePictureUrl = 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'; // Default avatar image
-
     const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
 
     // Fetch project and task details
@@ -22,14 +21,7 @@ const Activity = () => {
                 const user = JSON.parse(localStorage.getItem('user'));
                 const accessToken = user ? user.accessToken : null;
 
-                // Fetch username and profile picture
-                setUserName(`${user.firstName} ${user.lastName}`);
-                if (user.profilePicture && user.profilePicture.url) {
-                    setProfilePicture(user.profilePicture.url);
-                } else {
-                    setProfilePicture(defaultProfilePictureUrl);
-                }
-
+    
                 const projectResponse = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
@@ -61,7 +53,6 @@ const Activity = () => {
         fetchProjectsAndTasks();
     }, []);
 
-    // Function to determine what to display based on task changes
     const getTaskChanges = (task) => {
         let changes = [];
     
@@ -80,11 +71,20 @@ const Activity = () => {
                         break;
                     case 'description':
                         changeType = 'added new description';
-                        newValue = parsedChanges[key];
                         break;
-                    case 'objectives':
-                        changeType = 'added new objective';
-                        break;
+                        case 'objectives':
+                            changeType = 'updated objectives';
+                            newValue = parsedChanges[key].map((objective, index) => (
+                              <li key={index}>
+                                <span>{objective.text}</span>
+                                {objective.done ? (
+                                  <span className="text-green-500 ml-2">(Completed)</span>
+                                ) : (
+                                  <span className="text-red-500 ml-2">(Not Completed)</span>
+                                )}
+                              </li>
+                            ));
+                            break;
                     case 'priority':
                         changeType = 'changed the priority to';
                         break;
@@ -101,39 +101,39 @@ const Activity = () => {
                         // Format the newValue (dueDate) using date-fns
                         newValue = format(new Date(parsedChanges[key]), 'MMM d, yyyy hh:mm a');
                         break;
-                        case 'attachment':
-                            changeType = 'added new attachment';
-                        
-                            // Check if the attachment is an array (it looks like it based on the image)
-                            if (Array.isArray(parsedChanges[key])) {
-                                newValue = parsedChanges[key].map((attachment, index) => (
-                                    <div key={index}>
-                                        <a href={attachment.url} target="_blank" rel="noopener noreferrer">
-                                            {attachment.publicId} {/* You can display either publicId or another identifier */}
-                                        </a>
-                                    </div>
-                                ));
-                            } else {
-                                newValue = (
-                                    <a href={parsedChanges[key].url} target="_blank" rel="noopener noreferrer">
-                                        {parsedChanges[key].url}
+                    case 'attachment':
+                        changeType = 'added new attachment';
+                        // Check if the attachment is an array
+                        if (Array.isArray(parsedChanges[key])) {
+                            newValue = parsedChanges[key].map((attachment, index) => (
+                                <div key={index}>
+                                    <a href={attachment.url} target="_blank" rel="noopener noreferrer">
+                                        {attachment.publicId}
                                     </a>
-                                );
-                            }
+                                </div>
+                            ));
+                        } else {
+                            newValue = (
+                                <a href={parsedChanges[key].url} target="_blank" rel="noopener noreferrer">
+                                    {parsedChanges[key].url}
+                                </a>
+                            );
+                        }
+                        break;
+                        case 'assignee':
+                            changeType = 'assigned to';
+                            newValue = Array.isArray(parsedChanges[key])
+                              ? parsedChanges[key].map((assignee) => assignee.username).join(', ')
+                              : 'Other User';
                             break;
-                    case 'assignee':
-                        changeType = task.assignee && task.assignee._id === parsedChanges.assignee
-                            ? 'reassigned to'
-                            : 'assigned to';
-                        break;
-                    default:
-                        changeType = 'made an update';
-                        break;
-                }
+                          default:
+                            changeType = 'made an update';
+                            break;
+                        }
     
                 changes.push({
                     modifiedBy: change.modifiedBy, // The user who modified the task
-                    type: changeType, // e.g., 'changed due date'
+                    type: changeType, // E.g., 'changed due date'
                     newValue, // The new value after the change (formatted date or other values)
                     modifiedAt: change.modifiedAt, // Timestamp of when the change was made
                 });
@@ -143,7 +143,7 @@ const Activity = () => {
         // Sort changes by modifiedAt date
         return changes.sort((a, b) => new Date(b.modifiedAt) - new Date(a.modifiedAt));
     };
-
+    
     return (
         <div className="bg-gray-100 min-h-screen p-6">
             {/* Header */}
@@ -186,51 +186,42 @@ const Activity = () => {
                                                 </div>
 
                                                 {taskChanges.map((change, changeIndex) => (
-    <div key={changeIndex} className="relative pl-10 mb-8">
-        {/* Vertical line */}
-        <div className="absolute top-0 left-4 h-full w-px bg-indigo-800"></div>
-        
-        {/* Timeline bullet */}
-        <div className="absolute top-2 left-3 w-3 h-3 rounded-full bg-indigo-800"></div>
+                                                    <div key={changeIndex} className="relative pl-10 mb-8">
+                                                        {/* Vertical line */}
+                                                        <div className="absolute top-0 left-4 h-full w-px bg-indigo-800"></div>
+                                                        
+                                                        {/* Timeline bullet */}
+                                                        <div className="absolute top-2 left-3 w-3 h-3 rounded-full bg-indigo-800"></div>
 
-        {/* Task changes */}
-        <div className="ml-6">
-            <div className="flex items-center">
-                <img
-                    src={(change.modifiedBy?.profilePicture?.url) || defaultProfilePictureUrl} // Use optional chaining here
-                    alt="Profile"
-                    className="w-8 h-8 rounded-full"
-                />
-                <div className="ml-3">
-                    <div className="text-sm md:text-base text-gray-700">
-                        <span className="font-medium mr-1">{change.modifiedBy?.username || 'Unknown User'}</span> {/* Handle undefined user */}
-                        <span>{change.type}</span>
-                        {change.type.includes('reassigned') || change.type.includes('assigned') ? (
-                            Array.isArray(change.newValue) ? (
-                                change.newValue.map((user, idx) => (
-                                    <span key={idx} className="text-blue-500 ml-1">
-                                        {user.username || 'Other User'} {/* Display username */}
-                                    </span>
-                                ))
-                            ) : (
-                                <span className="text-blue-500 ml-1">
-                                    {change.newValue?.username || 'Other User'} {/* Handle undefined newValue */}
-                                </span>
-                            )
-                        ) : (
-                            <span className="text-blue-500 ml-1">
-                                {typeof change.newValue === 'object' ? change.newValue : change.newValue}
-                            </span>
-                        )}
-                    </div>
-                    <span className="text-xs md:text-sm text-gray-500">
-                        {format(new Date(change.modifiedAt), 'MMM yyyy hh:mm a')}
-                    </span>
-                </div>
-            </div>
-        </div>
-    </div>
-))}
+                                                        {/* Task changes */}
+                                                        <div className="ml-6">
+                                                        <div className="flex items-center">
+                                                            <img
+                                                            src={(change.modifiedBy?.profilePicture?.url || change.modifiedBy?.profilePicture ) || defaultProfilePictureUrl} // Use optional chaining here
+                                                            alt="Profile"
+                                                            className="w-8 h-8 rounded-full"
+                                                            />
+                                                            <div className="ml-3">
+                                                            <div className="text-sm md:text-base text-gray-700">
+                                                                <span className="font-medium mr-1">{change.modifiedBy?.username || 'A user'}</span> {/* Handle undefined user */}
+                                                                <span>{change.type}</span>
+                                                                <span className="text-blue-500 ml-1">
+                                                                {typeof change.newValue === 'object' ? (
+                                                                    <ul>{change.newValue}</ul>
+                                                                ) : (
+                                                                    change.newValue
+                                                                )}
+                                                                </span>
+                                                            </div>
+                                                            <span className="text-xs md:text-sm text-gray-500">
+                                                                {format(new Date(change.modifiedAt), 'MMM yyyy hh:mm a')}
+                                                            </span>
+                                                            </div>
+                                                        </div>
+                                                        </div>
+                                                    </div>
+                                                    ))}
+
 
 
 
@@ -238,7 +229,7 @@ const Activity = () => {
                                         );
                                     })
                                 ) : (
-                                    <p className="text-lg text-gray-500">No tasks available</p>
+                                    <p className="text-lg text-gray-500"></p>
                                 )}
                             </ul>
                         </div>

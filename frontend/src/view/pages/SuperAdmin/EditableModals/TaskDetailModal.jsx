@@ -487,13 +487,16 @@ const handleSaveStatus = async () => {
               <div className="flex -space-x-5">
                 {editedAssignees.map((assignee, index) => (
                   <div key={index} className="flex items-center">
-                    {assignee.profilePicture?.url ? (
-                      <img src={assignee.profilePicture?.url} 
-                      alt={assignee.username} 
-                      className="w-8 h-8 rounded-full border" />
-                    ) : (
-                      <FaUser className="text-gray-500 text-lg bg-transparent  rounded-3xl " />
-                    )}
+                {assignee.profilePicture?.url || assignee.profilePicture ? (
+                  <img 
+                    src={assignee.profilePicture?.url || assignee.profilePicture} 
+                    alt={assignee.username || 'User'} 
+                    className="w-8 h-8 rounded-full border"
+                  />
+                ) : (
+                  <FaUser className="text-gray-500 text-lg bg-transparent rounded-3xl" />
+                )}
+
                     {/* <span className="ml-2 text-sm text-gray-500">{assignee.username}</span> */}
                   </div>
                 ))}

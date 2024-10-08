@@ -133,8 +133,12 @@ const Dashboard = () => {
 
     return (
         <div className="bg-gray-100 min-h-screen p-6">
-            <div className="flex justify-between items-center mb-16">
-                <h1 className="text-2xl font-medium text-gray-800 hidden md:block">Dashboard</h1>
+            <div className="w-full flex justify-between items-center mb-4">
+                <div className="relative">
+                    <h1 className={`text-2xl font-medium text-gray-800 hidden md:block`}>
+                        Dashboard
+                    </h1>
+                </div>
                 <AdminNavbar 
                     isAccountDropdownOpen={isAccountDropdownOpen}
                     toggleAccountDropdown={toggleAccountDropdown}
@@ -226,38 +230,42 @@ const Dashboard = () => {
                         ))}
                     </Slider>
                 </div>
+
+
+                
             {/* Today Task, Activity, and Ongoing Projects Section */}
             <div className="flex flex-col md:flex-row mb-2 gap-4">
                    {/* Today Task */}
-                <div className="w-full md:w-3/5">
-                    <Today_Task projects={projects} taskDetails={taskDetails} />
-                </div>
+                   <div className="w-full md:w-3/5">
+                   
+        <Today_Task projects={projects} taskDetails={taskDetails} />
+    </div>
 
-                {/* Activity Section */}
-                <div className="w-full md:w-2/5">
-                    
-                    <Activity_Task 
-                        projects={projects}
-                        taskDetails={taskDetails}
-                        profilePicture={profilePicture}
-                        userName={userName}
-                        defaultProfilePictureUrl={defaultProfilePictureUrl}
-                    />
-                </div>
-            </div>
-
-            {/* Ongoing Projects Section */}
-            <div className="flex flex-col md:flex-row gap-4">
-                <div className="w-full">
-                    <Ongoing_Project 
-                        projects={projects} 
-                        taskDetails={taskDetails} 
-                        calculateProgress={calculateProgress} 
-                    />
-                </div>
-            </div>
+           {/* Activity and Ongoing Projects Section */}
+<div className="w-full md:w-2/5 flex-grow flex flex-col gap-2"> {/* Flex column and reduced gap */}
+    {/* Activity Section */}
+        <div className="h-1/4">
+            <Activity_Task 
+                projects={projects}
+                taskDetails={taskDetails}
+                profilePicture={profilePicture}
+                userName={userName}
+                defaultProfilePictureUrl={defaultProfilePictureUrl}
+            />
         </div>
-       
+
+    {/* Ongoing Projects Section */}
+    <div className="h-full mt-10"> {/* Added margin-top for spacing */}
+        <Ongoing_Project 
+            projects={projects} 
+            taskDetails={taskDetails} 
+            calculateProgress={calculateProgress} 
+        />
+    </div>
+</div>
+
+        </div>
+        </div>
     );
 };
 

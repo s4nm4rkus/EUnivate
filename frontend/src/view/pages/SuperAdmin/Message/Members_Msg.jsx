@@ -32,23 +32,20 @@ const Members_Msg = () => {
         });
 
         // Fetch invited users from projects
-        const projectsResponse = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
+        const invitedUsersResponse = await axios.get('http://localhost:5000/api/users/invited', {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         });
 
         const allUsers = allUsersResponse.data;
-        const invitedUsersList = projectsResponse.data.flatMap(project => project.invitedUsers || []);
-
-        // Get list of invited user IDs
-        const invitedUserIds = invitedUsersList.map(user => user._id);
-
-        // Filter out non-invited users
-        const nonInvitedUsersList = allUsers.filter(user => !invitedUserIds.includes(user._id));
+        const invitedUsersList = invitedUsersResponse.data.invitedUsers.map((invitedUser) => {
+          // Find the corresponding user from the allUsers list and include the profile info
+          const userFromDB = allUsers.find((user) => user.email === invitedUser.email);
+          return userFromDB ? { ...invitedUser, ...userFromDB } : invitedUser;
+        });
 
         setInvitedUsers(invitedUsersList);
-        setNonInvitedUsers(nonInvitedUsersList);
 
         // Set current user
         const current = allUsers.find(u => u._id === user._id);
@@ -64,7 +61,7 @@ const Members_Msg = () => {
     fetchUsers();
   }, []);
 
-  const totalMembers = invitedUsers.length + nonInvitedUsers.length;
+  const totalMembers = invitedUsers.length;
 
   // Function to toggle modal visibility
   const toggleModal = () => {
@@ -118,9 +115,9 @@ const Members_Msg = () => {
       {/* Error Message */}
       {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
-      {/* Scrollable Online Members */}
+      {/* Scrollable Invited Members */}
       <div className="mt-1 flex-grow overflow-y-auto">
-        <p className="text-gray-500 text-sm mt-3">Online - {invitedUsers.length}</p>
+        <p className="text-gray-500 text-sm mt-3">Invited Members - {invitedUsers.length}</p>
         {loading ? (
           <p className="text-gray-500 text-sm">Loading users...</p>
         ) : (
@@ -140,30 +137,17 @@ const Members_Msg = () => {
         )}
       </div>
 
-      {/* Scrollable Offline Members */}
-      <div className="mt-4 flex-grow overflow-y-auto">
-        <p className="text-gray-500 text-sm mt-3">Offline - {nonInvitedUsers.length}</p>
-        {loading ? (
-          <p className="text-gray-500 text-sm">Loading users...</p>
-        ) : (
-          nonInvitedUsers.map(user => (
-            <div key={user._id} className="flex items-center mt-3">
-              <div className="relative">
-                <span className="absolute bottom-0 right-0 w-3 h-3 bg-gray-400 border-2 border-white rounded-full"></span>
-                <img
-                  src={user.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'}
-                  alt={user.username || 'Profile Picture'}
-                  className="w-8 h-8 rounded-full object-cover border-2 border-white"
-                />
-              </div>
-              <p className="ml-2 text-gray-800 text-sm">{user.username}</p>
-            </div>
-          ))
-        )}
-      </div>
-
       {/* Group modal rendering conditionally */}
-      {showModal && <Group_Modal toggleModal={toggleModal} invitedUsers={invitedUsers} nonInvitedUsers={nonInvitedUsers} />}
+      {showModal &&
+
+     <Group_Modal
+  toggleModal={toggleModal}
+  onCreateGroup={handleCreateGroup}
+  invitedUsers={invitedUsers} // Make sure this is populated correctly
+/>
+
+      
+      }
     </div>
   );
 };

@@ -1,42 +1,33 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify'; // Import toast for notifications
 
-const Group_Modal = ({ toggleModal, invitedUsers, nonInvitedUsers, onCreateGroup }) => {
+const Group_Modal = ({ toggleModal, onCreateGroup }) => {
   const [groupName, setGroupName] = useState('');
-  const [selectedMembers, setSelectedMembers] = useState([]); // Store selected members as full objects
-  const [image, setImage] = useState(null);
+  const [team, setTeam] = useState(''); // Selected team
   const [imagePreview, setImagePreview] = useState(null);
-  const [showMembers, setShowMembers] = useState(false);
 
-  // Handle image upload and preview
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    setImage(file);
-    setImagePreview(URL.createObjectURL(file));
-  };
-
-  // Handle member selection
-  const handleMemberSelect = (member) => {
-    setSelectedMembers((prevSelected) =>
-      prevSelected.includes(member)
-        ? prevSelected.filter((m) => m._id !== member._id)
-        : [...prevSelected, member]
-    );
+  // Handle team selection and generate group name and image
+  const handleTeamSelect = (selectedTeam) => {
+    setTeam(selectedTeam);
+    setGroupName(selectedTeam);
+    // Generate a placeholder image with the first two letters of the team name
+    const teamInitials = selectedTeam.split(' ').map((word) => word[0]).join('');
+    const placeholderImage = `https://via.placeholder.com/100x100.png?text=${teamInitials}`;
+    setImagePreview(placeholderImage);
   };
 
   // Handle form submission
   const handleSubmit = () => {
-    // Validate the inputs (name, members, and image)
-    if (!groupName || selectedMembers.length === 0 || !image) {
-      toast.error('Please provide a group name, select members, and upload an image.'); // Show toast if validation fails
+    if (!groupName || !team) {
+      toast.error('Please select a team and provide a group name.');
       return;
     }
 
-    // Create the new group object dynamically based on user inputs
+    // Create the new group object
     const newGroup = {
       groupName,
-      imagePreview, // This contains the image URL or null if no image is uploaded
-      selectedMembers, // Store full selected member objects
+      imagePreview,
+      selectedMembers: team, // The team selected
     };
 
     // Pass the newly created group data to the parent (Messages component)
@@ -69,65 +60,37 @@ const Group_Modal = ({ toggleModal, invitedUsers, nonInvitedUsers, onCreateGroup
           </svg>
         </button>
 
-        {/* Large Circular Image Upload with Plus Sign */}
+        {/* Large Circular Image Preview */}
         <div className="flex justify-center mb-6">
-          <label className="relative cursor-pointer">
-            <input
-              type="file"
-              onChange={handleImageUpload}
-              className="absolute inset-0 opacity-0 cursor-pointer"
-            />
-            <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden relative">
-              {imagePreview ? (
-                <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-gray-500 text-4xl absolute">+</span>
-              )}
-            </div>
-          </label>
+          <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden relative">
+            {imagePreview ? (
+              <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-gray-500 text-4xl absolute">+</span>
+            )}
+          </div>
         </div>
 
-        {/* Group Name Input */}
+        {/* Group Name Display */}
         <input
           type="text"
           placeholder="Group Name"
           value={groupName}
-          onChange={(e) => setGroupName(e.target.value)}
-          className="border border-gray-300 rounded-md p-2 w-full mb-4"
+          disabled
+          className="border border-gray-300 rounded-md p-2 w-full mb-4 bg-gray-100"
         />
 
-        {/* Add Members Button */}
-        <button
-          onClick={() => setShowMembers(!showMembers)}
-          className="w-full bg-red-500 text-white px-4 py-2 rounded-md mb-4"
+        {/* Team Selection Dropdown */}
+        <select
+          value={team}
+          onChange={(e) => handleTeamSelect(e.target.value)}
+          className="border border-gray-300 rounded-md p-2 w-full mb-4"
         >
-          Add Members
-        </button>
-
-        {/* Conditionally render the unified members list */}
-        {showMembers && (
-          <div className="border border-gray-300 rounded-md p-4 mb-4">
-            <h3 className="text-lg font-semibold mb-2">Select Members</h3>
-
-            {/* Unified Members List */}
-            {[...invitedUsers, ...nonInvitedUsers].map((user) => (
-              <div key={user._id} className="flex items-center mb-2">
-                <input
-                  type="checkbox"
-                  checked={selectedMembers.some((member) => member._id === user._id)}
-                  onChange={() => handleMemberSelect(user)}
-                  className="mr-2"
-                />
-                <img
-                  src={user.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'}
-                  alt={user.username}
-                  className="w-8 h-8 rounded-full object-cover mr-2"
-                />
-                <p>{user.username}</p>
-              </div>
-            ))}
-          </div>
-        )}
+          <option value="" disabled>Select a team</option>
+          <option value="Superboard">Superboard</option>
+          <option value="Team 2">Team 2</option>
+          <option value="Team 3">Team 3</option>
+        </select>
 
         {/* Submit Button */}
         <button

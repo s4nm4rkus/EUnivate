@@ -1,6 +1,16 @@
 import React from 'react';
 import { FaTrash } from 'react-icons/fa'; // Import the delete icon
 
+const handleDeleteGroup = (index) => {
+  const confirmDelete = window.confirm('Are you sure you want to delete this group?');
+  if (confirmDelete) {
+    const updatedGroups = groups.filter((_, i) => i !== index);
+    setGroups(updatedGroups);
+    localStorage.setItem('groups', JSON.stringify(updatedGroups));
+  }
+};
+
+
 const Group_List = ({ groups, onDeleteGroup, onSelectGroup }) => {
   return (
     <div>
@@ -14,18 +24,16 @@ const Group_List = ({ groups, onDeleteGroup, onSelectGroup }) => {
               onClick={() => onSelectGroup(group)} // Pass the selected group on click
             >
               {/* Group Image */}
-              <img
-                src={group.imagePreview || 'https://via.placeholder.com/50'}
-                alt={group.groupName}
-                className="w-12 h-12 rounded-full object-cover mr-4"
-              />
+              <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mr-4">
+                <span className="text-xl font-bold text-gray-700">
+                  {group.groupName.split(' ').map(word => word[0]).join('')}
+                </span>
+              </div>
               
               {/* Group Name and Member Count */}
               <div>
                 <h3 className="text-sm font-semibold">{group.groupName}</h3>
-                <p className="text-xs text-gray-500">
-                  {group.selectedMembers.length} {group.selectedMembers.length === 1 ? 'member' : 'members'}
-                </p>
+               
               </div>
 
               {/* Delete Button */}

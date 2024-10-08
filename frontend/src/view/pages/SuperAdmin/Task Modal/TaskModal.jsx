@@ -84,17 +84,17 @@ const TaskModal = ({ task, isOpen, onClose, formatDate }) => {
                 </div>
 
                 {/* Display Assignee with profile picture closer to the Assignee text */}
-                <div className="mt-4 flex items-center ml-5 mr-10">
+                <div className="mt-4 flex items-center  ml-5 mr-10">
                     <p className="font-semibold">Assignee:</p>
-                    <div className="flex items-center">
+                    <div className="flex items-end -space-x-2 ">
                         {task.invitedUsers.slice(0, 3).map(user => (
-                            <div key={user._id} className="flex items-center ml-2">
+                            <div key={user._id} className="flex items-center ">
                                 <img
-                                    src={user.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'}
+                                    src={user.profilePicture?.url || user.profilePicture}
                                     alt={user.username || 'Profile Picture'}
                                     className="w-5 h-5 rounded-full object-cover"  
                                 />
-                                <p className="ml-2 text-sm">{user.username}</p>
+                             
                             </div>
                         ))}
                     </div>
@@ -131,6 +131,7 @@ const TaskModal = ({ task, isOpen, onClose, formatDate }) => {
                         value={description}
                         onChange={(e) => setDescription(e.target.value)} // Allow user to edit the description if needed
                         placeholder="No description available"
+                        disabled
                     />
                 </div>
 
@@ -178,18 +179,6 @@ const TaskModal = ({ task, isOpen, onClose, formatDate }) => {
             </div>
         ))}
     </div>
-</div>
-
-{/* Textarea below the objectives section */}
-<div className="mt-4 ml-5 mr-5">
-    <textarea
-        className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        rows="1" // Reduce the height by setting fewer rows
-        value={message}
-        onChange={(e) => setMessage(e.target.value)} // Update the message state when the user types
-        placeholder="Ask question or post an update"
-        style={{ resize: 'none' }} // Prevent the textarea from being resized
-    />
 </div>
 
 

@@ -14,7 +14,7 @@ const Activity_Task = ({ projects }) => {
         if (storedUser) {
             // Set the username and profile picture from localStorage
             setUserName(`${storedUser.firstName} ${storedUser.lastName}`);
-            setProfilePicture(storedUser.profilePicture?.url || defaultProfilePictureUrl);
+            setProfilePicture(storedUser.profilePicture?.url || storedUser.profilePicture || defaultProfilePictureUrl);
         }
 
         const fetchTaskDetails = async () => {

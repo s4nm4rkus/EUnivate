@@ -20,7 +20,7 @@ const Dashboard = () => {
     
     // Retrieve user profile details
     const user = JSON.parse(localStorage.getItem('user'));
-    const profilePicture = user?.profilePicture;
+    const profilePicture = user?.profilePicture?.url ||  user?.profilePicture;
     const userName = user?.name;
     const defaultProfilePictureUrl = 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'; // Add the path to your default image
 

@@ -108,7 +108,6 @@ const Kanban_mem = () => {
             className="text-gray-600 p-0 flex items-center justify-center"
             style={{ width: '30px', height: '30px' }}
           >
-            <FaPlus size={16} />
           </button>
         </div>
         <div className="space-y-2">{children}</div>

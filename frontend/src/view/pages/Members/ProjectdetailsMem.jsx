@@ -120,15 +120,10 @@
 
   {/* FaUserPlus icon */}
   <div className="flex items-center space-x-3">
-    <FontAwesomeIcon
-      icon={faUserPlus}
-      className="cursor-pointer mt-[-1rem]"
-      size="lg"
-      onClick={handleUserIconClick}
-    />
+    
 
     {/* Invited Users' profile images next to the icon */}
-    <div className="flex ml-2 -space-x-3 mt-[-13px]">
+    <div className="flex ml-auto -space-x-3 mt-[-13px]">
       {invitedUsers.length > 0 ? (
         invitedUsers.slice(0, 5).map((user) => (
           <img

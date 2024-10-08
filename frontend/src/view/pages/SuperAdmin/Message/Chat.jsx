@@ -92,11 +92,11 @@ const Chat = ({ group, onBack }) => {
         </div>
 
 {/* Display group members' profile pictures and names */}
-<div className="flex space-x-4 items-center">
+<div className="flex -space-x-6 items-center">
   {group.selectedMembers.map((member, index) => (
     <div key={index} className="flex items-center space-x-2">
       <img
-        src={member.profilePicture || defaultProfilePictureUrl}
+        src={member.profilePicture?.url || defaultProfilePictureUrl}
         alt={member.name}
         className="w-8 h-8 rounded-full object-cover"
         title={member.name}

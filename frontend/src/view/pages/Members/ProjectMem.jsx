@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaCalendar, FaCheckCircle } from 'react-icons/fa';
 import axios from 'axios';
 import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate to handle project click navigation
+import { useNavigate } from 'react-router-dom';
 
 const ProjectMem = () => {
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
@@ -10,28 +10,26 @@ const ProjectMem = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [taskCounts, setTaskCounts] = useState({});
-  const [loadingProject, setLoadingProject] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [tasks, setTasks] = useState([]); // New state to store tasks
 
-  const navigate = useNavigate(); // Initialize useNavigate for project navigation
+  const navigate = useNavigate();
 
-  // Toggle account dropdown
   const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
 
-  // Fetch projects
+  // Fetch Projects
   useEffect(() => {
     const fetchProjects = async () => {
       setLoading(true); 
       try {
         const user = JSON.parse(localStorage.getItem('user'));
         const accessToken = user ? user.accessToken : null;
-      
+
         if (!accessToken) {
           setError('No access token found. Please log in again.');
           return;
         }
 
-        // Fetch projects where the member is invited
         const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -50,7 +48,7 @@ const ProjectMem = () => {
     fetchProjects();
   }, []);
 
-  // Fetch task counts (total and done) for each project
+  // Fetch task counts per project
   useEffect(() => {
     const fetchTaskCounts = async () => {
       const counts = {};
@@ -75,15 +73,30 @@ const ProjectMem = () => {
     }
   }, [projects]);
 
-  const handleProjectClick = (project) => {
-    setSelectedProject(project);
-    setLoadingProject(true);
-    setTimeout(() => {
-      navigate(`/member/projects/${project._id}`, { state: { projectId: project._id } });
-      setLoadingProject(false);
-    }, 2000); // Adjust timeout as needed
+  // Fetch tasks for selected project
+  const handleProjectClick = async (project) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}`);
+      const tasks = response.data.data;
+      setTasks(tasks); // Store the tasks locally
+      setSelectedProject(project._id); // Keep track of selected project
+      
+      // Navigate to ProjectDetailsMem, passing project details and tasks
+      navigate(`/member/projects/${project._id}`, {
+        state: {
+          projectId: project._id,
+          projectName: project.projectName,
+          tasks,  // Make sure tasks include priority field
+          thumbnail: project.thumbnail,
+          invitedUsers: project.invitedUsers, 
+        },
+      });      
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+    }
   };
-
+  
+  // Calculate progress for each project
   const calculateProgress = (projectId) => {
     const { totalTasks, doneTasks } = taskCounts[projectId] || { totalTasks: 0, doneTasks: 0 };
     return totalTasks > 0 ? (doneTasks / totalTasks) * 100 : 0;
@@ -91,7 +104,6 @@ const ProjectMem = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen p-6">
-      {/* Admin Navbar */}
       <div className="w-full flex justify-between items-center">
         <div className="relative">
           <h1 className="text-2xl font-medium text-gray-800 hidden md:block">Project</h1>
@@ -102,7 +114,6 @@ const ProjectMem = () => {
         />
       </div>
 
-      {/* Display Projects */}
       <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {error && <p className="text-red-500">{error}</p>}
         {projects.length > 0 ? (
@@ -110,7 +121,7 @@ const ProjectMem = () => {
             <div
               key={project._id}
               className="bg-white p-4 rounded-md shadow-md border border-gray-200 mt-2 relative cursor-pointer"
-              onClick={() => handleProjectClick(project)} // Navigate to project details
+              onClick={() => handleProjectClick(project)}
             >
               {project.thumbnail && (
                 <img
@@ -127,19 +138,46 @@ const ProjectMem = () => {
                 <p className="ml-2">
                   {taskCounts[project._id] ? taskCounts[project._id].doneTasks : 'Loading...'}
                 </p>
+
+                {/* Invited users' profile images placed next to FaCheckCircle */}
+                <div className="flex ml-4 -space-x-3">
+                  {project.invitedUsers && project.invitedUsers.length > 0 ? (
+                    project.invitedUsers.map(user => (
+                      <img
+                        key={user._id}
+                        src={user.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'} 
+                        alt={user.username}
+                        className="w-6 h-6 rounded-full object-cover border border-gray-300"
+                      />
+                    ))
+                  ) : (
+                    <p className="text-gray-500 text-sm">No users invited yet.</p>
+                  )}
+                </div>
               </div>
 
-              {/* Progress Bar */}
               <div className="flex items-center mt-4">
                 <div className="w-full bg-gray-200 rounded-full h-2 relative">
                   <div
                     className="bg-green-500 h-2 rounded-full"
-                    style={{ width: `${calculateProgress(project._id)}%` }} // Dynamically set progress width
+                    style={{ width: `${calculateProgress(project._id)}%` }}
                   ></div>
                 </div>
                 <p className="ml-2 text-gray-500">
                   {`${Math.floor(calculateProgress(project._id))}%`}
                 </p>
+              </div>
+
+              {/* Display tasks and their statuses */}
+              <div className="mt-4">
+                {selectedProject === project._id && tasks.map(task => (
+                  <div key={task._id} className="flex justify-between items-center p-2 bg-gray-100 rounded-md mb-2">
+                    <span>{task.title}</span>
+                    <span className={`text-sm px-2 py-1 rounded-full ${task.status === 'Done' ? 'bg-green-200 text-green-600' : 'bg-yellow-200 text-yellow-600'}`}>
+                      {task.status}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           ))

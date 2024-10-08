@@ -488,7 +488,9 @@ const handleSaveStatus = async () => {
                 {editedAssignees.map((assignee, index) => (
                   <div key={index} className="flex items-center">
                     {assignee.profilePicture?.url ? (
-                      <img src={assignee.profilePicture?.url} alt={assignee.username} className="w-8 h-8 rounded-full border" />
+                      <img src={assignee.profilePicture?.url} 
+                      alt={assignee.username} 
+                      className="w-8 h-8 rounded-full border" />
                     ) : (
                       <FaUser className="text-gray-500 text-lg bg-transparent  rounded-3xl " />
                     )}
@@ -734,7 +736,9 @@ const handleSaveStatus = async () => {
             <div className="flex overflow-x-auto space-x-2 py-2">
               {attachmentPreviewUrls.map((url, index) => (
                 <div key={index} className="relative">
-                  <img src={url} alt={`Attachment ${index + 1}`} className="w-32 h-32 object-cover rounded-md" />
+                  <img src={url} 
+                  alt={`Attachment ${index + 1}`} 
+                  className="w-32 h-32 object-cover rounded-md" />
       
                 </div>
               ))}
@@ -775,7 +779,9 @@ const handleSaveStatus = async () => {
             <ul className="list-disc list-inside">
               {commentsList.map((cmt, index) => (
                 <li key={index} className="mt-1 flex items-start text-gray-500">
-                  <img src={cmt.profilePicture?.url} alt={cmt.username} className="w-8 h-8 rounded-full mr-2" />
+                  <img src={cmt.profilePicture?.url} 
+                  alt={cmt.username} 
+                  className="w-8 h-8 rounded-full mr-2" />
                   <div>
                     <strong>{cmt.userName}</strong>
                     <p>{cmt.text}</p>

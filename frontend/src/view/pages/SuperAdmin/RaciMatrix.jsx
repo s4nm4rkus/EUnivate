@@ -81,7 +81,7 @@ const RaciMatrix = ({ projectId }) => {
                 {task.assignee && task.assignee.length > 1 && (
                   <>
                     <img
-                      src={task.assignee[1]?.profilePicture?.url || '/path/to/default/avatar.png'}
+                      src={task.assignee[1]?.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'}
                       alt={task.assignee[1]?.name}
                       className="w-8 h-8 rounded-full border-2"
                       title={task.assignee[1]?.name}

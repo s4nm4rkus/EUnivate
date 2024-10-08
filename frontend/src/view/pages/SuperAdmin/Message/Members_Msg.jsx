@@ -72,7 +72,7 @@ const Members_Msg = () => {
   };
 
   return (
-    <div className="flex flex-col overflow-y-auto h-full custom-scrollbar">
+    <div className="flex flex-col h-full overflow-y-auto custom-scrollbar">
       {/* About section */}
       <div className="mb-4">
         <h2 className="text-sm font-bold text-gray-800">About</h2>
@@ -90,15 +90,14 @@ const Members_Msg = () => {
         </p>
       </div>
 
-        {/* Member text with total number of members and plus icon */}
-        <div className="mt-4 flex items-center justify-between">
+      {/* Member text with total number of members and plus icon */}
+      <div className="mt-4 flex items-center justify-between">
         <div className="flex items-center">
           <p className="text-gray-800 text-sm font-semibold">Member</p>
           <div className="bg-orange-500 text-white text-sm font-bold ml-2 px-1 py-0.5 rounded-md">
             {totalMembers}
           </div>
         </div>
-        {/* You can add a plus icon or button here if needed */}
       </div>
 
       {/* Display Current User */}
@@ -116,55 +115,52 @@ const Members_Msg = () => {
         </div>
       )}
 
-    
-
       {/* Error Message */}
       {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
-     {/* Scrollable Online Members */}
-<div className="mt-1 h-32">  {/* Decreased height from h-40 to h-32 */}
-  <p className="text-gray-500 text-sm mt-3">Online - {invitedUsers.length}</p>
-  {loading ? (
-    <p className="text-gray-500 text-sm">Loading users...</p>
-  ) : (
-    invitedUsers.map(user => (
-      <div key={user._id} className="flex items-center mt-3">
-        <div className="relative">
-          <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
-          <img
-            src={user.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'}
-            alt={user.username || 'Profile Picture'}
-            className="w-8 h-8 rounded-full object-cover border-2 border-white"
-          />
-        </div>
-        <p className="ml-2 text-gray-800 text-sm">{user.username}</p>
+      {/* Scrollable Online Members */}
+      <div className="mt-1 flex-grow overflow-y-auto">
+        <p className="text-gray-500 text-sm mt-3">Online - {invitedUsers.length}</p>
+        {loading ? (
+          <p className="text-gray-500 text-sm">Loading users...</p>
+        ) : (
+          invitedUsers.map(user => (
+            <div key={user._id} className="flex items-center mt-3">
+              <div className="relative">
+                <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+                <img
+                  src={user.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'}
+                  alt={user.username || 'Profile Picture'}
+                  className="w-8 h-8 rounded-full object-cover border-2 border-white"
+                />
+              </div>
+              <p className="ml-2 text-gray-800 text-sm">{user.username}</p>
+            </div>
+          ))
+        )}
       </div>
-    ))
-  )}
-</div>
 
-{/* Scrollable Offline Members */}
-<div className="mt-4 h-32">  {/* Increased margin to mt-4 to reduce gap */}
-  <p className="text-gray-500 text-sm mt-3">Offline - {nonInvitedUsers.length}</p>
-  {loading ? (
-    <p className="text-gray-500 text-sm">Loading users...</p>
-  ) : (
-    nonInvitedUsers.map(user => (
-      <div key={user._id} className="flex items-center mt-3">
-        <div className="relative">
-          <span className="absolute bottom-0 right-0 w-3 h-3 bg-gray-400 border-2 border-white rounded-full"></span>
-          <img
-            src={user.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'}
-            alt={user.username || 'Profile Picture'}
-            className="w-8 h-8 rounded-full object-cover border-2 border-white"
-          />
-        </div>
-        <p className="ml-2 text-gray-800 text-sm">{user.username}</p>
+      {/* Scrollable Offline Members */}
+      <div className="mt-4 flex-grow overflow-y-auto">
+        <p className="text-gray-500 text-sm mt-3">Offline - {nonInvitedUsers.length}</p>
+        {loading ? (
+          <p className="text-gray-500 text-sm">Loading users...</p>
+        ) : (
+          nonInvitedUsers.map(user => (
+            <div key={user._id} className="flex items-center mt-3">
+              <div className="relative">
+                <span className="absolute bottom-0 right-0 w-3 h-3 bg-gray-400 border-2 border-white rounded-full"></span>
+                <img
+                  src={user.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'}
+                  alt={user.username || 'Profile Picture'}
+                  className="w-8 h-8 rounded-full object-cover border-2 border-white"
+                />
+              </div>
+              <p className="ml-2 text-gray-800 text-sm">{user.username}</p>
+            </div>
+          ))
+        )}
       </div>
-    ))
-  )}
-</div>
-
 
       {/* Group modal rendering conditionally */}
       {showModal && <Group_Modal toggleModal={toggleModal} invitedUsers={invitedUsers} nonInvitedUsers={nonInvitedUsers} />}

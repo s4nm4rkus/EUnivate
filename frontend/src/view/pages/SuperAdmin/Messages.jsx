@@ -140,7 +140,7 @@ const Messages = () => {
         )}
 
         {/* Right side box that either shows the Chat_Msg (group list) or Chat (selected group chat) */}
-        <div className="bg-white w-full md:w-3/4 p-4 shadow-md rounded-md flex-grow relative">
+        <div className="bg-white w-full md:w-3/4 p-4 shadow-md rounded-md flex-grow relative max-h-[calc(120vh-100px)] overflow-y-auto">
           {selectedGroup ? (
             <Chat group={selectedGroup} onBack={handleBackToGroupList} />  
           ) : (

@@ -59,6 +59,7 @@ import ProjectDetails from './view/pages/SuperAdmin/ProjectDetails';
 import Member from "./view/pages/Members/Member.jsx"; 
 import ProjMem from "./view/pages/Members/ProjectMem.jsx"; 
 import TaskMem from "./view/pages/Members/TaskMem.jsx"; 
+import ProjectDetailsMem from "./view/pages/Members/ProjectdetailsMem.jsx"; 
 
 /* Global CSS */
 import './index.css';
@@ -118,7 +119,8 @@ const App = () => {
 >
   {/* Default route for "/member" */}
   <Route index element={<ProjMem />} />
-  
+  <Route path="projects/:id" element={<ProjectDetailsMem />} />
+
   {/* Other routes */}
   <Route path="projectmem" element={<ProjMem />} />
   <Route path="taskmem" element={<TaskMem />} />

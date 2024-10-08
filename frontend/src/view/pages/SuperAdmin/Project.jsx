@@ -316,7 +316,7 @@ const Project = () => {
                 {project.invitedUsers && project.invitedUsers.slice(0, 3).map(user => (
                   <img
                     key={user._id}
-                    src={user.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'} // Ensure it falls back to a default if no picture
+                    src={user.profilePicture?.url || user.profilePicture} // Ensure it falls back to a default if no picture
                     alt={user.username || 'Profile Picture'}
                     className="w-8 h-8 rounded-full object-cover -ml-2 border-2 border-white"
                   />

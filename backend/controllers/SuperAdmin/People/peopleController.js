@@ -17,7 +17,7 @@ export const getUsers = async (req, res) => {
     }
   };
   
-
+  
 // Invite users with storation to sainvitedUser Schema
 export const inviteUsers = async (req, res) => {
     try {

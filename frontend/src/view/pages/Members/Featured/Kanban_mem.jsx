@@ -2,20 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { FaPlus, FaCalendar, FaPaperclip, FaCheckCircle } from 'react-icons/fa';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import Modal from './KanbanModals/Modal';
-import TaskDetailModal from './EditableModals/TaskDetailModal'; // New modal for task details
+import Modal from '../Modal/Kanban_modal';
+import TaskDetailModal from '../../SuperAdmin/EditableModals/TaskDetailModal';
 import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 
 const ItemType = {
   TASK: 'task',
 };
 
-const Kanban = ({ projectId, projectName }) => {
+const Kanban_mem = () => {
+  const location = useLocation();
+  const { projectId, projectName, tasks: initialTasks } = location.state; // Get projectId and tasks passed from ProjectMem
+
   const [isModalOpen, setModalOpen] = useState(false);
   const [isTaskDetailModalOpen, setTaskDetailModalOpen] = useState(false);
-  const [tasks, setTasks] = useState([]);
-  const [selectedTask, setSelectedTask] = useState(null); 
+  const [tasks, setTasks] = useState(initialTasks || []); // Use initialTasks passed from ProjectMem
+  const [selectedTask, setSelectedTask] = useState(null);
 
+  // Fetch tasks from the backend when the project is loaded
   useEffect(() => {
     const fetchTasks = async () => {
       try {
@@ -29,9 +34,12 @@ const Kanban = ({ projectId, projectName }) => {
         console.error('Error fetching tasks:', error);
       }
     };
-    fetchTasks();
-  }, [projectId]);
+    if (!initialTasks || initialTasks.length === 0) {
+      fetchTasks();
+    }
+  }, [projectId, initialTasks]);
 
+  // Modal handling functions
   const handleOpenModal = () => {
     setModalOpen(true);
   };
@@ -47,28 +55,25 @@ const Kanban = ({ projectId, projectName }) => {
 
   const handleCloseTaskDetailModal = () => {
     setTaskDetailModalOpen(false);
-    setSelectedTask(null); // Clear selected task
+    setSelectedTask(null);
   };
 
-  const updateTaskStatus = async (taskId, newStatus,modifiedBy) => {
+  // Update the task status in the backend
+  const updateTaskStatus = async (taskId, newStatus) => {
     try {
-      await axios.patch(`http://localhost:5000/api/users/sa-tasks/${taskId}`, {    status: newStatus,
-        modifiedBy: modifiedBy,
-        
-       });
+      await axios.patch(`http://localhost:5000/api/users/sa-tasks/${taskId}`, { status: newStatus });
     } catch (error) {
       console.error('Error updating task status:', error);
     }
   };
 
+  // Move task to a new status (column) after dragging
   const moveTask = (taskId, newStatus) => {
     const updatedTask = tasks.find(task => task._id === taskId);
     if (updatedTask) {
       updatedTask.status = newStatus;
-      const user = JSON.parse(localStorage.getItem('user'));
-      const currentUserId = user?._id;
       setTasks([...tasks]);
-      updateTaskStatus(taskId, newStatus,currentUserId);
+      updateTaskStatus(taskId, newStatus);
     }
   };
 
@@ -76,25 +81,24 @@ const Kanban = ({ projectId, projectName }) => {
     setTasks(prevTasks => [...prevTasks, newTask]);
   };
 
-  // Function to handle task update (description update)
   const handleUpdateTask = (updatedTask) => {
     const updatedTasks = tasks.map(task =>
       task._id === updatedTask._id ? updatedTask : task
     );
-    setTasks(updatedTasks); // Update the tasks array
-  
-    // Check if the updated task is the currently selected task
+    setTasks(updatedTasks);
+
     if (selectedTask && selectedTask._id === updatedTask._id) {
-      setSelectedTask(updatedTask); // Update selectedTask
+      setSelectedTask(updatedTask);
     }
   };
 
+  // Column Component for task categorization
   const Column = ({ status, children }) => {
     const [, drop] = useDrop({
       accept: ItemType.TASK,
       drop: (item) => moveTask(item.id, status),
     });
-  
+
     return (
       <div ref={drop} className="w-full sm:w-1/5 p-2">
         <div className="flex items-center justify-between mb-2">
@@ -104,14 +108,14 @@ const Kanban = ({ projectId, projectName }) => {
             className="text-gray-600 p-0 flex items-center justify-center"
             style={{ width: '30px', height: '30px' }}
           >
-            <FaPlus size={16} />
           </button>
         </div>
         <div className="space-y-2">{children}</div>
       </div>
     );
   };
-  
+
+  // Task Card Component
   const TaskCard = ({ task }) => {
     const [, drag] = useDrag({
       type: ItemType.TASK,
@@ -119,7 +123,7 @@ const Kanban = ({ projectId, projectName }) => {
     });
 
     const handleTaskClick = () => {
-      handleOpenTaskDetailModal(task); // Open the task detail modal
+      handleOpenTaskDetailModal(task);
     };
 
     const getPriorityBackgroundColor = (priority) => {
@@ -138,7 +142,7 @@ const Kanban = ({ projectId, projectName }) => {
     const formatStartMonth = (startDate) => {
       if (!startDate) return 'N/A';
       const date = new Date(startDate);
-      return date.toLocaleString('default', { month: 'short' }); 
+      return date.toLocaleString('default', { month: 'short' });
     };
 
     return (
@@ -151,7 +155,7 @@ const Kanban = ({ projectId, projectName }) => {
             {task.assignee && task.assignee.map((member, index) => (
               <img
                 key={index}
-                src={member.profilePicture?.url || member.profilePicture} 
+                src={member.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'}
                 alt={member.name}
                 className="w-8 h-8 rounded-full border-2 border-white"
                 title={member.name}
@@ -187,7 +191,6 @@ const Kanban = ({ projectId, projectName }) => {
           <div className="flex items-center space-x-2 flex-shrink-0">
             <FaCheckCircle className="text-gray-400" />
             <p>{task.doneObjectivesCount || 0}</p>
-
           </div>
         </div>
       </div>
@@ -196,35 +199,33 @@ const Kanban = ({ projectId, projectName }) => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-    <div className="flex flex-wrap p-4">
-    {['Document', 'Todo', 'Ongoing', 'Done', 'Backlog'].map((status) => (
-  <Column key={status} status={status}>
-    {tasks
-      .filter(task => task.status === status)
-      .map(task => (
-        <TaskCard key={task._id} task={task} />
-      ))}
-  </Column>
-))}
-
-    </div>
-    <Modal 
-      isOpen={isModalOpen} 
-      onClose={handleCloseModal} 
-      projectId={projectId} 
-      onTaskSubmit={handleTaskSubmit} 
-    />
-    <TaskDetailModal
-      isOpen={isTaskDetailModalOpen} 
-      onClose={handleCloseTaskDetailModal} 
-      task={selectedTask} 
-      projectName={projectName} // Pass the project name here
-      onUpdateTask={handleUpdateTask} // Pass the update task handler to the modal
-      projectId={projectId} 
-      
-    />
-  </DndProvider>
+      <div className="flex flex-wrap p-4">
+        {['Document', 'Todo', 'Ongoing', 'Done', 'Backlog'].map((status) => (
+          <Column key={status} status={status}>
+            {tasks
+              .filter(task => task.status === status)
+              .map(task => (
+                <TaskCard key={task._id} task={task} />
+              ))}
+          </Column>
+        ))}
+      </div>
+      <Modal 
+        isOpen={isModalOpen} 
+        onClose={handleCloseModal} 
+        projectId={projectId} 
+        onTaskSubmit={handleTaskSubmit} 
+      />
+      <TaskDetailModal
+        isOpen={isTaskDetailModalOpen} 
+        onClose={handleCloseTaskDetailModal} 
+        task={selectedTask} 
+        projectName={projectName} 
+        onUpdateTask={handleUpdateTask} 
+        projectId={projectId} 
+      />
+    </DndProvider>
   );
 };
 
-export default Kanban;
+export default Kanban_mem;

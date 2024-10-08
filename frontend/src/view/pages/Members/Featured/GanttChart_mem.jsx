@@ -2,17 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlag, faPaperclip, faCheck } from '@fortawesome/free-solid-svg-icons';
-import axios from 'axios';
 import { format, startOfWeek, addDays, addWeeks, subWeeks } from 'date-fns';
-import filterIcon from '../../../assets/Filter.png';
-import TaskModal from '../SuperAdmin/Library/GanttModal'; // Import the TaskModal component
+import filterIcon from '../../../../assets/Filter.png';
+import TaskModal from '../Library_mem/Gantt_Modal_mem'; // Adjust the path for TaskModal
 
-const GanttChart = ({ projectId }) => {
-  const [tasks, setTasks] = useState([]);
-  const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
-  const [selectedTask, setSelectedTask] = useState(null); // State to hold the selected task
+const GanttChart_mem = () => {
   const location = useLocation();
-  const projectName = location.state?.project?.name;
+  const { tasks: initialTasks, projectId, projectName } = location.state;
+
+  const [tasks, setTasks] = useState(initialTasks || []);
+  const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
+  const [selectedTask, setSelectedTask] = useState(null);
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -24,13 +24,10 @@ const GanttChart = ({ projectId }) => {
       }
     };
 
-    if (projectId) {
+    if (!initialTasks || initialTasks.length === 0) {
       fetchTasks();
-    } else if (projectName) {
-      const storedTasks = JSON.parse(localStorage.getItem(`kanban-${projectName}`)) || [];
-      setTasks(storedTasks);
     }
-  }, [projectId, projectName]);
+  }, [projectId, initialTasks]);
 
   const handleNextWeek = () => setCurrentWeekStart(addWeeks(currentWeekStart, 1));
   const handlePrevWeek = () => setCurrentWeekStart(subWeeks(currentWeekStart, 1));
@@ -102,16 +99,9 @@ const GanttChart = ({ projectId }) => {
 
   const allStatuses = ['Document', 'Todo', 'Ongoing', 'Done', 'Backlog'];
 
-  const SMALL_TEXT_THRESHOLD = 10;
-  const MAX_TASK_HEIGHT = 4;
-  const TASK_SPACING = 1;
-
   const groupedTasks = allStatuses.map((status) => {
     const filteredTasks = tasks.filter(task => (status === 'Document' && task.status === 'Pending') || task.status === status);
-    const totalHeight = filteredTasks.length * (MAX_TASK_HEIGHT + TASK_SPACING);
-    const shrinkFactor = totalHeight > MAX_TASK_HEIGHT * 5 ? (MAX_TASK_HEIGHT * 5) / totalHeight : 1;
-
-    return { status, tasks: filteredTasks, shrinkFactor };
+    return { status, tasks: filteredTasks };
   });
 
   return (
@@ -135,14 +125,8 @@ const GanttChart = ({ projectId }) => {
           ))}
         </div>
         <div className="overflow-x-auto">
-          {groupedTasks.map(({ status, tasks, shrinkFactor }) => (
-            <div
-              key={status}
-              className="flex items-start border-b border-gray-300 mt-16"
-              style={{
-                minHeight: `${tasks.length * (MAX_TASK_HEIGHT + TASK_SPACING) * shrinkFactor}rem`,
-              }}
-            >
+          {groupedTasks.map(({ status, tasks }) => (
+            <div key={status} className="flex items-start border-b border-gray-300 mt-16">
               <div className="w-28 min-w-[7rem] border-gray-300 p-2 flex items-start -ml-20">
                 <div className="transform rotate-90 ml-20 -translate-x-1/2 mb-10 text-xl font-semibold relative translate-y-[-0.5rem]">
                   {status}
@@ -152,8 +136,6 @@ const GanttChart = ({ projectId }) => {
                 {tasks.map((task, index) => {
                   const taskWidth = calculateTaskWidth(task.startDate, task.dueDate);
                   const taskLeft = calculateTaskLeft(task.startDate);
-                  const taskHeight = MAX_TASK_HEIGHT * shrinkFactor;
-                  const textSizeClass = taskWidth < SMALL_TEXT_THRESHOLD ? 'text-xs' : 'text-sm';
 
                   return (
                     <div
@@ -162,64 +144,47 @@ const GanttChart = ({ projectId }) => {
                       style={{
                         width: `${taskWidth}%`,
                         left: `${taskLeft}%`,
-                        top: `${index * (taskHeight + TASK_SPACING)}rem`,
-                        height: `${taskHeight}rem`,
-                        lineHeight: `${taskHeight}rem`,
+                        top: `${index * 3}rem`,
+                        height: '4rem',
+                        lineHeight: '3rem',
                         display: taskWidth > 0 ? 'flex' : 'none',
                         flexDirection: 'column',
                         justifyContent: 'center',
                       }}
-                      onClick={() => setSelectedTask(task)} // Open the modal on task click
+                      onClick={() => setSelectedTask(task)}
                     >
-                      {/* Task content with assignee avatars on the left, task name, and objectives */}
                       <div className="flex items-center justify-between w-full pl-2">
-                        {/* Assignee avatars */}
                         <div className="flex -space-x-3 mr-2">
-                          {task.assignee && task.assignee.map((member, index) => (
+                          {task.assignee && task.assignee.map((member, idx) => (
                             <img
-                              key={index}
-                              src={member.profilePicture?.url || member.profilePicture}
+                              key={idx}
+                              src={member.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'} 
                               alt={member.name}
                               className="w-6 h-6 rounded-full border-2 border-white"
                               title={member.name}
                             />
                           ))}
                         </div>
-
-                        {/* Task name and Objectives */}
                         <div className="flex flex-col items-start flex-grow">
-                          {/* Show task name always */}
-                          <div className={`text-black font-semibold ${textSizeClass}`}>
+                          <div className="text-black font-semibold text-sm">
                             {task.taskName}
                           </div>
-                          
-                          {/* Hide on mobile */}
                           <div className="hidden sm:flex items-center w-full">
-                            {/* Icon for Objectives and Objectives text */}
                             <div className="flex items-center text-xs text-black font-semibold mr-2">
                               <img src={filterIcon} alt="Objectives Icon" className="w-4 h-4 mr-1" />
                               {task.objectives ? task.objectives.length : 0} Objectives
                             </div>
-
-                            {/* Paperclip icon and attachment count */}
                             <div className="flex items-center text-xs text-black mx-2">
                               <FontAwesomeIcon icon={faPaperclip} className="text-xs mr-1 text-gray-700" />
                               <span>{task.attachment && task.attachment.length > 0 ? task.attachment.length : '-'}</span>
                             </div>
-
-                            {/* Priority flag icon and text */}
                             <div className="flex items-center text-xs text-black ml-2">
-                              <FontAwesomeIcon
-                                icon={faFlag}
-                                className={`${getPriorityIconColor(task.priority)} mr-1`}
-                              />
+                              <FontAwesomeIcon icon={faFlag} className={`${getPriorityIconColor(task.priority)} mr-1`} />
                               {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
                             </div>
                           </div>
                         </div>
                       </div>
-
-                      {/* Circle with a checkmark for 'Done' tasks */}
                       {task.status === 'Done' && (
                         <div className="absolute right-5 top-1/2 transform -translate-y-1/2 bg-green-500 text-white w-7 h-7 flex items-center justify-center rounded-full">
                           <FontAwesomeIcon icon={faCheck} className="w-4 h-4" />
@@ -236,10 +201,10 @@ const GanttChart = ({ projectId }) => {
 
       {/* TaskModal component */}
       {selectedTask && (
-        <TaskModal task={selectedTask} onClose={() => setSelectedTask(null)} /> // Close modal when clicking outside
+        <TaskModal task={selectedTask} onClose={() => setSelectedTask(null)} />
       )}
     </div>
   );
 };
 
-export default GanttChart;
+export default GanttChart_mem;

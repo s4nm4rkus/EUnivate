@@ -20,6 +20,7 @@ const Task = () => {
         return new Date(dateString).toLocaleDateString('en-GB', options);
     };
 
+    // Fetch tasks with objectives and assignees
     useEffect(() => {
         const fetchTasks = async () => {
             setLoading(true);
@@ -45,7 +46,7 @@ const Task = () => {
                         const tasksWithProject = taskResponse.data.data.map(task => ({
                             ...task,
                             projectName: project.projectName,
-                            objectiveCount: task.objectives ? task.objectives.length : 0,
+                            objectives: task.objectives || [], // Ensure objectives are included
                             assignedUsers: task.assignedUsers || [],
                             invitedUsers: project.invitedUsers || [] // Fetching invited users from the project
                         }));
@@ -79,13 +80,13 @@ const Task = () => {
     const getPriorityColor = (priority) => {
         switch (priority.toLowerCase()) {
             case 'easy':
-                return 'text-green-500'; 
+                return 'text-green-500';
             case 'medium':
-                return 'text-yellow-500'; 
+                return 'text-yellow-500';
             case 'hard':
-                return 'text-red-500'; 
+                return 'text-red-500';
             default:
-                return 'text-gray-500'; 
+                return 'text-gray-500';
         }
     };
 
@@ -110,11 +111,6 @@ const Task = () => {
                     toggleAccountDropdown={toggleAccountDropdown}
                 />
             </div>
-            <div className="mt-4">
-                <h2 className="text-md md:text-xl font-medium text-gray-700 text-left">
-                    Assignee
-                </h2>
-            </div>
 
             <div className="mt-4 flex gap-4">
                 <div className="p-6 bg-white border rounded-lg shadow-md w-full">
@@ -123,7 +119,7 @@ const Task = () => {
                             <p className="text-xs md:text-sm">Task</p>
                             <p className="hidden md:block text-center">Due Date</p>
                             <p className="hidden md:block text-center">Priority</p>
-                            <p className="hidden md:block text-center">Objective</p>
+                            <p className="text-center text-xs md:text-sm">Objectives</p>
                             <p className="text-center text-xs md:text-sm">Status</p>
                             <p className="text-right text-xs md:text-sm">Project</p>
                         </div>
@@ -151,7 +147,7 @@ const Task = () => {
                                             <FaFlag className={`mr-1 text-xs md:text-sm ${getPriorityColor(task.priority)}`} />
                                             <p className="text-xs md:text-sm">{task.priority}</p>
                                         </div>
-                                        <p className="hidden md:block text-center relative z-10">{task.objectiveCount} Objective</p>
+                                        <p className="text-center relative z-10">{task.objectives.length} Objectives</p>
                                         <p className="text-center relative z-10 text-sm md:text-base">{task.status}</p>
                                         <p className="text-right relative z-10 text-sm md:text-base">{task.projectName}</p>
                                     </li>

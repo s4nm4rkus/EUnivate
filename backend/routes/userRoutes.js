@@ -26,6 +26,8 @@
       import { protect, verifySuperAdmin } from '../middlewares/middleware.js'; 
       import { inviteUsers, updateUserRole, getInvitedUsers, removeInvitedMember, getUsers} from '../controllers/SuperAdmin/People/peopleController.js';
       import { getAssignees } from '../controllers/findUserNameIDController.js';
+      import { createMessage,replyToMessage, reactToMessage,starMessage,flagMessage, getAllMessages, deleteMessage} from '../controllers/SuperAdmin/Message/messageController.js';
+      
       // User Authentication Routes
       router.post('/login', loginUser);
       router.post('/forgot-password', forgotPassword);
@@ -73,6 +75,17 @@
       router.delete('/sa-tasks/:id', deleteTask);
       router.post('/sa-tasks/:taskId/comments', addCommentToTask);
       router.get('/sa-tasks/:taskId/comments', getTaskComments);
+
+      // Message routes
+      router.get('/messages', getAllMessages);
+      router.post('/create-message', createMessage);
+      router.post('/:messageId/reply', replyToMessage);
+      router.post('/:messageId/react', reactToMessage);
+      router.post('/:messageId/star', starMessage);
+      router.post('/:messageId/flag', flagMessage);
+      router.delete('/:messageId', deleteMessage);
+
+
       // quotation route  
       router.post('/quotation',createQuotation);
       router.get('/quotation/confirm/:quotationToken', confirmQuotationEmail);
@@ -81,6 +94,7 @@
       // User Update Routes
       router.put('/:id', updateUser);
       router.put('/:id/password', updateUserPassword);
+
 
         //Admin Routes
       //Products

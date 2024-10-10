@@ -55,11 +55,14 @@ import Settings from './view/pages/SuperAdmin/Settings';
 import ProjectDetails from './view/pages/SuperAdmin/ProjectDetails'; 
 
 //Member
-
 import Member from "./view/pages/Members/Member.jsx"; 
 import ProjMem from "./view/pages/Members/ProjectMem.jsx"; 
 import TaskMem from "./view/pages/Members/TaskMem.jsx"; 
 import ProjectDetailsMem from "./view/pages/Members/ProjectdetailsMem.jsx"; 
+
+//Guest
+import GuestAuth from './view/hooks/GuestAuth.jsx'; // Import the GuestAuth hook
+import Guest_Sidebar from './view/pages/Guess/Guess_Sidebar.jsx'; // Import the Guest sidebar component
 
 /* Global CSS */
 import './index.css';
@@ -127,6 +130,19 @@ const App = () => {
   <Route path="messages" element={<Messages />} />
   <Route path="settings" element={<Settings />} />
 </Route>
+
+ {/* Guest Account Routes */}
+ <Route
+          path="/guest-dashboard/*"
+          element={
+            <GuestAuth>
+              <Guest_Sidebar />
+            </GuestAuth>
+          }
+        >
+          
+          
+        </Route>
 
         {/*
               <Route path="/admin-container" element={<AdminContainer />} />

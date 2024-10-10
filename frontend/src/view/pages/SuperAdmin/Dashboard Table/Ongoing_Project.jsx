@@ -17,21 +17,21 @@ const Ongoing_Project = ({ projects, taskDetails, calculateProgress }) => {
                                 />
                             )}
                             <div className="flex-grow">
-                                <p className="text-gray-800 font-semibold text-xl">{project.projectName}</p>
+                                <p className="text-gray-800 font-semibold text-sm2">{project.projectName}</p>
                                 <div className="flex items-center text-gray-500">
                                     {/* Date Section */}
                                     <div className="flex items-center space-x-2">
-                                        <FaCalendarAlt className="w-4 h-4" />
+                                        <FaCalendarAlt className="w-3 h-3 " />
                                         <p>{new Date(project.createdAt).toLocaleDateString()}</p>
                                     </div>
                                     {/* Attachments and Objectives Section */}
                                     <div className="flex items-center space-x-4">
                                         <div className="flex items-center space-x-1 ml-5">
-                                            <FaPaperclip className="w-4 h-4" />
+                                            <FaPaperclip className="w-3 h-3" />
                                             <p>{taskDetails[project._id]?.attachmentsCount || 0}</p>
                                         </div>
                                         <div className="flex items-center space-x-1">
-                                            <FaCheckCircle className="w-4 h-4" />
+                                            <FaCheckCircle className="w-3 h-3" />
                                             <p>{taskDetails[project._id]?.objectivesCount || 0}</p>
                                         </div>
                                     </div>
@@ -42,7 +42,7 @@ const Ongoing_Project = ({ projects, taskDetails, calculateProgress }) => {
                                                 key={i}
                                                 src={user.profilePicture?.url || user.profilePicture}
                                                 alt={user.username || 'User'}
-                                                className="w-8 h-8 rounded-full object-cover border border-white -ml-3"
+                                                className="w-5 h-5 rounded-full object-cover border border-white -ml-3"
                                             />
                                         ))}
                                         {project.invitedUsers.length > 3 && (

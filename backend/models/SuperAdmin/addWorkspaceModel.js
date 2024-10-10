@@ -5,9 +5,10 @@ const workspaceSchema = new mongoose.Schema({
         type: String,
         required: true
     }
-    }, {
-        timestamps: true
-    });
+    
+}, {
+    timestamps: true
+});
 
 const Workspace = mongoose.model('Workspace', workspaceSchema);
 

@@ -9,6 +9,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Project = () => {
+ 
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -21,7 +22,7 @@ const Project = () => {
   const [loadingProject, setLoadingProject] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [taskCounts, setTaskCounts] = useState({}); // Store total and done tasks count per project
-
+  const [selectedWorkspace, setSelectedWorkspace] = useState(null); // State to store selected workspace
   const navigate = useNavigate();
   const { isNavOpen } = useOutletContext();
 
@@ -79,6 +80,27 @@ const Project = () => {
       fetchTaskCounts();
     }
   }, [projects]);
+
+
+  useEffect(() => {
+      const fetchSelectedWorkspace = async () => {
+          setLoading(true); // Set loading true at the start
+          try {
+              const response = await axios.get('http://localhost:5000/api/users/workspaces/selected');
+              console.log('API Response:', response.data); // Log the response data
+              if (response.data && response.data.selectedWorkspace) {
+                  setSelectedWorkspace(response.data.selectedWorkspace);
+              }
+          } catch (error) {
+              console.error('Error fetching selected workspace:', error);
+          } finally {
+              setLoading(false); // Stop loading after fetch
+          }
+      };
+  
+      fetchSelectedWorkspace();
+  }, []);
+  
 
   const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
   const openModal = () => setIsModalOpen(true);
@@ -215,6 +237,17 @@ const Project = () => {
         </button>
       </div>
 
+      <div>
+          <h1>Project Page</h1>
+          {loading ? (
+              <p>Loading...</p> // Show loading state
+          ) : selectedWorkspace ? (
+              <p>Selected Workspace: {selectedWorkspace.selectedWorkspaceTitle}</p>
+          ) : (
+              <p>No workspace selected</p>
+          )}
+      </div>
+
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-gray-800 bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-md shadow-lg relative max-w-md mx-auto w-full z-60">
@@ -284,6 +317,8 @@ const Project = () => {
                 Close
               </button>
             </div>
+
+            
 
           </div>
         </div>

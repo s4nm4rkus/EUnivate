@@ -51,6 +51,21 @@ app.use('/api/users', userRoutes);
 
 // Workspace
 app.use('/api', addNewWorkspace);
+app.get('/api/users/workspaces/selected', async (req, res) => {
+  try {
+      const selectedWorkspaceRecord = await SelectedWorkspace.findOne().populate('selectedWorkspace'); // Populate the workspace reference
+      console.log("Fetched selected workspace record:", selectedWorkspaceRecord); // Log the fetched record
+      if (!selectedWorkspaceRecord) {
+          return res.status(404).json({ message: 'No selected workspace found' });
+      }
+
+      return res.status(200).json({ selectedWorkspaceRecord });
+  } catch (error) {
+      return res.status(500).json({ error: error.message || 'Error fetching selected workspace' });
+  }
+});
+
+
 
 // Chat message routes
 app.use('/api/messages', chatMessageRoutes); // Ensure this path is correct

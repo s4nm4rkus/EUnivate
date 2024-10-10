@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import axios from 'axios'; // Import Axios
+// import { useNavigate } from 'react-router-dom';
 import { 
     dashboard_logo, 
     dashboard_sidenav_icon, 
@@ -28,29 +29,41 @@ const SideNav = ({ isNavOpen }) => {
     const [workspaceTitle, setWorkspaceTitle] = useState('');
     const [error, setError] = useState('');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [selectedWorkspace, setSelectedWorkspace] = useState('Select Workspace'); 
-    const [workspaces, setWorkspaces] = useState([]); // State to store workspaces
+    const [selectedWorkspace, setSelectedWorkspace] = useState(null);
+    const [workspaces, setWorkspaces] = useState([]);
 
     useEffect(() => {
-        // Fetch workspaces when the component mounts
         const fetchWorkspaces = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/users/workspaces'); // Adjust the URL accordingly
-                setWorkspaces(response.data); // Set the fetched workspaces into state
+                // Fetch all workspaces
+                const response = await axios.get('http://localhost:5000/api/users/workspaces');
+                const workspacesData = response.data;
+                setWorkspaces(workspacesData);
+
+                const selectedWorkspaceResponse = await axios.get('http://localhost:5000/api/users/workspaces/selected');
+                const selectedWorkspaceId = selectedWorkspaceResponse.data.selectedWorkspace?._id;
+                const defaultWorkspace = workspacesData.find(workspace => workspace._id === selectedWorkspaceId);
+    
+                // Set the selected workspace only if it exists
+                if (defaultWorkspace) {
+                    setSelectedWorkspace(defaultWorkspace);
+                } else {
+                    console.warn("Selected workspace not found in workspaces data.");
+                }
             } catch (err) {
                 console.error("Error fetching workspaces:", err);
                 setError('Failed to load workspaces');
             }
         };
-
-        fetchWorkspaces(); // Call the function to fetch workspaces
-    }, []); // Empty dependency array means this will run once when the component mounts
-
+    
+        fetchWorkspaces();
+    }, []);
+    
 
     const closeModal = () => {
         setIsModalOpen(false);
-        setWorkspaceTitle(''); // Reset the title
-        setError(''); // Reset the error message
+        setWorkspaceTitle('');
+        setError('');
     };
 
     const handleCreateWorkspace = async (e) => {
@@ -62,18 +75,13 @@ const SideNav = ({ isNavOpen }) => {
         setError('');
 
         try {
-            const response = await axios.post('http://localhost:5000/api/users/workspace', { // Adjust the URL as necessary
+            const response = await axios.post('http://localhost:5000/api/users/workspace', {
                 workspaceTitle,
             });
 
             if (response.status === 201) {
                 window.location.reload(); // Refresh the page
             }
-
-            console.log("Workspace created:", response.data);
-            // Optionally, you can update the UI or state with the new workspace
-            // For example, you might have a state that holds all workspaces
-            // setWorkspaces([...workspaces, response.data]);
 
             closeModal();
         } catch (err) {
@@ -82,9 +90,25 @@ const SideNav = ({ isNavOpen }) => {
         }
     };
 
-    const handleWorkspaceSelect = (workspace) => {
-        setSelectedWorkspace(workspace.workspaceTitle); 
-        setIsDropdownOpen(false); // Close dropdown after selection
+    const updateSelectedWorkspace = async (workspaceId, workspaceTitle) => {
+        try {
+            // Send selected workspace ID to the backend to update the SelectedWorkspace model
+            await axios.put(`http://localhost:5000/api/users/workspaces/selected`, { 
+                selectedWorkspace: workspaceId,
+                selectedWorkspaceTitle: workspaceTitle 
+            });
+            console.log('Selected workspace updated successfully');
+        } catch (err) {
+            console.error("Error updating selected workspace:", err);
+        }
+    };
+
+    const handleWorkspaceSelect = async (workspace) => {
+        setSelectedWorkspace(workspace); // Update the selected workspace in the UI
+        setIsDropdownOpen(false); // Close the dropdown after selection
+    
+        // Update the selected workspace in the database
+        await updateSelectedWorkspace(workspace._id, workspace.workspaceTitle);
     };
 
     
@@ -147,23 +171,16 @@ const SideNav = ({ isNavOpen }) => {
                 </button>
              </p>   
              <div className="workspaceSelect relative inline-block">
-                <button
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="workspaceDropdown flex items-center justify-between bg-transparent text-white"
-                >
-                    <span>{selectedWorkspace}</span>
-                    <FontAwesomeIcon icon={isDropdownOpen ? faChevronUp : faChevronDown} className='faChevronWS' />
-                </button>
+                    <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="workspaceDropdown flex items-center justify-between bg-transparent text-white">
+                        <span>{selectedWorkspace ? selectedWorkspace.workspaceTitle : 'Select Workspace'}</span>
+                        <FontAwesomeIcon icon={isDropdownOpen ? faChevronUp : faChevronDown} className="faChevronWS" />
+                    </button>
 
-                {isDropdownOpen && (
+                    {isDropdownOpen && (
                         <ul className="workspaceList absolute z-10 mt-2 ms-2 bg-white text-black shadow">
                             {workspaces.length > 0 ? (
                                 workspaces.map((workspace) => (
-                                    <li
-                                        key={workspace._id} // Use unique identifier
-                                        onClick={() => handleWorkspaceSelect(workspace)}
-                                        className="p-2 hover:bg-gray-400 cursor-pointer"
-                                    >
+                                    <li key={workspace._id} onClick={() => handleWorkspaceSelect(workspace)} className="p-2 hover:bg-gray-400 cursor-pointer">
                                         {workspace.workspaceTitle}
                                     </li>
                                 ))
@@ -173,6 +190,7 @@ const SideNav = ({ isNavOpen }) => {
                         </ul>
                     )}
                 </div>
+
 
             </div> 
 

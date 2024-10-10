@@ -25,28 +25,33 @@
             }
         };
 
-        // Reply to a message
-        export const replyToMessage = async (req, res) => {
-            const { messageId } = req.params;
-            const { sender, content } = req.body;
+                // Reply to a message
+            export const replyToMessage = async (req, res) => {
+                const { messageId } = req.params;
+                const { sender, content } = req.body;
 
-            try {
-                const message = await Message.findById(messageId);
+                try {
+                    const message = await Message.findById(messageId);
 
-                if (!message) {
-                    return res.status(404).json({ message: 'Message not found' });
+                    if (!message) {
+                        return res.status(404).json({ message: 'Message not found' });
+                    }
+
+                    const newReply = { sender, content, createdAt: new Date() };
+                    message.replies.push(newReply);
+
+                    await message.save();
+
+                    // Populate sender's info for real-time update
+                    const populatedReply = await message.populate('replies.sender', 'firstName lastName profilePicture');
+
+                    io.emit('new-reply', { messageId, reply: populatedReply.replies.pop() });
+
+                    res.status(201).json(message);
+                } catch (error) {
+                    res.status(500).json({ message: 'Error replying to message', error });
                 }
-
-                const newReply = { sender, content, createdAt: new Date() };
-                message.replies.push(newReply);
-
-                await message.save();
-             io.emit('new-reply', { messageId, reply: newReply });
-                res.status(201).json(message);
-            } catch (error) {
-                res.status(500).json({ message: 'Error replying to message', error });
-            }
-        };
+            };
 
 
         // React to a message

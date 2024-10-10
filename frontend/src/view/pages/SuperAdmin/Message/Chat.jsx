@@ -58,8 +58,7 @@ const Chat = ({ group }) => {
       });
     });
     
-  
-
+    
     socket.on('new-reaction', (reactionData) => {
       setMessages((prevMessages) => {
         return prevMessages.map((msg) =>

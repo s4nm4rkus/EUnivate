@@ -104,17 +104,16 @@ const Messages = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen p-6">
-    <div className="w-full flex justify-between items-center mb-4">
-        <div className="relative">
-            <h1 className={`text-2xl font-medium text-gray-800 hidden md:block`}>
-                Dashboard
-            </h1>
-        </div>
-        <AdminNavbar 
-            isAccountDropdownOpen={isAccountDropdownOpen}
-            toggleAccountDropdown={toggleAccountDropdown}
+      {/* Header with AdminNavbar */}
+      <div className="w-full flex justify-between items-center mb-4">
+        <h1 className="text-lg md:text-2xl font-medium text-gray-800 hidden md:block">
+          Messages
+        </h1>
+        <AdminNavbar
+          isAccountDropdownOpen={isAccountDropdownOpen}
+          toggleAccountDropdown={toggleAccountDropdown}
         />
-    </div>
+      </div>
 
       {/* Main layout with two boxes that grow with content */}
       <div className="flex flex-row gap-2">

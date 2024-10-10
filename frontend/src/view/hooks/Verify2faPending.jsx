@@ -111,7 +111,7 @@ const Verify2FAPending = () => {
             } else if (roleLowerCase === 'members') {
               navigate('/member');
             } else if (roleLowerCase === 'guest') {
-              navigate('/guest');
+              navigate('/guest-dashboard');
             } else if (roleLowerCase === 'User') {
               navigate('/');
             } else {

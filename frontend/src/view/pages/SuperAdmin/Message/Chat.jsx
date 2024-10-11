@@ -82,12 +82,17 @@
             msg._id === reactionData.messageId
               ? {
                   ...msg,
-                  reactions: [...msg.reactions, reactionData.reaction].filter(r => r && r.reaction)  
+                  reactions: msg.reactions.some((r) => r.user._id === reactionData.reaction.user._id)
+                    ? msg.reactions.map((r) =>
+                        r.user._id === reactionData.reaction.user._id ? reactionData.reaction : r
+                      )
+                    : [...msg.reactions, reactionData.reaction],
                 }
               : msg
           )
         );
       });
+      
       
       socket.on('flagged-message', (flagData) => {
         setMessages((prevMessages) => {
@@ -202,6 +207,7 @@
         console.error('Error reacting to message:', error.response ? error.response.data : error.message);
       }
     };
+    
     
 
     const toggleStar = (index) => {

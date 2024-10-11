@@ -58,24 +58,36 @@
         export const reactToMessage = async (req, res) => {
             const { messageId } = req.params;
             const { user, reaction } = req.body;
-
+          
             try {
-                const message = await Message.findById(messageId);
-
-                if (!message) {
-                    return res.status(404).json({ message: 'Message not found' });
-                }
-
+              const message = await Message.findById(messageId);
+          
+              if (!message) {
+                return res.status(404).json({ message: 'Message not found' });
+              }
+          
+              const existingReactionIndex = message.reactions.findIndex(r => r.user.toString() === user);
+          
+              if (existingReactionIndex !== -1) {
+                message.reactions[existingReactionIndex].reaction = reaction;
+                message.reactions[existingReactionIndex].reactedAt = new Date();
+              } else {
                 const newReaction = { user, reaction, reactedAt: new Date() };
                 message.reactions.push(newReaction);
-
-                await message.save();
-                io.emit('new-reaction', { messageId, reaction: newReaction }); // Broadcast the new reaction
-                res.status(201).json(message);
+              }
+          
+              await message.save();
+          
+              const populatedMessage = await message.populate('reactions.user')
+          
+         
+              res.status(201).json(message);
             } catch (error) {
-                res.status(500).json({ message: 'Error reacting to message', error });
+              console.error('Error reacting to message:', error);
+              res.status(500).json({ message: 'Error reacting to message', error });
             }
-        };
+          };
+        
 
         // Star a message
         export const starMessage = async (req, res) => {
@@ -131,7 +143,7 @@
                 const messages = await Message.find({ removed: { $ne: true } }) 
                     .populate('sender', 'firstName lastName profilePicture') 
                     .populate('replies.sender', 'firstName lastName profilePicture') 
-                    .populate('reactions.user', 'firstName lastName profilePicture'); 
+                    .populate('reactions.user'); 
 
                 res.status(200).json(messages); 
             } catch (error) {

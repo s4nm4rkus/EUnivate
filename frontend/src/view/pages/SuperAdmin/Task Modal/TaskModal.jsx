@@ -36,9 +36,6 @@ const TaskModal = ({ task, isOpen, onClose, formatDate }) => {
         }
     };
 
-    // Filter objectives to only show completed ones
-    const completedObjectives = task.objectives.filter(obj => obj.completed);
-
     return (
         <div className={`fixed inset-0 z-50 flex justify-end bg-gray-800 bg-opacity-50 transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
             <div className={`bg-white py-6 rounded-l-lg shadow-lg max-w-sm w-full h-full overflow-y-auto transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
@@ -46,21 +43,21 @@ const TaskModal = ({ task, isOpen, onClose, formatDate }) => {
                     className="absolute top-4 left-4 text-gray-500 hover:text-gray-700 focus:outline-none"
                     onClick={onClose}
                 >
-                    <FaTimes className="text-1xl" />
+                    <FaTimes className="text-xl" />
                 </button>
 
                 <div className="relative">
                     <div className="absolute top-0 left-6 mt-2 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
                         {isTaskDone && <FaCheckCircle className="text-green-500 text-2xl" />}
                     </div>
-                    <h2 className="text-xm mb-1 mt-5 ml-20">{task.projectName}</h2>
+                    <h2 className="text-xl mb-1 mt-5 ml-20">{task.projectName}</h2>
                     <p className="text-md mb-4 ml-20 font-bold text-gray-600">{task.taskName}</p>
                 </div>
 
                 {/* Assignees */}
                 <div className="mt-4 flex items-center ml-5 mr-10">
                     <p className="font-semibold">Assignee:</p>
-                    <div className="flex items-end -space-x-2">
+                    <div className="flex items-end ml-2 -space-x-2">
                         {task.invitedUsers.slice(0, 3).map(user => (
                             <div key={user._id} className="flex items-center">
                                 <img
@@ -110,8 +107,8 @@ const TaskModal = ({ task, isOpen, onClose, formatDate }) => {
                 <div className="mt-4 ml-5 mr-5">
                     <p className="font-semibold">Attachments:</p>
                     <div className="flex flex-wrap gap-2 mt-2">
-                        {task.attachments && task.attachments.length > 0 ? (
-                            task.attachments.map((attachment, index) => (
+                        {task.attachment && task.attachment.length > 0 ? (
+                            task.attachment.map((attachment, index) => (
                                 <img
                                     key={index}
                                     src={attachment.url}
@@ -125,20 +122,23 @@ const TaskModal = ({ task, isOpen, onClose, formatDate }) => {
                     </div>
                 </div>
 
-                {/* Objectives Section (Only completed objectives) */}
+                {/* Done Objectives Section */}
                 <div className="mt-4 ml-5 mr-5">
-                    <p className="font-semibold">Completed Objectives ({completedObjectives.length}/{task.objectives.length}):</p>
+                    <p className="font-semibold">Done Objectives:</p>
                     <div className="space-y-2 mt-2">
-                        {completedObjectives.map((objective, index) => (
+                        {task.objectives.filter(obj => obj.done).map((objective, index) => (
                             <div key={index} className="flex items-center space-x-2">
                                 <div className="w-5 h-5 rounded-full flex items-center justify-center border bg-green-500 border-green-500">
-                                    <FaCheckCircle className="text-white text-sm6" />
+                                    <FaCheckCircle className="text-white text-sm" />
                                 </div>
                                 <p className="text-sm line-through text-gray-500">
                                     {objective.text}
                                 </p>
                             </div>
                         ))}
+                        {task.objectives.filter(obj => obj.done).length === 0 && (
+                            <p className="text-sm text-gray-500">No objectives completed yet.</p>
+                        )}
                     </div>
                 </div>
             </div>

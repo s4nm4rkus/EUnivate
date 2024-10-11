@@ -7,7 +7,7 @@ const saInvitedMemberSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['User', 'members', 'admin', 'superadmin'],
+        enum: ['User', 'guest','members', 'admin', 'superadmin'],
         default: 'User',
     },      
     project: [{

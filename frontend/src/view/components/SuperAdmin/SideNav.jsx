@@ -1,11 +1,12 @@
-// frontend/src/components/SideNav.js
 
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import axios from 'axios'; // Import Axios
-// import { useNavigate } from 'react-router-dom';
+import { useWorkspace } from './workspaceContext';
+import { useNavigate } from 'react-router-dom';
+
 import { 
     dashboard_logo, 
     dashboard_sidenav_icon, 
@@ -29,35 +30,58 @@ const SideNav = ({ isNavOpen }) => {
     const [workspaceTitle, setWorkspaceTitle] = useState('');
     const [error, setError] = useState('');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [selectedWorkspace, setSelectedWorkspace] = useState(null);
+    const navigate = useNavigate();
+    const { selectedWorkspace, setSelectedWorkspace } = useWorkspace();
     const [workspaces, setWorkspaces] = useState([]);
-
+    
     useEffect(() => {
         const fetchWorkspaces = async () => {
-            try {
-                // Fetch all workspaces
-                const response = await axios.get('http://localhost:5000/api/users/workspaces');
-                const workspacesData = response.data;
-                setWorkspaces(workspacesData);
-
-                const selectedWorkspaceResponse = await axios.get('http://localhost:5000/api/users/workspaces/selected');
-                const selectedWorkspaceId = selectedWorkspaceResponse.data.selectedWorkspace?._id;
-                const defaultWorkspace = workspacesData.find(workspace => workspace._id === selectedWorkspaceId);
+            // Retrieve user information from local storage
+            const user = JSON.parse(localStorage.getItem('user'));
     
-                // Set the selected workspace only if it exists
-                if (defaultWorkspace) {
-                    setSelectedWorkspace(defaultWorkspace);
+            // Check if user is defined and has a valid access token
+            if (!user || !user.accessToken) {
+                console.error("User is not authenticated.");
+                setError('User is not authenticated.'); // Optionally set an error state
+                return; // Exit if user is not defined
+            }
+    
+            try {
+                // Fetch all workspaces that belong to the owner
+                const response = await axios.get('http://localhost:5000/api/users/workspaces', {
+                    headers: {
+                        Authorization: `Bearer ${user.accessToken}`,
+                    },
+                });
+    
+                // Check if the response status is 200 (OK)
+                if (response.status === 200) {
+                    const workspacesData = response.data;
+    
+                    // Set the fetched workspaces in state
+                    setWorkspaces(workspacesData);
                 } else {
-                    console.warn("Selected workspace not found in workspaces data.");
+                    console.error("Error fetching workspaces: Unexpected response status", response.status);
+                    setError('Failed to load workspaces');
                 }
             } catch (err) {
-                console.error("Error fetching workspaces:", err);
-                setError('Failed to load workspaces');
+                if (err.response) {
+                    console.error("Error fetching workspaces:", err.response.data || err.message);
+                    setError(`Failed to load workspaces: ${err.response.data.message || err.message}`);
+                } else if (err.request) {
+                    console.error("No response received:", err.request);
+                    setError('Failed to load workspaces: No response from server');
+                } else {
+                    console.error("Error fetching workspaces:", err.message);
+                    setError(`Failed to load workspaces: ${err.message}`);
+                }
             }
         };
     
         fetchWorkspaces();
     }, []);
+    
+
     
 
     const closeModal = () => {
@@ -72,17 +96,35 @@ const SideNav = ({ isNavOpen }) => {
             setError('Workspace title is required');
             return;
         }
+    
+        const user = JSON.parse(localStorage.getItem('user'));
+        const accessToken = user ? user.accessToken : null;
+    
+        if (!accessToken) {
+            setLoading(false);
+            setError('No access token found. Please log in again.');
+            return;
+        }
+        
         setError('');
-
+    
         try {
-            const response = await axios.post('http://localhost:5000/api/users/workspace', {
-                workspaceTitle,
-            });
-
+            const response = await axios.post(
+                'http://localhost:5000/api/users/workspace', 
+                {
+                    workspaceTitle,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`, // Include the token in the headers
+                    },
+                }
+            );
+    
             if (response.status === 201) {
                 window.location.reload(); // Refresh the page
             }
-
+    
             closeModal();
         } catch (err) {
             console.error("Error creating workspace:", err.response?.data?.error || err.message);
@@ -90,29 +132,11 @@ const SideNav = ({ isNavOpen }) => {
         }
     };
 
-    const updateSelectedWorkspace = async (workspaceId, workspaceTitle) => {
-        try {
-            // Send selected workspace ID to the backend to update the SelectedWorkspace model
-            await axios.put(`http://localhost:5000/api/users/workspaces/selected`, { 
-                selectedWorkspace: workspaceId,
-                selectedWorkspaceTitle: workspaceTitle 
-            });
-            console.log('Selected workspace updated successfully');
-        } catch (err) {
-            console.error("Error updating selected workspace:", err);
-        }
+    const handleWorkspaceSelect = (workspace) => {
+        setSelectedWorkspace(workspace); // This will store the selected workspace globally
+        navigate(`/superadmin/dashboard?workspaceId=${workspace._id}&workspaceTitle=${workspace.workspaceTitle}`);
     };
 
-    const handleWorkspaceSelect = async (workspace) => {
-        setSelectedWorkspace(workspace); // Update the selected workspace in the UI
-        setIsDropdownOpen(false); // Close the dropdown after selection
-    
-        // Update the selected workspace in the database
-        await updateSelectedWorkspace(workspace._id, workspace.workspaceTitle);
-        window.location.reload();
-    };
-
-    
 
     return (
         <div
@@ -171,7 +195,9 @@ const SideNav = ({ isNavOpen }) => {
                         <FontAwesomeIcon icon={faPlus} className="faPlusWorkspace"/>
                 </button>
              </p>   
-             <div className="workspaceSelect relative inline-block">
+             
+
+                <div className="workspaceSelect relative inline-block">
                     <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="workspaceDropdown flex items-center justify-between bg-transparent text-white">
                         <span>{selectedWorkspace ? selectedWorkspace.workspaceTitle : 'Select Workspace'}</span>
                         <FontAwesomeIcon icon={isDropdownOpen ? faChevronUp : faChevronDown} className="faChevronWS" />
@@ -191,8 +217,6 @@ const SideNav = ({ isNavOpen }) => {
                         </ul>
                     )}
                 </div>
-
-
             </div> 
 
             {isModalOpen && (

@@ -25,7 +25,7 @@
       import { getAddedMembers, createTask, getTasks, getTaskById, updateTask, updateTaskObjectives, addCommentToTask, getTaskComments, getTasksByProjectId, deleteTask } from '../controllers/SuperAdmin/Task/saAddTaskController.js';  
       import { protect, verifySuperAdmin } from '../middlewares/middleware.js'; 
       import { inviteUsers, updateUserRole, getInvitedUsers, removeInvitedMember, getUsers} from '../controllers/SuperAdmin/People/peopleController.js';
-      import { addNewWorkspace, getAllWorkspaces, updateSelectedWorkspace, getSelectedWorkspace } from '../controllers/SuperAdmin/workspaceController.js';
+      import { addNewWorkspace, getAllWorkspaces } from '../controllers/SuperAdmin/workspaceController.js';
       import { getAssignees } from '../controllers/findUserNameIDController.js';
 
       // User Authentication Routes
@@ -55,10 +55,8 @@
       router.get('/findByUsername/:username', findUserByUsername);
 
       //Workspace
-      router.post('/workspace', addNewWorkspace);
-      router.get('/workspaces', getAllWorkspaces);
-      router.put('/workspaces/selected', updateSelectedWorkspace);
-      router.get('/workspaces/selected', getSelectedWorkspace);
+      router.post('/workspace', protect, addNewWorkspace);
+      router.get('/workspaces', protect, getAllWorkspaces);
       
       //get the Invited users from people on superadmin
       router.post('/invite', protect, inviteUsers); 

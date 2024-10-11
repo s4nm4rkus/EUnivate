@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { FaCalendar, FaCheckCircle, FaPlus } from 'react-icons/fa';
 import { useNavigate, useOutletContext } from 'react-router-dom'; 
@@ -7,6 +7,7 @@ import LoadingSpinner from './Loading Style/Fill File Loading/Loader.jsx';
 import ButtonSpinner from './Loading Style/Spinner Loading/ButtonSpinner.jsx';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useWorkspace } from '../../components/SuperAdmin/workspaceContext.jsx';
 
 const Project = () => {
  
@@ -21,8 +22,8 @@ const Project = () => {
   const [loading, setLoading] = useState(false);
   const [loadingProject, setLoadingProject] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
-  const [taskCounts, setTaskCounts] = useState({}); // Store total and done tasks count per project
-  const [selectedWorkspace, setSelectedWorkspace] = useState(null); // State to store selected workspace
+  const [taskCounts, setTaskCounts] = useState({}); 
+  const { selectedWorkspace } = useWorkspace();
   const navigate = useNavigate();
   const { isNavOpen } = useOutletContext();
 
@@ -81,27 +82,6 @@ const Project = () => {
     }
   }, [projects]);
 
-
-  useEffect(() => {
-      const fetchSelectedWorkspace = async () => {
-          setLoading(true); // Set loading true at the start
-          try {
-              const response = await axios.get('http://localhost:5000/api/users/workspaces/selected');
-              console.log('API Response:', response.data); // Log the response data
-              if (response.data && response.data.selectedWorkspace) {
-                  setSelectedWorkspace(response.data.selectedWorkspace);
-              }
-          } catch (error) {
-              console.error('Error fetching selected workspace:', error);
-          } finally {
-              setLoading(false); // Stop loading after fetch
-          }
-      };
-  
-      fetchSelectedWorkspace();
-  }, []);
-  
-
   const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
@@ -150,7 +130,15 @@ const Project = () => {
       setLoading(false);
       return;
     }
+
+    if (!selectedWorkspace) {
+      setLoading(false);
+      setError('No workspace selected. Please select a workspace to create a project.');
+      return;
+    }
   
+
+    const workspaceId = selectedWorkspace._id;
     const user = JSON.parse(localStorage.getItem('user'));
     const accessToken = user ? user.accessToken : null;
 
@@ -165,6 +153,7 @@ const Project = () => {
       const newProject = {
         projectName,
         thumbnail,
+        workspaceId,
       };
 
       const response = await axios.post('http://localhost:5000/api/users/sa-newproject', newProject, {
@@ -237,6 +226,17 @@ const Project = () => {
         </button>
       </div>
 
+        <div>
+            <h1>Project Page</h1>
+            {loading ? (
+                <p>Loading...</p> // Show loading state
+            ) : selectedWorkspace ? (
+                <p>Selected Workspace: {selectedWorkspace.workspaceTitle}</p> // Display the workspace title
+            ) : (
+                <p>No workspace selected</p> // Handle case where no workspace is selected
+            )}
+        </div>
+
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-gray-800 bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-md shadow-lg relative max-w-md mx-auto w-full z-60">
@@ -294,19 +294,8 @@ const Project = () => {
             <input
               type="hidden"
               name="workspaceId"
-              value={selectedWorkspace ? selectedWorkspace.workspaceId : ''}
+              value={selectedWorkspace ? selectedWorkspace.workspaceTitle : ''}
             />      
-
-            {/* <div>
-              <h1>Project Page</h1>
-              {loading ? (
-                  <p>Loading...</p> // Show loading state
-              ) : selectedWorkspace ? (
-                  <p>Selected Workspace: {selectedWorkspace.selectedWorkspaceTitle}</p>
-              ) : (
-                  <p>No workspace selected</p>
-              )}
-            </div> */}
 
             <div className="mt-6 flex flex-col justify-center">
               <button

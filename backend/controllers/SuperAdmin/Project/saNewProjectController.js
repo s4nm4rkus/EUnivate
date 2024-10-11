@@ -5,23 +5,37 @@ import User from '../../../models/Client/userModels.js';
 
 export const createSaNewProject = async (req, res) => {
     try {
-   
-        const { projectName, thumbnail,invitedUsers  } = req.body;
+        // Destructure the request body
+        const { projectName, thumbnail, invitedUsers, workspaceId } = req.body;
 
+        // Ensure all required fields are present
+        if (!projectName || !thumbnail || !workspaceId || !req.user) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        // Create a new project
         const newSaNewProject = new SaNewProject({
-            projectName: projectName,
-            thumbnail: thumbnail,
-            owner: req.user._id,
+            projectName,
+            thumbnail,
+            workspaceId,  // Make sure workspaceId is passed from the request
+            owner: req.user._id,  // req.user should be populated by authentication middleware
             invitedUsers
-        }); 
+        });
 
+      
         const savedSaNewProject = await newSaNewProject.save();
         return res.status(201).json(savedSaNewProject);
     } catch (error) {
-        console.error("Error in creatingSaNewProject:", error.message);
-        return res.status(500).json({ error: error.message || 'An error occurred while creating the SaNewProject' });
+        // Log detailed error for debugging
+        console.error("Error in createSaNewProject:", error);
+
+        // Return a 500 error response
+        return res.status(500).json({
+            error: error.message || 'An error occurred while creating the SaNewProject'
+        });
     }
 };
+
 
 //Get all Project
 export const getAllProjects = async (req, res) => {

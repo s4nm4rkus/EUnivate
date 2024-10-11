@@ -20,7 +20,6 @@ const projectSchema = new mongoose.Schema({
 
   workspaceId:{
     type: String,
-    required: true,
   },
   
   owner: { 

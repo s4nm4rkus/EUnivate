@@ -2,22 +2,17 @@ import React from "react";
 import { Link } from 'react-router-dom';
 import { 
     dashboard_logo, 
-    dashboard_sidenav_icon, 
-    project_red, 
-    task_red,
     messages_red, 
+    project_red, 
     settings_red, 
-    activity_red,
-    people_red,
-    project_icon,
-    task_icon,
+    task_red,
     messages_icon,
+    project_icon,
     settings_icon,
-    activity_icon,
-    people_icon
+    task_icon
 } from "../../../constants/assets";
 
-const Guess_Layout = ({ isNavOpen }) => {
+const GeustLayout = ({ isNavOpen }) => {
     return (
         <div
             className={`side-nav-admin fixed top-0 left-0 h-full bg-red-750 shadow-lg transition-transform transform ${
@@ -34,24 +29,18 @@ const Guess_Layout = ({ isNavOpen }) => {
             </div>
 
             <ul className="list-none p-0">
-                {[
-{
-    to: "project-guest", text: "Project", icon: project_icon, hoverIcon: project_red
-},
-{
-    to: "task-guest", text: "Task", icon: task_icon, hoverIcon: task_red
-},
-{
-    to: "activity-guest", text: "Activity", icon: activity_icon, hoverIcon: activity_red
-},
-{
-    to: "messages-guest", text: "Messages", icon: messages_icon, hoverIcon: messages_red
-},
-{
-    to: "settings-guest", text: "Settings", icon: settings_icon, hoverIcon: settings_red
-}
-
-            ].map((item, index) => (
+                {[{
+                    to: "projectG", text: "Project", icon: project_icon, hoverIcon: project_red
+                },
+                {
+                    to: "taskG", text: "My Task", icon: task_icon, hoverIcon: task_red
+                },
+                {
+                    to: "messagesG", text: "Messages", icon: messages_icon, hoverIcon: messages_red
+                },
+                {
+                    to: "settingsG", text: "Settings", icon: settings_icon, hoverIcon: settings_red
+                }].map((item, index) => (
                     <li className="mb-2" key={index}>
                         <Link
                             to={item.to}
@@ -78,4 +67,4 @@ const Guess_Layout = ({ isNavOpen }) => {
     );
 };
 
-export default Guess_Layout;
+export default GeustLayout;

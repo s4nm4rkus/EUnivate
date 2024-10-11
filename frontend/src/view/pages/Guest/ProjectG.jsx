@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { FaCalendar, FaCheckCircle } from 'react-icons/fa';
 import axios from 'axios';
-import AdminNavbar from '../../../components/SuperAdmin/AdminNavbar';
+import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx';
 import { useNavigate } from 'react-router-dom';
 
-
-
-const Project_G = () => {
+const ProjectG = () => {
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
   const [projects, setProjects] = useState([]);
   const [error, setError] = useState('');
@@ -84,7 +82,7 @@ const Project_G = () => {
       setSelectedProject(project._id); // Keep track of selected project
       
       // Navigate to ProjectDetailsMem, passing project details and tasks
-      navigate(`/guest/projects/${project._id}`, {
+      navigate(`/guest-dashboard/projects/${project._id}`, {
         state: {
           projectId: project._id,
           projectName: project.projectName,
@@ -191,4 +189,4 @@ const Project_G = () => {
   );
 };
 
-export default Project_G
+export default ProjectG;

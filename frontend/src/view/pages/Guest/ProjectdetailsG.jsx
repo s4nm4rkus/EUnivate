@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import AdminNavbar from '../../../components/SuperAdmin/AdminNavbar.jsx';
-import KanbanModal_G from '../Modal.jsx/KanbanModal_G.jsx';
-import List_G from '../Featured/List_G.jsx';
-import Calendar from '../Featured/Calendar_G.jsx';
-import GanttChart_G from '../Featured/GanttChart_G.jsx';
-import RaciMatrix_G from '../Featured/RaciMatrix_G.jsx';
+  import React, { useState, useEffect, useRef } from 'react';
+  import { useLocation, useNavigate } from 'react-router-dom';
+  import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx';
+  import KanbanG from './Featured/KanbanG.jsx';
+  import ListG from './Featured/ListG.jsx';
+  import CalendarG from './Featured/CalendarG.jsx';
+  import GanttChartG from './Featured/GanttChartG.jsx';
+  import RaciMatrixG from './Featured/RaciMatrixG.jsx';
 
-const ProJectDetails_G = () => {
+  const ProjectDetailsG = () => {
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
     const [selectedView, setSelectedView] = useState('Kanban');
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -208,11 +208,11 @@ const ProJectDetails_G = () => {
         </div>
 
         <div className="mt-6 border-gray-200">
-          {selectedView === 'Kanban' && <KanbanModal_G tasks={tasks} />}
-          {selectedView === 'List' && <List_G tasks={tasks} />}
-          {selectedView === 'Calendar' && <Calendar tasks={tasks} />}
-          {selectedView === 'GanttChart' && <GanttChart_G />}
-          {selectedView === 'RaciMatrix' && <RaciMatrix_G />}
+          {selectedView === 'Kanban' && <KanbanG tasks={tasks} />}
+          {selectedView === 'List' && <ListG tasks={tasks} />}
+          {selectedView === 'Calendar' && <CalendarG tasks={tasks} />}
+          {selectedView === 'GanttChart' && <GanttChartG />}
+          {selectedView === 'RaciMatrix' && <RaciMatrixG />}
         </div>
 
         {isUserModalOpen && (
@@ -279,4 +279,4 @@ const ProJectDetails_G = () => {
     );
   };
 
-export default ProJectDetails_G
+  export default ProjectDetailsG;

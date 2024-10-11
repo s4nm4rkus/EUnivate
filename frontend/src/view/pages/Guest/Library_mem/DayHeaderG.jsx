@@ -1,6 +1,6 @@
 import React from 'react';
 
-const CustomDayHeader_G = ({ label, tasks }) => {
+const DayHeaderG = ({ label, tasks }) => {
     const tasksForDay = tasks.filter(task => {
         const taskDate = new Date(task.startDate);
         return taskDate.toDateString() === new Date(label).toDateString();
@@ -22,4 +22,4 @@ const CustomDayHeader_G = ({ label, tasks }) => {
     );
 };
 
-export default CustomDayHeader_G
+export default DayHeaderG;

@@ -60,14 +60,12 @@ import ProjMem from "./view/pages/Members/ProjectMem.jsx";
 import TaskMem from "./view/pages/Members/TaskMem.jsx"; 
 import ProjectDetailsMem from "./view/pages/Members/ProjectdetailsMem.jsx"; 
 
-// //Guest
-// import GuestAuth from './view/hooks/GuestAuth.jsx'; 
-// import Guest_Sidebar from './view/pages/Guest/Guest_Sidebar.jsx';
-// import Project_G from './view/pages/Guest/Features/Project_G.jsx'; 
-// import Task_G from './view/pages/Guest/Features/Task_G.jsx'; 
-// import Activity_G from './view/pages/Guest/Features/Activity_G.jsx'; 
-// import ProJectDetails_G from './view/pages/Guest/Features/ProJectDetails_G.jsx';
-
+//Guest
+import Guest from './view/pages/Guest/Guest.jsx';
+import ProjectG from './view/pages/Guest/ProjectG.jsx';
+import TaskG from './view/pages/Guest/TaskG.jsx';
+import ProjectdetailsG from './view/pages/Guest/ProjectdetailsG.jsx';
+import GuestAuth from './view/hooks/GuestAuth.jsx';
 /* Global CSS */
 import './index.css';
 import './admin.css';
@@ -131,6 +129,25 @@ const App = () => {
           <Route path="messages" element={<Messages />} />
           <Route path="settings" element={<Settings />} />
         </Route>
+
+          {/* Guest Account Routes */}
+          <Route
+            path="/guest-dashboard/*"
+            element={
+            <GuestAuth>
+            <Guest />
+            </GuestAuth>
+            }
+          >
+         <Route path="projects/:id" element={<ProjectdetailsG />} />
+          <Route path="projectG" element={<ProjectG />} /> 
+          <Route path="taskG" element={<TaskG />} /> 
+          <Route path="messagesG" element={<Messages />} /> 
+          <Route path="settingsG" element={<Settings />} />
+      
+          
+        </Route>
+
 
         {/* Super Admin Routes */}
         <Route

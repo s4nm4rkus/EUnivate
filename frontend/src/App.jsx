@@ -59,13 +59,14 @@ import Member from "./view/pages/Members/Member.jsx";
 import ProjMem from "./view/pages/Members/ProjectMem.jsx"; 
 import TaskMem from "./view/pages/Members/TaskMem.jsx"; 
 import ProjectDetailsMem from "./view/pages/Members/ProjectdetailsMem.jsx"; 
-
+import Settings_Members from './view/pages/Members/Settings_Members.jsx';
 //Guest
 import Guest from './view/pages/Guest/Guest.jsx';
 import ProjectG from './view/pages/Guest/ProjectG.jsx';
-import TaskG from './view/pages/Guest/TaskG.jsx';
+import TaskG from './view/pages/Guest/Modal/TaskG.jsx';
 import ProjectdetailsG from './view/pages/Guest/ProjectdetailsG.jsx';
 import GuestAuth from './view/hooks/GuestAuth.jsx';
+import SettingsG from './view/pages/Guest/SettingsG.jsx';
 /* Global CSS */
 import './index.css';
 import './admin.css';
@@ -127,7 +128,7 @@ const App = () => {
           <Route path="projectmem" element={<ProjMem />} />
           <Route path="taskmem" element={<TaskMem />} />
           <Route path="messages" element={<Messages />} />
-          <Route path="settings" element={<Settings />} />
+          <Route path="settings_Members" element={<Settings_Members />} />
         </Route>
 
           {/* Guest Account Routes */}
@@ -143,7 +144,7 @@ const App = () => {
           <Route path="projectG" element={<ProjectG />} /> 
           <Route path="taskG" element={<TaskG />} /> 
           <Route path="messagesG" element={<Messages />} /> 
-          <Route path="settingsG" element={<Settings />} />
+          <Route path="settingsG" element={<SettingsG />} />
       
           
         </Route>

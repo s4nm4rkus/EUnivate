@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaCalendar, FaCheckCircle } from 'react-icons/fa';
 import axios from 'axios';
-import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx';
+import AdminNavbarG from '../../components/Guest/AdminNavbarG';
 import { useNavigate } from 'react-router-dom';
 
 const ProjectG = () => {
@@ -108,7 +108,7 @@ const ProjectG = () => {
         <div className="relative">
           <h1 className="text-2xl font-medium text-gray-800 hidden md:block">Project</h1>
         </div>
-        <AdminNavbar
+        <AdminNavbarG
           isAccountDropdownOpen={isAccountDropdownOpen}
           toggleAccountDropdown={toggleAccountDropdown}
         />

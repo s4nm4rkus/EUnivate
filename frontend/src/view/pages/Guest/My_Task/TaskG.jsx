@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaTimes, FaCheckCircle, FaRegCalendarAlt, FaFlag } from 'react-icons/fa';
 
-const Task_ModalG = ({ task, isOpen, onClose, formatDate }) => {
+const Task_Modal = ({ task, isOpen, onClose, formatDate }) => {
     if (!task) return null;
 
     const isTaskDone = task.status.toLowerCase() === 'done';
@@ -146,4 +146,4 @@ const Task_ModalG = ({ task, isOpen, onClose, formatDate }) => {
     );
 };
 
-export default Task_ModalG;
+export default Task_Modal;

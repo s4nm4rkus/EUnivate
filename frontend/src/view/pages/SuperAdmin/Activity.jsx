@@ -163,80 +163,78 @@ const Activity = () => {
             <div className="bg-white p-4 md:p-6 border border-gray-300 rounded-lg shadow-sm">
                 {/* Render each group of task changes */}
                 {projects.length > 0 ? (
-                    projects.map((project) => (
-                        <div key={project._id} className="mb-6">
-                            <div className="flex items-center">
-                                <h2 className="text-lg md:text-2xs text-gray-800">
-                                    {project.projectName}
-                                    
-                                </h2>
-                            </div>
-                            <ul className="mt-2 relative">
-                                {taskDetails[project._id] && taskDetails[project._id].length > 0 ? (
-                                    taskDetails[project._id].map((task) => {
-                                        const taskChanges = getTaskChanges(task);
+    projects.map((project) => (
+        <div key={project._id} className="mb-6">
+            <div className="flex items-center">
+                <h2 className="text-lg md:text-2xs text-gray-800">
+                    {project.projectName}
+                </h2>
+            </div>
+            <ul className="mt-2 relative">
+                {taskDetails[project._id] && taskDetails[project._id].length > 0 ? (
+                    taskDetails[project._id].map((task) => {
+                        const taskChanges = getTaskChanges(task);
 
-                                        if (taskChanges.length === 0) return null;
+                        if (taskChanges.length === 0) return null;
 
-                                        return (
-                                            <div key={task._id} className="mb-6">
-                                                {/* Task Name */}
-                                                <div className="mb-2">
-                                                    <span className="text-lg md:text-2xl font-semibold">{task.taskName}</span>
-                                                </div>
+                        return (
+                            <div key={task._id} className="mb-6 relative">
+                                {/* Task Name */}
+                                <div className="mb-2">
+                                    <span className="text-lg md:text-2xl font-semibold">{task.taskName}</span>
+                                </div>
 
-                                                {taskChanges.map((change, changeIndex) => (
-                                                    <div key={changeIndex} className="relative pl-10 mb-8">
-                                                        {/* Vertical line */}
-                                                        <div className="absolute top-0 left-4 h-full w-px bg-indigo-800"></div>
-                                                        
-                                                        {/* Timeline bullet */}
-                                                        <div className="absolute top-2 left-3 w-3 h-3 rounded-full bg-indigo-800"></div>
-
-                                                        {/* Task changes */}
-                                                        <div className="ml-6">
-                                                        <div className="flex items-center">
-                                                            <img
-                                                            src={(change.modifiedBy?.profilePicture?.url || change.modifiedBy?.profilePicture ) || defaultProfilePictureUrl} // Use optional chaining here
-                                                            alt="Profile"
-                                                            className="w-8 h-8 rounded-full"
-                                                            />
-                                                            <div className="ml-3">
-                                                            <div className="text-sm md:text-base text-gray-700">
-                                                                <span className="font-medium mr-1">{change.modifiedBy?.username || 'A user'}</span> {/* Handle undefined user */}
-                                                                <span>{change.type}</span>
-                                                                <span className="text-blue-500 ml-1">
-                                                                {typeof change.newValue === 'object' ? (
-                                                                    <ul>{change.newValue}</ul>
-                                                                ) : (
-                                                                    change.newValue
-                                                                )}
-                                                                </span>
-                                                            </div>
-                                                            <span className="text-xs md:text-sm text-gray-500">
-                                                                {format(new Date(change.modifiedAt), 'MMM yyyy hh:mm a')}
-                                                            </span>
-                                                            </div>
-                                                        </div>
-                                                        </div>
-                                                    </div>
-                                                    ))}
-
-
-
-
-                                            </div>
-                                        );
-                                    })
-                                ) : (
-                                    <p className="text-lg text-gray-500"></p>
+                                {/* Each task has its own vertical line */}
+                                {taskChanges.length > 0 && (
+                                    <div className="absolute top-16 left-[43px] w-[2px] bg-indigo-800" style={{ height: '84%', bottom: '30px' }}></div>
                                 )}
-                            </ul>
-                        </div>
-                    ))
+
+                                {taskChanges.map((change, changeIndex) => (
+                                    <div key={changeIndex} className="relative pl-10 mb-8">
+                                        {/* Timeline bullet */}
+                                        <div className="absolute top-5 left-10 w-2 h-2 rounded-full bg-indigo-800"></div>
+
+                                        {/* Task changes */}
+                                        <div className="ml-6">
+                                            <div className="flex items-center">
+                                                <img
+                                                    src={(change.modifiedBy?.profilePicture?.url || change.modifiedBy?.profilePicture ) || defaultProfilePictureUrl}
+                                                    alt="Profile"
+                                                    className="w-8 h-8 rounded-full"
+                                                />
+                                                <div className="ml-3">
+                                                    <div className="text-sm md:text-base text-gray-700">
+                                                        <span className="font-medium mr-1">{change.modifiedBy?.username || 'A user'}</span>
+                                                        <span>{change.type}</span>
+                                                        <span className="text-blue-500 ml-1">
+                                                            {typeof change.newValue === 'object' ? (
+                                                                <ul>{change.newValue}</ul>
+                                                            ) : (
+                                                                change.newValue
+                                                            )}
+                                                        </span>
+                                                    </div>
+                                                    <span className="text-xs md:text-sm text-gray-500">
+                                                        {format(new Date(change.modifiedAt), 'MMM yyyy hh:mm a')}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        );
+                    })
                 ) : (
-                    <p className="text-lg text-gray-500">No projects available</p>
+                    <p className="text-lg text-gray-500"></p>
                 )}
+            </ul>
+        </div>
+    ))
+) : (
+    <p className="text-lg text-gray-500">No projects available</p>
+)}
+
             </div>
         </div>
     );

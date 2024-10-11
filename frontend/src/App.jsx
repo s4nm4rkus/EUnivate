@@ -55,11 +55,17 @@ import Settings from './view/pages/SuperAdmin/Settings';
 import ProjectDetails from './view/pages/SuperAdmin/ProjectDetails'; 
 
 //Member
-
 import Member from "./view/pages/Members/Member.jsx"; 
 import ProjMem from "./view/pages/Members/ProjectMem.jsx"; 
 import TaskMem from "./view/pages/Members/TaskMem.jsx"; 
 import ProjectDetailsMem from "./view/pages/Members/ProjectdetailsMem.jsx"; 
+
+//Guest
+import GuestAuth from './view/hooks/GuestAuth.jsx'; 
+import Guest_Sidebar from './view/pages/Guest/Guest_Sidebar.jsx';
+import Project_G from './view/pages/Guest/Features/Project_G.jsx'; 
+import Task_G from './view/pages/Guest/Features/Task_G.jsx'; 
+import Activity_G from './view/pages/Guest/Features/Activity_G.jsx'; 
 
 /* Global CSS */
 import './index.css';
@@ -127,6 +133,26 @@ const App = () => {
   <Route path="messages" element={<Messages />} />
   <Route path="settings" element={<Settings />} />
 </Route>
+
+ {/* Guest Account Routes */}
+ <Route
+  path="/guest-dashboard/*"
+  element={
+  <GuestAuth>
+  <Guest_Sidebar />
+  </GuestAuth>
+  }
+ >
+      
+          <Route path="project-guest" element={<Project_G />} /> {/* Create this component */}
+          <Route path="task-guest" element={<Task_G />} /> {/* Create this component */}
+          <Route path="activity-guest" element={<Activity_G />} /> {/* Create this component */}
+
+          <Route path="messages-guest" element={<Messages />} /> {/* Create this component */}
+          <Route path="settings-guest" element={<Settings />} /> {/* Create this component */}
+      
+          
+        </Route>
 
         {/*
               <Route path="/admin-container" element={<AdminContainer />} />

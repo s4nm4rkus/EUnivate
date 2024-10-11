@@ -126,24 +126,32 @@
         export const flagMessage = async (req, res) => {
             const { messageId } = req.params;
             const { priorityFlag } = req.body;
-
+          
             try {
-                const message = await Message.findById(messageId);
-
-                if (!message) {
-                    return res.status(404).json({ message: 'Message not found' });
-                }
-
-                message.priorityFlag = priorityFlag;
-
-                await message.save();
-                io.emit('flagged-message', { messageId, priorityFlag }); // Broadcast the flagged message
-                res.status(201).json(message);
+              const message = await Message.findById(messageId);
+          
+              if (!message) {
+                return res.status(404).json({ message: 'Message not found' });
+              }
+          
+              // If the same flag is selected, toggle it off
+              if (message.priorityFlag === priorityFlag) {
+                message.priorityFlag = null; // Remove the flag
+              } else {
+                message.priorityFlag = priorityFlag; // Set the new flag
+              }
+          
+              await message.save();
+              
+              // Broadcast the updated flag status to all connected clients
+              io.emit('flagged-message', { messageId, priorityFlag: message.priorityFlag });
+          
+              res.status(201).json(message);
             } catch (error) {
-                res.status(500).json({ message: 'Error flagging message', error });
+              res.status(500).json({ message: 'Error flagging message', error });
             }
-        };
-
+          };
+          
 
         //Get the Message
         export const getAllMessages = async (req, res) => {

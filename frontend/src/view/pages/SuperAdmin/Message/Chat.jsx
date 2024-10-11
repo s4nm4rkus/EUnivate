@@ -1,252 +1,239 @@
-  import React, { useState, useEffect } from 'react';
-  import { FaPaperPlane, FaReply, FaSmile, FaStar, FaFlag } from 'react-icons/fa';
-  import { io } from 'socket.io-client';
-  import axios from 'axios';
-  import ReactQuill from 'react-quill';
-  import 'react-quill/dist/quill.snow.css';
+import React, { useState, useEffect } from 'react';
+import { FaPaperPlane, FaReply, FaSmile, FaStar, FaFlag } from 'react-icons/fa';
+import { io } from 'socket.io-client';
+import axios from 'axios';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
-  const emojis = ['😀', '😂', '😍', '👍', '👏']; 
-  const flagColors = ['red', 'yellow', 'green']; // Define flag colors
-  let socket;
-  const Chat = ({ group }) => {
-    const [message, setMessage] = useState('');
-    const [messages, setMessages] = useState([]);
-    const [replyMessage, setReplyMessage] = useState(null);
-    const [currentUser, setCurrentUser] = useState(null);
-    const [showEmojiPicker, setShowEmojiPicker] = useState(null); 
-    const [selectedEmoji, setSelectedEmoji] = useState({});
-    const [starredMessages, setStarredMessages] = useState({}); 
-    const [showFlagPicker, setShowFlagPicker] = useState(null);
-    const [selectedFlag, setSelectedFlag] = useState({}); 
-    const [file, setFile] = useState(null); 
+const emojis = ['😀', '😂', '😍', '👍', '👏']; 
+const flagColors = ['red', 'yellow', 'green']; // Define flag colors
+let socket;
+const Chat = ({ group }) => {
+  const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState([]);
+  const [replyMessage, setReplyMessage] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(null); 
+  const [selectedEmoji, setSelectedEmoji] = useState({});
+  const [showFlagPicker, setShowFlagPicker] = useState(null);
+  const [selectedFlag, setSelectedFlag] = useState({}); 
+  const [file, setFile] = useState(null); 
 
-    const defaultProfilePictureUrl = 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png';
+  const defaultProfilePictureUrl = 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png';
 
-    const groupReactions = (reactions = []) => {
-      let totalReactions = 0;
-      const reactionGroups = reactions.reduce((acc, reaction) => {
-        // Ensure the reaction object exists and is valid
-        if (reaction && reaction.reaction) {
-          if (!acc[reaction.reaction]) {
-            acc[reaction.reaction] = { emoji: reaction.reaction, count: 0 };
-          }
-          acc[reaction.reaction].count += 1;
-          totalReactions += 1;
+  const groupReactions = (reactions = []) => {
+    let totalReactions = 0;
+    const reactionGroups = reactions.reduce((acc, reaction) => {
+      if (reaction && reaction.reaction) {
+        if (!acc[reaction.reaction]) {
+          acc[reaction.reaction] = { emoji: reaction.reaction, count: 0 };
         }
-        return acc;
-      }, {});
-    
-      return { reactionGroups, totalReactions };
-    };
-    
-    useEffect(() => {
-      socket = io("http://localhost:5000");
-      
-      const storedUser = JSON.parse(localStorage.getItem('user'));
-      if (storedUser) {
-        setCurrentUser({
-          ...storedUser,
-          profilePicture: storedUser.profilePicture?.url || defaultProfilePictureUrl,
-        });
+        acc[reaction.reaction].count += 1;
+        totalReactions += 1;
       }
+      return acc;
+    }, {});
 
-      // Fetch messages from the backend on initial load
-      const fetchMessages = async () => {
-        try {
-          const response = await axios.get('http://localhost:5000/api/users/messages');
-          setMessages(response.data);
-        } catch (error) {
-          console.error('Error fetching messages:', error);
-        }
-      };
+    return { reactionGroups, totalReactions };
+  };
 
-      fetchMessages();
+  useEffect(() => {
+    socket = io("http://localhost:5000");
 
-      // Listen for real-time updates from the server
-      socket.on('new-message', (newMessage) => {
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (storedUser) {
+      setCurrentUser({
+        ...storedUser,
+        profilePicture: storedUser.profilePicture?.url || defaultProfilePictureUrl,
       });
+    }
 
-      socket.on('new-reply', (replyData) => {
-        setMessages((prevMessages) => {
-          return prevMessages.map((msg) =>
-            msg._id === replyData.messageId ? { ...msg, replies: [...msg.replies, replyData.reply] } : msg
-          );
-        });
-      });
-      
-      
-      socket.on('new-reaction', (reactionData) => {
-        setMessages((prevMessages) =>
-          prevMessages.map((msg) =>
-            msg._id === reactionData.messageId
-              ? {
-                  ...msg,
-                  reactions: msg.reactions.some((r) => r.user._id === reactionData.reaction.user._id)
-                    ? msg.reactions.map((r) =>
-                        r.user._id === reactionData.reaction.user._id ? reactionData.reaction : r
-                      )
-                    : [...msg.reactions, reactionData.reaction],
-                }
-              : msg
-          )
+    const fetchMessages = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/users/messages');
+        setMessages(response.data);
+      } catch (error) {
+        console.error('Error fetching messages:', error);
+      }
+    };
+
+    fetchMessages();
+
+    socket.on('new-message', (newMessage) => {
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    });
+
+    socket.on('new-reply', (replyData) => {
+      setMessages((prevMessages) => {
+        return prevMessages.map((msg) =>
+          msg._id === replyData.messageId ? { ...msg, replies: [...msg.replies, replyData.reply] } : msg
         );
       });
-      
-      
-      socket.on('flagged-message', (flagData) => {
-        setMessages((prevMessages) => {
-          return prevMessages.map((msg) =>
-            msg._id === flagData.messageId ? { ...msg, priorityFlag: flagData.priorityFlag } : msg
-          );
-        });
-      });
+    });
 
-      socket.on('starred-message', (starData) => {
-        setMessages((prevMessages) => {
-          return prevMessages.map((msg) =>
-            msg._id === starData.messageId
-              ? {
-                  ...msg,
-                  starredBy: starData.hasStarred
-                    ? [...msg.starredBy, starData.userId]
-                    : msg.starredBy.filter((id) => id !== starData.userId),
-                }
-              : msg
-          );
-        });
-      });
+    socket.on('new-reaction', (reactionData) => {
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg._id === reactionData.messageId
+            ? {
+                ...msg,
+                reactions: msg.reactions.some((r) => r.user._id === reactionData.reaction.user._id)
+                  ? msg.reactions.map((r) =>
+                      r.user._id === reactionData.reaction.user._id ? reactionData.reaction : r
+                    )
+                  : [...msg.reactions, reactionData.reaction],
+              }
+            : msg
+        )
+      );
+    });
 
-      return () => {
-        socket.disconnect(); // Clean up socket connection
+    socket.on('flagged-message', (flagData) => {
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg._id === flagData.messageId ? { ...msg, priorityFlag: flagData.priorityFlag } : msg
+        )
+      );
+    });
+
+    socket.on('starred-message', (starData) => {
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg._id === starData.messageId
+            ? {
+                ...msg,
+                starredBy: starData.hasStarred
+                  ? [...msg.starredBy, starData.userId]
+                  : msg.starredBy.filter((id) => id !== starData.userId),
+              }
+            : msg
+        )
+      );
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  const handleSendMessage = async () => {
+    if (message.trim() && currentUser) {
+      let fileData = {};
+      if (file) {
+        fileData = await uploadImageToCloudinary(file);  
+      }
+
+      const newMessage = {
+        sender: currentUser._id,
+        content: message,
+        files: fileData.url ? [fileData] : [],  
+        replyTo: replyMessage ? replyMessage._id : null,
       };
-    }, []);
 
-    const handleSendMessage = async () => {
-      if (message.trim() && currentUser) {
-        let fileData = {};
-        if (file) {
-          fileData = await uploadImageToCloudinary(file);  
-        }
-    
-        const newMessage = {
-          sender: currentUser._id,
-          content: message,
-          files: fileData.url ? [fileData] : [],  
-          replyTo: replyMessage ? replyMessage._id : null,
-        };
-    
-        try {
-          const response = await axios.post('http://localhost:5000/api/users/create-message', newMessage);
-          // socket.emit('new-message', response.data);  
-          setMessage('');  
-          setFile(null);  
-          setReplyMessage(null);  
-        } catch (error) {
-          console.error('Error sending message:', error);
-        }
-      }
-    };
-
-    const handleReplyMessage = async () => {
-      if (replyMessage && message.trim() && currentUser) {
-        const newReply = {
-          sender: currentUser._id,
-          content: message,
-        };
-    
-        try {
-          const response = await axios.post(`http://localhost:5000/api/users/${replyMessage?._id}/reply`, newReply);
-
-    
-        
-          setMessage('');
-          setReplyMessage(null);
-        } catch (error) {
-          console.error('Error replying to message:', error);
-        }
-      }
-    };
-    
-
-    
-    const uploadImageToCloudinary = async (file) => {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', 'EunivateImage'); 
-      formData.append('cloud_name', 'dzxzc7kwb');
-    
       try {
-        const response = await axios.post('https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload', formData);
-        return { publicId: response.data.public_id, url: response.data.secure_url };
+        const response = await axios.post('http://localhost:5000/api/users/create-message', newMessage);
+        setMessage('');
+        setFile(null);
+        setReplyMessage(null);
       } catch (error) {
-        console.error('Error uploading image:', error);
-        return { publicId: '', url: '' };
+        console.error('Error sending message:', error);
       }
-    };
-    
-    const handleEmojiSelect = async (emoji, index) => {
-      const messageId = messages[index]._id;
-      const userId = currentUser._id;
-    
-      // Update the selected emoji in the local state
-      setSelectedEmoji((prev) => ({
-        ...prev,
-        [index]: emoji,
-      }));
-    
-      // Hide the emoji picker after selecting
-      setShowEmojiPicker(null);
-    
-      // Emit the new reaction immediately to all clients for real-time update
-      socket.emit('new-reaction', {
-        messageId,
-        reaction: { user: { _id: userId }, reaction: emoji },
+    }
+  };
+
+  const handleReplyMessage = async () => {
+    if (replyMessage && message.trim() && currentUser) {
+      const newReply = {
+        sender: currentUser._id,
+        content: message,
+      };
+
+      try {
+        await axios.post(`http://localhost:5000/api/users/${replyMessage?._id}/reply`, newReply);
+        setMessage('');
+        setReplyMessage(null);
+      } catch (error) {
+        console.error('Error replying to message:', error);
+      }
+    }
+  };
+
+  const uploadImageToCloudinary = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'EunivateImage'); 
+    formData.append('cloud_name', 'dzxzc7kwb');
+
+    try {
+      const response = await axios.post('https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload', formData);
+      return { publicId: response.data.public_id, url: response.data.secure_url };
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      return { publicId: '', url: '' };
+    }
+  };
+
+  const handleEmojiSelect = async (emoji, index) => {
+    const messageId = messages[index]._id;
+    const userId = currentUser._id;
+
+    setSelectedEmoji((prev) => ({
+      ...prev,
+      [index]: emoji,
+    }));
+
+    setShowEmojiPicker(null);
+
+    socket.emit('new-reaction', {
+      messageId,
+      reaction: { user: { _id: userId }, reaction: emoji },
+    });
+
+    try {
+      await axios.post(`http://localhost:5000/api/users/${messageId}/react`, {
+        user: userId,
+        reaction: emoji,
       });
-    
-      // Also send the reaction to the backend to persist it in the database
-      try {
-        await axios.post(`http://localhost:5000/api/users/${messageId}/react`, {
-          user: userId,
-          reaction: emoji,
-        });
-      } catch (error) {
-        console.error('Error reacting to message:', error.response ? error.response.data : error.message);
-      }
-    };
-    
+    } catch (error) {
+      console.error('Error reacting to message:', error.response ? error.response.data : error.message);
+    }
+  };
 
-    const toggleStar = async (index) => {
-      const messageId = messages[index]._id;
-      const userId = currentUser._id;
+  const toggleStar = async (index) => {
+    const messageId = messages[index]._id;
+    const userId = currentUser._id;
 
-      try {
-   
-        socket.emit('starred-message', { messageId, userId });
+    socket.emit('starred-message', { messageId, userId });
 
-        // Send the request to the backend to persist the star in the database
-        await axios.post(`http://localhost:5000/api/users/${messageId}/star`, { userId });
+    try {
+      await axios.post(`http://localhost:5000/api/users/${messageId}/star`, { userId });
+    } catch (error) {
+      console.error('Error starring message:', error.response ? error.response.data : error.message);
+    }
+  };
 
-      } catch (error) {
-        console.error('Error starring message:', error.response ? error.response.data : error.message);
-      }
-    };
+  const handleFlagSelect = async (color, index) => {
+    setSelectedFlag((prev) => ({
+      ...prev,
+      [index]: color,
+    }));
+    setShowFlagPicker(null);
 
-    const handleFlagSelect = (color, index) => {
-      setSelectedFlag((prev) => ({
-        ...prev,
-        [index]: color,
-      }));
-      setShowFlagPicker(null);
+    const messageId = messages[index]._id;
 
-      const messageId = messages[index]._id;
-      socket.emit('flagged-message', { messageId, priorityFlag: color });
-    };
+    socket.emit('flagged-message', { messageId, priorityFlag: color });
 
-    
-    
-    return (
-      <div className="flex flex-col h-full w-full p-4">
+    try {
+      await axios.post(`http://localhost:5000/api/users/${messageId}/flag`, {
+        priorityFlag: color,
+      });
+    } catch (error) {
+      console.error('Error flagging message:', error);
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-full w-full p-4">
       {/* Header */}
       <div className="flex items-center justify-start border-b pb-3 mb-4">
         <img
@@ -273,17 +260,15 @@
               className="w-10 h-10 rounded-full mr-3"
             />
             
-             <div
-              className={`p-3 rounded-lg w-full max-w-4xl relative ${
-                msg.starredBy.includes(currentUser._id) ? 'bg-yellow-100' : 'bg-gray-100'
-              }`}
+            <div
+              className={`p-3 rounded-lg w-full max-w-4xl relative ${msg.starredBy.includes(currentUser._id) ? 'bg-yellow-100' : 'bg-gray-100'}`}
             >
               <div className="flex mb-1 items-center">
                 <p className="text-sm font-semibold">{msg.sender?.firstName} {msg.sender?.lastName}</p>
                 <p className="text-xs text-gray-500 mr-auto ml-2 flex items-center">
                   {msg.time}
-                  {selectedFlag[index] && (
-                    <FaFlag className={`ml-2 text-${selectedFlag[index]}-500 text-xs`} />
+                  {msg.priorityFlag && (
+                    <FaFlag className={`ml-2 text-${msg.priorityFlag}-500 text-xs`} />
                   )}
                 </p>
               </div>
@@ -293,7 +278,7 @@
                 </div>
               )}
               <div className="text-sm break-words" dangerouslySetInnerHTML={{ __html: msg.content }} />
-    
+
               {/* Display the replies */}
               {msg.replies && msg.replies.length > 0 && (
                 <div className="mt-4">
@@ -326,13 +311,11 @@
                       <span>{emoji}</span>
                     </span>
                   ))}
-                  {/* Display the total count of reactions */}
                   <span className="ml-1 text-sm">
                     {groupReactions(msg.reactions).totalReactions}
                   </span>
                 </div>
               )}
-
 
               {/* Icons */}
               <div className="absolute top-0 right-0 flex items-center space-x-3 bg-gray-50 p-2 rounded-lg mt-5 mr-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-300">
@@ -363,7 +346,7 @@
                   )}
                 </div>
               </div>
-    
+
               {showEmojiPicker === index && (
                 <div className="absolute bottom-2 right-0 bg-white shadow-lg rounded-lg p-2 flex space-x-2">
                   {emojis.map((emoji) => (
@@ -377,7 +360,7 @@
           </div>
         ))}
       </div>
-    
+
       {/* Reply Preview */}
       {replyMessage && (
         <div className="bg-gray-200 p-2 mb-2 rounded-md text-xs text-gray-700">
@@ -387,7 +370,7 @@
           </button>
         </div>
       )}
-    
+
       {/* Message Input */}
       <div className="border-t pt-3 relative flex items-center">
         <ReactQuill
@@ -402,6 +385,6 @@
         </button>
       </div>
     </div>
-    );
-  };  
-  export default Chat;
+  );
+};  
+export default Chat;

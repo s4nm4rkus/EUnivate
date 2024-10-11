@@ -158,7 +158,7 @@ const GanttChart_mem = () => {
                           {task.assignee && task.assignee.map((member, idx) => (
                             <img
                               key={idx}
-                              src={member.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'} 
+                              src={member.profilePicture?.url || member.profilePicture || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'} 
                               alt={member.name}
                               className="w-6 h-6 rounded-full border-2 border-white"
                               title={member.name}

@@ -145,7 +145,7 @@ const ProjectMem = () => {
                     project.invitedUsers.map(user => (
                       <img
                         key={user._id}
-                        src={user.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'} 
+                        src={user.profilePicture?.url || user.profilePicture || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'} 
                         alt={user.username}
                         className="w-6 h-6 rounded-full object-cover border border-gray-300"
                       />

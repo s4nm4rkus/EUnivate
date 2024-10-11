@@ -70,7 +70,7 @@ const Calendar_mem = () => {
           event.task.assignee.map((member, index) => (
             <img
               key={index}
-              src={member.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'} 
+              src={member.profilePicture?.url || member.profilePicture || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'} 
               alt={member.name}
               className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-md"
               title={member.name}

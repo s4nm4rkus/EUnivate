@@ -70,7 +70,7 @@ const RaciMatrix_mem = () => {
               {task.assignee && task.assignee.length > 0 ? (
                 <>
                   <img
-                    src={task.assignee[0]?.profilePicture?.url || '/path/to/default/avatar.png'}
+                    src={task.assignee[0]?.profilePicture?.url || task.assignee[0]?.profilePicture}
                     alt={task.assignee[0]?.name || 'Profile Picture'}
                     className="w-8 h-8 rounded-full border-2"
                     title={task.assignee[0]?.name}

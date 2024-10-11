@@ -128,7 +128,7 @@
         invitedUsers.slice(0, 5).map((user) => (
           <img
             key={user._id}
-            src={user.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'} // Default image fallback
+            src={user.profilePicture?.url || user.profilePicture || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'} // Default image fallback
             alt={user.username}
             className="w-6 h-6 rounded-full object-cover border border-gray-300"
           />
@@ -257,7 +257,7 @@
                   filteredMembers.map(member => (
                     <li key={member._id} className="flex items-center mb-2 text-sm md:text-base">
                       <img
-                        src={member.profilePicture?.url || 'default_image_url'}
+                        src={member.profilePicture?.url || user.profilePicture ||'default_image_url'}
                         alt={member.username}
                         className="w-8 h-8 rounded-full mr-2"
                       />

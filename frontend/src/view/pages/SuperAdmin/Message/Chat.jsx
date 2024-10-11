@@ -105,7 +105,14 @@
       socket.on('starred-message', (starData) => {
         setMessages((prevMessages) => {
           return prevMessages.map((msg) =>
-            msg._id === starData.messageId ? { ...msg, starredBy: [...msg.starredBy, starData.userId] } : msg
+            msg._id === starData.messageId
+              ? {
+                  ...msg,
+                  starredBy: starData.hasStarred
+                    ? [...msg.starredBy, starData.userId]
+                    : msg.starredBy.filter((id) => id !== starData.userId),
+                }
+              : msg
           );
         });
       });
@@ -209,13 +216,20 @@
     };
     
 
-    const toggleStar = (index) => {
-      setStarredMessages((prev) => ({
-        ...prev,
-        [index]: !prev[index],
-      }));
+    const toggleStar = async (index) => {
       const messageId = messages[index]._id;
-      socket.emit('starred-message', { messageId, userId: currentUser._id });
+      const userId = currentUser._id;
+
+      try {
+   
+        socket.emit('starred-message', { messageId, userId });
+
+        // Send the request to the backend to persist the star in the database
+        await axios.post(`http://localhost:5000/api/users/${messageId}/star`, { userId });
+
+      } catch (error) {
+        console.error('Error starring message:', error.response ? error.response.data : error.message);
+      }
     };
 
     const handleFlagSelect = (color, index) => {
@@ -258,7 +272,12 @@
               alt={msg.sender.firstName}
               className="w-10 h-10 rounded-full mr-3"
             />
-            <div className="bg-gray-100 p-3 rounded-lg w-full max-w-4xl relative">
+            
+             <div
+              className={`p-3 rounded-lg w-full max-w-4xl relative ${
+                msg.starredBy.includes(currentUser._id) ? 'bg-yellow-100' : 'bg-gray-100'
+              }`}
+            >
               <div className="flex mb-1 items-center">
                 <p className="text-sm font-semibold">{msg.sender?.firstName} {msg.sender?.lastName}</p>
                 <p className="text-xs text-gray-500 mr-auto ml-2 flex items-center">
@@ -324,7 +343,7 @@
                   <FaSmile size={15} />
                 </button>
                 <button
-                  className={`hover:text-blue-500 ${starredMessages[index] ? 'text-yellow-500' : 'text-gray-500'}`}
+                  className={`hover:text-blue-500 ${msg.starredBy.includes(currentUser._id) ? 'text-yellow-500' : 'text-gray-500'}`}
                   onClick={() => toggleStar(index)}
                 >
                   <FaStar size={15} />

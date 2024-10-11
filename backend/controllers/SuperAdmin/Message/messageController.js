@@ -92,25 +92,35 @@
         export const starMessage = async (req, res) => {
             const { messageId } = req.params;
             const { userId } = req.body;
-
+        
             try {
                 const message = await Message.findById(messageId);
-
+        
                 if (!message) {
                     return res.status(404).json({ message: 'Message not found' });
                 }
-
-                if (!message.starredBy.includes(userId)) {
+        
+                // Check if the user has already starred the message
+                const hasStarred = message.starredBy.includes(userId);
+                if (hasStarred) {
+                    // If the user has already starred, remove the star
+                    message.starredBy = message.starredBy.filter(id => id.toString() !== userId);
+                } else {
+                    // Otherwise, add the star
                     message.starredBy.push(userId);
                 }
-
+        
                 await message.save();
-                io.emit('starred-message', { messageId, userId }); // Broadcast the starred message
+        
+                // Emit the star event to all clients via WebSocket
+                io.emit('starred-message', { messageId, userId, hasStarred: !hasStarred });
+        
                 res.status(201).json(message);
             } catch (error) {
                 res.status(500).json({ message: 'Error starring message', error });
             }
         };
+        
 
         // Flag a message with priority
         export const flagMessage = async (req, res) => {

@@ -40,22 +40,27 @@ const Activity_Task = ({ projects }) => {
 
     const getTaskChanges = (task) => {
         let changesByUser = {};
-
+    
         task.history.forEach((change) => {
             const parsedChanges = JSON.parse(change.changes);
+    
+            // Safely access modifiedBy.username and provide fallback values
+            const username = change.modifiedBy?.username || 'Unknown User';
+            const profilePicture = change.modifiedBy?.profilePicture?.url || change.modifiedBy?.profilePicture || defaultProfilePictureUrl;
 
+    
             // Group changes by the user who modified the task
-            if (!changesByUser[change.modifiedBy.username]) {
-                changesByUser[change.modifiedBy.username] = {
-                    profilePicture: change.modifiedBy.profilePicture || defaultProfilePictureUrl,
+            if (!changesByUser[username]) {
+                changesByUser[username] = {
+                    profilePicture,
                     changes: []
                 };
             }
-
+    
             Object.keys(parsedChanges).forEach((key) => {
                 let changeType = '';
                 let newValue = parsedChanges[key];
-
+    
                 // Set specific labels for the type of change
                 switch (key) {
                     case 'taskName':
@@ -117,18 +122,18 @@ const Activity_Task = ({ projects }) => {
                         changeType = 'made an update';
                         break;
                 }
-
-                changesByUser[change.modifiedBy.username].changes.push({
+    
+                changesByUser[username].changes.push({
                     type: changeType,
                     newValue,
                     modifiedAt: change.modifiedAt
                 });
             });
         });
-
+    
         return changesByUser;
     };
-
+    
     return (
         <div className="w-full h-full">
             <h2 className="text-medium font-semibold text-gray-800 mb-2">Activity</h2>

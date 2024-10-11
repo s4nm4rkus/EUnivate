@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa'; 
 
-const Toolbar_mem = ({ label, onNavigate, onView, view }) => {
+const Toolbar_G = ({ label, onNavigate, onView, view }) => {
     const [activeView, setActiveView] = useState(view); // Track the currently active view
 
     const handleViewChange = (viewName) => {
@@ -52,5 +52,4 @@ const Toolbar_mem = ({ label, onNavigate, onView, view }) => {
         </div>
     );
 };
-
-export default Toolbar_mem;
+export default Toolbar_G

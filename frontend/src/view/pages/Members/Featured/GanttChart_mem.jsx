@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlag, faPaperclip, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { format, startOfWeek, addDays, addWeeks, subWeeks } from 'date-fns';
 import filterIcon from '../../../../assets/Filter.png';
-import TaskModal from '../Library_mem/Gantt_Modal_mem'; // Adjust the path for TaskModal
+import TaskModal from '../Library_mem/Gantt_Modal_mem'; 
 
 const GanttChart_mem = () => {
   const location = useLocation();

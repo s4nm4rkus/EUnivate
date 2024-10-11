@@ -1,13 +1,13 @@
-  import React, { useState, useEffect, useRef } from 'react';
-  import { useLocation, useNavigate } from 'react-router-dom';
-  import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx';
-  import Kanban from './Featured/Kanban_mem.jsx';
-  import List from './Featured/List_mem.jsx';
-  import Calendar from './Featured/Calendar_mem.jsx';
-  import GanttChart from './Featured/GanttChart_mem.jsx';
-  import RaciMatrix from './Featured/RaciMatrix_mem.jsx';
+import React, { useState, useEffect, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import AdminNavbar from '../../../components/SuperAdmin/AdminNavbar.jsx';
+import KanbanModal_G from '../Modal.jsx/KanbanModal_G.jsx';
+import List_G from '../Featured/List_G.jsx';
+import Calendar from '../Featured/Calendar_G.jsx';
+import GanttChart_G from '../Featured/GanttChart_G.jsx';
+import RaciMatrix_G from '../Featured/RaciMatrix_G.jsx';
 
-  const ProjectDetailsMem = () => {
+const ProJectDetails_G = () => {
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
     const [selectedView, setSelectedView] = useState('Kanban');
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -208,11 +208,11 @@
         </div>
 
         <div className="mt-6 border-gray-200">
-          {selectedView === 'Kanban' && <Kanban tasks={tasks} />}
-          {selectedView === 'List' && <List tasks={tasks} />}
+          {selectedView === 'Kanban' && <KanbanModal_G tasks={tasks} />}
+          {selectedView === 'List' && <List_G tasks={tasks} />}
           {selectedView === 'Calendar' && <Calendar tasks={tasks} />}
-          {selectedView === 'GanttChart' && <GanttChart />}
-          {selectedView === 'RaciMatrix' && <RaciMatrix />}
+          {selectedView === 'GanttChart' && <GanttChart_G />}
+          {selectedView === 'RaciMatrix' && <RaciMatrix_G />}
         </div>
 
         {isUserModalOpen && (
@@ -279,4 +279,4 @@
     );
   };
 
-  export default ProjectDetailsMem;
+export default ProJectDetails_G

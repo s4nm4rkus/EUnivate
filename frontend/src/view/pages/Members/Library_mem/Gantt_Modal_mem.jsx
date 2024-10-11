@@ -2,8 +2,8 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { format } from 'date-fns';
-import progressGif from '../../../../assets/gif/process.gif'; // Import the default gif
-import doneImage from '../../../../assets/gif/checklist.gif'; // Import the 'done' image
+import progressGif from '../../../../assets/gif/process.gif'; 
+import doneImage from '../../../../assets/gif/checklist.gif'; 
 
 const TaskModal = ({ task, onClose }) => {
   // Determine which image to show based on the task status

@@ -109,6 +109,7 @@ const SideNav = ({ isNavOpen }) => {
     
         // Update the selected workspace in the database
         await updateSelectedWorkspace(workspace._id, workspace.workspaceTitle);
+        window.location.reload();
     };
 
     

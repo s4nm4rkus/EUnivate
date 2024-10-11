@@ -237,17 +237,6 @@ const Project = () => {
         </button>
       </div>
 
-      <div>
-          <h1>Project Page</h1>
-          {loading ? (
-              <p>Loading...</p> // Show loading state
-          ) : selectedWorkspace ? (
-              <p>Selected Workspace: {selectedWorkspace.selectedWorkspaceTitle}</p>
-          ) : (
-              <p>No workspace selected</p>
-          )}
-      </div>
-
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-gray-800 bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-md shadow-lg relative max-w-md mx-auto w-full z-60">
@@ -301,6 +290,23 @@ const Project = () => {
                 <option value="team3">Team 3</option>
               </select>
             </div>
+
+            <input
+              type="hidden"
+              name="workspaceId"
+              value={selectedWorkspace ? selectedWorkspace.workspaceId : ''}
+            />      
+
+            {/* <div>
+              <h1>Project Page</h1>
+              {loading ? (
+                  <p>Loading...</p> // Show loading state
+              ) : selectedWorkspace ? (
+                  <p>Selected Workspace: {selectedWorkspace.selectedWorkspaceTitle}</p>
+              ) : (
+                  <p>No workspace selected</p>
+              )}
+            </div> */}
 
             <div className="mt-6 flex flex-col justify-center">
               <button

@@ -86,7 +86,7 @@ const ProjectMem = () => {
         state: {
           projectId: project._id,
           projectName: project.projectName,
-          tasks,  // Make sure tasks include priority field
+          tasks,  
           thumbnail: project.thumbnail,
           invitedUsers: project.invitedUsers, 
         },

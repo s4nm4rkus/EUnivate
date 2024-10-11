@@ -208,7 +208,6 @@
       }
     };
     
-    
 
     const toggleStar = (index) => {
       setStarredMessages((prev) => ({

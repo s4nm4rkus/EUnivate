@@ -78,9 +78,8 @@
           
               await message.save();
           
-              const populatedMessage = await message.populate('reactions.user')
-          
-         
+    
+        
               res.status(201).json(message);
             } catch (error) {
               console.error('Error reacting to message:', error);

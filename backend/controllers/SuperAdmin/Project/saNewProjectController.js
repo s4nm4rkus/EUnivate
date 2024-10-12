@@ -5,20 +5,17 @@ import User from '../../../models/Client/userModels.js';
 
 export const createSaNewProject = async (req, res) => {
     try {
-        // Destructure the request body
         const { projectName, thumbnail, invitedUsers, workspaceId } = req.body;
 
-        // Ensure all required fields are present
         if (!projectName || !thumbnail || !workspaceId || !req.user) {
             return res.status(400).json({ error: 'Missing required fields' });
         }
 
-        // Create a new project
         const newSaNewProject = new SaNewProject({
             projectName,
             thumbnail,
-            workspaceId,  // Make sure workspaceId is passed from the request
-            owner: req.user._id,  // req.user should be populated by authentication middleware
+            workspaceId,  
+            owner: req.user._id,  
             invitedUsers
         });
 
@@ -26,10 +23,9 @@ export const createSaNewProject = async (req, res) => {
         const savedSaNewProject = await newSaNewProject.save();
         return res.status(201).json(savedSaNewProject);
     } catch (error) {
-        // Log detailed error for debugging
+        
         console.error("Error in createSaNewProject:", error);
 
-        // Return a 500 error response
         return res.status(500).json({
             error: error.message || 'An error occurred while creating the SaNewProject'
         });
@@ -37,10 +33,9 @@ export const createSaNewProject = async (req, res) => {
 };
 
 
-//Get all Project
 export const getAllProjects = async (req, res) => {
     try {
-        // Fetch the user along with their projects
+        
         const user = await User.findById(req.user._id).populate({
             path: 'projects',
             populate: {
@@ -53,14 +48,11 @@ export const getAllProjects = async (req, res) => {
         return res.status(404).json({ message: 'User not found' });
       }
   
-  // Fetch projects where the current user is the owner
-  const ownedProjects = await SaNewProject.find({ owner: req.user._id }).populate('invitedUsers', 'username profilePicture');
+        const ownedProjects = await SaNewProject.find({ owner: req.user._id }).populate('invitedUsers', 'username profilePicture');
+        const invitedProjects = await SaNewProject.find({ invitedUsers: req.user._id }).populate('invitedUsers', 'username profilePicture');
+        
 
-  // Fetch projects where the current user is invited
-  const invitedProjects = await SaNewProject.find({ invitedUsers: req.user._id }).populate('invitedUsers', 'username profilePicture');
-  
-      // Combine owned projects with invited projects and user's projects
-      const allProjects = [...ownedProjects, ...invitedProjects, ...user.projects];
+        const allProjects = [...ownedProjects, ...invitedProjects, ...user.projects];
   
       if (allProjects.length === 0) {
         return res.status(404).json({ message: 'No projects found' });

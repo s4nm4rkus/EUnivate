@@ -136,7 +136,6 @@ const Project = () => {
       setError('No workspace selected. Please select a workspace to create a project.');
       return;
     }
-  
 
     const workspaceId = selectedWorkspace._id;
     const user = JSON.parse(localStorage.getItem('user'));
@@ -298,23 +297,20 @@ const Project = () => {
             />      
 
             <div className="mt-6 flex flex-col justify-center">
-              <button
-                onClick={handleCreateProject}
-                className="bg-red-800 text-white px-8 py-3 rounded-md shadow hover:bg-red-900 w-full mb-2 flex items-center justify-center"
-                disabled={loading}
-              >
-                {loading ? <ButtonSpinner /> : 'Create Project'}
-              </button>
-              <button
-                onClick={closeModal}
-                className="bg-gray-500 text-white px-8 py-3 rounded-md shadow hover:bg-gray-600 w-full flex items-center justify-center"
-              >
-                Close
-              </button>
+                <button
+                  onClick={handleCreateProject}
+                  className="bg-red-800 text-white px-8 py-3 rounded-md shadow hover:bg-red-900 w-full mb-2 flex items-center justify-center"
+                  disabled={loading}
+                >
+                  {loading ? <ButtonSpinner /> : 'Create Project'}
+                </button>
+                <button
+                  onClick={closeModal}
+                  className="bg-gray-500 text-white px-8 py-3 rounded-md shadow hover:bg-gray-600 w-full flex items-center justify-center"
+                >
+                  Close
+                </button>
             </div>
-
-            
-
           </div>
         </div>
       )}
@@ -343,15 +339,15 @@ const Project = () => {
                 {taskCounts[project._id] ? taskCounts[project._id].doneTasks : 'Loading...'}
               </p>
               <div className="flex items-center justify-end ml-9 -space-x-4">
-                {project.invitedUsers && project.invitedUsers.slice(0, 3).map(user => (
-                  <img
-                    key={user._id}
-                    src={user.profilePicture?.url || user.profilePicture} // Ensure it falls back to a default if no picture
-                    alt={user.username || 'Profile Picture'}
-                    className="w-8 h-8 rounded-full object-cover -ml-2 border-2 border-white"
-                  />
-                ))}
-                </div>
+                  {project.invitedUsers && project.invitedUsers.slice(0, 3).map(user => (
+                    <img
+                      key={user._id}
+                      src={user.profilePicture?.url || user.profilePicture} // Ensure it falls back to a default if no picture
+                      alt={user.username || 'Profile Picture'}
+                      className="w-8 h-8 rounded-full object-cover -ml-2 border-2 border-white"
+                    />
+                  ))}
+              </div>
             </div>
 
             {/* Progress Bar */}

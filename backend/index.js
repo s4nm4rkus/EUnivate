@@ -2,7 +2,6 @@ import express from 'express';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
-import chatMessageRoutes from './routes/chatMessageRoutes.js'; 
 import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
@@ -15,7 +14,9 @@ connectDB();
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 const server = createServer(app);
 const io = new Server(server, {
@@ -38,8 +39,32 @@ io.on('connection', (socket) => {
     }
   });
   
-  
+   // Handle message-related socket events
+   socket.on('new-message', (message) => {
+    io.emit('new-message', message);
+  });
 
+  socket.on('new-reply', (reply) => {
+    io.emit('new-reply', reply);
+  });
+
+  socket.on('new-reaction', (reaction) => {
+    io.emit('new-reaction', reaction);
+  });
+
+  socket.on('starred-message', (message) => {
+    io.emit('starred-message', message);
+  });
+
+  socket.on('flagged-message', (message) => {
+    io.emit('flagged-message', message);
+  });
+
+  socket.on('deleted-message', (messageId) => {
+    io.emit('deleted-message', messageId);
+  });
+
+  
   socket.on('disconnect', () => {
     console.log('Client disconnected');
   });
@@ -85,6 +110,8 @@ app.use((err, req, res, next) => {
     error: process.env.NODE_ENV === 'production' ? {} : err.message,
   });
 });
+
+
 
 app.get('/', (req, res) => {
   res.send('Welcome to the API');

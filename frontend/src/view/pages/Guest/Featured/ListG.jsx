@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaFlag } from 'react-icons/fa';
 
-const List_mem = ({ tasks }) => {
+const ListG = ({ tasks }) => {
     const getPriorityColor = (priority) => {
         switch (priority.toLowerCase()) {
             case 'easy':
@@ -98,4 +98,4 @@ const List_mem = ({ tasks }) => {
     );
 };
 
-export default List_mem;
+export default ListG;

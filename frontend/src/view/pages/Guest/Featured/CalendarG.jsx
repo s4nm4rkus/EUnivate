@@ -4,8 +4,8 @@ import { format, parse, startOfWeek, getDay } from 'date-fns';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import enUS from 'date-fns/locale/en-US';
 import { useLocation } from 'react-router-dom';
-import CustomToolbar from '../Library_mem/Toolbar_mem'; // Your custom toolbar component
-import CustomDayHeader from '../Library_mem/DayHeader_mem'; // Your custom day header component
+import CustomToolbar from '../Library_mem/ToolbarG'; // Your custom toolbar component
+import CustomDayHeader from '../Library_mem/DayHeaderG'; // Your custom day header component
 
 const locales = {
   'en-US': enUS,
@@ -19,7 +19,7 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-const Calendar_mem = () => {
+const CalendarG = () => {
   const location = useLocation();
   const { tasks: initialTasks, projectId, projectName } = location.state; // Use state from previous route
 
@@ -131,4 +131,4 @@ const Calendar_mem = () => {
   );
 };
 
-export default Calendar_mem;
+export default CalendarG;

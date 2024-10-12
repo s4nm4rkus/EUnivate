@@ -1,13 +1,13 @@
   import React, { useState, useEffect, useRef } from 'react';
   import { useLocation, useNavigate } from 'react-router-dom';
   import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx';
-  import Kanban from './Featured/Kanban_mem.jsx';
-  import List from './Featured/List_mem.jsx';
-  import Calendar from './Featured/Calendar_mem.jsx';
-  import GanttChart from './Featured/GanttChart_mem.jsx';
-  import RaciMatrix from './Featured/RaciMatrix_mem.jsx';
+  import KanbanG from './Featured/KanbanG.jsx';
+  import ListG from './Featured/ListG.jsx';
+  import CalendarG from './Featured/CalendarG.jsx';
+  import GanttChartG from './Featured/GanttChartG.jsx';
+  import RaciMatrixG from './Featured/RaciMatrixG.jsx';
 
-  const ProjectDetailsMem = () => {
+  const ProjectDetailsG = () => {
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
     const [selectedView, setSelectedView] = useState('Kanban');
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -208,11 +208,11 @@
         </div>
 
         <div className="mt-6 border-gray-200">
-          {selectedView === 'Kanban' && <Kanban tasks={tasks} />}
-          {selectedView === 'List' && <List tasks={tasks} />}
-          {selectedView === 'Calendar' && <Calendar tasks={tasks} />}
-          {selectedView === 'GanttChart' && <GanttChart />}
-          {selectedView === 'RaciMatrix' && <RaciMatrix />}
+          {selectedView === 'Kanban' && <KanbanG tasks={tasks} />}
+          {selectedView === 'List' && <ListG tasks={tasks} />}
+          {selectedView === 'Calendar' && <CalendarG tasks={tasks} />}
+          {selectedView === 'GanttChart' && <GanttChartG />}
+          {selectedView === 'RaciMatrix' && <RaciMatrixG />}
         </div>
 
         {isUserModalOpen && (
@@ -279,4 +279,4 @@
     );
   };
 
-  export default ProjectDetailsMem;
+  export default ProjectDetailsG;

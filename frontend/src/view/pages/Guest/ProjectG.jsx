@@ -4,7 +4,7 @@ import axios from 'axios';
 import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx';
 import { useNavigate } from 'react-router-dom';
 
-const ProjectMem = () => {
+const ProjectG = () => {
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
   const [projects, setProjects] = useState([]);
   const [error, setError] = useState('');
@@ -82,7 +82,7 @@ const ProjectMem = () => {
       setSelectedProject(project._id); // Keep track of selected project
       
       // Navigate to ProjectDetailsMem, passing project details and tasks
-      navigate(`/member/projects/${project._id}`, {
+      navigate(`/guest-dashboard/projects/${project._id}`, {
         state: {
           projectId: project._id,
           projectName: project.projectName,
@@ -189,4 +189,4 @@ const ProjectMem = () => {
   );
 };
 
-export default ProjectMem;
+export default ProjectG;

@@ -1,34 +1,65 @@
 import mongoose from 'mongoose';
 
-const chatMessageSchema = new mongoose.Schema({
-  content: {
-    type: String,
-    required: false,
-  },
-  sender: {
-    name: { type: String, required: true },
-    avatar: { type: String }, // optional avatar URL for sender
-  },
-  file: {
-    name: { type: String, default: '' }, // file name
-    type: { type: String, default: '' }, // file type
-    url: { type: String, default: '' },  // file URL
-  },
-  time: {
-    type: String,
-    required: true,
-  },
-  edited: {
-    type: Boolean,
-    default: false,
-  },
-  replyTo: {  // Reference to another message
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'ChatMessage',
-    default: null,
-  }
+const messageSchema = new mongoose.Schema({
+    sender: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    content: {
+        type: String,
+        required: true,
+    },
+    replies: [
+        {
+            sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+            content: { type: String, required: true },
+            createdAt: { type: Date, default: Date.now },
+        }
+    ],
+    reactions: [
+        {
+            user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+            reaction: {
+                type: String,
+                enum: ['😀', '👏', '👍', '😍', '😂'],
+            },
+            reactedAt: { type: Date, default: Date.now },
+        }
+    ],
+    starredBy: [
+        { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+    ],
+    priorityFlag: {
+        type: String,
+        enum: ['red', 'green', 'yellow', null],
+        default: null
+    },
+    files: [
+        {
+            publicId: { type: String },
+            url: { type: String },
+            uploadedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+            uploadedAt: { type: Date, default: Date.now }
+        }
+    ],
+    createdAt: {
+        type: Date,
+        default: Date.now,
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now,
+    },
+    removed: {
+        type: Boolean,
+        default: false
+    }
+}, 
+{
+    timestamps: true,
 });
 
-const ChatMessage = mongoose.model('ChatMessage', chatMessageSchema);
+const Message = mongoose.model('Message', messageSchema);
 
-export default ChatMessage;
+export default Message;

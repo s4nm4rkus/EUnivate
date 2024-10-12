@@ -4,9 +4,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlag, faPaperclip, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { format, startOfWeek, addDays, addWeeks, subWeeks } from 'date-fns';
 import filterIcon from '../../../../assets/Filter.png';
-import TaskModal from '../Library_mem/Gantt_Modal_mem'; 
+import Gantt_ModalG from '../Library_mem/Gantt_ModalG'; 
 
-const GanttChart_mem = () => {
+const GanttChartG = () => {
   const location = useLocation();
   const { tasks: initialTasks, projectId, projectName } = location.state;
 
@@ -201,10 +201,10 @@ const GanttChart_mem = () => {
 
       {/* TaskModal component */}
       {selectedTask && (
-        <TaskModal task={selectedTask} onClose={() => setSelectedTask(null)} />
+        <Gantt_ModalG task={selectedTask} onClose={() => setSelectedTask(null)} />
       )}
     </div>
   );
 };
 
-export default GanttChart_mem;
+export default GanttChartG;

@@ -63,12 +63,11 @@ import TaskMem from "./view/pages/Members/TaskMem.jsx";
 import ProjectDetailsMem from "./view/pages/Members/ProjectdetailsMem.jsx"; 
 
 //Guest
-import GuestAuth from './view/hooks/GuestAuth.jsx'; 
-import Guest_Sidebar from './view/pages/Guest/Guest_Sidebar.jsx';
-import Project_G from './view/pages/Guest/Features/Project_G.jsx'; 
-import Task_G from './view/pages/Guest/Features/Task_G.jsx'; 
-import Activity_G from './view/pages/Guest/Features/Activity_G.jsx'; 
-
+import Guest from './view/pages/Guest/Guest.jsx';
+import ProjectG from './view/pages/Guest/ProjectG.jsx';
+import TaskG from './view/pages/Guest/TaskG.jsx';
+import ProjectdetailsG from './view/pages/Guest/ProjectdetailsG.jsx';
+import GuestAuth from './view/hooks/GuestAuth.jsx';
 /* Global CSS */
 import './index.css';
 import './admin.css';
@@ -103,63 +102,55 @@ const App = () => {
         <Route path="/quotation-complete" element = { <CompleteQuotation />}/>
         <Route path="/email/quotation/verification-sent" element = { <VerifyEmailQuotationSent />}/>
         <Route path="/quotation-complete" component={CompleteQuotation} />
+        <Route path="/verify-2fa-pending" element={<Verify2FAPending />} />
 
-                <Route path="/verify-2fa-pending" element={<Verify2FAPending />} />
-        {/* <Route path="/verify-2fa-pending" element={<PrivateOTP><Verify2FAPending /></PrivateOTP>} /> */}
 
         {/* Admin Routes */}
-      <Route path="/admin" element={<AdminAuth><AdminDashboard /></AdminAuth>} />
-      <Route path="/admin-addproducts" element={<AdminAuth><AdminAddProduct /></AdminAuth>} />
-      <Route path="/products" element={<AdminAuth><Product /></AdminAuth>} />
-      <Route path="/admin-addprojects" element={<AdminAuth><AdminAddProject /></AdminAuth>} />
-      <Route path="/projects" element={<AdminAuth><Projects /></AdminAuth>} />
-      <Route path="/admin-addevents" element={<AdminAuth><AdminAddEvents /></AdminAuth>} />
-      <Route path="/events-admin" element={<AdminAuth><EventsAdmin /></AdminAuth>} />
+        <Route path="/admin" element={<AdminAuth><AdminDashboard /></AdminAuth>} />
+        <Route path="/admin-addproducts" element={<AdminAuth><AdminAddProduct /></AdminAuth>} />
+        <Route path="/products" element={<AdminAuth><Product /></AdminAuth>} />
+        <Route path="/admin-addprojects" element={<AdminAuth><AdminAddProject /></AdminAuth>} />
+        <Route path="/projects" element={<AdminAuth><Projects /></AdminAuth>} />
+        <Route path="/admin-addevents" element={<AdminAuth><AdminAddEvents /></AdminAuth>} />
+        <Route path="/events-admin" element={<AdminAuth><EventsAdmin /></AdminAuth>} />
         
 
-{/* Members */}
-<Route
-  path="/member/*"
-  element={
-    <MemberAuth>
-      <Member />
-    </MemberAuth>
-  }
->
-  {/* Default route for "/member" */}
-  <Route index element={<ProjMem />} />
-  <Route path="projects/:id" element={<ProjectDetailsMem />} />
+          {/* Members */}
+          <Route
+            path="/member/*"
+            element={
+              <MemberAuth>
+                <Member />
+              </MemberAuth>
+            }
+          >
+          {/* Default route for "/member" */}
+          <Route index element={<ProjMem />} />
+          <Route path="projects/:id" element={<ProjectDetailsMem />} />
+          <Route path="projectmem" element={<ProjMem />} />
+          <Route path="taskmem" element={<TaskMem />} />
+          <Route path="messages" element={<Messages />} />
+          <Route path="settings" element={<Settings />} />
+        </Route>
 
-  {/* Other routes */}
-  <Route path="projectmem" element={<ProjMem />} />
-  <Route path="taskmem" element={<TaskMem />} />
-  <Route path="messages" element={<Messages />} />
-  <Route path="settings" element={<Settings />} />
-</Route>
-
- {/* Guest Account Routes */}
- <Route
-  path="/guest-dashboard/*"
-  element={
-  <GuestAuth>
-  <Guest_Sidebar />
-  </GuestAuth>
-  }
- >
-      
-          <Route path="project-guest" element={<Project_G />} /> {/* Create this component */}
-          <Route path="task-guest" element={<Task_G />} /> {/* Create this component */}
-          <Route path="activity-guest" element={<Activity_G />} /> {/* Create this component */}
-
-          <Route path="messages-guest" element={<Messages />} /> {/* Create this component */}
-          <Route path="settings-guest" element={<Settings />} /> {/* Create this component */}
+          {/* Guest Account Routes */}
+          <Route
+            path="/guest-dashboard/*"
+            element={
+            <GuestAuth>
+            <Guest />
+            </GuestAuth>
+            }
+          >
+         <Route path="projects/:id" element={<ProjectdetailsG />} />
+          <Route path="projectG" element={<ProjectG />} /> 
+          <Route path="taskG" element={<TaskG />} /> 
+          <Route path="messagesG" element={<Messages />} /> 
+          <Route path="settingsG" element={<Settings />} />
       
           
         </Route>
 
-        {/*
-              <Route path="/admin-container" element={<AdminContainer />} />
-        <Route path="/verify-2fa-pending" element={<PrivateOTP><Verify2FAPending /></PrivateOTP>} /> */}
 
         {/* Super Admin Routes */}
         <Route

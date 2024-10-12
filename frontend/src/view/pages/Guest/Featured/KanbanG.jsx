@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { FaPlus, FaCalendar, FaPaperclip, FaCheckCircle } from 'react-icons/fa';
+import { FaCalendar, FaPaperclip, FaCheckCircle } from 'react-icons/fa';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import Modal from '../Modal/Kanban_modal';
+import KanbanModalG from '../Modal/KanbanModalG';
 import TaskDetailModal from '../../SuperAdmin/EditableModals/TaskDetailModal';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
@@ -11,7 +11,7 @@ const ItemType = {
   TASK: 'task',
 };
 
-const Kanban_mem = () => {
+const KanbanG = () => {
   const location = useLocation();
   const { projectId, projectName, tasks: initialTasks } = location.state; // Get projectId and tasks passed from ProjectMem
 
@@ -210,7 +210,7 @@ const Kanban_mem = () => {
           </Column>
         ))}
       </div>
-      <Modal 
+      <KanbanModalG 
         isOpen={isModalOpen} 
         onClose={handleCloseModal} 
         projectId={projectId} 
@@ -228,4 +228,4 @@ const Kanban_mem = () => {
   );
 };
 
-export default Kanban_mem;
+export default KanbanG;

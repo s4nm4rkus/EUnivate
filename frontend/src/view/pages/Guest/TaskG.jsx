@@ -3,16 +3,14 @@ import axios from 'axios';
 import '../../../admin.css';
 import AdminNavbar from '../../components/SuperAdmin/AdminNavbar';
 import { FaFlag, FaCheckCircle } from 'react-icons/fa';
-import BoxLoader from './Loading Style/Box Loading/BoxLoader';
-import TaskModal from './Task Modal/TaskModal';
-import abt1Image from '../../../assets/Filter.png';  // Update the path if needed
-
-const Task = () => {
+import BoxLoader from '../SuperAdmin/Loading Style/Box Loading/BoxLoader';
+import Task_ModalG from './My_Task/Task_ModalG';
+const TaskG = () => {
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedTask, setSelectedTask] = useState(null); 
-    const [isModalOpen, setIsModalOpen] = useState(false); 
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
 
@@ -21,7 +19,6 @@ const Task = () => {
         return new Date(dateString).toLocaleDateString('en-GB', options);
     };
 
-    // Fetch tasks with objectives and assignees
     useEffect(() => {
         const fetchTasks = async () => {
             setLoading(true);
@@ -47,9 +44,9 @@ const Task = () => {
                         const tasksWithProject = taskResponse.data.data.map(task => ({
                             ...task,
                             projectName: project.projectName,
-                            objectives: task.objectives || [], // Ensure objectives are included
+                            objectiveCount: task.objectives ? task.objectives.length : 0,
                             assignedUsers: task.assignedUsers || [],
-                            invitedUsers: project.invitedUsers || [] // Fetching invited users from the project
+                            invitedUsers: project.invitedUsers || [] 
                         }));
                         tasksList.push(...tasksWithProject);
                     })
@@ -81,13 +78,13 @@ const Task = () => {
     const getPriorityColor = (priority) => {
         switch (priority.toLowerCase()) {
             case 'easy':
-                return 'text-green-500';
+                return 'text-green-500'; 
             case 'medium':
-                return 'text-yellow-500';
+                return 'text-yellow-500'; 
             case 'hard':
-                return 'text-red-500';
+                return 'text-red-500'; 
             default:
-                return 'text-gray-500';
+                return 'text-gray-500'; 
         }
     };
 
@@ -112,60 +109,60 @@ const Task = () => {
                     toggleAccountDropdown={toggleAccountDropdown}
                 />
             </div>
+            <div className="mt-4">
+                <h2 className="text-md md:text-xl font-medium text-gray-700 text-left">
+                    Assignee
+                </h2>
+            </div>
 
             <div className="mt-4 flex gap-4">
                 <div className="p-6 bg-white border rounded-lg shadow-md w-full">
-                <div className="text-gray-600 text-sm md:text-base">
-    <div className="grid grid-cols-3 md:grid-cols-6 gap-4 font-medium mb-2">
-        <p className="text-xs md:text-sm">Task</p>
-        <p className="hidden md:block text-center">Due Date</p>
-        <p className="hidden md:block text-center">Priority</p>
-        <p className="text-center text-xs md:text-sm">Objectives</p>
-        <p className="text-center text-xs md:text-sm">Status</p>
-        <p className="hidden md:block text-right text-xs md:text-sm">Project</p> {/* Hide Project on mobile */}
-    </div>
+                    <div className="text-gray-600 text-sm md:text-base">
+                        <div className="grid grid-cols-3 md:grid-cols-6 gap-4 font-medium mb-2">
+                            <p className="text-xs md:text-sm">Task</p>
+                            <p className="hidden md:block text-center">Due Date</p>
+                            <p className="hidden md:block text-center">Priority</p>
+                            <p className="hidden md:block text-center">Objective</p>
+                            <p className="text-center text-xs md:text-sm">Status</p>
+                            <p className="text-right text-xs md:text-sm">Project</p>
+                        </div>
 
-    {loading ? (
-        <div className="flex justify-center">
-            <BoxLoader />
-        </div>
-    ) : (
-        <ul className="space-y-2">
-            {tasks.map((task) => (
-                <li
-                    key={task._id}
-                    className="relative grid grid-cols-3 md:grid-cols-6 gap-4 items-center mb-1 py-4 bg-white rounded-lg cursor-pointer transition-all duration-300 ease-in-out"
-                    onClick={() => openModal(task)}
-                >
-                    <div className="absolute inset-0 bg-transparent hover:bg-gray-200 hover:shadow-md hover:scale-[1.02] transition-all duration-300 ease-in-out -mx-4 py-4"></div>
+                        {loading ? (
+                            <div className="flex justify-center">
+                                <BoxLoader />
+                            </div>
+                        ) : (
+                            <ul className="space-y-2">
+                                {tasks.map((task) => (
+                                    <li
+                                        key={task._id}
+                                        className="relative grid grid-cols-3 md:grid-cols-6 gap-4 items-center mb-1 py-4 bg-white rounded-lg cursor-pointer transition-all duration-300 ease-in-out"
+                                        onClick={() => openModal(task)}
+                                    >
+                                        <div className="absolute inset-0 bg-transparent hover:bg-gray-200 hover:shadow-md hover:scale-[1.02] transition-all duration-300 ease-in-out -mx-4 py-4"></div>
 
-                    <div className="flex items-center relative z-10">
-                        {renderStatusIcon(task.status)}
-                        <p className="ml-2 font-bold text-sm md:text-base">{task.taskName}</p>
+                                        <div className="flex items-center relative z-10">
+                                            {renderStatusIcon(task.status)}
+                                            <p className="ml-2 font-bold text-sm md:text-base">{task.taskName}</p>
+                                        </div>
+                                        <p className="hidden md:block text-center relative z-10">{formatDate(task.dueDate)}</p>
+                                        <div className="hidden md:flex items-center justify-center relative z-10">
+                                            <FaFlag className={`mr-1 text-xs md:text-sm ${getPriorityColor(task.priority)}`} />
+                                            <p className="text-xs md:text-sm">{task.priority}</p>
+                                        </div>
+                                        <p className="hidden md:block text-center relative z-10">{task.objectiveCount} Objective</p>
+                                        <p className="text-center relative z-10 text-sm md:text-base">{task.status}</p>
+                                        <p className="text-right relative z-10 text-sm md:text-base">{task.projectName}</p>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
-                    <p className="hidden md:block text-center relative z-10">{formatDate(task.dueDate)}</p>
-                    <div className="hidden md:flex items-center justify-center relative z-10">
-                        <FaFlag className={`mr-1 text-xs md:text-sm ${getPriorityColor(task.priority)}`} />
-                        <p className="text-xs md:text-sm">{task.priority}</p>
-                    </div>
-                    <p className="text-center relative z-10 flex items-center justify-center">
-                        <img src={abt1Image} alt="Objective Icon" className="w-5 h-5 mr-2" /> 
-                        {task.objectives.length} Objectives
-                    </p>
-
-                    <p className="text-center relative z-10 text-sm md:text-base">{task.status}</p>
-                    <p className="hidden md:block text-right relative z-10 text-sm md:text-base">{task.projectName}</p> {/* Hide Project on mobile */}
-                </li>
-            ))}
-        </ul>
-    )}
-</div>
-
                 </div>
             </div>
 
             {/* Pass modal props to TaskModal component */}
-            <TaskModal
+            <Task_ModalG
                 task={selectedTask}
                 isOpen={isModalOpen}
                 onClose={closeModal}
@@ -175,4 +172,4 @@ const Task = () => {
     );
 };
 
-export default Task;
+export default TaskG;

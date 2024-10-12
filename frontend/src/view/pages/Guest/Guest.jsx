@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
-import GuestSidebar from "./Guest_Layout";
+import MemberSidebar from "./GeustLayout"; // Import the MemberSidebar
 import { FaBars } from 'react-icons/fa';
 
-const Guest_Sidebar = () => {
+const Guest = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -25,7 +25,7 @@ const Guest_Sidebar = () => {
         </button>
       )}
 
-      <GuestSidebar isNavOpen={isSidebarOpen} />
+      <MemberSidebar isNavOpen={isSidebarOpen} />
 
       <main
         className={`transition-transform duration-300 ${
@@ -38,4 +38,4 @@ const Guest_Sidebar = () => {
   );
 };
 
-export default Guest_Sidebar;
+export default Guest;

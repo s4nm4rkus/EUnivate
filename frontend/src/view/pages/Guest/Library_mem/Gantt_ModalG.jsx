@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import progressGif from '../../../../assets/gif/process.gif'; 
 import doneImage from '../../../../assets/gif/checklist.gif'; 
 
-const TaskModal = ({ task, onClose }) => {
+const Gantt_ModalG = ({ task, onClose }) => {
   // Determine which image to show based on the task status
   const displayImage = task.status === 'Done' ? doneImage : progressGif;
 
@@ -66,4 +66,4 @@ const TaskModal = ({ task, onClose }) => {
   );
 };
 
-export default TaskModal;
+export default Gantt_ModalG;

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios'; // For fetching task data if needed
 
-const RaciMatrix_mem = () => {
+const RaciMatrixG = () => {
   const location = useLocation();
   const { tasks: initialTasks, projectId } = location.state;
 
@@ -109,4 +109,4 @@ const RaciMatrix_mem = () => {
   );
 };
 
-export default RaciMatrix_mem;
+export default RaciMatrixG;

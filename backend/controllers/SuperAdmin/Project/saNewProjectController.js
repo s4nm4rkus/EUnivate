@@ -33,37 +33,84 @@ export const createSaNewProject = async (req, res) => {
 };
 
 
+// export const getAllProjects = async (req, res) => {
+//     try {
+        
+//         const user = await User.findById(req.user._id).populate({
+//             path: 'projects',
+//             populate: {
+//                 path: 'invitedUsers',
+//                 select: 'username profilePicture'
+//             }
+//         });
+  
+//       if (!user) {
+//         return res.status(404).json({ message: 'User not found' });
+//       }
+  
+//         const ownedProjects = await SaNewProject.find({ owner: req.user._id }).populate('invitedUsers', 'username profilePicture');
+//         const invitedProjects = await SaNewProject.find({ invitedUsers: req.user._id }).populate('invitedUsers', 'username profilePicture');
+        
+
+//         const allProjects = [...ownedProjects, ...invitedProjects, ...user.projects];
+  
+//       if (allProjects.length === 0) {
+//         return res.status(404).json({ message: 'No projects found' });
+//       }
+  
+//       return res.status(200).json(allProjects);
+//     } catch (error) {
+//       console.error("Error in fetching projects:", error.message);
+//       return res.status(500).json({ error: error.message || 'An error occurred while fetching the projects' });
+//     }
+//   };
+
+
 export const getAllProjects = async (req, res) => {
     try {
-        
-        const user = await User.findById(req.user._id).populate({
-            path: 'projects',
-            populate: {
-                path: 'invitedUsers',
-                select: 'username profilePicture'
-            }
-        });
+      const { workspaceId } = req.query; // Get the workspaceId from query parameters
+  
+      // Validate the workspaceId
+      if (!workspaceId) {
+        return res.status(400).json({ message: 'Workspace ID is required' });
+      }
+  
+      // Find the user and populate their projects
+      const user = await User.findById(req.user._id).populate({
+        path: 'projects',
+        match: { workspaceId }, // Filter user's projects by the workspaceId
+        populate: {
+          path: 'invitedUsers',
+          select: 'username profilePicture'
+        }
+      });
   
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
   
-        const ownedProjects = await SaNewProject.find({ owner: req.user._id }).populate('invitedUsers', 'username profilePicture');
-        const invitedProjects = await SaNewProject.find({ invitedUsers: req.user._id }).populate('invitedUsers', 'username profilePicture');
-        
-
-        const allProjects = [...ownedProjects, ...invitedProjects, ...user.projects];
+      // Find owned and invited projects that match the workspaceId
+      const ownedProjects = await SaNewProject.find({ owner: req.user._id, workspaceId })
+        .populate('invitedUsers', 'username profilePicture');
+      const invitedProjects = await SaNewProject.find({ invitedUsers: req.user._id, workspaceId })
+        .populate('invitedUsers', 'username profilePicture');
   
+      // Combine the projects
+      const allProjects = [...ownedProjects, ...invitedProjects, ...user.projects];
+  
+      // Check if there are any projects
       if (allProjects.length === 0) {
-        return res.status(404).json({ message: 'No projects found' });
+        return res.status(404).json({ message: 'No projects found for the selected workspace' });
       }
   
+      // Send the filtered projects as a response
       return res.status(200).json(allProjects);
     } catch (error) {
       console.error("Error in fetching projects:", error.message);
       return res.status(500).json({ error: error.message || 'An error occurred while fetching the projects' });
     }
   };
+  
   
   
 //Get Project by id

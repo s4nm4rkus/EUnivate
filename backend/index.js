@@ -93,7 +93,6 @@ app.get('/api/users/workspaces/selected', async (req, res) => {
 
 
 // Chat message routes
-app.use('/api/messages', chatMessageRoutes); // Ensure this path is correct
 app.get('/api/users/quotation/confirm/', confirmQuotationEmail);
 
 app.get('/quotation-complete', (req, res) => {

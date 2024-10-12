@@ -28,23 +28,65 @@ const Project = () => {
   const { isNavOpen } = useOutletContext();
 
   useEffect(() => {
+    // const fetchProjects = async () => {
+    //   setLoading(true); 
+    //   try {
+    //     const user = JSON.parse(localStorage.getItem('user'));
+    //     const accessToken = user ? user.accessToken : null;
+      
+    //     if (!accessToken) {
+    //       setError('No access token found. Please log in again.');
+    //       return;
+    //     }
+
+    //     const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
+    //       headers: {
+    //         Authorization: `Bearer ${accessToken}`,
+    //       },
+    //     });
+
+    //     setProjects(response.data);
+    //   } catch (error) {
+    //     console.error('Error fetching projects:', error);
+    //     setError('An error occurred while fetching projects.');
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // };
+
+    // fetchProjects();
+
     const fetchProjects = async () => {
       setLoading(true); 
       try {
         const user = JSON.parse(localStorage.getItem('user'));
         const accessToken = user ? user.accessToken : null;
-      
+    
         if (!accessToken) {
           setError('No access token found. Please log in again.');
+          setLoading(false);
           return;
         }
-
+    
+        // Get the workspaceId from the selectedWorkspace
+        const workspaceId = selectedWorkspace ? selectedWorkspace._id : null;
+    
+        if (!workspaceId) {
+          setError('No workspace selected. Please select a workspace.');
+          setLoading(false);
+          return;
+        }
+    
+        // Make the API call to fetch projects with the workspaceId as a query parameter
         const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
+          params: {
+            workspaceId, // Pass the workspaceId as a query parameter
+          },
         });
-
+    
         setProjects(response.data);
       } catch (error) {
         console.error('Error fetching projects:', error);
@@ -53,8 +95,10 @@ const Project = () => {
         setLoading(false);
       }
     };
-
+    
+    // Call the function to fetch projects
     fetchProjects();
+    
   }, []);
 
   // Fetch task counts (total and done) for each project

@@ -53,6 +53,8 @@ import Messages from './view/pages/SuperAdmin/Messages';
 import Activity from './view/pages/SuperAdmin/Activity';
 import Settings from './view/pages/SuperAdmin/Settings';
 import ProjectDetails from './view/pages/SuperAdmin/ProjectDetails'; 
+import { WorkspaceProvider } from './view/components/SuperAdmin/workspaceContext.jsx';
+
 
 //Member
 import Member from "./view/pages/Members/Member.jsx"; 
@@ -73,6 +75,7 @@ import SettingsG from './view/pages/Guest/SettingsG.jsx';
 /* Global CSS */
 import './index.css';
 import './admin.css';
+
 
 
 const App = () => {
@@ -157,9 +160,11 @@ const App = () => {
         <Route
           path="/superadmin/*"
           element={
-            <SuperAdminRoute>
-              <AdminLayout />
-            </SuperAdminRoute>
+            <WorkspaceProvider>
+              <SuperAdminRoute>
+                <AdminLayout />
+              </SuperAdminRoute>  
+            </WorkspaceProvider>
           }
         >
           <Route path="dashboard" element={<Dashboard />} />

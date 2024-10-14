@@ -1,5 +1,12 @@
-import React from "react";
+
+import React, { useState, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
+import axios from 'axios'; // Import Axios
+import { useWorkspace } from './workspaceContext';
+import { useNavigate } from 'react-router-dom';
+
 import { 
     dashboard_logo, 
     dashboard_sidenav_icon, 
@@ -19,6 +26,118 @@ import {
 } from "../../../constants/assets";
 
 const SideNav = ({ isNavOpen }) => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [workspaceTitle, setWorkspaceTitle] = useState('');
+    const [error, setError] = useState('');
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const navigate = useNavigate();
+    const { selectedWorkspace, setSelectedWorkspace } = useWorkspace();
+    const [workspaces, setWorkspaces] = useState([]);
+    
+    useEffect(() => {
+        const fetchWorkspaces = async () => {
+            // Retrieve user information from local storage
+            const user = JSON.parse(localStorage.getItem('user'));
+    
+            // Check if user is defined and has a valid access token
+            if (!user || !user.accessToken) {
+                console.error("User is not authenticated.");
+                setError('User is not authenticated.'); // Optionally set an error state
+                return; // Exit if user is not defined
+            }
+    
+            try {
+                // Fetch all workspaces that belong to the owner
+                const response = await axios.get('http://localhost:5000/api/users/workspaces', {
+                    headers: {
+                        Authorization: `Bearer ${user.accessToken}`,
+                    },
+                });
+    
+                // Check if the response status is 200 (OK)
+                if (response.status === 200) {
+                    const workspacesData = response.data;
+    
+                    // Set the fetched workspaces in state
+                    setWorkspaces(workspacesData);
+                } else {
+                    console.error("Error fetching workspaces: Unexpected response status", response.status);
+                    setError('Failed to load workspaces');
+                }
+            } catch (err) {
+                if (err.response) {
+                    console.error("Error fetching workspaces:", err.response.data || err.message);
+                    setError(`Failed to load workspaces: ${err.response.data.message || err.message}`);
+                } else if (err.request) {
+                    console.error("No response received:", err.request);
+                    setError('Failed to load workspaces: No response from server');
+                } else {
+                    console.error("Error fetching workspaces:", err.message);
+                    setError(`Failed to load workspaces: ${err.message}`);
+                }
+            }
+        };
+    
+        fetchWorkspaces();
+    }, []);
+    
+
+    
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setWorkspaceTitle('');
+        setError('');
+    };
+
+    const handleCreateWorkspace = async (e) => {
+        e.preventDefault();
+        if (!workspaceTitle.trim()) {
+            setError('Workspace title is required');
+            return;
+        }
+    
+        const user = JSON.parse(localStorage.getItem('user'));
+        const accessToken = user ? user.accessToken : null;
+    
+        if (!accessToken) {
+            setLoading(false);
+            setError('No access token found. Please log in again.');
+            return;
+        }
+        
+        setError('');
+    
+        try {
+            const response = await axios.post(
+                'http://localhost:5000/api/users/workspace', 
+                {
+                    workspaceTitle,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`, // Include the token in the headers
+                    },
+                }
+            );
+    
+            if (response.status === 201) {
+                window.location.reload(); // Refresh the page
+            }
+    
+            closeModal();
+        } catch (err) {
+            console.error("Error creating workspace:", err.response?.data?.error || err.message);
+            setError(err.response?.data?.error || 'An error occurred while creating the workspace');
+        }
+    };
+
+    const handleWorkspaceSelect = (workspace) => {
+        setSelectedWorkspace(workspace); // This will store the selected workspace globally
+        navigate(`/superadmin/dashboard?workspaceId=${workspace._id}&workspaceTitle=${workspace.workspaceTitle}`);
+    };
+
+
     return (
         <div
             className={`side-nav-admin fixed top-0 left-0 h-full bg-red-750 shadow-lg transition-transform transform ${
@@ -35,27 +154,15 @@ const SideNav = ({ isNavOpen }) => {
             </div>
 
             <ul className="list-none p-0">
-                {[{
-                    to: "dashboard", text: "Dashboard", icon: dashboard_sidenav_icon, hoverIcon: dashboard_red
-                },
-                {
-                    to: "project", text: "Project", icon: project_icon, hoverIcon: project_red
-                },
-                {
-                    to: "task", text: "My Task", icon: task_icon, hoverIcon: task_red
-                },
-                {
-                    to: "activity", text: "Activity", icon: activity_icon, hoverIcon: activity_red
-                },
-                {
-                    to: "people", text: "People", icon: people_icon, hoverIcon: people_red
-                },
-                {
-                    to: "messages", text: "Messages", icon: messages_icon, hoverIcon: messages_red
-                },
-                {
-                    to: "settings", text: "Settings", icon: settings_icon, hoverIcon: settings_red
-                }].map((item, index) => (
+                {[
+                    { to: "dashboard", text: "Dashboard", icon: dashboard_sidenav_icon, hoverIcon: dashboard_red },
+                    { to: "project", text: "Project", icon: project_icon, hoverIcon: project_red },
+                    { to: "task", text: "My Task", icon: task_icon, hoverIcon: task_red },
+                    { to: "activity", text: "Activity", icon: activity_icon, hoverIcon: activity_red },
+                    { to: "people", text: "People", icon: people_icon, hoverIcon: people_red },
+                    { to: "messages", text: "Messages", icon: messages_icon, hoverIcon: messages_red },
+                    { to: "settings", text: "Settings", icon: settings_icon, hoverIcon: settings_red },
+                ].map((item, index) => (
                     <li className="mb-2" key={index}>
                         <Link
                             to={item.to}
@@ -76,8 +183,94 @@ const SideNav = ({ isNavOpen }) => {
                             </span>
                         </Link>
                     </li>
-                ))}
+                ))} 
             </ul>
+            
+            <div className="add-workspace">
+            <p className="font-size">Workspace 
+                <button onClick={() => {
+                    console.log("Open Modal Triggered"); // Debugging line
+                    setIsModalOpen(true); // Open the modal using local state
+                }}>
+                        <FontAwesomeIcon icon={faPlus} className="faPlusWorkspace"/>
+                </button>
+             </p>   
+             
+
+                <div className="workspaceSelect relative inline-block">
+                    <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="workspaceDropdown flex items-center justify-between bg-transparent text-white">
+                        <span>{selectedWorkspace ? selectedWorkspace.workspaceTitle : 'Select Workspace'}</span>
+                        <FontAwesomeIcon icon={isDropdownOpen ? faChevronUp : faChevronDown} className="faChevronWS" />
+                    </button>
+
+                    {isDropdownOpen && (
+                        <ul className="workspaceList absolute z-10 mt-2 ms-2 bg-white text-black shadow">
+                            {workspaces.length > 0 ? (
+                                workspaces.map((workspace) => (
+                                    <li key={workspace._id} onClick={() => handleWorkspaceSelect(workspace)} className="p-2 hover:bg-gray-400 cursor-pointer">
+                                        {workspace.workspaceTitle}
+                                    </li>
+                                ))
+                            ) : (
+                                <li className="p-2 text-gray-500">No workspaces available</li>
+                            )}
+                        </ul>
+                    )}
+                </div>
+            </div> 
+
+            {isModalOpen && (
+                <div className="fixed inset-0 z-50 bg-gray-800 bg-opacity-50 flex ">
+                    <div
+                        className="addWorkspaceModal ml-1 bg-white p-2 rounded-md shadow-lg absolute bottom-20 h-50 w-60 z-60"
+                        role="dialog"
+                        aria-modal="true"
+                    >
+                        {/* Close Button */}
+                        <button
+                            onClick={closeModal}
+                            className="absolute top-1 right-3 text-gray-600 hover:text-gray-800 text-2xl font-bold"
+                            aria-label="Close Modal"
+                        >
+                            &times;
+                        </button>
+
+                        {/* Error Message */}
+                        {error && <p className="text-red-500 mb-2">{error}</p>}
+
+                        {/* Workspace Creation Form */}
+                        <form onSubmit={handleCreateWorkspace}>
+                            {/* Workspace Title Input */}
+                            <label className="block m-1 text-gray-700">Add Workspace</label>
+                            <input
+                                type="text"
+                                placeholder="Enter workspace title"
+                                className="mt-1 w-full p-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring focus:border-blue-300"
+                                value={workspaceTitle}
+                                onChange={(e) => setWorkspaceTitle(e.target.value)}
+                                required
+                            />
+
+                            {/* Action Buttons */}
+                            <div className="mt-4 flex justify-end">
+                                <button
+                                    type="button"
+                                    onClick={closeModal}
+                                    className="mr-10 px-5 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-6 py-2 bg-red-800 text-white rounded-md hover:bg-red-900"
+                                >
+                                    Create
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

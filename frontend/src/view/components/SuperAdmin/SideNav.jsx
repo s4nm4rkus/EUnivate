@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
-import axios from 'axios'; // Import Axios
-import { useWorkspace } from './workspaceContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios'; 
+import { useWorkspace } from './workspaceContext'; 
+import { useLocation } from 'react-router-dom'; 
 
 import { 
     dashboard_logo, 
@@ -30,68 +29,60 @@ const SideNav = ({ isNavOpen }) => {
     const [workspaceTitle, setWorkspaceTitle] = useState('');
     const [error, setError] = useState('');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');  
     const navigate = useNavigate();
     const { selectedWorkspace, setSelectedWorkspace } = useWorkspace();
     const [workspaces, setWorkspaces] = useState([]);
-    
+    const location = useLocation(); // Use the useLocation hook
+
     useEffect(() => {
+        // Parse URL parameters using location.search
+        const params = new URLSearchParams(location.search);
+        const workspaceId = params.get('workspaceId');
+        const workspaceTitle = params.get('workspaceTitle');
+
+        if (workspaceId && workspaceTitle) {
+            // Set the selected workspace from URL parameters
+            setSelectedWorkspace({ _id: workspaceId, workspaceTitle });
+        }
+
+        // Fetch workspaces from the API
         const fetchWorkspaces = async () => {
-            // Retrieve user information from local storage
             const user = JSON.parse(localStorage.getItem('user'));
-    
-            // Check if user is defined and has a valid access token
             if (!user || !user.accessToken) {
-                console.error("User is not authenticated.");
-                setError('User is not authenticated.'); // Optionally set an error state
-                return; // Exit if user is not defined
+                setError('User is not authenticated.');
+                return;
             }
-    
+
             try {
-                // Fetch all workspaces that belong to the owner
                 const response = await axios.get('http://localhost:5000/api/users/workspaces', {
-                    headers: {
-                        Authorization: `Bearer ${user.accessToken}`,
-                    },
+                    headers: { Authorization: `Bearer ${user.accessToken}` },
                 });
-    
-                // Check if the response status is 200 (OK)
+
                 if (response.status === 200) {
-                    const workspacesData = response.data;
-    
-                    // Set the fetched workspaces in state
-                    setWorkspaces(workspacesData);
+                    setWorkspaces(response.data);
                 } else {
-                    console.error("Error fetching workspaces: Unexpected response status", response.status);
                     setError('Failed to load workspaces');
                 }
             } catch (err) {
-                if (err.response) {
-                    console.error("Error fetching workspaces:", err.response.data || err.message);
-                    setError(`Failed to load workspaces: ${err.response.data.message || err.message}`);
-                } else if (err.request) {
-                    console.error("No response received:", err.request);
-                    setError('Failed to load workspaces: No response from server');
-                } else {
-                    console.error("Error fetching workspaces:", err.message);
-                    setError(`Failed to load workspaces: ${err.message}`);
-                }
+                setError(`Failed to load workspaces: ${err.message}`);
             }
         };
-    
-        fetchWorkspaces();
-    }, []);
-    
 
-    
+        fetchWorkspaces();
+    }, [location.search, setSelectedWorkspace]); // Dependencies: location.search and setSelectedWorkspace
 
     const closeModal = () => {
         setIsModalOpen(false);
         setWorkspaceTitle('');
         setError('');
+        setAlertMessage(''); 
     };
 
     const handleCreateWorkspace = async (e) => {
         e.preventDefault();
+    
+        // Ensure workspace title is not empty
         if (!workspaceTitle.trim()) {
             setError('Workspace title is required');
             return;
@@ -101,42 +92,42 @@ const SideNav = ({ isNavOpen }) => {
         const accessToken = user ? user.accessToken : null;
     
         if (!accessToken) {
-            setLoading(false);
             setError('No access token found. Please log in again.');
             return;
         }
-        
-        setError('');
     
         try {
             const response = await axios.post(
                 'http://localhost:5000/api/users/workspace', 
+                { workspaceTitle },  // Payload with the title
                 {
-                    workspaceTitle,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`, // Include the token in the headers
-                    },
+                    headers: { Authorization: `Bearer ${accessToken}` },
                 }
             );
     
             if (response.status === 201) {
-                window.location.reload(); // Refresh the page
-            }
+                const newWorkspace = response.data; 
+                localStorage.setItem('currentWorkspaceId', newWorkspace._id); // Save current workspace ID
     
-            closeModal();
+                // Success notification
+                setAlertMessage('Workspace created successfully!');
+    
+                closeModal();
+                setWorkspaces([...workspaces, newWorkspace]); // Add the new workspace to the list
+
+                navigate(`/superadmin/dashboard?workspaceId=${newWorkspace._id}&workspaceTitle=${newWorkspace.workspaceTitle}`);
+            }
         } catch (err) {
             console.error("Error creating workspace:", err.response?.data?.error || err.message);
             setError(err.response?.data?.error || 'An error occurred while creating the workspace');
         }
     };
-
+    
     const handleWorkspaceSelect = (workspace) => {
-        setSelectedWorkspace(workspace); // This will store the selected workspace globally
+        setSelectedWorkspace(workspace);
+        setIsDropdownOpen(false); // Close the dropdown after selecting
         navigate(`/superadmin/dashboard?workspaceId=${workspace._id}&workspaceTitle=${workspace.workspaceTitle}`);
     };
-
 
     return (
         <div
@@ -187,15 +178,11 @@ const SideNav = ({ isNavOpen }) => {
             </ul>
             
             <div className="add-workspace">
-            <p className="font-size">Workspace 
-                <button onClick={() => {
-                    console.log("Open Modal Triggered"); // Debugging line
-                    setIsModalOpen(true); // Open the modal using local state
-                }}>
+                <p className="font-size">Workspace 
+                    <button onClick={() => setIsModalOpen(true)}>
                         <FontAwesomeIcon icon={faPlus} className="faPlusWorkspace"/>
-                </button>
-             </p>   
-             
+                    </button>
+                </p>   
 
                 <div className="workspaceSelect relative inline-block">
                     <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="workspaceDropdown flex items-center justify-between bg-transparent text-white">
@@ -240,7 +227,6 @@ const SideNav = ({ isNavOpen }) => {
 
                         {/* Workspace Creation Form */}
                         <form onSubmit={handleCreateWorkspace}>
-                            {/* Workspace Title Input */}
                             <label className="block m-1 text-gray-700">Add Workspace</label>
                             <input
                                 type="text"
@@ -251,7 +237,6 @@ const SideNav = ({ isNavOpen }) => {
                                 required
                             />
 
-                            {/* Action Buttons */}
                             <div className="mt-4 flex justify-end">
                                 <button
                                     type="button"
@@ -270,8 +255,10 @@ const SideNav = ({ isNavOpen }) => {
                         </form>
                     </div>
                 </div>
-            )}
+         
+         )}
         </div>
+        
     );
 };
 

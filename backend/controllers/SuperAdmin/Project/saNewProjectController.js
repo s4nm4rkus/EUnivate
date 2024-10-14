@@ -5,7 +5,7 @@ import User from '../../../models/Client/userModels.js';
 
 export const createSaNewProject = async (req, res) => {
     try {
-        const { projectName, thumbnail, invitedUsers, workspaceId } = req.body;
+      const { projectName, thumbnail, invitedUsers, workspaceId } = req.body;
 
         if (!projectName || !thumbnail || !workspaceId || !req.user) {
             return res.status(400).json({ error: 'Missing required fields' });
@@ -32,38 +32,6 @@ export const createSaNewProject = async (req, res) => {
     }
 };
 
-
-// export const getAllProjects = async (req, res) => {
-//     try {
-        
-//         const user = await User.findById(req.user._id).populate({
-//             path: 'projects',
-//             populate: {
-//                 path: 'invitedUsers',
-//                 select: 'username profilePicture'
-//             }
-//         });
-  
-//       if (!user) {
-//         return res.status(404).json({ message: 'User not found' });
-//       }
-  
-//         const ownedProjects = await SaNewProject.find({ owner: req.user._id }).populate('invitedUsers', 'username profilePicture');
-//         const invitedProjects = await SaNewProject.find({ invitedUsers: req.user._id }).populate('invitedUsers', 'username profilePicture');
-        
-
-//         const allProjects = [...ownedProjects, ...invitedProjects, ...user.projects];
-  
-//       if (allProjects.length === 0) {
-//         return res.status(404).json({ message: 'No projects found' });
-//       }
-  
-//       return res.status(200).json(allProjects);
-//     } catch (error) {
-//       console.error("Error in fetching projects:", error.message);
-//       return res.status(500).json({ error: error.message || 'An error occurred while fetching the projects' });
-//     }
-//   };
 
 
 export const getAllProjects = async (req, res) => {
@@ -135,35 +103,6 @@ export const getProjectById = async (req, res) => {
     }
 };
 
-//  delete a project by its ID
-//I will comment muna this 
-// export const deleteProjectById = async (req, res) => {
-//     try {
-//         const { id } = req.params;
-
-//         // Find and delete the project by its ID
-//         const deletedProject = await SaNewProject.findByIdAndDelete(id);
-
-//         if (!deletedProject) {
-//             return res.status(404).json({ message: 'Project not found' });
-//         }
-
-//         // Also delete all tasks associated with the deleted project
-//         const deletedTasks = await saAddTask.deleteMany({ project: id });
-
-//         return res.status(200).json({
-//             message: 'Project and associated tasks deleted successfully',
-//             deletedProject,
-//             deletedTasks,
-//         });
-//     } catch (error) {
-//         console.error("Error in deleting project and tasks:", error.message);
-//         return res.status(500).json({ error: error.message || 'An error occurred while deleting the project and tasks' });
-//     }
-// };
-
-
-// Invite users to a project
 
 export const inviteUsersToProject = async (req, res) => {
     try {

@@ -24,37 +24,11 @@ const Project = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [taskCounts, setTaskCounts] = useState({}); 
   const { selectedWorkspace } = useWorkspace();
+  const [workspaces, setWorkspaces] = useState([]); 
   const navigate = useNavigate();
   const { isNavOpen } = useOutletContext();
 
   useEffect(() => {
-    // const fetchProjects = async () => {
-    //   setLoading(true); 
-    //   try {
-    //     const user = JSON.parse(localStorage.getItem('user'));
-    //     const accessToken = user ? user.accessToken : null;
-      
-    //     if (!accessToken) {
-    //       setError('No access token found. Please log in again.');
-    //       return;
-    //     }
-
-    //     const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
-    //       headers: {
-    //         Authorization: `Bearer ${accessToken}`,
-    //       },
-    //     });
-
-    //     setProjects(response.data);
-    //   } catch (error) {
-    //     console.error('Error fetching projects:', error);
-    //     setError('An error occurred while fetching projects.');
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
-
-    // fetchProjects();
 
     const fetchProjects = async () => {
       setLoading(true); 
@@ -126,6 +100,33 @@ const Project = () => {
     }
   }, [projects]);
 
+
+  useEffect(() => {
+    const fetchWorkspaces = async () => {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const accessToken = user ? user.accessToken : null;
+
+      if (!accessToken) {
+        console.error('No access token found.');
+        return;
+      }
+
+      try {
+        const response = await axios.get('http://localhost:5000/api/users/workspaces', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        setWorkspaces(response.data);  // Set the fetched workspaces to state
+      } catch (error) {
+        console.error('Error fetching workspaces:', error);
+      }
+    };
+
+    fetchWorkspaces();
+  }, []);
+
   const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
@@ -169,22 +170,22 @@ const Project = () => {
 
   const handleCreateProject = async () => {
     setLoading(true);
-    if (!imagePreview || !projectName || !team) {
+    if (!imagePreview || !projectName || !team) {  // Ensure 'team' is selected
       setError('Please fill out all fields including image, project name, and team.');
       setLoading(false);
       return;
     }
-
+  
     if (!selectedWorkspace) {
       setLoading(false);
       setError('No workspace selected. Please select a workspace to create a project.');
       return;
     }
-
-    const workspaceId = selectedWorkspace._id;
+  
+    const workspaceId = team;  // Use the selected team (workspace)
     const user = JSON.parse(localStorage.getItem('user'));
     const accessToken = user ? user.accessToken : null;
-
+  
     if (!accessToken) {
       setLoading(false);
       setError('No access token found. Please log in again.');
@@ -196,21 +197,18 @@ const Project = () => {
       const newProject = {
         projectName,
         thumbnail,
-        workspaceId,
+        workspaceId,  // Pass the selected workspaceId (team)
       };
-
+  
       const response = await axios.post('http://localhost:5000/api/users/sa-newproject', newProject, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-
+  
       setProjects([...projects, response.data]);
       closeModal();
-      
-      // Show success toast
-      toast.success('Project created successfully!'); // Add this line
-
+      toast.success('Project created successfully!');
     } catch (error) {
       setLoading(false);
       console.error('Error creating project:', error);
@@ -219,6 +217,7 @@ const Project = () => {
       setLoading(false);
     }
   };
+  
 
   const handleProjectClick = (project) => {
     setSelectedProject(project);
@@ -269,7 +268,7 @@ const Project = () => {
         </button>
       </div>
 
-        <div>
+        {/* <div>
             <h1>Project Page</h1>
             {loading ? (
                 <p>Loading...</p> // Show loading state
@@ -278,7 +277,7 @@ const Project = () => {
             ) : (
                 <p>No workspace selected</p> // Handle case where no workspace is selected
             )}
-        </div>
+        </div> */}
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-gray-800 bg-opacity-50 flex items-center justify-center">
@@ -319,20 +318,23 @@ const Project = () => {
               className="mt-2 w-full p-2 border border-gray-300 rounded-md text-gray-700"
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
-            />
-            <p className="mt-4 text-gray-500 text-left">Team</p>
-            <div className="relative mt-2">
-              <select
-                className="w-full p-2 border border-gray-300 rounded-md text-gray-700"
-                value={team}
-                onChange={(e) => setTeam(e.target.value)}
-              >
-                <option value="" disabled>Team</option>
-                <option value="team1">Super Board</option>
-                <option value="team2">Team 2</option>
-                <option value="team3">Team 3</option>
-              </select>
-            </div>
+                />
+              <p className="mt-4 text-gray-500 text-left">Team (Workspace)</p>
+              <div className="relative mt-2">
+                <select
+                  className="w-full p-2 border border-gray-300 rounded-md text-gray-700"
+                  value={team}
+                  onChange={(e) => setTeam(e.target.value)}
+                >
+                  <option value="" disabled>Select Workspace</option>
+                  {workspaces.map((workspace) => (
+                    <option key={workspace._id} value={workspace._id}>
+                      {workspace.workspaceTitle}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
 
             <input
               type="hidden"

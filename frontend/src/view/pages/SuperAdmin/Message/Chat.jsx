@@ -78,9 +78,13 @@ const Chat = ({ group }) => {
           msg._id === reactionData.messageId
             ? {
                 ...msg,
-                reactions: msg.reactions.some((r) => r.user._id === reactionData.reaction.user._id)
+                reactions: msg.reactions.some(
+                  (r) => r.user && r.user._id === reactionData.reaction.user._id
+                )
                   ? msg.reactions.map((r) =>
-                      r.user._id === reactionData.reaction.user._id ? reactionData.reaction : r
+                      r.user && r.user._id === reactionData.reaction.user._id
+                        ? reactionData.reaction
+                        : r
                     )
                   : [...msg.reactions, reactionData.reaction],
               }
@@ -88,6 +92,8 @@ const Chat = ({ group }) => {
         )
       );
     });
+    
+    
 
     socket.on('flagged-message', (flagData) => {
       setMessages((prevMessages) =>
@@ -260,10 +266,11 @@ const Chat = ({ group }) => {
           className={`mb-4 flex group ${msg.sender === currentUser._id ? 'justify-end' : 'justify-start'}`}
         >
           <img
-            src={msg.sender.profilePicture?.url || msg.sender.profilePicture || defaultProfilePictureUrl}
-            alt={msg.sender.firstName}
-            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full mr-3"
-          />
+          src={msg.sender?.profilePicture?.url || msg.sender?.profilePicture || defaultProfilePictureUrl}
+          alt={msg.sender?.firstName}
+          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full mr-3"
+        />
+
   
           <div
             className={`p-2 sm:p-3 rounded-lg w-full max-w-xs sm:max-w-4xl relative ${msg.starredBy.includes(currentUser._id) ? 'bg-yellow-100' : 'bg-gray-100'}`}
@@ -309,16 +316,16 @@ const Chat = ({ group }) => {
             )}
   
             {/* Display reactions */}
-{msg.reactions && msg.reactions.length > 0 && (
-  <div className="mt-2 flex items-center">
-    {Object.values(groupReactions(msg.reactions).reactionGroups).map(({ emoji, count }, i) => (
-      <span key={i} className="text-sm p-1 rounded-full flex items-center">
-        <span>{emoji}</span>
-        <span className="ml-1">{count}</span> {/* Display the count next to each emoji */}
-      </span>
-    ))}
-  </div>
-)}
+  {msg.reactions && msg.reactions.length > 0 && (
+    <div className="mt-2 flex items-center">
+      {Object.values(groupReactions(msg.reactions).reactionGroups).map(({ emoji, count }, i) => (
+        <span key={i} className="text-sm p-1 rounded-full flex items-center">
+          <span>{emoji}</span>
+          <span className="ml-1">{count}</span> {/* Display the count next to each emoji */}
+        </span>
+      ))}
+    </div>
+  )}
 
   
             {/* Icons */}

@@ -22,20 +22,7 @@ const ProjectMem = () => {
     const fetchProjects = async () => {
       setLoading(true); 
       try {
-        const user = JSON.parse(localStorage.getItem('user'));
-        const accessToken = user ? user.accessToken : null;
-
-        if (!accessToken) {
-          setError('No access token found. Please log in again.');
-          return;
-        }
-
-        const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-
+        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-getnewproject`);
         setProjects(response.data);
       } catch (error) {
         console.error('Error fetching projects:', error);

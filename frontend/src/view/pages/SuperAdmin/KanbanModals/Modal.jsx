@@ -70,18 +70,7 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
 
   const fetchProjectDetails = async () => {
     try {
-      const user = JSON.parse(localStorage.getItem('user'));
-
-      const token = user?.accessToken;
-
-      if (!token) {
-        throw new Error('No access token found. Please log in again.');
-    }
-    const response = await axios.get(`http://localhost:5000/api/users/sa-getnewproject/${projectId}`, {
-      headers: {
-          Authorization: `Bearer ${token}`  
-      }
-  });
+      const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-getnewproject/${projectId}`);
       setProject(response.data);
     } catch (error) {
       console.error('Error fetching project details:', error);
@@ -90,8 +79,8 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/users/get-assignee?projectId=${projectId}`);
-      setMembersList(response.data.invitedUsers); // Assuming the response structure
+      const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/members-superadmins`);
+      setMembersList(response.data);
     } catch (error) {
       console.error('Error fetching users:', error);
     }
@@ -150,9 +139,9 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
     }
   
     try {
-      const assigneeIds = selectedName.split(', ').map(name => {
-        const user = membersList.find(member => member.username === name);
-        return user?.id;
+      const assigneeIds = selectedName.split(', ').map(async (name) => {
+        const userResponse = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/findByUsername/${name}`);
+        return userResponse.data._id;
       });
   
       const newTask = {
@@ -168,8 +157,8 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
         questionUpdate: question,
         project: projectId,
       };
-  
-      const response = await axios.post('http://localhost:5000/api/users/sa-task', newTask);
+
+      const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-task`, newTask);
       console.log('Task created:', response.data);
       onTaskSubmit(newTask);
       toast.success('Task submitted successfully!');

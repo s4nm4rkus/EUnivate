@@ -13,10 +13,11 @@ const QuotationStep4 = ({ prevStep, formData }) => {
             console.log('submitForm triggered');
             console.log('Submitting form data:', formData); 
     
-            const response = await fetch('http://localhost:5000/api/users/quotation', {
+            const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/quotation`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
                 },
                 body: JSON.stringify(formData)
             });

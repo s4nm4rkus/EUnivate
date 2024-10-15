@@ -78,7 +78,7 @@ app.get('/api/users/quotation/confirm/', confirmQuotationEmail);
 
 app.get('/quotation-complete', (req, res) => {
 // res.send('Quotation verification complete');
-res.redirect('http://localhost:5173/quotation-complete');
+res.redirect(`https://eunivate.vercel.app/quotation-complete`);
 });
 
 

@@ -22,8 +22,26 @@ const People = () => {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [showUsersInModal, setShowUsersInModal] = useState(false);
+    const [showUsersInModal, setShowUsersInModal] = useState(false); 
+    const fetchProjects = async () => {
+        try {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const accessToken = user?.accessToken;
 
+            if (!accessToken) {
+                throw new Error('No access token found. Please log in again.');
+            }
+
+            const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-getnewproject`, {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
+
+            setProjects(response.data);
+        } catch (error) {
+            console.error('Error fetching projects:', error);
+            setError('An error occurred while fetching projects.');
+        }
+    };
 
     const fetchUsers = async () => {
         try {
@@ -34,7 +52,7 @@ const People = () => {
                 throw new Error('No access token found. Please log in again.');
             }
 
-            const response = await fetch('http://localhost:5000/api/users/', {
+            const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
@@ -47,9 +65,7 @@ const People = () => {
             setAllUsers(users);
             setFilteredUsers(users);
 
-               // Fetch invited users
-
-            const invitedUsersResponse = await fetch('http://localhost:5000/api/users/invited', {
+            const invitedUsersResponse = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/invited`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
@@ -200,7 +216,7 @@ const People = () => {
         setLoading(true);
 
     try {
-        const response = await fetch('http://localhost:5000/api/users/invite', {
+        const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/invite`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -262,7 +278,7 @@ const People = () => {
                 throw new Error(`User with email ${userEmail} not found`);
             }
 
-            const response = await fetch(`http://localhost:5000/api/users/${user._id}/role`, {
+            const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/${user._id}/role`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -296,27 +312,28 @@ const People = () => {
 
     const handleRemoveUser = async (userEmail) => {
         const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
-
-    if (!token) {
-        toast.error('Access token is missing. Please log in again.');
-        return;
-    }
-
-    const invitedMember = invitedUsers.find((u) => u.email === userEmail);
-    if (!invitedMember) {
-        toast.error('Invited member not found in the list.');
-        return;
-    }
-
-    try {
-        const response = await fetch(`http://localhost:5000/api/users/invited/${invitedMember._id}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-        });
-
+    
+        if (!token) {
+            alert('Access token is missing. Please log in again.');
+            return;
+        }
+    
+        const invitedMember = invitedUsers.find((u) => u.email === userEmail);
+        if (!invitedMember) {
+            alert('Invited member not found in the list.');
+            return;
+        }
+    
+        try {
+            // Send the actual user ID for deletion
+            const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/invited/${invitedMember.userId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+    
             if (!response.ok) {
                 const errorResponse = await response.json();
                 throw new Error(errorResponse.message);

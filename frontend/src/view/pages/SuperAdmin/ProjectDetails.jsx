@@ -36,7 +36,7 @@
         useEffect(() => {
             const fetchTasks = async () => {
                 // Existing fetch logic
-                const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${projectId}`);
+                const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-tasks/${projectId}`);
                 setTasks(response.data.data);
             };
             fetchTasks();
@@ -54,8 +54,8 @@
                         return;
                     }
 
-                    const response = await axios.get(`http://localhost:5000/api/users/sa-getnewproject/${projectId}`, {
-                        headers: { Authorization: `Bearer ${token}` },
+                    const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-getnewproject/${projectId}`, {
+                        headers: { Authorization: `Bearer ${accessToken}` },
                     });
 
                     
@@ -105,7 +105,7 @@
                             throw new Error('No access token found. Please log in.');
                         }
         
-                        const response = await axios.get('http://localhost:5000/api/users/invited', {
+                        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/invited`, {
                             headers: { Authorization: `Bearer ${accessToken}` }
                         });
         
@@ -158,7 +158,7 @@
                     throw new Error('No valid user IDs to add.');
                 }
         
-                const response = await axios.post('http://localhost:5000/api/users/add-member-to-project', {
+                const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/add-member-to-project`, {
                     projectId: project._id,
                     users: userIds
                 }, {

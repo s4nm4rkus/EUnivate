@@ -1,6 +1,6 @@
   import React, { useState, useEffect, useRef } from 'react';
   import { useLocation, useNavigate } from 'react-router-dom';
-  import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx';
+  import AdminNavbar_Members from '../../components/Members/AdminNavbar_Members.jsx';
   import Kanban from './Featured/Kanban_mem.jsx';
   import List from './Featured/List_mem.jsx';
   import Calendar from './Featured/Calendar_mem.jsx';
@@ -80,7 +80,7 @@
               Project Details
             </h1>
           </div>
-          <AdminNavbar
+          <AdminNavbar_Members
             isAccountDropdownOpen={isAccountDropdownOpen}
             toggleAccountDropdown={toggleAccountDropdown}
           />

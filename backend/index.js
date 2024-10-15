@@ -7,6 +7,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import saAddTask from './models/SuperAdmin/saAddTask.js';
 import { confirmQuotationEmail } from './controllers/Client/quotationController.js';
+import {addNewWorkspace}from './controllers/SuperAdmin/workspaceController.js';
 
 dotenv.config();
 connectDB();
@@ -73,7 +74,25 @@ export { io };
 // Routes
 app.use('/api/users', userRoutes);
 
+// Workspace
+app.use('/api', addNewWorkspace);
+app.get('/api/users/workspaces/selected', async (req, res) => {
+  try {
+      const selectedWorkspaceRecord = await SelectedWorkspace.findOne().populate('selectedWorkspace'); // Populate the workspace reference
+      console.log("Fetched selected workspace record:", selectedWorkspaceRecord); // Log the fetched record
+      if (!selectedWorkspaceRecord) {
+          return res.status(404).json({ message: 'No selected workspace found' });
+      }
 
+      return res.status(200).json({ selectedWorkspaceRecord });
+  } catch (error) {
+      return res.status(500).json({ error: error.message || 'Error fetching selected workspace' });
+  }
+});
+
+
+
+// Chat message routes
 app.get('/api/users/quotation/confirm/', confirmQuotationEmail);
 
 app.get('/quotation-complete', (req, res) => {

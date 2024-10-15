@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import AdminNavbar from '../../components/SuperAdmin/AdminNavbar';
+import AdminNavbarG from '../../components/Guest/AdminNavbarG';
 import Members_Msg from './message/Members_Msg';
 import Chat from './message/Chat';
 import { FaUsers } from 'react-icons/fa'; // Import icon for the mobile sidebar
@@ -36,7 +36,7 @@ const Messages = () => {
             Dashboard
           </h1>
         </div>
-        <AdminNavbar 
+        <AdminNavbarG 
           isAccountDropdownOpen={isAccountDropdownOpen}
           toggleAccountDropdown={toggleAccountDropdown}
         />

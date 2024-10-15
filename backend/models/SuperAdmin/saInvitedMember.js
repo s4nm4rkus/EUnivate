@@ -9,7 +9,7 @@ const saInvitedMemberSchema = new mongoose.Schema({
         type: String,
         enum: ['User', 'guest','members', 'admin', 'superadmin'],
         default: 'User',
-    },      
+    },   
     project: [{
         type: mongoose.Schema.Types.ObjectId,  // Store project IDs as ObjectId
         ref: 'SaNewProject',  // Reference the Project model

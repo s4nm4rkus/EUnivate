@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { FaCalendar, FaCheckCircle, FaPlus } from 'react-icons/fa';
 import { useNavigate, useOutletContext } from 'react-router-dom'; 
 import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx';
 import LoadingSpinner from './Loading Style/Fill File Loading/Loader.jsx';
 import ButtonSpinner from './Loading Style/Spinner Loading/ButtonSpinner.jsx';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useWorkspace } from '../../components/SuperAdmin/workspaceContext.jsx';
 
 const Project = () => {
+ 
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -18,29 +22,45 @@ const Project = () => {
   const [loading, setLoading] = useState(false);
   const [loadingProject, setLoadingProject] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
-
+  const [taskCounts, setTaskCounts] = useState({}); 
+  const { selectedWorkspace } = useWorkspace();
+  const [workspaces, setWorkspaces] = useState([]); 
   const navigate = useNavigate();
-  const [doneTaskCounts, setDoneTaskCounts] = useState({});
   const { isNavOpen } = useOutletContext();
 
   useEffect(() => {
+
     const fetchProjects = async () => {
       setLoading(true); 
       try {
         const user = JSON.parse(localStorage.getItem('user'));
         const accessToken = user ? user.accessToken : null;
-      
+    
         if (!accessToken) {
           setError('No access token found. Please log in again.');
+          setLoading(false);
           return;
         }
-  
+    
+        // Get the workspaceId from the selectedWorkspace
+        const workspaceId = selectedWorkspace ? selectedWorkspace._id : null;
+    
+        if (!workspaceId) {
+          setError('No workspace selected. Please select a workspace.');
+          setLoading(false);
+          return;
+        }
+    
+        // Make the API call to fetch projects with the workspaceId as a query parameter
         const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
+          params: {
+            workspaceId, // Pass the workspaceId as a query parameter
+          },
         });
-  
+    
         setProjects(response.data);
       } catch (error) {
         console.error('Error fetching projects:', error);
@@ -49,10 +69,67 @@ const Project = () => {
         setLoading(false);
       }
     };
-  
+    
+    if (selectedWorkspace) {
+      fetchProjects();
+    }
+    // Call the function to fetch projects
     fetchProjects();
+    
   }, []);
-  
+
+  // Fetch task counts (total and done) for each project
+  useEffect(() => {
+    const fetchTaskCounts = async () => {
+      const counts = {};
+      for (let project of projects) {
+        try {
+          const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}`);
+          const totalTasks = response.data.data.length;
+          const doneTasks = response.data.data.filter(task => task.status === 'Done').length;
+          counts[project._id] = {
+            totalTasks,
+            doneTasks,
+          };
+        } catch (error) {
+          console.error('Error fetching task counts:', error);
+        }
+      }
+      setTaskCounts(counts);
+    };
+
+    if (projects.length) {
+      fetchTaskCounts();
+    }
+  }, [projects]);
+
+
+  useEffect(() => {
+    const fetchWorkspaces = async () => {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const accessToken = user ? user.accessToken : null;
+
+      if (!accessToken) {
+        console.error('No access token found.');
+        return;
+      }
+
+      try {
+        const response = await axios.get('http://localhost:5000/api/users/workspaces', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        setWorkspaces(response.data);  // Set the fetched workspaces to state
+      } catch (error) {
+        console.error('Error fetching workspaces:', error);
+      }
+    };
+
+    fetchWorkspaces();
+  }, []);
+
   const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
@@ -96,12 +173,19 @@ const Project = () => {
 
   const handleCreateProject = async () => {
     setLoading(true);
-    if (!imagePreview || !projectName || !team) {
+    if (!imagePreview || !projectName || !team) {  // Ensure 'team' is selected
       setError('Please fill out all fields including image, project name, and team.');
       setLoading(false);
       return;
     }
   
+    if (!selectedWorkspace) {
+      setLoading(false);
+      setError('No workspace selected. Please select a workspace to create a project.');
+      return;
+    }
+  
+    const workspaceId = team;  // Use the selected team (workspace)
     const user = JSON.parse(localStorage.getItem('user'));
     const accessToken = user ? user.accessToken : null;
   
@@ -116,6 +200,7 @@ const Project = () => {
       const newProject = {
         projectName,
         thumbnail,
+        workspaceId,  // Pass the selected workspaceId (team)
       };
   
       const response = await axios.post('http://localhost:5000/api/users/sa-newproject', newProject, {
@@ -126,6 +211,7 @@ const Project = () => {
   
       setProjects([...projects, response.data]);
       closeModal();
+      toast.success('Project created successfully!');
     } catch (error) {
       setLoading(false);
       console.error('Error creating project:', error);
@@ -134,30 +220,7 @@ const Project = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    const fetchDoneTaskCounts = async () => {
-      try {
-        const counts = {};
-        for (let project of projects) {
-          try {
-            const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}?status=Done`);
-            counts[project._id] = response.data.data.length;
-          } catch (error) {
-            console.error('Error fetching done task count:', error);
-            counts[project._id] = 0;
-          }
-        }
-        setDoneTaskCounts(counts);
-      } catch (error) {
-        console.error('Error fetching done task counts:', error);
-      }
-    };
-
-    if (projects.length) {
-      fetchDoneTaskCounts();
-    }
-  }, [projects]);
+  
 
   const handleProjectClick = (project) => {
     setSelectedProject(project);
@@ -168,8 +231,14 @@ const Project = () => {
     }, 3000);
   };
 
+  const calculateProgress = (projectId) => {
+    const { totalTasks, doneTasks } = taskCounts[projectId] || { totalTasks: 0, doneTasks: 0 };
+    return totalTasks > 0 ? (doneTasks / totalTasks) * 100 : 0;
+  };
+
   return (
     <div className="bg-gray-100 min-h-screen p-6">
+      <ToastContainer />
 
       {loadingProject && (
         <div className="flex flex-col items-center">
@@ -202,6 +271,17 @@ const Project = () => {
         </button>
       </div>
 
+        {/* <div>
+            <h1>Project Page</h1>
+            {loading ? (
+                <p>Loading...</p> // Show loading state
+            ) : selectedWorkspace ? (
+                <p>Selected Workspace: {selectedWorkspace.workspaceTitle}</p> // Display the workspace title
+            ) : (
+                <p>No workspace selected</p> // Handle case where no workspace is selected
+            )}
+        </div> */}
+
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-gray-800 bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-md shadow-lg relative max-w-md mx-auto w-full z-60">
@@ -209,7 +289,7 @@ const Project = () => {
               onClick={closeModal}
               className="absolute top-3 right-3 text-gray-600 hover:text-gray-800"
             >
-              <FaTimes />
+              
             </button>
             <h2 className="text-xl font-semibold">New Project</h2>
             <p className="mt-4 text-gray-500">Thumbnail</p>
@@ -241,29 +321,44 @@ const Project = () => {
               className="mt-2 w-full p-2 border border-gray-300 rounded-md text-gray-700"
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
-            />
-            <p className="mt-4 text-gray-500 text-left">Team</p>
-            <div className="relative mt-2">
-              <select
-                className="w-full p-2 border border-gray-300 rounded-md text-gray-700"
-                value={team}
-                onChange={(e) => setTeam(e.target.value)}
-              >
-                <option value="" disabled>Team</option>
-                <option value="team1">Super Board</option>
-                <option value="team2">Team 2</option>
-                <option value="team3">Team 3</option>
-              </select>
-            </div>
+                />
+              <p className="mt-4 text-gray-500 text-left">Team (Workspace)</p>
+              <div className="relative mt-2">
+                <select
+                  className="w-full p-2 border border-gray-300 rounded-md text-gray-700"
+                  value={team}
+                  onChange={(e) => setTeam(e.target.value)}
+                >
+                  <option value="" disabled>Select Workspace</option>
+                  {workspaces.map((workspace) => (
+                    <option key={workspace._id} value={workspace._id}>
+                      {workspace.workspaceTitle}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            <div className="mt-6 flex justify-center">
-              <button
-                onClick={handleCreateProject}
-                className="bg-red-800 text-white px-8 py-3 rounded-md shadow hover:bg-red-900 w-full flex items-center justify-center"
-                disabled={loading}
-              >
-                {loading ? <ButtonSpinner /> : 'Create Project'}
-              </button>
+
+            <input
+              type="hidden"
+              name="workspaceId"
+              value={selectedWorkspace ? selectedWorkspace.workspaceTitle : ''}
+            />      
+
+            <div className="mt-6 flex flex-col justify-center">
+                <button
+                  onClick={handleCreateProject}
+                  className="bg-red-800 text-white px-8 py-3 rounded-md shadow hover:bg-red-900 w-full mb-2 flex items-center justify-center"
+                  disabled={loading}
+                >
+                  {loading ? <ButtonSpinner /> : 'Create Project'}
+                </button>
+                <button
+                  onClick={closeModal}
+                  className="bg-gray-500 text-white px-8 py-3 rounded-md shadow hover:bg-gray-600 w-full flex items-center justify-center"
+                >
+                  Close
+                </button>
             </div>
           </div>
         </div>
@@ -290,30 +385,31 @@ const Project = () => {
               <p>{new Date(project.createdAt).toLocaleDateString() || 'No date available'}</p>
               <FaCheckCircle className="ml-5" />
               <p className="ml-2">
-                {doneTaskCounts[project._id] !== undefined ? doneTaskCounts[project._id] : 'Loading...'}
+                {taskCounts[project._id] ? taskCounts[project._id].doneTasks : 'Loading...'}
               </p>
               <div className="flex items-center justify-end ml-9 -space-x-4">
-                {project.invitedUsers && project.invitedUsers.slice(0, 3).map(user => (
-                  <img
-                    key={user._id}
-                    src={user.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'} // Ensure it falls back to a default if no picture
-                    alt={user.username || 'Profile Picture'}
-                    className="w-8 h-8 rounded-full object-cover -ml-2 border-2 border-white"
-                  />
-                ))}
-                </div>
+                  {project.invitedUsers && project.invitedUsers.slice(0, 3).map(user => (
+                    <img
+                      key={user._id}
+                      src={user.profilePicture?.url || user.profilePicture} // Ensure it falls back to a default if no picture
+                      alt={user.username || 'Profile Picture'}
+                      className="w-8 h-8 rounded-full object-cover -ml-2 border-2 border-white"
+                    />
+                  ))}
+              </div>
             </div>
 
-
-
+            {/* Progress Bar */}
             <div className="flex items-center mt-4">
               <div className="w-full bg-gray-200 rounded-full h-2 relative">
                 <div
                   className="bg-green-500 h-2 rounded-full"
-                  style={{ width: '5%' }} // Adjust this as needed
+                  style={{ width: `${calculateProgress(project._id)}%` }} // Dynamically set progress width
                 ></div>
               </div>
-              <p className="ml-2 text-gray-500">5%</p>
+              <p className="ml-2 text-gray-500">
+                {`${Math.floor(calculateProgress(project._id))}%`}
+              </p>
             </div>
           </div>
         ))}

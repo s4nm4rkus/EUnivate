@@ -8,7 +8,7 @@ const UserNameModal = ({ isOpen, onClose, user, onSelectName }) => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users`);
+        const response = await fetch('http://localhost:5000/api/users');
         if (!response.ok) {
           throw new Error('Failed to fetch users');
         }

@@ -47,7 +47,7 @@ import { io } from '../../../index.js';
           priority, 
           status, 
           description, 
-          objectives,  // Array of { text: String, done: Boolean }
+          objectives,  
           questionUpdate, 
           attachment,
           project 
@@ -60,12 +60,14 @@ import { io } from '../../../index.js';
         // Check if all assignees are invited users
         const invalidAssignees = assignee.filter(userId => !invitedUserIds.includes(userId.toString()));
     
+        // Automatically invite users if they are not part of invited users
         if (invalidAssignees.length > 0) {
-          return res.status(400).json({
-            success: false,
-            message: 'Some assignees are not invited members of this project.',
-            invalidAssignees
-          });
+          console.log('Automatically inviting invalid assignees:', invalidAssignees);
+          // Add these users to the invited list for the project
+          await saInvitedMember.insertMany(invalidAssignees.map(userId => ({
+            userId,
+            project
+          })));
         }
     
         // Prepare objectives with the default `done` status as false if not provided
@@ -106,6 +108,8 @@ import { io } from '../../../index.js';
         });
       }
     };
+    
+    
     
       // Get All Tasks Controller
       export const getTasks = async (req, res) => {

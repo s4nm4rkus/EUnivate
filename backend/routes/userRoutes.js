@@ -81,53 +81,53 @@ router.post('/contactEunivate',ContactEunivate );
       router.post('/sa-tasks/:taskId/comments', addCommentToTask);
       router.get('/sa-tasks/:taskId/comments', getTaskComments);
 
-// Message routes
-router.get('/messages', getAllMessages);
-router.post('/create-message', createMessage);
-router.post('/:messageId/reply', replyToMessage);
-router.post('/:messageId/react', reactToMessage);
-router.post('/:messageId/star', starMessage);
-router.post('/:messageId/flag', flagMessage);
-router.delete('/:messageId', deleteMessage);
+      // Message routes
+      router.get('/messages', getAllMessages);
+      router.post('/create-message', createMessage);
+      router.post('/:messageId/reply', replyToMessage);
+      router.post('/:messageId/react', reactToMessage);
+      router.post('/:messageId/star', starMessage);
+      router.post('/:messageId/flag', flagMessage);
+      router.delete('/:messageId', deleteMessage);
 
 
-// quotation route  
-router.post('/quotation',createQuotation);
-router.get('/quotation/confirm/:quotationToken', confirmQuotationEmail);
-router.get('/quotations/:id/status', checkVerificationStatus);
+      // quotation route  
+      router.post('/quotation',createQuotation);
+      router.get('/quotation/confirm/:quotationToken', confirmQuotationEmail);
+      router.get('/quotations/:id/status', checkVerificationStatus);
 
-// User Update Routes
-router.put('/:id', updateUser);
-router.put('/:id/password', updateUserPassword);
+      // User Update Routes
+      router.put('/:id', updateUser);
+      router.put('/:id/password', updateUserPassword);
 
 
-  //Admin Routes
-//Products
-router.post('/addproduct', upload.single('image'), createProduct );
-router.get('/products', getProducts);
-router.delete('/products/:id', deleteProduct);
-router.put('/products/:id', upload.single('image'), updateProduct);
-//Projects
-router.post('/addproject', upload.single('image'), createProject);
-router.get('/projects', getProjects);
-router.put('/projects/:id', upload.single('image'), updateProject);
-router.delete('/projects/:id', deleteProject);
-//Events
-router.post('/addevent', upload.single('image'), createEvent);
-router.get('/events', getEvents);
-router.put('/events/:id', upload.single('image'), updateEvent);
-router.delete('/events/:id', deleteEvent);
-//Dashboard
-router.get('/stats', getDashboardStats);
-// Get all quotations
-router.get('/quotations', getQuotations);
-router.delete('/quotations/:id', deleteQuotation);
-//Notification for admin
-router.get('/notifications', checkNotifications);
+        //Admin Routes
+      //Products
+      router.post('/addproduct', upload.single('image'), createProduct );
+      router.get('/products', getProducts);
+      router.delete('/products/:id', deleteProduct);
+      router.put('/products/:id', upload.single('image'), updateProduct);
+      //Projects
+      router.post('/addproject', upload.single('image'), createProject);
+      router.get('/projects', getProjects);
+      router.put('/projects/:id', upload.single('image'), updateProject);
+      router.delete('/projects/:id', deleteProject);
+      //Events
+      router.post('/addevent', upload.single('image'), createEvent);
+      router.get('/events', getEvents);
+      router.put('/events/:id', upload.single('image'), updateEvent);
+      router.delete('/events/:id', deleteEvent);
+      //Dashboard
+      router.get('/stats', getDashboardStats);
+      // Get all quotations
+      router.get('/quotations', getQuotations);
+      router.delete('/quotations/:id', deleteQuotation);
+      //Notification for admin
+      router.get('/notifications', checkNotifications);
 
-// SuperAdmin Route (Protected)
-router.get('/superadmin', protect, verifySuperAdmin, (req, res) => {
-  res.status(200).json({ message: 'Welcome to the SuperAdmin dashboard' });
-});
+      // SuperAdmin Route (Protected)
+      router.get('/superadmin', protect, verifySuperAdmin, (req, res) => {
+        res.status(200).json({ message: 'Welcome to the SuperAdmin dashboard' });
+      });
 
-export default router;
+      export default router;

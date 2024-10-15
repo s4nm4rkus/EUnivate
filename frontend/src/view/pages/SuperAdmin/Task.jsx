@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import '../../../admin.css';
 import AdminNavbar from '../../components/SuperAdmin/AdminNavbar';
@@ -6,6 +6,7 @@ import { FaFlag, FaCheckCircle } from 'react-icons/fa';
 import BoxLoader from './Loading Style/Box Loading/BoxLoader';
 import TaskModal from './Task Modal/TaskModal';
 import abt1Image from '../../../assets/Filter.png';  // Update the path if needed
+import { useWorkspace } from '../../components/SuperAdmin/workspaceContext'; // Import your workspace context
 
 const Task = () => {
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
@@ -13,6 +14,7 @@ const Task = () => {
     const [loading, setLoading] = useState(false);
     const [selectedTask, setSelectedTask] = useState(null); 
     const [isModalOpen, setIsModalOpen] = useState(false); 
+    const { selectedWorkspace } = useWorkspace(); // Use the workspace context to get the selected workspace
 
     const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
 
@@ -25,60 +27,90 @@ const Task = () => {
     useEffect(() => {
         const fetchTasks = async () => {
             setLoading(true);
+            console.log('Fetching tasks...');
+    
             try {
                 const user = JSON.parse(localStorage.getItem('user'));
                 const accessToken = user ? user.accessToken : null;
-
+    
                 if (!accessToken) {
                     console.error('No access token found. Please log in again.');
                     return;
                 }
-
-                const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
+                
+                // Check if a workspace is selected
+                if (!selectedWorkspace) {
+                    console.error('No workspace selected.');
+                    setLoading(false);
+                    return;
+                }
+    
+                console.log(`Fetching projects for workspace: ${selectedWorkspace.workspaceTitle} (ID: ${selectedWorkspace._id})`);
+    
+                // Fetch projects associated with the selected workspace
+                const projectResponse = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
+                    params: {
+                        workspaceId: selectedWorkspace._id, // Pass the workspace ID to filter projects
+                    }
                 });
-
+    
                 const tasksList = [];
                 await Promise.all(
-                    response.data.map(async (project) => {
-                        const taskResponse = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}`);
-                        const tasksWithProject = taskResponse.data.data.map(task => ({
-                            ...task,
-                            projectName: project.projectName,
-                            objectives: task.objectives || [], // Ensure objectives are included
-                            assignedUsers: task.assignedUsers || [],
-                            invitedUsers: project.invitedUsers || [] // Fetching invited users from the project
-                        }));
-                        tasksList.push(...tasksWithProject);
+                    projectResponse.data.map(async (project) => {
+                        try {
+                            console.log(`Fetching tasks for project: ${project.projectName}, ID: ${project._id}`);
+                            const taskResponse = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}`, {
+                                headers: {
+                                    Authorization: `Bearer ${accessToken}`, // Include the token here as well
+                                },
+                            });
+                            console.log(`Tasks for project ${project.projectName}:`, taskResponse.data.data);
+    
+                            const tasksWithProject = taskResponse.data.data.map(task => ({
+                                ...task,
+                                projectName: project.projectName,
+                                objectives: task.objectives || [], // Ensure objectives are included
+                                assignedUsers: task.assignedUsers || [],
+                                invitedUsers: project.invitedUsers || [] // Fetching invited users from the project
+                            }));
+                            tasksList.push(...tasksWithProject);
+                        } catch (taskError) {
+                            console.error(`Error fetching tasks for project ${project._id}:`, taskError);
+                        }
                     })
                 );
-
-                setTimeout(() => {
-                    setTasks(tasksList);
-                    setLoading(false);
-                }, 2000);
+    
+                console.log('All tasks:', tasksList);
+    
+                setTasks(tasksList);
+                setLoading(false);
             } catch (error) {
                 console.error('Error fetching tasks:', error);
                 setLoading(false);
             }
         };
-
+    
         fetchTasks();
-    }, []);
+    }, [selectedWorkspace]); // Re-fetch tasks when selectedWorkspace changes
+    
 
     const openModal = (task) => {
+        console.log('Opening modal for task:', task);
         setSelectedTask(task);
         setIsModalOpen(true);
     };
 
     const closeModal = () => {
+        console.log('Closing modal...');
         setIsModalOpen(false);
         setSelectedTask(null);
     };
 
     const getPriorityColor = (priority) => {
+        console.log('Getting priority color for:', priority);
         switch (priority.toLowerCase()) {
             case 'easy':
                 return 'text-green-500';
@@ -92,6 +124,7 @@ const Task = () => {
     };
 
     const renderStatusIcon = (status) => {
+        console.log('Rendering status icon for:', status);
         return status.toLowerCase() === 'done' ? (
             <FaCheckCircle className="text-green-500 text-2xl" />
         ) : (

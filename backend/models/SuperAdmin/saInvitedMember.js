@@ -10,11 +10,6 @@ const saInvitedMemberSchema = new mongoose.Schema({
         enum: ['User', 'guest','members', 'admin', 'superadmin'],
         default: 'User',
     },   
-    workspaceId: {
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'Workspace',  
-        required: true,    
-    },
     project: [{
         type: mongoose.Schema.Types.ObjectId,  // Store project IDs as ObjectId
         ref: 'SaNewProject',  // Reference the Project model

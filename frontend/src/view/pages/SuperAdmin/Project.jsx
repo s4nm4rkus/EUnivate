@@ -70,6 +70,9 @@ const Project = () => {
       }
     };
     
+    if (selectedWorkspace) {
+      fetchProjects();
+    }
     // Call the function to fetch projects
     fetchProjects();
     

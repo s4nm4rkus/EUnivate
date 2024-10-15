@@ -40,13 +40,12 @@ const router = express.Router();
       // router.get('/invitedMembers', protect, getInvitedMembersByUserId); 
       router.put('/:userId/role', updateUserRole); 
 
-// User Management Routes
-router.get('/', getUsers); 
-router.post('/signup', createUser);  
-router.post('/', upload.single('profilePicture'), createUser);
-
-//User Messages Related
-router.post('/contactEunivate',ContactEunivate );
+        // User Management Routes
+        router.get('/', getUsers); 
+        router.post('/signup', createUser);  
+        router.post('/', upload.single('profilePicture'), createUser);
+        //User Messages Related
+        router.post('/contactEunivate',ContactEunivate );
 
       //SuperAdminRoutes
       router.post('/sa-newproject',protect, createSaNewProject);

@@ -36,17 +36,14 @@ const SideNav = ({ isNavOpen }) => {
     const location = useLocation(); // Use the useLocation hook
 
     useEffect(() => {
-        // Parse URL parameters using location.search
         const params = new URLSearchParams(location.search);
         const workspaceId = params.get('workspaceId');
         const workspaceTitle = params.get('workspaceTitle');
 
         if (workspaceId && workspaceTitle) {
-            // Set the selected workspace from URL parameters
             setSelectedWorkspace({ _id: workspaceId, workspaceTitle });
         }
 
-        // Fetch workspaces from the API
         const fetchWorkspaces = async () => {
             const user = JSON.parse(localStorage.getItem('user'));
             if (!user || !user.accessToken) {
@@ -70,7 +67,7 @@ const SideNav = ({ isNavOpen }) => {
         };
 
         fetchWorkspaces();
-    }, [location.search, setSelectedWorkspace]); // Dependencies: location.search and setSelectedWorkspace
+    }, [location.search, setSelectedWorkspace]);
 
     const closeModal = () => {
         setIsModalOpen(false);
@@ -82,7 +79,6 @@ const SideNav = ({ isNavOpen }) => {
     const handleCreateWorkspace = async (e) => {
         e.preventDefault();
     
-        // Ensure workspace title is not empty
         if (!workspaceTitle.trim()) {
             setError('Workspace title is required');
             return;
@@ -99,7 +95,7 @@ const SideNav = ({ isNavOpen }) => {
         try {
             const response = await axios.post(
                 'http://localhost:5000/api/users/workspace', 
-                { workspaceTitle },  // Payload with the title
+                { workspaceTitle }, 
                 {
                     headers: { Authorization: `Bearer ${accessToken}` },
                 }
@@ -107,13 +103,12 @@ const SideNav = ({ isNavOpen }) => {
     
             if (response.status === 201) {
                 const newWorkspace = response.data; 
-                localStorage.setItem('currentWorkspaceId', newWorkspace._id); // Save current workspace ID
+                localStorage.setItem('currentWorkspaceId', newWorkspace._id);
     
-                // Success notification
                 setAlertMessage('Workspace created successfully!');
     
                 closeModal();
-                setWorkspaces([...workspaces, newWorkspace]); // Add the new workspace to the list
+                setWorkspaces([...workspaces, newWorkspace]);
 
                 navigate(`/superadmin/dashboard?workspaceId=${newWorkspace._id}&workspaceTitle=${newWorkspace.workspaceTitle}`);
             }
@@ -125,7 +120,7 @@ const SideNav = ({ isNavOpen }) => {
     
     const handleWorkspaceSelect = (workspace) => {
         setSelectedWorkspace(workspace);
-        setIsDropdownOpen(false); // Close the dropdown after selecting
+        setIsDropdownOpen(false);
         navigate(`/superadmin/dashboard?workspaceId=${workspace._id}&workspaceTitle=${workspace.workspaceTitle}`);
     };
 
@@ -133,7 +128,7 @@ const SideNav = ({ isNavOpen }) => {
         <div
             className={`side-nav-admin fixed top-0 left-0 h-full bg-red-750 shadow-lg transition-transform transform ${
                 isNavOpen ? 'translate-x-0' : '-translate-x-full'
-            } lg:translate-x-0 lg:w-[250px] z-30`}
+            } lg:translate-x-0 lg:w-[250px] z-30 w-[250px]`}  // Fixed width for consistency
         >
             <div className="dashboard-logo flex items-center p-4">
                 <img
@@ -176,8 +171,8 @@ const SideNav = ({ isNavOpen }) => {
                     </li>
                 ))} 
             </ul>
-            
-            <div className="add-workspace">
+
+            <div className="absolute bottom-0 left-0 w-full p-4 text-white text-center">
                 <p className="font-size">Workspace 
                     <button onClick={() => setIsModalOpen(true)}>
                         <FontAwesomeIcon icon={faPlus} className="faPlusWorkspace"/>
@@ -191,7 +186,7 @@ const SideNav = ({ isNavOpen }) => {
                     </button>
 
                     {isDropdownOpen && (
-                        <ul className="workspaceList absolute z-10 mt-2 ms-2 bg-white text-black shadow">
+                        <ul className="workspaceList absolute z-10 bottom-full mb-2 bg-white text-black shadow">
                             {workspaces.length > 0 ? (
                                 workspaces.map((workspace) => (
                                     <li key={workspace._id} onClick={() => handleWorkspaceSelect(workspace)} className="p-2 hover:bg-gray-400 cursor-pointer">
@@ -204,8 +199,9 @@ const SideNav = ({ isNavOpen }) => {
                         </ul>
                     )}
                 </div>
-            </div> 
+            </div>
 
+            {/* Modal for adding a new workspace */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 bg-gray-800 bg-opacity-50 flex ">
                     <div
@@ -255,10 +251,8 @@ const SideNav = ({ isNavOpen }) => {
                         </form>
                     </div>
                 </div>
-         
-         )}
+            )}
         </div>
-        
     );
 };
 

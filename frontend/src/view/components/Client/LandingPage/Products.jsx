@@ -33,7 +33,7 @@ const Products = () => {
   const availableProducts = products.filter(product => product.availability === "Available");
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-20">
       {/* Header */}
       <header className="mb-6">
        

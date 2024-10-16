@@ -28,7 +28,7 @@ const router = express.Router();
       import { addNewWorkspace, getAllWorkspaces } from '../controllers/SuperAdmin/workspaceController.js';
       import { getAssignees } from '../controllers/findUserNameIDController.js';
       import { createMessage,replyToMessage, reactToMessage,starMessage,flagMessage, getAllMessages, deleteMessage} from '../controllers/SuperAdmin/Message/messageController.js';
-      
+      import { getAddedMembersForMessage } from '../controllers/SuperAdmin/Message/getAddedMeberstoProject.js';
       // User Authentication Routes
       router.post('/login', loginUser);
       router.post('/forgot-password', forgotPassword);
@@ -48,48 +48,48 @@ const router = express.Router();
       //User Messages Related
       router.post('/contactEunivate',ContactEunivate );
 
-      //SuperAdminRoutes
-      router.post('/sa-newproject',protect, createSaNewProject);
-      router.post('/sa-invite-users',protect,  inviteUsers);
-      router.get('/sa-getnewproject', protect, getAllProjects);
-      router.get('/sa-getnewproject/:id', protect,  getProjectById)
-      router.get('/findByUsername/:username', findUserByUsername);
+        //SuperAdminRoutes
+        router.post('/sa-newproject',protect, createSaNewProject);
+        router.post('/sa-invite-users',protect,  inviteUsers);
+        router.get('/sa-getnewproject', protect, getAllProjects);
+        router.get('/sa-getnewproject/:id', protect,  getProjectById)
+        router.get('/findByUsername/:username', findUserByUsername);
 
-      //Workspace
-      router.post('/workspace', protect, addNewWorkspace);
-      router.get('/workspaces', protect, getAllWorkspaces);
-      
-      //get the Invited users from people on superadmin
-      router.post('/invite', protect, inviteUsers); 
-      router.get('/invited', protect, getInvitedUsers);
-      router.delete('/invited/:id', protect, removeInvitedMember);
-      //people Controller
-      router.put('/assign-project', protect, assignProjectToUser);
-      //add member on the project details on user add icon
-      router.post('/add-member-to-project', addMemberToProject);
-      // Activity Controller
-      router.get('/assignee', getAssignees); 
-      // Task Routes
-      router.get('/get-assignee', getAddedMembers);
-      router.post('/sa-task', createTask);
-      router.get('/sa-tasks', getTasks);
-      router.get('/sa-tasks/:projectId', getTasksByProjectId);
-      router.get('/sa-tasks/:id', getTaskById);
-      router.patch('/sa-tasks/:id', updateTask);
-      router.patch('/sa-tasks/:id/objectives', updateTaskObjectives);
-      router.delete('/sa-tasks/:id', deleteTask);
-      router.post('/sa-tasks/:taskId/comments', addCommentToTask);
-      router.get('/sa-tasks/:taskId/comments', getTaskComments);
+        //Workspace
+        router.post('/workspace', protect, addNewWorkspace);
+        router.get('/workspaces', protect, getAllWorkspaces);
+        
+        //get the Invited users from people on superadmin
+        router.post('/invite', protect, inviteUsers); 
+        router.get('/invited', protect, getInvitedUsers);
+        router.delete('/invited/:id', protect, removeInvitedMember);
+        //people Controller
+        router.put('/assign-project', protect, assignProjectToUser);
+        //add member on the project details on user add icon
+        router.post('/add-member-to-project', addMemberToProject);
+        // Activity Controller
+        router.get('/assignee', getAssignees); 
+        // Task Routes
+        router.get('/get-assignee', getAddedMembers);
+        router.post('/sa-task', createTask);
+        router.get('/sa-tasks', getTasks);
+        router.get('/sa-tasks/:projectId', getTasksByProjectId);
+        router.get('/sa-tasks/:id', getTaskById);
+        router.patch('/sa-tasks/:id', updateTask);
+        router.patch('/sa-tasks/:id/objectives', updateTaskObjectives);
+        router.delete('/sa-tasks/:id', deleteTask);
+        router.post('/sa-tasks/:taskId/comments', addCommentToTask);
+        router.get('/sa-tasks/:taskId/comments', getTaskComments);
 
-      // Message routes
-      router.get('/messages', getAllMessages);
-      router.post('/create-message', createMessage);
-      router.post('/:messageId/reply', replyToMessage);
-      router.post('/:messageId/react', reactToMessage);
-      router.post('/:messageId/star', starMessage);
-      router.post('/:messageId/flag', flagMessage);
-      router.delete('/:messageId', deleteMessage);
-
+        // Message routes
+        router.get('/messages', getAllMessages);
+        router.post('/create-message', createMessage);
+        router.post('/:messageId/reply', replyToMessage);
+        router.post('/:messageId/react', reactToMessage);
+        router.post('/:messageId/star', starMessage);
+        router.post('/:messageId/flag', flagMessage);
+        router.delete('/:messageId', deleteMessage);
+        router.get('/get-added-members', getAddedMembersForMessage); 
 
       // quotation route  
       router.post('/quotation',createQuotation);

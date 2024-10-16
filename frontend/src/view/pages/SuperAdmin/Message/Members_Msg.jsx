@@ -8,6 +8,8 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
   const [error, setError] = useState(null);
   const [workspaces, setWorkspaces] = useState([]); // State to hold workspaces
   const [selectedWorkspace, setSelectedWorkspace] = useState(''); // State to hold selected workspace
+  const [projects, setProjects] = useState([]); // State to hold projects
+  const [selectedProject, setSelectedProject] = useState(''); // State to hold selected project
 
   // Fetch workspaces and users when the component mounts
   useEffect(() => {
@@ -74,13 +76,49 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
     }
   }, []);
 
+  // Fetch projects when a workspace is selected
+  useEffect(() => {
+    const fetchProjects = async () => {
+      if (!selectedWorkspace) return;
+
+      const user = JSON.parse(localStorage.getItem('user'));
+      const accessToken = user ? user.accessToken : null;
+
+      try {
+        const projectsResponse = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          params: {
+            workspaceId: selectedWorkspace,
+          },
+        });
+        setProjects(projectsResponse.data);
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+      }
+    };
+
+    fetchProjects();
+  }, [selectedWorkspace]);
+
   // Handle workspace selection change
   const handleWorkspaceChange = (event) => {
     const selected = event.target.value;
     setSelectedWorkspace(selected);
+    setSelectedProject(''); // Reset project selection when workspace changes
 
     // Save the selected workspace to localStorage to persist across refreshes
     localStorage.setItem('selectedWorkspace', selected);
+  };
+
+  // Handle project selection change
+  const handleProjectChange = (event) => {
+    const selected = event.target.value;
+    setSelectedProject(selected);
+
+    // Save the selected project to localStorage to persist across refreshes
+    localStorage.setItem('selectedProject', selected);
   };
 
   const totalMembers = invitedUsers.length;
@@ -111,6 +149,28 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
           ))}
         </select>
       </div>
+
+      {/* Project Selection Dropdown */}
+      {selectedWorkspace && (
+        <div className="mt-4">
+          <label htmlFor="project" className="block text-sm font-medium text-gray-700">
+            Select Project
+          </label>
+          <select
+            id="project"
+            value={selectedProject}
+            onChange={handleProjectChange}
+            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          >
+            <option value="" disabled>Select a Project</option>
+            {projects.map((project) => (
+              <option key={project._id} value={project._id}>
+                {project.projectName}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* Workspace Description */}
       <div className="bg-gray-100 p-4 rounded-md h-52 mt-4">

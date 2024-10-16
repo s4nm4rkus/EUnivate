@@ -3,6 +3,7 @@ import axios from 'axios';
 import '../../../admin.css';
 import AdminNavbar from '../../components/SuperAdmin/AdminNavbar';
 import { format } from 'date-fns'; // For date formatting
+import { useWorkspace } from '../../components/SuperAdmin/workspaceContext';
 
 const Activity = () => {
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
@@ -10,13 +11,15 @@ const Activity = () => {
     const [taskDetails, setTaskDetails] = useState({});
     const [userName, setUserName] = useState('');
     const [profilePicture, setProfilePicture] = useState('');
-
+    const { selectedWorkspace } = useWorkspace(); 
     const defaultProfilePictureUrl = 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'; // Default avatar image
 
     const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
 
     // Fetch project and task details
     useEffect(() => {
+        if (!selectedWorkspace) return; // Ensure a workspace is selected before fetching
+
         const fetchProjectsAndTasks = async () => {
             try {
                 const user = JSON.parse(localStorage.getItem('user'));
@@ -24,22 +27,27 @@ const Activity = () => {
 
                 // Fetch username and profile picture
                 setUserName(`${user.firstName} ${user.lastName}`);
-                if (user.profilePicture && user.profilePicture.url) {
-                    setProfilePicture(user.profilePicture.url);
-                } else {
-                    setProfilePicture(defaultProfilePictureUrl);
-                }
+                setProfilePicture(user.profilePicture?.url || user.profilePicture || defaultProfilePictureUrl);
 
+                // Fetch projects based on the selected workspace
                 const projectResponse = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
+                    params: {
+                        workspaceId: selectedWorkspace._id, // Pass the workspace ID to filter projects
+                    }
                 });
 
                 setProjects(projectResponse.data);
 
+                // Fetch tasks for each project
                 const taskDetailsPromises = projectResponse.data.map(async (project) => {
-                    const taskResponse = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}`);
+                    const taskResponse = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}`, {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`
+                        }
+                    });
                     const tasks = taskResponse.data.data;
 
                     return { projectId: project._id, tasks };
@@ -59,12 +67,11 @@ const Activity = () => {
         };
 
         fetchProjectsAndTasks();
-    }, []);
+    }, [selectedWorkspace]); // Ensure that this runs again when selectedWorkspace changes
 
     // Function to determine what to display based on task changes
     const getTaskChanges = (task) => {
         let changes = [];
-
         const isTaskNew = task.createdAt === task.updatedAt;
 
         // Detect if the task was just created
@@ -131,7 +138,7 @@ const Activity = () => {
         } else if (task.status && isTaskNew) {
             changes.push({
                 type: 'status',
-                label: 'Add status to',
+                label: 'Add status',
                 value: task.status
             });
         }
@@ -165,7 +172,7 @@ const Activity = () => {
                                 </h2>
                                 <div className="text-gray-500 text-xs md:text-sm flex items-center ml-2">
                                     <span>&#8226;</span> {/* Bullet Point */}
-                                    <span className="ml-2 ">
+                                    <span className="ml-2">
                                         {format(new Date(project.createdAt), 'MMM dd, yyyy')}
                                     </span> {/* Date */}
                                 </div>

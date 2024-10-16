@@ -6,8 +6,8 @@ import { faChevronDown, faChevronRight } from '@fortawesome/free-solid-svg-icons
 import { User } from '../../../constants/assets';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-
+import { useWorkspace } from '../../components/SuperAdmin/workspaceContext';
+import axios from 'axios';
 const People = () => {
     const [user, setUser] = useState({ profilePicture: { url: '' } });
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
@@ -22,7 +22,8 @@ const People = () => {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [showUsersInModal, setShowUsersInModal] = useState(false); 
+    const { selectedWorkspace } = useWorkspace(); // Get selected workspace from context
+
     const fetchProjects = async () => {
         try {
             const user = JSON.parse(localStorage.getItem('user'));
@@ -42,110 +43,87 @@ const People = () => {
             setError('An error occurred while fetching projects.');
         }
     };
-
     const fetchUsers = async () => {
         try {
             const user = JSON.parse(localStorage.getItem('user'));
             const token = user?.accessToken;
-
+    
             if (!token) {
                 throw new Error('No access token found. Please log in again.');
             }
-
-            const response = await fetch('http://localhost:5000/api/users/', {
+    
+            // Fetch all users
+            const response = await axios.get('http://localhost:5000/api/users/', {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
             });
-
-            if (!response.ok) throw new Error('Failed to fetch users');
-
-            const users = await response.json();
-            setAllUsers(users);
-            setFilteredUsers(users);
-
-            const invitedUsersResponse = await fetch('http://localhost:5000/api/users/invited', {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-
-            if (!invitedUsersResponse.ok) throw new Error('Failed to fetch invited users');
-
-            const invitedUsersData = await invitedUsersResponse.json();
-
-             const updatedInvitedUsers = invitedUsersData.invitedUsers.map((invitedUser) => {
-            const userFromDB = users.find((user) => user.email === invitedUser.email);
-            
-                        return userFromDB
-                            ? { ...invitedUser, role: userFromDB.role, profilePicture: userFromDB.profilePicture, _id: userFromDB._id }
-                            : invitedUser;
-                    });
-
-                    setInvitedUsers(updatedInvitedUsers);
-                } catch (error) {
-                    console.error('Error fetching users:', error);
-                    setError(error.message);
-                }
-            };
-
+    
+            setAllUsers(response.data);
+    
+            // Fetch invited users specific to the selected workspace
+            if (selectedWorkspace) {
+                const invitedUsersResponse = await axios.get('http://localhost:5000/api/users/invited', {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    params: { workspaceId: selectedWorkspace._id },  // Pass workspaceId as a query param
+                });
+    
+                const invitedUsersData = invitedUsersResponse.data.invitedUsers.map((invitedUser) => {
+                    const userFromDB = response.data.find((user) => user.email === invitedUser.email);
+    
+                    return userFromDB
+                        ? { ...invitedUser, role: userFromDB.role, profilePicture: userFromDB.profilePicture, _id: userFromDB._id }
+                        : invitedUser;
+                });
+    
+                setInvitedUsers(invitedUsersData);
+            }
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            setError(error.message);
+        }
+    };
+    
     useEffect(() => {
         fetchUsers();
-        const handleClickOutside = (event) => {
-            if (!event.target.closest('.role-dropdown') && !event.target.closest('.role-toggle')) {
-                setIsRoleDropdownOpen({});
-                setIsProjectDropdownOpen({});
-            }
-        };
-
-        // Attach the event listener
-        document.addEventListener('mousedown', handleClickOutside);
-
-        return () => {
-            // Cleanup the event listener on component unmount
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
+    }, [selectedWorkspace]);  // Refetch users when workspace changes
+    
     const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
-
+    
     const toggleRoleDropdown = (userEmail) => {
-        console.log(`Toggling dropdown for: ${userEmail}`);
         setIsRoleDropdownOpen((prev) => ({
             ...prev,
             [userEmail]: !prev[userEmail],
         }));
     };
-
+    
     const toggleProjectDropdown = (userEmail) => {
         setIsProjectDropdownOpen((prev) => ({
             ...prev,
             [userEmail]: !prev[userEmail],
         }));
     };
-
+    
     const toggleModal = () => {
         setIsModalOpen((prev) => !prev);
         if (!isModalOpen) {
             // Reset state when modal opens
             setSelectedRole('');
-            setFilteredUsers(allUsers); // Show all users
+            setFilteredUsers(allUsers);
             setSelectedEmails([]);
-            setShowUsersInModal(false); // Hide users when modal opens
-        } else {
-            // When closing the modal, you might want to show users again
-            setShowUsersInModal(true); 
         }
     };
-
+    
     const handleRoleFilter = (role) => {
         setSelectedRole(role);
-        const filteredByRole = role 
-            ? allUsers.filter((user) => user.role.toLowerCase() === role.toLowerCase()) 
+        const filteredByRole = role
+            ? allUsers.filter((user) => user.role.toLowerCase() === role.toLowerCase())
             : allUsers;
-
+    
         setFilteredUsers(filteredByRole.filter((user) => {
             const searchQuery = document.querySelector('input[placeholder="Search email"]').value.toLowerCase();
             return user.email.toLowerCase().includes(searchQuery) ||
@@ -153,25 +131,23 @@ const People = () => {
                    user.lastName.toLowerCase().includes(searchQuery);
         }));
     };
-
+    
     const handleInvite = async () => {
-        if (!selectedEmails.length) {
-            toast.error('Please select at least one email to invite.', {
+        if (!selectedEmails.length || !selectedWorkspace) {
+            toast.error('Please select at least one email and ensure a workspace is selected.', {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: false,
                 draggable: true,
-                className: 'bg-red-600 text-white font-semibold p-3 rounded-lg shadow-lg',
-                icon: false,
             });
             return;
         }
-
+    
         const user = JSON.parse(localStorage.getItem('user'));
         const token = user?.accessToken;
-
+    
         if (!token) {
             toast.error('No access token found. Please log in again.', {
                 position: "top-right",
@@ -180,96 +156,81 @@ const People = () => {
                 closeOnClick: true,
                 pauseOnHover: false,
                 draggable: true,
-                className: 'bg-red-600 text-white font-semibold p-3 rounded-lg shadow-lg',
-                icon: false,
             });
             return;
         }
-
-       // Map selected emails to their corresponding user IDs, projects, profilePicture, and role
-       const selectedUsers = selectedEmails.map((email) => {
-        const userFromDB = allUsers.find((user) => user.email === email);
-        return userFromDB 
-            ? { 
-                id: userFromDB._id, 
-                projects: userFromDB.projects.length > 0 ? userFromDB.projects : [], 
-                profilePicture: userFromDB.profilePicture || {}, 
-                role: userFromDB.role || 'N/A' 
-              } 
-            : null;
-    }).filter((user) => user !== null);
-
-    if (selectedUsers.length === 0) {
-        toast.error('No valid users found for the selected emails.', {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: true,
-            className: 'bg-red-600 text-white font-semibold p-3 rounded-lg shadow-lg',
-            icon: false,
-        });
-        return;
-    }
-
+    
+        const selectedUsers = selectedEmails.map((email) => {
+            const userFromDB = allUsers.find((user) => user.email === email);
+            return userFromDB
+                ? {
+                    id: userFromDB._id,
+                    projects: userFromDB.projects.length > 0 ? userFromDB.projects : [],
+                    profilePicture: userFromDB.profilePicture || {},
+                    role: userFromDB.role || 'N/A',
+                }
+                : null;
+        }).filter((user) => user !== null);
+    
+        if (selectedUsers.length === 0) {
+            toast.error('No valid users found for the selected emails.', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: true,
+            });
+            return;
+        }
+    
         setLoading(true);
-
-    try {
-        const response = await fetch('http://localhost:5000/api/users/invite', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({
+    
+        try {
+            const response = await axios.post('http://localhost:5000/api/users/invite', {
                 userIds: selectedUsers.map(user => user.id),
                 projects: selectedUsers.map(user => user.projects).flat(),
                 roles: selectedUsers.map(user => user.role),
                 profilePictures: selectedUsers.map(user => user.profilePicture),
-                invitedBy: user._id 
-            }),
-        });
-
+                workspaceId: selectedWorkspace._id,  // Pass workspace ID
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+    
             if (!response.ok) {
-                const errorResponse = await response.json();
-                throw new Error(errorResponse.message);
+                throw new Error(response.data.message || 'Failed to send invitations.');
             }
-
-            fetchUsers(); // Refresh the user list
-
-        toast.success('Invitations sent successfully!', {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: true,
-            className: 'bg-green-600 text-white font-semibold p-3 rounded-lg shadow-lg',
-            icon: false,
-        });
-
-        toggleModal();
-
-
-        toggleModal();
-    } catch (error) {
-        console.error('Error inviting users:', error.message);
-        toast.error(`An error occurred: ${error.message}`, {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: true,
-            className: 'bg-red-600 text-white font-semibold p-3 rounded-lg shadow-lg',
-            icon: false,
-        });
-    } finally {
-        setLoading(false);
-    }
-};
-
+    
+            fetchUsers();  // Refresh the user list
+    
+            toast.success('Invitations sent successfully!', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: true,
+            });
+    
+            toggleModal();
+        } catch (error) {
+            console.error('Error inviting users:', error.message);
+            toast.error(`An error occurred: ${error.message}`, {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: true,
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+    
     const handleRoleChange = async (newRole, userEmail) => {
         try {
             const user = allUsers.find((u) => u.email === userEmail);

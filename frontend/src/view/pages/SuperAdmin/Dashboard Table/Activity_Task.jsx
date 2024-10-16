@@ -1,54 +1,82 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import axios from 'axios';
+import { useWorkspace } from '../../../components/SuperAdmin/workspaceContext';  // Import workspace context
 
-const Activity_Task = ({ projects }) => {
+const Activity_Task = () => {
     const [profilePicture, setProfilePicture] = useState('');
     const [userName, setUserName] = useState('');
     const [taskDetails, setTaskDetails] = useState({});
+    const [projects, setProjects] = useState([]);
+    const { selectedWorkspace } = useWorkspace();  // Get the selected workspace
     const defaultProfilePictureUrl = 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'; // Default image URL
 
     // Fetch user data and task details for each project
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem('user'));
         if (storedUser) {
-            // Set the username and profile picture from localStorage
             setUserName(`${storedUser.firstName} ${storedUser.lastName}`);
             setProfilePicture(storedUser.profilePicture?.url || storedUser.profilePicture || defaultProfilePictureUrl);
         }
 
-        const fetchTaskDetails = async () => {
-            const taskDetailsPromises = projects.map(async (project) => {
-                const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}`);
-                const tasks = response.data.data;
-                return { projectId: project._id, tasks };
-            });
+        const fetchProjectsAndTasks = async () => {
+            if (!selectedWorkspace) return;  // Only proceed if a workspace is selected
 
-            const details = await Promise.all(taskDetailsPromises);
-            const taskDetailsMap = details.reduce((acc, { projectId, tasks }) => {
-                acc[projectId] = tasks;
-                return acc;
-            }, {});
+            try {
+                const user = JSON.parse(localStorage.getItem('user'));
+                const accessToken = user ? user.accessToken : null;
 
-            setTaskDetails(taskDetailsMap);
+                if (!accessToken) {
+                    console.error('No access token found. Please log in again.');
+                    return;
+                }
+
+                // Fetch projects for the selected workspace
+                const projectResponse = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                    params: {
+                        workspaceId: selectedWorkspace._id,  // Filter projects by workspace ID
+                    }
+                });
+
+                setProjects(projectResponse.data);
+
+                // Fetch tasks for each project
+                const taskDetailsPromises = projectResponse.data.map(async (project) => {
+                    const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}`, {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`
+                        }
+                    });
+                    const tasks = response.data.data;
+                    return { projectId: project._id, tasks };
+                });
+
+                const details = await Promise.all(taskDetailsPromises);
+                const taskDetailsMap = details.reduce((acc, { projectId, tasks }) => {
+                    acc[projectId] = tasks;
+                    return acc;
+                }, {});
+
+                setTaskDetails(taskDetailsMap);  // Set the task details for each project
+            } catch (error) {
+                console.error('Error fetching projects and tasks:', error);
+            }
         };
 
-        if (projects.length > 0) {
-            fetchTaskDetails();
-        }
-    }, [projects]);
+        fetchProjectsAndTasks();
+    }, [selectedWorkspace]);  // Re-fetch projects and tasks when the selected workspace changes
 
     const getTaskChanges = (task) => {
         let changesByUser = {};
-    
+
         task.history.forEach((change) => {
             const parsedChanges = JSON.parse(change.changes);
-    
-            // Safely access modifiedBy.username and provide fallback values
             const username = change.modifiedBy?.username || 'Unknown User';
             const profilePicture = change.modifiedBy?.profilePicture?.url || change.modifiedBy?.profilePicture || defaultProfilePictureUrl;
 
-    
             // Group changes by the user who modified the task
             if (!changesByUser[username]) {
                 changesByUser[username] = {
@@ -56,11 +84,11 @@ const Activity_Task = ({ projects }) => {
                     changes: []
                 };
             }
-    
+
             Object.keys(parsedChanges).forEach((key) => {
                 let changeType = '';
                 let newValue = parsedChanges[key];
-    
+
                 // Set specific labels for the type of change
                 switch (key) {
                     case 'taskName':
@@ -72,15 +100,15 @@ const Activity_Task = ({ projects }) => {
                     case 'objectives':
                         changeType = 'updated objectives';
                         newValue = parsedChanges[key].map((objective, index) => (
-                              <li key={index}>
+                            <li key={index}>
                                 <span>{objective.text}</span>
                                 {objective.done ? (
-                                  <span className="text-green-500 ml-2">(Completed)</span>
+                                    <span className="text-green-500 ml-2">(Completed)</span>
                                 ) : (
-                                  <span className="text-red-500 ml-2">(Not Completed)</span>
+                                    <span className="text-red-500 ml-2">(Not Completed)</span>
                                 )}
-                              </li>
-                            ));
+                            </li>
+                        ));
                         break;
                     case 'priority':
                         changeType = 'changed the priority to';
@@ -122,7 +150,7 @@ const Activity_Task = ({ projects }) => {
                         changeType = 'made an update';
                         break;
                 }
-    
+
                 changesByUser[username].changes.push({
                     type: changeType,
                     newValue,
@@ -130,10 +158,10 @@ const Activity_Task = ({ projects }) => {
                 });
             });
         });
-    
+
         return changesByUser;
     };
-    
+
     return (
         <div className="w-full h-full">
             <h2 className="text-medium font-semibold text-gray-800 mb-2">Activity</h2>
@@ -173,7 +201,7 @@ const Activity_Task = ({ projects }) => {
                                                                 {username}
                                                             </span>
                                                         </div>
-                                                        <ul className="pl-10 ">
+                                                        <ul className="pl-10">
                                                             {userChanges.changes.map((change, idx) => (
                                                                 <li key={idx} className="text-sm text-gray-500 mb-2">
                                                                     {change.type}{' '}
@@ -184,7 +212,6 @@ const Activity_Task = ({ projects }) => {
                                                                             change.newValue
                                                                         )}
                                                                     </span>
-                                                                    
                                                                 </li>
                                                             ))}
                                                         </ul>

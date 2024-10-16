@@ -9,7 +9,8 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Today_Task from './Dashboard Table/Today_Task';
 import Ongoing_Project from './Dashboard Table/Ongoing_Project';
-import Activity_Task from './Dashboard Table/Activity_Task'; // Import Activity_Task component
+import Activity_Task from './Dashboard Table/Activity_Task';
+import { useWorkspace } from '../../components/SuperAdmin/workspaceContext'; // Import workspace context
 
 const Dashboard = () => {
     const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
@@ -17,7 +18,8 @@ const Dashboard = () => {
     const [projects, setProjects] = useState([]);  
     const [taskDetails, setTaskDetails] = useState({}); 
     const navigate = useNavigate();
-    
+    const { selectedWorkspace } = useWorkspace();  // Get the selected workspace
+
     // Retrieve user profile details
     const user = JSON.parse(localStorage.getItem('user'));
     const profilePicture = user?.profilePicture?.url ||  user?.profilePicture;
@@ -67,14 +69,19 @@ const Dashboard = () => {
 
     useEffect(() => {
         const fetchProjects = async () => {
+            if (!selectedWorkspace) return;  // Ensure a workspace is selected before fetching
+
             try {
-                const user = JSON.parse(localStorage.getItem('user')); // You may want to fetch user from your auth system instead of localStorage
+                const user = JSON.parse(localStorage.getItem('user'));
                 const accessToken = user ? user.accessToken : null;
     
                 const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
+                    params: {
+                        workspaceId: selectedWorkspace._id, // Filter by selected workspace
+                    }
                 });
            
                 setProjects(response.data);
@@ -108,7 +115,7 @@ const Dashboard = () => {
         };
     
         fetchProjects();
-    }, []);
+    }, [selectedWorkspace]);  // Fetch projects when the selected workspace changes
     
 
     const toggleProjectDropdown = () => setIsProjectDropdownOpen(!isProjectDropdownOpen);
@@ -242,7 +249,7 @@ const Dashboard = () => {
     </div>
 
            {/* Activity and Ongoing Projects Section */}
-<div className="w-full md:w-2/5 flex-grow flex flex-col gap-2"> {/* Flex column and reduced gap */}
+<div className="h-full md:w-2/5 flex-grow flex flex-col gap-2"> {/* Flex column and reduced gap */}
     {/* Activity Section */}
         <div className="h-1/4">
             <Activity_Task 

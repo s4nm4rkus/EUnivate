@@ -39,6 +39,9 @@ import { io } from '../../../index.js';
     // Create Task Controller
     export const createTask = async (req, res) => {
       try {
+        // Log the incoming request body
+        // console.log('Request body:', req.body);
+    
         const {
           taskName, 
           assignee, 
@@ -53,14 +56,22 @@ import { io } from '../../../index.js';
           project 
         } = req.body;
     
+        // Log the project ID to make sure it's coming correctly
+        // console.log('Project ID:', project);
+    
         // Fetch invited users for the project
         const invitedUsers = await saInvitedMember.find({ project }).select('userId');
+        // console.log('Invited users for project:', invitedUsers);
+    
         const invitedUserIds = invitedUsers.map(user => user.userId.toString());
+        // console.log('Invited user IDs:', invitedUserIds);
     
         // Check if all assignees are invited users
         const invalidAssignees = assignee.filter(userId => !invitedUserIds.includes(userId.toString()));
+        // console.log('Invalid assignees:', invalidAssignees);
     
         if (invalidAssignees.length > 0) {
+          console.log('Some assignees are not invited members of this project:', invalidAssignees);
           return res.status(400).json({
             success: false,
             message: 'Some assignees are not invited members of this project.',
@@ -68,11 +79,16 @@ import { io } from '../../../index.js';
           });
         }
     
+        // Log the objectives for the task
+        // console.log('Objectives before preparation:', objectives);
+    
         // Prepare objectives with the default `done` status as false if not provided
         const preparedObjectives = objectives.map(obj => ({
           text: obj.text,
           done: obj.done || false
         }));
+    
+        // console.log('Prepared objectives:', preparedObjectives);
     
         // Create a new task document
         const newTask = new saAddTask({
@@ -89,8 +105,11 @@ import { io } from '../../../index.js';
           project,
         });
     
+        console.log('New task before saving:', newTask);
+    
         // Save to the database
         const savedTask = await newTask.save();
+        // console.log('Task saved successfully:', savedTask);
     
         res.status(201).json({
           success: true,
@@ -98,7 +117,7 @@ import { io } from '../../../index.js';
           data: savedTask
         });
       } catch (error) {
-        console.error(error);
+        console.error('Error creating task:', error);
         res.status(500).json({
           success: false,
           message: 'Server Error. Could not create task.',
@@ -106,6 +125,7 @@ import { io } from '../../../index.js';
         });
       }
     };
+    
     
       // Get All Tasks Controller
       export const getTasks = async (req, res) => {

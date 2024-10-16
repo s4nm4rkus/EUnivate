@@ -22,6 +22,7 @@ const Chat = ({ group }) => {
 
   const defaultProfilePictureUrl = 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png';
 
+  // Group message reactions by emoji and count the total reactions
   const groupReactions = (reactions = []) => {
     let totalReactions = 0;
     const reactionGroups = reactions.reduce((acc, reaction) => {
@@ -38,6 +39,8 @@ const Chat = ({ group }) => {
     return { reactionGroups, totalReactions };
   };
 
+
+  // Initialize socket and fetch initial messages(Pang realtime to)
   useEffect(() => {
     socket = io("http://localhost:5000");
 
@@ -49,6 +52,8 @@ const Chat = ({ group }) => {
       });
     }
 
+        // Fetch all chat messages laggayan nalang din siguro ng workspace yung mga messages ng users ano also sa controller kagaya nung ginawa mo sa project 
+        // ganun lang din yung ginagawa ko sa iba eh yung controller ng messages is messageController tas sa model naman is chat message model
     const fetchMessages = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/users/messages');
@@ -60,10 +65,13 @@ const Chat = ({ group }) => {
 
     fetchMessages();
 
+
+    // Listen for new messages (Nasa Index tong emit ng mga to)
     socket.on('new-message', (newMessage) => {
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     });
 
+     // Listen for new replies to messages
     socket.on('new-reply', (replyData) => {
       setMessages((prevMessages) => {
         return prevMessages.map((msg) =>
@@ -72,15 +80,20 @@ const Chat = ({ group }) => {
       });
     });
 
+      // Listen for reactions on messages
     socket.on('new-reaction', (reactionData) => {
       setMessages((prevMessages) =>
         prevMessages.map((msg) =>
           msg._id === reactionData.messageId
             ? {
                 ...msg,
-                reactions: msg.reactions.some((r) => r.user._id === reactionData.reaction.user._id)
+                reactions: msg.reactions.some(
+                  (r) => r.user && r.user._id === reactionData.reaction.user._id
+                )
                   ? msg.reactions.map((r) =>
-                      r.user._id === reactionData.reaction.user._id ? reactionData.reaction : r
+                      r.user && r.user._id === reactionData.reaction.user._id
+                        ? reactionData.reaction
+                        : r
                     )
                   : [...msg.reactions, reactionData.reaction],
               }
@@ -88,6 +101,8 @@ const Chat = ({ group }) => {
         )
       );
     });
+    
+      // Listen for flagged messages
 
     socket.on('flagged-message', (flagData) => {
       setMessages((prevMessages) =>
@@ -97,6 +112,7 @@ const Chat = ({ group }) => {
       );
     });
 
+     // Listen for starred messages
     socket.on('starred-message', (starData) => {
       setMessages((prevMessages) =>
         prevMessages.map((msg) =>
@@ -117,6 +133,7 @@ const Chat = ({ group }) => {
     };
   }, []);
 
+    // Handle sending a message
   const handleSendMessage = async () => {
     const plainTextMessage = DOMPurify.sanitize(message, { ALLOWED_TAGS: [] }).trim();
     
@@ -144,6 +161,8 @@ const Chat = ({ group }) => {
     }
   };
   
+
+  // Handle replying to a message
   const handleReplyMessage = async () => {
     const plainTextMessage = DOMPurify.sanitize(message, { ALLOWED_TAGS: [] }).trim();
     
@@ -163,6 +182,7 @@ const Chat = ({ group }) => {
     }
   };
 
+  // Upload image to Cloudinary (siguro dinanamn to need galawin)
   const uploadImageToCloudinary = async (file) => {
     const formData = new FormData();
     formData.append('file', file);
@@ -178,6 +198,7 @@ const Chat = ({ group }) => {
     }
   };
 
+    // Handle emoji selection for message reaction
   const handleEmojiSelect = async (emoji, index) => {
     const messageId = messages[index]._id;
     const userId = currentUser._id;
@@ -204,6 +225,8 @@ const Chat = ({ group }) => {
     }
   };
 
+
+  // Toggle star for a message
   const toggleStar = async (index) => {
     const messageId = messages[index]._id;
     const userId = currentUser._id;
@@ -239,13 +262,9 @@ const Chat = ({ group }) => {
 
   return (
     <div className="flex flex-col h-full w-full p-4">
-    {/* Header */}
+    {/* Header i fetch molang yung actual workspaces*/}
     <div className="flex items-center justify-start border-b pb-3 mb-4">
-      <img
-        src={group.imagePreview || defaultProfilePictureUrl}
-        alt={group.groupName}
-        className="w-10 h-10 sm:w-12 sm:h-12 rounded-full mr-4"
-      />
+
       <div>
         <h2 className="text-base sm:text-lg font-bold">{group.groupName} Chat</h2>
         <p className="text-sm text-gray-500">General chat for {group.groupName}</p>
@@ -260,10 +279,11 @@ const Chat = ({ group }) => {
           className={`mb-4 flex group ${msg.sender === currentUser._id ? 'justify-end' : 'justify-start'}`}
         >
           <img
-            src={msg.sender.profilePicture?.url || msg.sender.profilePicture || defaultProfilePictureUrl}
-            alt={msg.sender.firstName}
-            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full mr-3"
-          />
+          src={msg.sender?.profilePicture?.url || msg.sender?.profilePicture || defaultProfilePictureUrl}
+          alt={msg.sender?.firstName}
+          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full mr-3"
+        />
+
   
           <div
             className={`p-2 sm:p-3 rounded-lg w-full max-w-xs sm:max-w-4xl relative ${msg.starredBy.includes(currentUser._id) ? 'bg-yellow-100' : 'bg-gray-100'}`}
@@ -309,16 +329,16 @@ const Chat = ({ group }) => {
             )}
   
             {/* Display reactions */}
-{msg.reactions && msg.reactions.length > 0 && (
-  <div className="mt-2 flex items-center">
-    {Object.values(groupReactions(msg.reactions).reactionGroups).map(({ emoji, count }, i) => (
-      <span key={i} className="text-sm p-1 rounded-full flex items-center">
-        <span>{emoji}</span>
-        <span className="ml-1">{count}</span> {/* Display the count next to each emoji */}
-      </span>
-    ))}
-  </div>
-)}
+  {msg.reactions && msg.reactions.length > 0 && (
+    <div className="mt-2 flex items-center">
+      {Object.values(groupReactions(msg.reactions).reactionGroups).map(({ emoji, count }, i) => (
+        <span key={i} className="text-sm p-1 rounded-full flex items-center">
+          <span>{emoji}</span>
+          <span className="ml-1">{count}</span> {/* Display the count next to each emoji */}
+        </span>
+      ))}
+    </div>
+  )}
 
   
             {/* Icons */}

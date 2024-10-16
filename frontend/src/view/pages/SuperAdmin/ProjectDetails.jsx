@@ -105,8 +105,10 @@ const ProjectDetails = () => {
                         throw new Error('No access token found. Please log in.');
                     }
     
+                    // Include the workspaceId in the request if available
                     const response = await axios.get('http://localhost:5000/api/users/invited', {
-                        headers: { Authorization: `Bearer ${accessToken}` }
+                        headers: { Authorization: `Bearer ${accessToken}` },
+                        params: { workspaceId: project.workspaceId }  // Pass workspaceId as a query parameter
                     });
     
                     if (Array.isArray(response.data.invitedUsers)) {
@@ -123,7 +125,7 @@ const ProjectDetails = () => {
     
             fetchMembers();
         }
-    }, [isUserModalOpen]); // This effect runs only when the modal is opened
+    }, [isUserModalOpen, project.workspaceId]);  // This effect runs only when the modal is opened
     
     const filteredMembers = (members || []).filter(member =>
         member.email.toLowerCase().includes(searchQuery.toLowerCase())

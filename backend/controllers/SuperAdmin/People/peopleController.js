@@ -18,28 +18,38 @@ export const getUsers = async (req, res) => {
   };
   
   
-// Invite users with storation to sainvitedUser Schema
+      // Invite users with storation to sainvitedUser Schema
 export const inviteUsers = async (req, res) => {
     try {
-        const { userIds, projects, roles, profilePictures } = req.body;
+        const { userIds, projects, roles, profilePictures, workspaceId } = req.body;
         const inviterId = req.user.id;
 
-        if (!userIds || !userIds.length) {
-            return res.status(400).json({ message: 'No valid user IDs provided' });
+        console.log('Request body:', req.body);
+        console.log('Inviter ID:', inviterId);
+
+        if (!userIds || !userIds.length || !workspaceId) {
+            console.log('Missing userIds or workspaceId.');
+            return res.status(400).json({ message: 'No valid user IDs or workspace ID provided' });
         }
 
         await Promise.all(
             userIds.map(async (userId, index) => {
                 try {
+                    console.log(`Processing user with ID: ${userId}`);
+
                     const existingUser = await User.findById(userId);
                     if (!existingUser) {
                         console.warn(`User with ID ${userId} does not exist. Skipping...`);
                         return;
                     }
 
+                    console.log(`Found existing user: ${existingUser.email}`);
+
                     // Check if the user is already invited
-                    const invitedUser = await InviteMember.findOne({ email: existingUser.email });
+                    const invitedUser = await InviteMember.findOne({ email: existingUser.email, workspaceId });
                     if (invitedUser) {
+                        console.log(`User ${existingUser.email} is already invited to workspace ${workspaceId}. Updating invitation...`);
+
                         if (!invitedUser.invitedBy.includes(inviterId)) {
                             invitedUser.invitedBy.push(inviterId);
                         }
@@ -47,40 +57,48 @@ export const inviteUsers = async (req, res) => {
                         invitedUser.project = [...new Set([...invitedUser.project, ...projects.map(project => project.toString())])];
 
                         // Ensure profilePicture is an object
-                        invitedUser.profilePicture = typeof profilePictures[index] === 'string' 
+                        invitedUser.profilePicture = typeof profilePictures[index] === 'string'
                             ? { url: profilePictures[index], publicId: '' }
                             : profilePictures[index] || invitedUser.profilePicture;
 
+                        console.log(`Saving updated invitation for user: ${existingUser.email}`);
                         await invitedUser.save();
                     } else {
+                        console.log(`User ${existingUser.email} is not invited. Creating new invitation...`);
+
                         // Create a new invitation if the user is not already invited
                         const newMember = new InviteMember({
                             email: existingUser.email,
                             role: roles[index] || existingUser.role || 'User',
                             project: projects.map(project => project.toString()),
+                            workspaceId,
                             invitedBy: [inviterId],
                             userId: existingUser._id,
                             
                             // Ensure profilePicture is an object
-                            profilePicture: typeof profilePictures[index] === 'string' 
+                            profilePicture: typeof profilePictures[index] === 'string'
                                 ? { url: profilePictures[index], publicId: '' }
                                 : profilePictures[index] || existingUser.profilePicture || {},
                         });
 
+                        console.log(`Saving new invitation for user: ${existingUser.email}`);
                         await newMember.save();
                     }
 
+                    console.log(`Sending invitation email to: ${existingUser.email}`);
                     await sendEmail({
                         email: existingUser.email,
                         subject: 'Invitation to become a Collaborator',
-                        message: `You have been invited to join the project. Please check your role and proceed.`,
+                        message: `You have been invited to join the project in workspace ${workspaceId}. Please check your role and proceed.`,
                     });
+
                 } catch (error) {
                     console.error(`Failed to invite user ID ${userId}:`, error.message);
                 }
             })
         );
 
+        console.log('All invitation emails sent successfully.');
         res.status(200).json({ message: 'Invitation emails sent successfully' });
     } catch (error) {
         console.error('Error inviting users:', error.message);
@@ -90,20 +108,27 @@ export const inviteUsers = async (req, res) => {
 
 
 
+
 //Get Invited Users
 
 export const getInvitedUsers = async (req, res) => {
     try {
         const userId = req.user._id;
-        // console.log('Fetching invited users for userId:', userId);  // Log userId to track which user is making the request
+        const { workspaceId } = req.query;  // Get the workspaceId from query parameters
+        
+        if (!workspaceId) {
+            return res.status(400).json({ message: 'Workspace ID is required' });  // Ensure workspaceId is provided
+        }
 
-        // Fetch invited users and populate the project field with full project details
-        const invitedUsers = await InviteMember.find({
-            $or: [
-                { invitedBy: userId },
-                // Add other conditions if needed
+        console.log('Fetching invited users for workspaceId:', workspaceId, 'and userId:', userId);
+
+
+    const invitedUsers = await InviteMember.find({
+            $and: [
+                { $or: [{ invitedBy: userId }] },  // Fetch users invited by the current user
+                { workspaceId: workspaceId }  // Filter by workspaceId
             ]
-        }).populate('project', 'projectName');  // Populates only the projectName field of related projects
+        }).populate('project', 'projectName');// Populates only the projectName field of related projects
 
         // console.log('Raw invitedUsers data:', invitedUsers);  // Log the invitedUsers data after fetching and populating
 

@@ -38,24 +38,27 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
           },
         });
 
-        // Fetch invited users from projects
-        const invitedUsersResponse = await axios.get('http://localhost:5000/api/users/invited', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
+        // Fetch invited users from the selected workspace
+        if (selectedWorkspace) {
+          const invitedUsersResponse = await axios.get('http://localhost:5000/api/users/invited', {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+            params: { workspaceId: selectedWorkspace }, // Pass selected workspaceId
+          });
 
-        const allUsers = allUsersResponse.data;
-        const invitedUsersList = invitedUsersResponse.data.invitedUsers.map((invitedUser) => {
-          const userFromDB = allUsers.find((user) => user.email === invitedUser.email);
-          return userFromDB ? { ...invitedUser, ...userFromDB } : invitedUser;
-        });
+          const allUsers = allUsersResponse.data;
+          const invitedUsersList = invitedUsersResponse.data.invitedUsers.map((invitedUser) => {
+            const userFromDB = allUsers.find((user) => user.email === invitedUser.email);
+            return userFromDB ? { ...invitedUser, ...userFromDB } : invitedUser;
+          });
 
-        setInvitedUsers(invitedUsersList);
-        setCurrentUser(allUsers.find((u) => u._id === user._id));
+          setInvitedUsers(invitedUsersList);
+          setCurrentUser(allUsers.find((u) => u._id === user._id));
 
-        // Pass the invited users back to Messages component
-        onInvitedUsersFetched(invitedUsersList);
+          // Pass the invited users back to Messages component
+          onInvitedUsersFetched(invitedUsersList);
+        }
       } catch (error) {
         setError('Failed to load users and workspaces. Please try again later.');
       } finally {
@@ -64,7 +67,7 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
     };
 
     fetchData();
-  }, [onInvitedUsersFetched]);
+  }, [onInvitedUsersFetched, selectedWorkspace]); // Fetch data whenever selectedWorkspace changes
 
   // UseEffect to load the selected workspace from localStorage on component mount
   useEffect(() => {
@@ -136,7 +139,7 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
           <div className="relative">
             <span className="absolute bottom-0 right-0 w-3 h-3 bg-blue-500 border-2 border-white rounded-full"></span>
             <img
-              src={currentUser.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'}
+              src={currentUser.profilePicture?.url || currentUser.profilePicture || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'}
               alt={currentUser.username || 'Profile Picture'}
               className="w-8 h-8 rounded-full object-cover border-2 border-white"
             />
@@ -159,7 +162,7 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
               <div className="relative">
                 <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
                 <img
-                  src={user.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'}
+                  src={user.profilePicture?.url || user.profilePicture || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'}
                   alt={user.username || 'Profile Picture'}
                   className="w-8 h-8 rounded-full object-cover border-2 border-white"
                 />

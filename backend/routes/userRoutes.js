@@ -28,7 +28,7 @@ const router = express.Router();
       import { addNewWorkspace, getAllWorkspaces } from '../controllers/SuperAdmin/workspaceController.js';
       import { getAssignees } from '../controllers/findUserNameIDController.js';
       import { createMessage,replyToMessage, reactToMessage,starMessage,flagMessage, getAllMessages, deleteMessage} from '../controllers/SuperAdmin/Message/messageController.js';
-      
+      import { getAddedMembersForMessage } from '../controllers/SuperAdmin/Message/getAddedMeberstoProject.js';
       // User Authentication Routes
       router.post('/login', loginUser);
       router.post('/forgot-password', forgotPassword);
@@ -40,93 +40,94 @@ const router = express.Router();
       // router.get('/invitedMembers', protect, getInvitedMembersByUserId); 
       router.put('/:userId/role', updateUserRole); 
 
-        // User Management Routes
-        router.get('/', getUsers); 
-        router.post('/signup', createUser);  
-        router.post('/', upload.single('profilePicture'), createUser);
-        //User Messages Related
-        router.post('/contactEunivate',ContactEunivate );
+      // User Management Routes
+      router.get('/', getUsers); 
+      router.post('/signup', createUser);  
+      router.post('/', upload.single('profilePicture'), createUser);
 
-      //SuperAdminRoutes
-      router.post('/sa-newproject',protect, createSaNewProject);
-      router.post('/sa-invite-users',protect,  inviteUsers);
-      router.get('/sa-getnewproject', protect, getAllProjects);
-      router.get('/sa-getnewproject/:id', protect,  getProjectById)
-      router.get('/findByUsername/:username', findUserByUsername);
+      //User Messages Related
+      router.post('/contactEunivate',ContactEunivate );
 
-      //Workspace
-      router.post('/workspace', protect, addNewWorkspace);
-      router.get('/workspaces', protect, getAllWorkspaces);
-      
-      //get the Invited users from people on superadmin
-      router.post('/invite', protect, inviteUsers); 
-      router.get('/invited', protect, getInvitedUsers);
-      router.delete('/invited/:id', protect, removeInvitedMember);
-      //people Controller
-      router.put('/assign-project', protect, assignProjectToUser);
-      //add member on the project details on user add icon
-      router.post('/add-member-to-project', addMemberToProject);
-      // Activity Controller
-      router.get('/assignee', getAssignees); 
-      // Task Routes
-      router.get('/get-assignee', getAddedMembers);
-      router.post('/sa-task', createTask);
-      router.get('/sa-tasks', getTasks);
-      router.get('/sa-tasks/:projectId', getTasksByProjectId);
-      router.get('/sa-tasks/:id', getTaskById);
-      router.patch('/sa-tasks/:id', updateTask);
-      router.patch('/sa-tasks/:id/objectives', updateTaskObjectives);
-      router.delete('/sa-tasks/:id', deleteTask);
-      router.post('/sa-tasks/:taskId/comments', addCommentToTask);
-      router.get('/sa-tasks/:taskId/comments', getTaskComments);
+        //SuperAdminRoutes
+        router.post('/sa-newproject',protect, createSaNewProject);
+        router.post('/sa-invite-users',protect,  inviteUsers);
+        router.get('/sa-getnewproject', protect, getAllProjects);
+        router.get('/sa-getnewproject/:id', protect,  getProjectById)
+        router.get('/findByUsername/:username', findUserByUsername);
 
-// Message routes
-router.get('/messages', getAllMessages);
-router.post('/create-message', createMessage);
-router.post('/:messageId/reply', replyToMessage);
-router.post('/:messageId/react', reactToMessage);
-router.post('/:messageId/star', starMessage);
-router.post('/:messageId/flag', flagMessage);
-router.delete('/:messageId', deleteMessage);
+        //Workspace
+        router.post('/workspace', protect, addNewWorkspace);
+        router.get('/workspaces', protect, getAllWorkspaces);
+        
+        //get the Invited users from people on superadmin
+        router.post('/invite', protect, inviteUsers); 
+        router.get('/invited', protect, getInvitedUsers);
+        router.delete('/invited/:id', protect, removeInvitedMember);
+        //people Controller
+        router.put('/assign-project', protect, assignProjectToUser);
+        //add member on the project details on user add icon
+        router.post('/add-member-to-project', addMemberToProject);
+        // Activity Controller
+        router.get('/assignee', getAssignees); 
+        // Task Routes
+        router.get('/get-assignee', getAddedMembers);
+        router.post('/sa-task', createTask);
+        router.get('/sa-tasks', getTasks);
+        router.get('/sa-tasks/:projectId', getTasksByProjectId);
+        router.get('/sa-tasks/:id', getTaskById);
+        router.patch('/sa-tasks/:id', updateTask);
+        router.patch('/sa-tasks/:id/objectives', updateTaskObjectives);
+        router.delete('/sa-tasks/:id', deleteTask);
+        router.post('/sa-tasks/:taskId/comments', addCommentToTask);
+        router.get('/sa-tasks/:taskId/comments', getTaskComments);
+
+        // Message routes
+        router.get('/messages', getAllMessages);
+        router.post('/create-message', createMessage);
+        router.post('/:messageId/reply', replyToMessage);
+        router.post('/:messageId/react', reactToMessage);
+        router.post('/:messageId/star', starMessage);
+        router.post('/:messageId/flag', flagMessage);
+        router.delete('/:messageId', deleteMessage);
+        router.get('/get-added-members', getAddedMembersForMessage); 
+
+      // quotation route  
+      router.post('/quotation',createQuotation);
+      router.get('/quotation/confirm/:quotationToken', confirmQuotationEmail);
+      router.get('/quotations/:id/status', checkVerificationStatus);
+
+      // User Update Routes
+      router.put('/:id', updateUser);
+      router.put('/:id/password', updateUserPassword);
 
 
-// quotation route  
-router.post('/quotation',createQuotation);
-router.get('/quotation/confirm/:quotationToken', confirmQuotationEmail);
-router.get('/quotations/:id/status', checkVerificationStatus);
+        //Admin Routes
+      //Products
+      router.post('/addproduct', upload.single('image'), createProduct );
+      router.get('/products', getProducts);
+      router.delete('/products/:id', deleteProduct);
+      router.put('/products/:id', upload.single('image'), updateProduct);
+      //Projects
+      router.post('/addproject', upload.single('image'), createProject);
+      router.get('/projects', getProjects);
+      router.put('/projects/:id', upload.single('image'), updateProject);
+      router.delete('/projects/:id', deleteProject);
+      //Events
+      router.post('/addevent', upload.single('image'), createEvent);
+      router.get('/events', getEvents);
+      router.put('/events/:id', upload.single('image'), updateEvent);
+      router.delete('/events/:id', deleteEvent);
+      //Dashboard
+      router.get('/stats', getDashboardStats);
+      // Get all quotations
+      router.get('/quotations', getQuotations);
+      router.delete('/quotations/:id', deleteQuotation);
+      //Notification for admin
+      router.get('/notifications', checkNotifications);
 
-// User Update Routes
-router.put('/:id', updateUser);
-router.put('/:id/password', updateUserPassword);
+      // SuperAdmin Route (Protected)
+      router.get('/superadmin', protect, verifySuperAdmin, (req, res) => {
+        res.status(200).json({ message: 'Welcome to the SuperAdmin dashboard' });
+      });
 
-
-  //Admin Routes
-//Products
-router.post('/addproduct', upload.single('image'), createProduct );
-router.get('/products', getProducts);
-router.delete('/products/:id', deleteProduct);
-router.put('/products/:id', upload.single('image'), updateProduct);
-//Projects
-router.post('/addproject', upload.single('image'), createProject);
-router.get('/projects', getProjects);
-router.put('/projects/:id', upload.single('image'), updateProject);
-router.delete('/projects/:id', deleteProject);
-//Events
-router.post('/addevent', upload.single('image'), createEvent);
-router.get('/events', getEvents);
-router.put('/events/:id', upload.single('image'), updateEvent);
-router.delete('/events/:id', deleteEvent);
-//Dashboard
-router.get('/stats', getDashboardStats);
-// Get all quotations
-router.get('/quotations', getQuotations);
-router.delete('/quotations/:id', deleteQuotation);
-//Notification for admin
-router.get('/notifications', checkNotifications);
-
-// SuperAdmin Route (Protected)
-router.get('/superadmin', protect, verifySuperAdmin, (req, res) => {
-  res.status(200).json({ message: 'Welcome to the SuperAdmin dashboard' });
-});
-
-export default router;
+      export default router;

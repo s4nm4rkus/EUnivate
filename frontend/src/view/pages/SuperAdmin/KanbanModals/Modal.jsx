@@ -91,7 +91,7 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
   const fetchUsers = async () => {
     try {
       const response = await axios.get(`http://localhost:5000/api/users/get-assignee?projectId=${projectId}`);
-      setMembersList(response.data.invitedUsers); // Assuming the response structure
+      setMembersList(response.data.invitedUsers); 
     } catch (error) {
       console.error('Error fetching users:', error);
     }
@@ -116,83 +116,83 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
     }
   };
 
-  const handleSubmit = async () => {
-    setLoading(true);
-  
-    // Validation checks
-    if (!taskName || !startDate || !dueDate || !status || !priority || !selectedName) {
-      toast.error('Please fill in all fields before submitting.');
-      setLoading(false);
-      return;
-    }
-  
-    if (new Date(dueDate) < new Date(startDate)) {
-      toast.error('Due Date cannot be earlier than Start Date.');
-      setLoading(false);
-      return;
-    }
-  
-    // Upload selected files to Cloudinary
-    let uploadedImages = [];
-    for (const file of selectedFiles) {
-      try {
-        const result = await handleSaveattachment(file);
-        uploadedImages.push({
-          publicId: result.publicId,
-          url: result.url
-        });
-      } catch (error) {
-        console.error('Error uploading image:', error);
-        toast.error('Failed to upload one or more images.');
+    const handleSubmit = async () => {
+      setLoading(true);
+
+      // Validation checks
+      if (!taskName || !startDate || !dueDate || !status || !priority || selectedName.length === 0) {
+        toast.error('Please fill in all fields before submitting.');
         setLoading(false);
         return;
       }
-    }
-  
-    try {
-      const assigneeIds = selectedName.split(', ').map(name => {
-        const user = membersList.find(member => member.username === name);
-        return user?.id;
-      });
-  
-      const newTask = {
-        taskName,
-        objectives, // Now passed as an array of objects
-        assignee: assigneeIds,
-        status,
-        priority,
-        startDate,
-        dueDate,
-        attachment: uploadedImages,
-        description,
-        questionUpdate: question,
-        project: projectId,
-      };
-  
-      const response = await axios.post('http://localhost:5000/api/users/sa-task', newTask);
-      console.log('Task created:', response.data);
-      onTaskSubmit(newTask);
-      toast.success('Task submitted successfully!');
-  
-      // Clear the fields
-      setTaskName('');
-      setDescription('');
-      setObjectives([]);
-      setSelectedObjective(null);
-      setSelectedName('');
-      setStatus('');
-      setStartDate('');
-      setDueDate('');
-      setQuestion('');
-      setSelectedFiles([]);
-      onClose();
-  
-    } catch (error) {
-      setLoading(false);
-      console.error('Error saving task:', error);
-      toast.error('Failed to save task.');
-    }
-  };
+
+      if (new Date(dueDate) < new Date(startDate)) {
+        toast.error('Due Date cannot be earlier than Start Date.');
+        setLoading(false);
+        return;
+      }
+
+      // Upload selected files to Cloudinary
+      let uploadedImages = [];
+      for (const file of selectedFiles) {
+        try {
+          const result = await handleSaveattachment(file);
+          uploadedImages.push({
+            publicId: result.publicId,
+            url: result.url
+          });
+        } catch (error) {
+          console.error('Error uploading image:', error);
+          toast.error('Failed to upload one or more images.');
+          setLoading(false);
+          return;
+        }
+      }
+
+      try {
+        const assigneeIds = selectedName.map(user => user.id); // Adjusted to map over the array of objects
+        const newTask = {
+          taskName,
+          objectives, // Now passed as an array of objects
+          assignee: assigneeIds, // Corrected from using `split()`
+          status,
+          priority,
+          startDate,
+          dueDate,
+          attachment: uploadedImages,
+          description,
+          questionUpdate: question,
+          project: projectId,
+        };
+
+        console.log("Task data being sent to the server:", newTask);
+
+        const response = await axios.post('http://localhost:5000/api/users/sa-task', newTask);
+        console.log('Task created successfully:', response.data);
+
+        onTaskSubmit(newTask);
+        toast.success('Task submitted successfully!');
+
+        // Clear the fields
+        setTaskName('');
+        setDescription('');
+        setObjectives([]);
+        setSelectedObjective(null);
+        setSelectedName('');
+        setStatus('');
+        setStartDate('');
+        setDueDate('');
+        setQuestion('');
+        setSelectedFiles([]);
+        onClose();
+
+      } catch (error) {
+        setLoading(false);
+        console.error('Error saving task:', error);
+        toast.error('Failed to save task.');
+      }
+    };
+
   
   
   const toggleUserNameVisibility = () => {
@@ -200,9 +200,9 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
   };
 
   const handleNameSelect = (members) => {
-    const memberNames = members.map(member => member.username).join(', ');
-    setSelectedName(memberNames);  
+    setSelectedName(members);  
   };
+  
   
 
   const handleClickFileInput = () => {
@@ -253,16 +253,31 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
           />
         </div>
 
-        <div className="mb-4 flex justify-start space-x-3">
-          <button
-            className="flex items-center space-x-2 bg-transparent border-none outline-none focus:outline-none"
-            onClick={toggleUserNameVisibility}
-          >
-            <span className="text-gray-700 text-sm font-semibold">Assignee</span>
-            <FaUser className="text-gray-500 text-lg bg-transparent rounded-lg border" />
-            <span className='text-sm text-gray-500'>{selectedName || 'Assign to'}</span>
-          </button>
-        </div>
+                  <div className="mb-4 flex justify-start space-x-3">
+            <button
+              className="flex items-center space-x-2 bg-transparent border-none outline-none focus:outline-none"
+              onClick={toggleUserNameVisibility}
+            >
+              <span className="text-gray-700 text-sm font-semibold">Assignee</span>
+              <FaUser className="text-gray-500 text-lg bg-transparent rounded-lg border" />
+              {selectedName && selectedName.length > 0 ? (
+                <div className="flex -space-x-4 items-center">
+                  {selectedName.map((user) => (
+                    <div key={user.id} className="flex items-center space-x-2">
+                      <img
+                        src={user.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'}  // Placeholder image URL
+                        alt={user.username}
+                        className="w-6 h-6 rounded-full"
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <span className="text-sm text-gray-500">Assign to</span>
+              )}
+            </button>
+          </div>
+
 
         <Dates
           startDate={startDate}

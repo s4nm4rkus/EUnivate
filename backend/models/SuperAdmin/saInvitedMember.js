@@ -35,7 +35,14 @@ const saInvitedMemberSchema = new mongoose.Schema({
         ref: 'User', 
         required: true,
     },
-}, {
+    workspaceId: { 
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Workspace',  // Reference the Workspace model
+        required: true,  // Make it required if workspace is mandatory for invites
+    }
+    
+},
+ {
     timestamps: true,
 });
 

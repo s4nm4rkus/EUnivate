@@ -22,6 +22,7 @@ const Chat = ({ group }) => {
 
   const defaultProfilePictureUrl = 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png';
 
+  // Group message reactions by emoji and count the total reactions
   const groupReactions = (reactions = []) => {
     let totalReactions = 0;
     const reactionGroups = reactions.reduce((acc, reaction) => {
@@ -38,6 +39,8 @@ const Chat = ({ group }) => {
     return { reactionGroups, totalReactions };
   };
 
+
+  // Initialize socket and fetch initial messages(Pang realtime to)
   useEffect(() => {
     socket = io("http://localhost:5000");
 
@@ -49,6 +52,8 @@ const Chat = ({ group }) => {
       });
     }
 
+        // Fetch all chat messages laggayan nalang din siguro ng workspace yung mga messages ng users ano also sa controller kagaya nung ginawa mo sa project 
+        // ganun lang din yung ginagawa ko sa iba eh yung controller ng messages is messageController tas sa model naman is chat message model
     const fetchMessages = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/users/messages');
@@ -60,10 +65,13 @@ const Chat = ({ group }) => {
 
     fetchMessages();
 
+
+    // Listen for new messages (Nasa Index tong emit ng mga to)
     socket.on('new-message', (newMessage) => {
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     });
 
+     // Listen for new replies to messages
     socket.on('new-reply', (replyData) => {
       setMessages((prevMessages) => {
         return prevMessages.map((msg) =>
@@ -72,6 +80,7 @@ const Chat = ({ group }) => {
       });
     });
 
+      // Listen for reactions on messages
     socket.on('new-reaction', (reactionData) => {
       setMessages((prevMessages) =>
         prevMessages.map((msg) =>
@@ -93,7 +102,7 @@ const Chat = ({ group }) => {
       );
     });
     
-    
+      // Listen for flagged messages
 
     socket.on('flagged-message', (flagData) => {
       setMessages((prevMessages) =>
@@ -103,6 +112,7 @@ const Chat = ({ group }) => {
       );
     });
 
+     // Listen for starred messages
     socket.on('starred-message', (starData) => {
       setMessages((prevMessages) =>
         prevMessages.map((msg) =>
@@ -123,6 +133,7 @@ const Chat = ({ group }) => {
     };
   }, []);
 
+    // Handle sending a message
   const handleSendMessage = async () => {
     const plainTextMessage = DOMPurify.sanitize(message, { ALLOWED_TAGS: [] }).trim();
     
@@ -150,6 +161,8 @@ const Chat = ({ group }) => {
     }
   };
   
+
+  // Handle replying to a message
   const handleReplyMessage = async () => {
     const plainTextMessage = DOMPurify.sanitize(message, { ALLOWED_TAGS: [] }).trim();
     
@@ -169,6 +182,7 @@ const Chat = ({ group }) => {
     }
   };
 
+  // Upload image to Cloudinary (siguro dinanamn to need galawin)
   const uploadImageToCloudinary = async (file) => {
     const formData = new FormData();
     formData.append('file', file);
@@ -184,6 +198,7 @@ const Chat = ({ group }) => {
     }
   };
 
+    // Handle emoji selection for message reaction
   const handleEmojiSelect = async (emoji, index) => {
     const messageId = messages[index]._id;
     const userId = currentUser._id;
@@ -210,6 +225,8 @@ const Chat = ({ group }) => {
     }
   };
 
+
+  // Toggle star for a message
   const toggleStar = async (index) => {
     const messageId = messages[index]._id;
     const userId = currentUser._id;
@@ -245,13 +262,9 @@ const Chat = ({ group }) => {
 
   return (
     <div className="flex flex-col h-full w-full p-4">
-    {/* Header */}
+    {/* Header i fetch molang yung actual workspaces*/}
     <div className="flex items-center justify-start border-b pb-3 mb-4">
-      <img
-        src={group.imagePreview || defaultProfilePictureUrl}
-        alt={group.groupName}
-        className="w-10 h-10 sm:w-12 sm:h-12 rounded-full mr-4"
-      />
+
       <div>
         <h2 className="text-base sm:text-lg font-bold">{group.groupName} Chat</h2>
         <p className="text-sm text-gray-500">General chat for {group.groupName}</p>

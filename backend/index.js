@@ -84,11 +84,11 @@ app.use((err, req, res, next) => {
 // Default route
 app.get('/', (req, res) => res.send('Welcome to the API'));
 
-
+// Export server for deployment
+export {io};
+export default server;
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-// Export server for deployment
-export {io};
-export default server;
+

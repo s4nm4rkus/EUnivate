@@ -38,7 +38,7 @@ const Chat = ({ group }) => {
   };
 
   useEffect(() => {
-    socket = io("http://localhost:5000");
+    socket = io(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}`);
 
     const storedUser = JSON.parse(localStorage.getItem('user'));
     if (storedUser) {
@@ -50,7 +50,7 @@ const Chat = ({ group }) => {
 
     const fetchMessages = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/users/messages');
+        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/messages`);
         setMessages(response.data);
       } catch (error) {
         console.error('Error fetching messages:', error);
@@ -131,7 +131,7 @@ const Chat = ({ group }) => {
       };
 
       try {
-        const response = await axios.post('http://localhost:5000/api/users/create-message', newMessage);
+        const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/create-message`, newMessage);
         setMessage('');
         setFile(null);
         setReplyMessage(null);
@@ -149,7 +149,7 @@ const Chat = ({ group }) => {
       };
 
       try {
-        await axios.post(`http://localhost:5000/api/users/${replyMessage?._id}/reply`, newReply);
+        await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/${replyMessage?._id}/reply`, newReply);
         setMessage('');
         setReplyMessage(null);
       } catch (error) {
@@ -190,7 +190,7 @@ const Chat = ({ group }) => {
     });
 
     try {
-      await axios.post(`http://localhost:5000/api/users/${messageId}/react`, {
+      await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/${messageId}/react`, {
         user: userId,
         reaction: emoji,
       });
@@ -206,7 +206,7 @@ const Chat = ({ group }) => {
     socket.emit('starred-message', { messageId, userId });
 
     try {
-      await axios.post(`http://localhost:5000/api/users/${messageId}/star`, { userId });
+      await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/${messageId}/star`, { userId });
     } catch (error) {
       console.error('Error starring message:', error.response ? error.response.data : error.message);
     }
@@ -224,7 +224,7 @@ const Chat = ({ group }) => {
     socket.emit('flagged-message', { messageId, priorityFlag: color });
 
     try {
-      await axios.post(`http://localhost:5000/api/users/${messageId}/flag`, {
+      await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/${messageId}/flag`, {
         priorityFlag: color,
       });
     } catch (error) {

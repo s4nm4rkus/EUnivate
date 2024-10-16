@@ -20,14 +20,14 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
         }
 
         // Fetch all users
-        const allUsersResponse = await axios.get('http://localhost:5000/api/users/', {
+        const allUsersResponse = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         });
 
         // Fetch invited users from projects
-        const invitedUsersResponse = await axios.get('http://localhost:5000/api/users/invited', {
+        const invitedUsersResponse = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/invited`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },

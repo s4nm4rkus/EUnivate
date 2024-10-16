@@ -52,7 +52,7 @@ const Project = () => {
         }
     
         // Make the API call to fetch projects with the workspaceId as a query parameter
-        const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
+        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-getnewproject`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
@@ -84,7 +84,7 @@ const Project = () => {
       const counts = {};
       for (let project of projects) {
         try {
-          const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}`);
+          const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-tasks/${project._id}`);
           const totalTasks = response.data.data.length;
           const doneTasks = response.data.data.filter(task => task.status === 'Done').length;
           counts[project._id] = {
@@ -115,7 +115,7 @@ const Project = () => {
       }
 
       try {
-        const response = await axios.get('http://localhost:5000/api/users/workspaces', {
+        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/workspaces`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
@@ -203,7 +203,7 @@ const Project = () => {
         workspaceId,  // Pass the selected workspaceId (team)
       };
   
-      const response = await axios.post('http://localhost:5000/api/users/sa-newproject', newProject, {
+      const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-newproject`, newProject, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },

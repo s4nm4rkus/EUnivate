@@ -14,7 +14,7 @@ const KanbanG = ({ isOpen, onClose, projectId, selectedTask }) => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/users/get-assignee?projectId=${projectId}`);
+      const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/get-assignee?projectId=${projectId}`);
       setMembersList(response.data.invitedUsers); 
     } catch (error) {
       console.error('Error fetching users:', error);

@@ -52,7 +52,7 @@ const SideNav = ({ isNavOpen }) => {
             }
 
             try {
-                const response = await axios.get('http://localhost:5000/api/users/workspaces', {
+                const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/workspaces`, {
                     headers: { Authorization: `Bearer ${user.accessToken}` },
                 });
 
@@ -94,7 +94,7 @@ const SideNav = ({ isNavOpen }) => {
     
         try {
             const response = await axios.post(
-                'http://localhost:5000/api/users/workspace', 
+                `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/workspace`, 
                 { workspaceTitle }, 
                 {
                     headers: { Authorization: `Bearer ${accessToken}` },

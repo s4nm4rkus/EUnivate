@@ -80,10 +80,10 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
   useEffect(() => {
     const fetchProjects = async () => {
       if (!selectedWorkspace) return;
-
+    
       const user = JSON.parse(localStorage.getItem('user'));
       const accessToken = user ? user.accessToken : null;
-
+    
       try {
         const projectsResponse = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
           headers: {
@@ -93,12 +93,16 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
             workspaceId: selectedWorkspace,
           },
         });
+    
+        console.log('Fetched Projects: ', projectsResponse.data); // Check here what is being fetched
+    
         setProjects(projectsResponse.data);
       } catch (error) {
         console.error('Error fetching projects:', error);
+        setError('Failed to fetch projects. Please try again later.');
       }
     };
-
+    
     fetchProjects();
   }, [selectedWorkspace]);
 
@@ -130,26 +134,7 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
         <h2 className="text-sm font-bold text-gray-800">About</h2>
       </div>
 
-      {/* Workspace Selection Dropdown */}
-      <div className="mt-4">
-        <label htmlFor="workspace" className="block text-sm font-medium text-gray-700">
-          Select Workspace (Team)
-        </label>
-        <select
-          id="workspace"
-          value={selectedWorkspace}
-          onChange={handleWorkspaceChange}
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-        >
-          <option value="" disabled>Select a Workspace</option>
-          {workspaces.map((workspace) => (
-            <option key={workspace._id} value={workspace._id}>
-              {workspace.workspaceTitle}
-            </option>
-          ))}
-        </select>
-      </div>
-
+    
       {/* Project Selection Dropdown */}
       {selectedWorkspace && (
         <div className="mt-4">

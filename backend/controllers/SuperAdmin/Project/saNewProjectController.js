@@ -39,7 +39,7 @@ export const getAllProjects = async (req, res) => {
       const { workspaceId } = req.query; // Get the workspaceId from query parameters
   
       // Validate the workspaceId
-      if (!workspaceId) {
+      if (!workspaceId) { 
         return res.status(400).json({ message: 'Workspace ID is required' });
       }
   

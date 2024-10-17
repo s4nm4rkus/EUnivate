@@ -8,6 +8,7 @@ import { Server } from 'socket.io';
 import saAddTask from './models/SuperAdmin/saAddTask.js';
 import { confirmQuotationEmail } from './controllers/Client/quotationController.js';
 import { addNewWorkspace } from './controllers/SuperAdmin/workspaceController.js';
+import SelectedWorkspace from './models/SelectedWorkspace.js';
 
 dotenv.config();
 connectDB();
@@ -21,9 +22,9 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: `https://eunivate.vercel.app`, // Client URL
-    methods: ["GET", "POST", "DELETE", "PATCH", "UPDATE"]
-  }
+    origin: 'https://eunivate.vercel.app', // Client URL
+    methods: ['GET', 'POST', 'DELETE', 'PATCH', 'UPDATE'],
+  },
 });
 
 // Socket logic
@@ -38,7 +39,7 @@ io.on('connection', (socket) => {
       console.error('Error updating objectives:', error);
     }
   });
-  
+
   // Other socket events
   socket.on('new-message', (message) => io.emit('new-message', message));
   socket.on('new-reply', (reply) => io.emit('new-reply', reply));
@@ -56,7 +57,7 @@ app.use('/api', addNewWorkspace);
 app.get('/api/users/workspaces/selected', async (req, res) => {
   try {
     const selectedWorkspaceRecord = await SelectedWorkspace.findOne().populate('selectedWorkspace');
-    console.log("Fetched selected workspace record:", selectedWorkspaceRecord);
+    console.log('Fetched selected workspace record:', selectedWorkspaceRecord);
     if (!selectedWorkspaceRecord) {
       return res.status(404).json({ message: 'No selected workspace found' });
     }
@@ -87,6 +88,5 @@ app.get('/', (req, res) => res.send('Welcome to the API'));
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-// Export server for deployment
-export { app, io, server};
-
+// Export app, io, and server for testing or further configuration
+export { app, io, server };

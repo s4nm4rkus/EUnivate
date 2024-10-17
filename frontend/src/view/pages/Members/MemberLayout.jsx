@@ -1,5 +1,9 @@
-import React from "react";
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+
+import { Link, useNavigate } from 'react-router-dom';
+
+import { useLocation } from 'react-router-dom';
+
 import { 
     dashboard_logo, 
     messages_red, 
@@ -13,6 +17,13 @@ import {
 } from "../../../constants/assets";
 
 const MemberLayout = ({ isNavOpen }) => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');  
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+    const navigate = useNavigate();
+    const location = useLocation(); // Use the useLocation hook
+
     return (
         <div
             className={`side-nav-admin fixed top-0 left-0 h-full bg-red-750 shadow-lg transition-transform transform ${
@@ -63,6 +74,16 @@ const MemberLayout = ({ isNavOpen }) => {
                     </li>
                 ))}
             </ul>
+
+            <div className="absolute bottom-0 left-0 w-full p-4 text-white text-center">
+            <p className="font-size">Team 
+                  
+                </p>   
+
+
+            </div>
+
+          
         </div>
     );
 };

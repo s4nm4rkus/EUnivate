@@ -181,12 +181,12 @@ const Task = () => {
                         <FaFlag className={`mr-1 text-xs md:text-sm ${getPriorityColor(task.priority)}`} />
                         <p className="text-xs md:text-sm">{task.priority}</p>
                     </div>
-                    <p className="text-center relative z-10 flex items-center justify-center">
+                    <p className="text-center relative  flex items-center justify-center">
                         <img src={abt1Image} alt="Objective Icon" className="w-5 h-5 mr-2" /> 
                         {task.objectives.length} Objectives
                     </p>
 
-                    <p className="text-center relative z-10 text-sm md:text-base">{task.status}</p>
+                    <p className="text-center relative  text-sm md:text-base">{task.status}</p>
                     <p className="hidden md:block text-right relative z-10 text-sm md:text-base">{task.projectName}</p> {/* Hide Project on mobile */}
                 </li>
             ))}

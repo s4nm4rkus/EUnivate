@@ -121,15 +121,15 @@ const Today_Task = ({ projects, taskDetails }) => {
             {/* Image Modal */}
             {isModalOpen && selectedImage && (
                 <div 
-                    className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+                    className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
                     onClick={closeModal}
                 >
-                    <div className="relative bg-white p-4 rounded-lg shadow-lg w-96 h-96 flex items-center justify-center">
-                        <button className="absolute top-0 right-0 m-2 text-gray-500" onClick={closeModal}>
-                            &times;
-                        </button>
-                        <img src={selectedImage} alt="Full View" className="max-w-full max-h-full object-contain" />
-                    </div>
+                    <img 
+                        src={selectedImage} 
+                        alt="Full View" 
+                        className="max-w-lg max-h-lg object-contain cursor-pointer" 
+                        onClick={closeModal} // Close modal on clicking the image
+                    />
                 </div>
             )}
         </div>

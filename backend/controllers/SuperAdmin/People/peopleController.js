@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import sendEmail from '../../../utils/sendEmail.js';
 import InviteMember from '../../../models/SuperAdmin/saInvitedMember.js';
 import Project from '../../../models/SuperAdmin/saNewProject.js';
-
+import Workspace from '../../../models/SuperAdmin/addWorkspaceModel.js';
 
 //Please dont remove any comments it's used to debug if the system is not working as it's expected
 
@@ -17,9 +17,9 @@ export const getUsers = async (req, res) => {
     }
   };
   
-  
-      // Invite users with storation to sainvitedUser Schema
-export const inviteUsers = async (req, res) => {
+
+
+  export const inviteUsers = async (req, res) => {
     try {
         const { userIds, projects, roles, profilePictures, workspaceId } = req.body;
         const inviterId = req.user.id;
@@ -30,6 +30,12 @@ export const inviteUsers = async (req, res) => {
         if (!userIds || !userIds.length || !workspaceId) {
             console.log('Missing userIds or workspaceId.');
             return res.status(400).json({ message: 'No valid user IDs or workspace ID provided' });
+        }
+
+        // Find the workspace where users are being invited
+        const workspace = await Workspace.findById(workspaceId);
+        if (!workspace) {
+            return res.status(404).json({ message: 'Workspace not found' });
         }
 
         await Promise.all(
@@ -85,6 +91,12 @@ export const inviteUsers = async (req, res) => {
                         await newMember.save();
                     }
 
+                    // Now add the invited user to the workspace's invitedMembers array
+                    if (!workspace.invitedMembers.includes(userId)) {
+                        workspace.invitedMembers.push(userId);
+                    }
+
+                    // Send invitation email to the invited user
                     console.log(`Sending invitation email to: ${existingUser.email}`);
                     await sendEmail({
                         email: existingUser.email,
@@ -98,13 +110,17 @@ export const inviteUsers = async (req, res) => {
             })
         );
 
+        // Save the workspace after adding the invited members
+        await workspace.save();
+
         console.log('All invitation emails sent successfully.');
-        res.status(200).json({ message: 'Invitation emails sent successfully' });
+        res.status(200).json({ message: 'Invitation emails sent successfully and workspace updated with invited members.' });
     } catch (error) {
         console.error('Error inviting users:', error.message);
         res.status(500).json({ message: 'Error inviting users', error: error.message });
     }
 };
+
 
 
 

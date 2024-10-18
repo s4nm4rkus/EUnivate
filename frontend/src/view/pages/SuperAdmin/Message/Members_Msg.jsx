@@ -6,10 +6,9 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [workspaces, setWorkspaces] = useState([]); // State to hold workspaces
-  const [selectedWorkspace, setSelectedWorkspace] = useState(''); // State to hold selected workspace
+  const [workspaces, setWorkspaces] = useState([]);
+  const [selectedWorkspace, setSelectedWorkspace] = useState('');
 
-  // Fetch workspaces and users when the component mounts
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -21,14 +20,12 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
           return;
         }
 
-        // Fetch available workspaces (teams)
+        // Fetch available workspaces
         const workspacesResponse = await axios.get('http://localhost:5000/api/users/workspaces', {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-
-        // Set fetched workspaces in state
         setWorkspaces(workspacesResponse.data);
 
         // Fetch all users
@@ -38,13 +35,13 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
           },
         });
 
-        // Fetch invited users from the selected workspace
+        // Fetch invited users if workspace is selected
         if (selectedWorkspace) {
           const invitedUsersResponse = await axios.get('http://localhost:5000/api/users/invited', {
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
-            params: { workspaceId: selectedWorkspace }, // Pass selected workspaceId
+            params: { workspaceId: selectedWorkspace }, // Pass workspace ID
           });
 
           const allUsers = allUsersResponse.data;
@@ -56,7 +53,7 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
           setInvitedUsers(invitedUsersList);
           setCurrentUser(allUsers.find((u) => u._id === user._id));
 
-          // Pass the invited users back to Messages component
+          // Pass the invited users back to the parent component
           onInvitedUsersFetched(invitedUsersList);
         }
       } catch (error) {
@@ -67,9 +64,8 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
     };
 
     fetchData();
-  }, [onInvitedUsersFetched, selectedWorkspace]); // Fetch data whenever selectedWorkspace changes
+  }, [onInvitedUsersFetched, selectedWorkspace]);
 
-  // UseEffect to load the selected workspace from localStorage on component mount
   useEffect(() => {
     const savedWorkspace = localStorage.getItem('selectedWorkspace');
     if (savedWorkspace) {
@@ -77,20 +73,16 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
     }
   }, []);
 
-  // Handle workspace selection change
   const handleWorkspaceChange = (event) => {
     const selected = event.target.value;
     setSelectedWorkspace(selected);
-
-    // Save the selected workspace to localStorage to persist across refreshes
-    localStorage.setItem('selectedWorkspace', selected);
+    localStorage.setItem('selectedWorkspace', selected);  // Persist selected workspace
   };
 
   const totalMembers = invitedUsers.length;
 
   return (
     <div className="flex flex-col h-full overflow-y-auto custom-scrollbar">
-      {/* About Section */}
       <div className="mb-4">
         <h2 className="text-sm font-bold text-gray-800">About</h2>
       </div>

@@ -121,15 +121,18 @@ const App = () => {
 
           {/* Members */}
           <Route
-            path="/member/*"
-            element={
+          path="/member/*"
+          element={
+            <WorkspaceProvider>
               <MemberAuth>
                 <Member />
               </MemberAuth>
-            }
-          >
+            </WorkspaceProvider>
+          }
+        >
           {/* Default route for "/member" */}
           <Route index element={<ProjMem />} />
+          {/* Nested member-specific routes */}
           <Route path="projects/:id" element={<ProjectDetailsMem />} />
           <Route path="projectmem" element={<ProjMem />} />
           <Route path="taskmem" element={<TaskMem />} />
@@ -137,6 +140,7 @@ const App = () => {
           <Route path="settings_Members" element={<Settings_Members />} />
         </Route>
 
+        
           {/* Guest Account Routes */}
           <Route
             path="/guest-dashboard/*"

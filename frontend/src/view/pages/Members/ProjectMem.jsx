@@ -3,6 +3,7 @@ import { FaCalendar, FaCheckCircle } from 'react-icons/fa';
 import axios from 'axios';
 import AdminNavbar_Members from '../../components/Members/AdminNavbar_Members';
 import { useNavigate } from 'react-router-dom';
+import { useWorkspace } from '../../components/SuperAdmin/workspaceContext';
 
 const ProjectMem = () => {
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
@@ -11,31 +12,58 @@ const ProjectMem = () => {
   const [loading, setLoading] = useState(false);
   const [taskCounts, setTaskCounts] = useState({});
   const [selectedProject, setSelectedProject] = useState(null);
-  const [tasks, setTasks] = useState([]); // New state to store tasks
-
+  const [tasks, setTasks] = useState([]); 
+  const { selectedWorkspace } = useWorkspace();
+  const [workspaces, setWorkspaces] = useState([]);
   const navigate = useNavigate();
 
   const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
 
-  // Fetch Projects
   useEffect(() => {
     const fetchProjects = async () => {
       setLoading(true); 
       try {
-        const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject');
-        setProjects(response.data);
-      } catch (error) {
-        console.error('Error fetching projects:', error);
+        const user = JSON.parse(localStorage.getItem('user'));
+        const accessToken = user ? user.accessToken : null;
+
+        if (!accessToken) {
+          setError('No access token found. Please log in again.');
+          setLoading(false);
+          return;
+        }
+
+        const workspaceId = selectedWorkspace ? selectedWorkspace._id : null;
+
+        if (!workspaceId) {
+          setError('No workspace selected. Please select a workspace.');
+          setLoading(false);
+          return;
+        }
+
+        const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
+          headers: { Authorization: `Bearer ${accessToken}` },
+          params: { workspaceId },
+        });
+
+        if (response.status === 200) {
+          setProjects(response.data);
+          setError(''); // Clear previous errors
+        } else {
+          setError('Failed to fetch projects.');
+        }
+      } catch (err) {
+        console.error('Error fetching projects:', err);
         setError('An error occurred while fetching projects.');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProjects();
-  }, []);
+    if (selectedWorkspace) {
+      fetchProjects();
+    }
+  }, [selectedWorkspace]);
 
-  // Fetch task counts per project
   useEffect(() => {
     const fetchTaskCounts = async () => {
       const counts = {};
@@ -44,12 +72,10 @@ const ProjectMem = () => {
           const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}`);
           const totalTasks = response.data.data.length;
           const doneTasks = response.data.data.filter(task => task.status === 'Done').length;
-          counts[project._id] = {
-            totalTasks,
-            doneTasks,
-          };
-        } catch (error) {
-          console.error('Error fetching task counts:', error);
+          counts[project._id] = { totalTasks, doneTasks };
+        } catch (err) {
+          console.error('Error fetching task counts:', err);
+          setError('An error occurred while fetching task counts.');
         }
       }
       setTaskCounts(counts);
@@ -60,30 +86,57 @@ const ProjectMem = () => {
     }
   }, [projects]);
 
-  // Fetch tasks for selected project
+  useEffect(() => {
+    const fetchWorkspaces = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        const accessToken = user ? user.accessToken : null;
+
+        if (!accessToken) {
+          console.error('No access token found.');
+          return;
+        }
+
+        const response = await axios.get('http://localhost:5000/api/users/workspaces', {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        if (response.status === 200) {
+          setWorkspaces(response.data);
+        } else {
+          setError('Failed to fetch workspaces.');
+        }
+      } catch (err) {
+        console.error('Error fetching workspaces:', err);
+        setError('An error occurred while fetching workspaces.');
+      }
+    };
+
+    fetchWorkspaces();
+  }, []);
+
   const handleProjectClick = async (project) => {
     try {
       const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}`);
       const tasks = response.data.data;
-      setTasks(tasks); // Store the tasks locally
-      setSelectedProject(project._id); // Keep track of selected project
-      
-      // Navigate to ProjectDetailsMem, passing project details and tasks
+      setTasks(tasks);
+      setSelectedProject(project._id);
+
       navigate(`/member/projects/${project._id}`, {
         state: {
           projectId: project._id,
           projectName: project.projectName,
-          tasks,  
+          tasks,
           thumbnail: project.thumbnail,
-          invitedUsers: project.invitedUsers, 
+          invitedUsers: project.invitedUsers,
         },
-      });      
-    } catch (error) {
-      console.error('Error fetching tasks:', error);
+      });
+    } catch (err) {
+      console.error('Error fetching tasks:', err);
+      setError('An error occurred while fetching tasks.');
     }
   };
-  
-  // Calculate progress for each project
+
   const calculateProgress = (projectId) => {
     const { totalTasks, doneTasks } = taskCounts[projectId] || { totalTasks: 0, doneTasks: 0 };
     return totalTasks > 0 ? (doneTasks / totalTasks) * 100 : 0;

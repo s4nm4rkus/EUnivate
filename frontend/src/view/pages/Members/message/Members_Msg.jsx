@@ -6,10 +6,12 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const [workspaces, setWorkspaces] = useState([]); // State to hold workspaces
+  const [selectedWorkspace, setSelectedWorkspace] = useState(''); // State to hold selected workspace
   // Fetch invited users and current user
+  // Fetch workspaces and users when the component mounts
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchData = async () => {
       try {
         const user = JSON.parse(localStorage.getItem('user'));
         const accessToken = user ? user.accessToken : null;
@@ -19,6 +21,16 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
           return;
         }
 
+        // Fetch available workspaces (teams)
+        const workspacesResponse = await axios.get('http://localhost:5000/api/users/workspaces', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        // Set fetched workspaces in state
+        setWorkspaces(workspacesResponse.data);
+
         // Fetch all users
         const allUsersResponse = await axios.get('http://localhost:5000/api/users/', {
           headers: {
@@ -26,33 +38,53 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
           },
         });
 
-        // Fetch invited users from projects
-        const invitedUsersResponse = await axios.get('http://localhost:5000/api/users/invited', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
+        // Fetch invited users from the selected workspace
+        if (selectedWorkspace) {
+          const invitedUsersResponse = await axios.get('http://localhost:5000/api/users/invited', {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+            params: { workspaceId: selectedWorkspace }, // Pass selected workspaceId
+          });
 
-        const allUsers = allUsersResponse.data;
-        const invitedUsersList = invitedUsersResponse.data.invitedUsers.map((invitedUser) => {
-          const userFromDB = allUsers.find((user) => user.email === invitedUser.email);
-          return userFromDB ? { ...invitedUser, ...userFromDB } : invitedUser;
-        });
+          const allUsers = allUsersResponse.data;
+          const invitedUsersList = invitedUsersResponse.data.invitedUsers.map((invitedUser) => {
+            const userFromDB = allUsers.find((user) => user.email === invitedUser.email);
+            return userFromDB ? { ...invitedUser, ...userFromDB } : invitedUser;
+          });
 
-        setInvitedUsers(invitedUsersList);
-        setCurrentUser(allUsers.find(u => u._id === user._id));
+          setInvitedUsers(invitedUsersList);
+          setCurrentUser(allUsers.find((u) => u._id === user._id));
 
-        // Pass the invited users back to Messages component
-        onInvitedUsersFetched(invitedUsersList);
+          // Pass the invited users back to Messages component
+          onInvitedUsersFetched(invitedUsersList);
+        }
       } catch (error) {
-        setError('Failed to load users. Please try again later.');
+        setError('Failed to load users and workspaces. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUsers();
-  }, [onInvitedUsersFetched]);
+    fetchData();
+  }, [onInvitedUsersFetched, selectedWorkspace]); // Fetch data whenever selectedWorkspace changes
+
+  // UseEffect to load the selected workspace from localStorage on component mount
+  useEffect(() => {
+    const savedWorkspace = localStorage.getItem('selectedWorkspace');
+    if (savedWorkspace) {
+      setSelectedWorkspace(savedWorkspace);
+    }
+  }, []);
+
+  // Handle workspace selection change
+  const handleWorkspaceChange = (event) => {
+    const selected = event.target.value;
+    setSelectedWorkspace(selected);
+
+    // Save the selected workspace to localStorage to persist across refreshes
+    localStorage.setItem('selectedWorkspace', selected);
+  };
 
   const totalMembers = invitedUsers.length;
 

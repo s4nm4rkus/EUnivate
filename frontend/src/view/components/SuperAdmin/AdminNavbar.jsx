@@ -4,6 +4,7 @@ import { faSearch, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import logomobile from "../../../assets/logomobile.png"; // Correct image import
 import { searchOptions } from './Search/SearchContext'; // Import the search options
+import './Css/Search.css'
 
 const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
   const [user, setUser] = useState({ firstName: '', lastName: '', profilePicture: { url: '' } });
@@ -96,20 +97,23 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
             className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
           />
           
-          {/* Dropdown for Search Results */}
-          {filteredResults.length > 0 && (
-            <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
-              {filteredResults.map((result, index) => (
-                <div
-                  key={index}
-                  className={`px-4 py-2 hover:bg-gray-100 cursor-pointer ${clickedOption === result.name ? 'bg-yellow-300 animate-blink' : ''}`}
-                  onClick={() => handleResultClick(result)}
-                >
-                  {result.name}
-                </div>
-              ))}
-            </div>
-          )}
+{/* Dropdown for Search Results */}
+{filteredResults.length > 0 && (
+  <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 custom-scrollbar" 
+       style={{ maxHeight: '200px', overflowY: 'scroll' }}> {/* Set max height and enable scrolling */}
+    {filteredResults.map((result, index) => (
+      <div
+        key={index}
+        className={`px-4 py-2 hover:bg-gray-100 cursor-pointer ${clickedOption === result.name ? 'bg-yellow-300 animate-blink' : ''}`}
+        onClick={() => handleResultClick(result)}
+      >
+        {result.name}
+      </div>
+    ))}
+  </div>
+)}
+
+
         </div>
 
         {/* User Profile */}

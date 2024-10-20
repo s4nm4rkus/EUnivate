@@ -62,16 +62,18 @@ import ProjMem from "./view/pages/Members/ProjectMem.jsx";
 import TaskMem from "./view/pages/Members/TaskMem.jsx"; 
 import ProjectDetailsMem from "./view/pages/Members/ProjectdetailsMem.jsx"; 
 import Settings_Members from './view/pages/Members/Settings_Members.jsx';
-
+import Messages_Mem from './view/pages/Members/Messages_Mem.jsx';
 
 
 //Guest
 import Guest from './view/pages/Guest/Guest.jsx';
 import ProjectG from './view/pages/Guest/ProjectG.jsx';
-import TaskG from './view/pages/Guest/Modal/TaskG.jsx';
+import Task_Guest from './view/pages/Guest/Task_Guest.jsx';
 import ProjectdetailsG from './view/pages/Guest/ProjectdetailsG.jsx';
 import GuestAuth from './view/hooks/GuestAuth.jsx';
 import SettingsG from './view/pages/Guest/SettingsG.jsx';
+import MessagesG from './view/pages/Guest/MessagesG.jsx';
+
 /* Global CSS */
 import './index.css';
 import './admin.css';
@@ -136,26 +138,28 @@ const App = () => {
           <Route path="projects/:id" element={<ProjectDetailsMem />} />
           <Route path="projectmem" element={<ProjMem />} />
           <Route path="taskmem" element={<TaskMem />} />
-          <Route path="messages" element={<Messages />} />
+          <Route path="message" element={<Messages_Mem />} />
           <Route path="settings_Members" element={<Settings_Members />} />
         </Route>
 
         
-          {/* Guest Account Routes */}
-          <Route
+        <Route
             path="/guest-dashboard/*"
             element={
-            <GuestAuth>
-            <Guest />
-            </GuestAuth>
+              <WorkspaceProvider>
+                <GuestAuth>
+                  <Guest />
+                </GuestAuth>
+              </WorkspaceProvider>  
             }
           >
+            
          <Route path="projects/:id" element={<ProjectdetailsG />} />
           <Route path="projectG" element={<ProjectG />} /> 
-          <Route path="taskG" element={<TaskG />} /> 
-          <Route path="messagesG" element={<Messages />} /> 
+          <Route path="taskG" element={<Task_Guest />} /> 
+          <Route path="messagesG" element={<MessagesG />} /> 
           <Route path="settingsG" element={<SettingsG />} />
-      
+ 
           
         </Route>
 

@@ -90,7 +90,7 @@ const MemberLayout = ({ isNavOpen }) => {
                     to: "taskmem", text: "My Task", icon: task_icon, hoverIcon: task_red
                 },
                 {
-                    to: "messages", text: "Messages", icon: messages_icon, hoverIcon: messages_red
+                    to: "message", text: "Messages", icon: messages_icon, hoverIcon: messages_red
                 },
                 {
                     to: "settings_Members", text: "Settings", icon: settings_icon, hoverIcon: settings_red

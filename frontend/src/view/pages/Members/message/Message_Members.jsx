@@ -1,90 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const Members_Msg = ({ onInvitedUsersFetched }) => {
+const Message_Members = ({ onInvitedUsersFetched, workspaceId }) => {
   const [invitedUsers, setInvitedUsers] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [workspaces, setWorkspaces] = useState([]);
-  const [selectedWorkspace, setSelectedWorkspace] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const user = JSON.parse(localStorage.getItem('user'));
         const accessToken = user ? user.accessToken : null;
-  
+
         if (!accessToken) {
           setError('Authentication required. Please log in.');
           return;
         }
-  
-        // Fetch available workspaces
-        const workspacesResponse = await axios.get('http://localhost:5000/api/users/workspaces', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        setWorkspaces(workspacesResponse.data);
-  
+
         // Fetch all users
         const allUsersResponse = await axios.get('http://localhost:5000/api/users/', {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-  
-        // Fetch invited users if a workspace is selected
-        if (selectedWorkspace) {
-          // Corrected the endpoint URL to fetch invited users from the workspace
-          const invitedUsersResponse = await axios.get('http://localhost:5000/api/workspaces/invitedUsers', {
+
+        // Fetch invited users for the selected workspace
+        if (workspaceId) {
+          const invitedUsersResponse = await axios.get('http://localhost:5000/api/users/invited', {
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
-            params: { workspaceId: selectedWorkspace }, // Pass workspace ID
+            params: { workspaceId: workspaceId }, // Pass workspace ID directly
           });
-  
-          console.log('Invited Users Response:', invitedUsersResponse.data);
-  
+
           const allUsers = allUsersResponse.data;
           const invitedUsersList = invitedUsersResponse.data.invitedUsers.map((invitedUser) => {
             const userFromDB = allUsers.find((user) => user.email === invitedUser.email);
             return userFromDB ? { ...invitedUser, ...userFromDB } : invitedUser;
           });
-  
+
           setInvitedUsers(invitedUsersList);
           setCurrentUser(allUsers.find((u) => u._id === user._id));
-  
+
           // Pass the invited users back to the parent component
           onInvitedUsersFetched(invitedUsersList);
         }
       } catch (error) {
-        console.error('Error fetching invited users:', error.response ? error.response.data : error.message);
-        setError('Failed to load users and workspaces. Please try again later.');
+        setError('Please invite people to see the members and ensure you select a workspace.');
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchData();
-  }, [onInvitedUsersFetched, selectedWorkspace]);
-  
-
-  // Load saved workspace from localStorage
-  useEffect(() => {
-    const savedWorkspace = localStorage.getItem('selectedWorkspace');
-    if (savedWorkspace) {
-      setSelectedWorkspace(savedWorkspace);
-    }
-  }, []);
-
-  // Handle workspace change
-  const handleWorkspaceChange = (event) => {
-    const selected = event.target.value;
-    setSelectedWorkspace(selected);
-    localStorage.setItem('selectedWorkspace', selected); // Persist selected workspace
-  };
+  }, [onInvitedUsersFetched, workspaceId]);
 
   const totalMembers = invitedUsers.length;
 
@@ -92,26 +62,6 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
     <div className="flex flex-col h-full overflow-y-auto custom-scrollbar">
       <div className="mb-4">
         <h2 className="text-sm font-bold text-gray-800">About</h2>
-      </div>
-
-      {/* Workspace Selection */}
-      <div className="mt-4">
-        <label htmlFor="workspace" className="block text-sm font-medium text-gray-700">
-          Select Workspace (Team)
-        </label>
-        <select
-          id="workspace"
-          value={selectedWorkspace}
-          onChange={handleWorkspaceChange}
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-        >
-          <option value="" disabled>Select a Workspace</option>
-          {workspaces.map((workspace) => (
-            <option key={workspace._id} value={workspace._id}>
-              {workspace.workspaceTitle}
-            </option>
-          ))}
-        </select>
       </div>
 
       {/* Workspace Description */}
@@ -124,7 +74,7 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
         </p>
       </div>
 
-      {/* Member Count */}
+      {/* Member Count and List */}
       <div className="mt-4 flex items-center">
         <p className="text-gray-800 text-sm font-semibold">Member</p>
         <div className="bg-orange-500 text-white text-sm font-bold ml-2 px-1 py-0.5 rounded-md">
@@ -138,7 +88,7 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
           <div className="relative">
             <span className="absolute bottom-0 right-0 w-3 h-3 bg-blue-500 border-2 border-white rounded-full"></span>
             <img
-              src={currentUser.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'}
+              src={currentUser.profilePicture?.url || currentUser.profilePicture || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'}
               alt={currentUser.username || 'Profile Picture'}
               className="w-8 h-8 rounded-full object-cover border-2 border-white"
             />
@@ -161,7 +111,7 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
               <div className="relative">
                 <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
                 <img
-                  src={user.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'}
+                  src={user.profilePicture?.url || user.profilePicture || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'}
                   alt={user.username || 'Profile Picture'}
                   className="w-8 h-8 rounded-full object-cover border-2 border-white"
                 />
@@ -174,5 +124,4 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
     </div>
   );
 };
-
-export default Members_Msg;
+export default Message_Members;

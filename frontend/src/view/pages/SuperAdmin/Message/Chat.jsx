@@ -20,7 +20,6 @@ const Chat = ({ group }) => {
   const [showFlagPicker, setShowFlagPicker] = useState(null);
   const [selectedFlag, setSelectedFlag] = useState({});
   const [file, setFile] = useState(null);
-  const [hasMembers, setHasMembers] = useState(group.selectedMembers.length > 0); 
   const defaultProfilePictureUrl = 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png';
 
   // Create a ref for the chat container
@@ -54,23 +53,6 @@ const Chat = ({ group }) => {
         profilePicture: storedUser.profilePicture?.url || defaultProfilePictureUrl,
       });
     }
-
-  // Fetch all chat messages if there are members
-  if (hasMembers) {
-    const fetchMessages = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/users/messages', {
-          params: { workspaceId: group.groupName }, // Fetch messages based on workspaceId
-        });
-        setMessages(response.data);
-      } catch (error) {
-        console.error('Error fetching messages:', error);
-      }
-    };
-
-    fetchMessages();
-  }
-
     // Listen for new messages
     socket.on('new-message', (newMessage) => {
       setMessages((prevMessages) => [...prevMessages, newMessage]);
@@ -135,7 +117,26 @@ const Chat = ({ group }) => {
     return () => {
       socket.disconnect();
     };
+  }, []);
+  // Fetch messages when group changes
+  useEffect(() => {
+    if (group.groupName) {
+      console.log('Workspace ID being used:', group.groupName); // Check if this is the correct ID
+      const fetchMessages = async () => {
+        try {
+          const response = await axios.get('http://localhost:5000/api/users/messages', {
+            params: { workspaceId: group.groupName }, // Fetch messages based on workspaceId
+          });
+          setMessages(response.data);
+        } catch (error) {
+          console.error('Error fetching messages:', error);
+        }
+      };
+
+      fetchMessages();
+    }
   }, [group.groupName]);
+
 
   // Scroll to the bottom when messages change
   useEffect(() => {
@@ -172,16 +173,6 @@ const Chat = ({ group }) => {
         }
     }
   };
-   // Return empty view if there are no members
-   if (!hasMembers) {
-    return (
-      <div className="flex flex-col h-full w-full p-4">
-        <div className="text-gray-500 text-sm">
-          No members in this workspace. Please invite members to start a conversation.
-        </div>
-      </div>
-    );
-  }
 
 
   // Handle replying to a message
@@ -280,7 +271,16 @@ const Chat = ({ group }) => {
       console.error('Error flagging message:', error);
     }
   };
-
+  // Fallback UI for when there are no members
+  if (!group.selectedMembers || group.selectedMembers.length === 0) {
+    return (
+      <div className="flex flex-col h-full w-full p-4">
+        <div className="text-gray-500 text-sm">
+          No members are available in this workspace. Please invite members to start a conversation.
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col h-full w-full p-4">
       {/* Header */}

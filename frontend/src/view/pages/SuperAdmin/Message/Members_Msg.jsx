@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const Members_Msg = ({ onInvitedUsersFetched, onWorkspaceChange }) => {
+const Members_Msg = ({ onInvitedUsersFetched, workspaceId }) => {
   const [invitedUsers, setInvitedUsers] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [workspaces, setWorkspaces] = useState([]);
-  const [selectedWorkspace, setSelectedWorkspace] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,14 +18,6 @@ const Members_Msg = ({ onInvitedUsersFetched, onWorkspaceChange }) => {
           return;
         }
 
-        // Fetch available workspaces
-        const workspacesResponse = await axios.get('http://localhost:5000/api/users/workspaces', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        setWorkspaces(workspacesResponse.data);
-
         // Fetch all users
         const allUsersResponse = await axios.get('http://localhost:5000/api/users/', {
           headers: {
@@ -35,13 +25,13 @@ const Members_Msg = ({ onInvitedUsersFetched, onWorkspaceChange }) => {
           },
         });
 
-        // Fetch invited users if workspace is selected
-        if (selectedWorkspace) {
+        // Fetch invited users for the selected workspace
+        if (workspaceId) {
           const invitedUsersResponse = await axios.get('http://localhost:5000/api/users/invited', {
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
-            params: { workspaceId: selectedWorkspace }, // Pass workspace ID
+            params: { workspaceId: workspaceId }, // Pass workspace ID directly
           });
 
           const allUsers = allUsersResponse.data;
@@ -57,31 +47,14 @@ const Members_Msg = ({ onInvitedUsersFetched, onWorkspaceChange }) => {
           onInvitedUsersFetched(invitedUsersList);
         }
       } catch (error) {
-        setError('Please Invite People to see the members and Ensure you Select Workspace!');
+        setError('Please invite people to see the members and ensure you select a workspace.');
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [onInvitedUsersFetched, selectedWorkspace]);
-
-  useEffect(() => {
-    const savedWorkspace = localStorage.getItem('selectedWorkspace');
-    if (savedWorkspace) {
-      setSelectedWorkspace(savedWorkspace);
-    }
-  }, []);
-
-  const handleWorkspaceChange = (event) => {
-    const selected = event.target.value;
-    setSelectedWorkspace(selected);
-    localStorage.setItem('selectedWorkspace', selected);  // Persist selected workspace
-
-    // Find the selected workspace title and pass it to the parent
-    const selectedWorkspaceTitle = workspaces.find(workspace => workspace._id === selected)?.workspaceTitle;
-    onWorkspaceChange(selectedWorkspaceTitle || ''); // Notify parent of workspace change
-  };
+  }, [onInvitedUsersFetched, workspaceId]);
 
   const totalMembers = invitedUsers.length;
 
@@ -89,26 +62,6 @@ const Members_Msg = ({ onInvitedUsersFetched, onWorkspaceChange }) => {
     <div className="flex flex-col h-full overflow-y-auto custom-scrollbar">
       <div className="mb-4">
         <h2 className="text-sm font-bold text-gray-800">About</h2>
-      </div>
-
-      {/* Workspace Selection Dropdown */}
-      <div className="mt-4">
-        <label htmlFor="workspace" className="block text-sm font-medium text-gray-700">
-          Select Workspace (Team)
-        </label>
-        <select
-          id="workspace"
-          value={selectedWorkspace}
-          onChange={handleWorkspaceChange}
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-        >
-          <option value="" disabled>Select a Workspace</option>
-          {workspaces.map((workspace) => (
-            <option key={workspace._id} value={workspace._id}>
-              {workspace.workspaceTitle}
-            </option>
-          ))}
-        </select>
       </div>
 
       {/* Workspace Description */}

@@ -21,7 +21,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: `https://eunivate.vercel.app`, // Client URL
+    origin: `https://eunivate-heix.onrender.com`, // Client URL
     methods: ["GET", "POST", "DELETE", "PATCH", "UPDATE"]
   }
 });
@@ -69,7 +69,7 @@ app.get('/api/users/workspaces/selected', async (req, res) => {
 // Quotation route
 app.get('/api/users/quotation/confirm/', confirmQuotationEmail);
 app.get('/quotation-complete', (req, res) => {
-  res.redirect('https://eunivate.vercel.app/quotation-complete');
+  res.redirect('https://eunivate-heix.onrender.com/quotation-complete');
 });
 
 // Error handling middleware

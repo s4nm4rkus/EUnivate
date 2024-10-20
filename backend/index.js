@@ -7,7 +7,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import saAddTask from './models/SuperAdmin/saAddTask.js';
 import { confirmQuotationEmail } from './controllers/Client/quotationController.js';
-import {addNewWorkspace}from './controllers/SuperAdmin/workspaceController.js';
+import { addNewWorkspace } from './controllers/SuperAdmin/workspaceController.js';
 
 dotenv.config();
 connectDB();
@@ -21,12 +21,12 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // Client URL
+    origin: `https://eunivate-heix.onrender.com`, // Client URL
     methods: ["GET", "POST", "DELETE", "PATCH", "UPDATE"]
   }
 });
 
-// Objective socket handler
+// Socket logic
 io.on('connection', (socket) => {
   console.log('New client connected');
 
@@ -39,67 +39,38 @@ io.on('connection', (socket) => {
     }
   });
   
-   // Handle message-related socket events
-   socket.on('new-message', (message) => {
-    io.emit('new-message', message);
-  });
+  // Other socket events
+  socket.on('new-message', (message) => io.emit('new-message', message));
+  socket.on('new-reply', (reply) => io.emit('new-reply', reply));
+  socket.on('new-reaction', (reaction) => io.emit('new-reaction', reaction));
+  socket.on('starred-message', (message) => io.emit('starred-message', message));
+  socket.on('flagged-message', (message) => io.emit('flagged-message', message));
+  socket.on('deleted-message', (messageId) => io.emit('deleted-message', messageId));
 
-  socket.on('new-reply', (reply) => {
-    io.emit('new-reply', reply);
-  });
-
-  socket.on('new-reaction', (reaction) => {
-    io.emit('new-reaction', reaction);
-  });
-
-  socket.on('starred-message', (message) => {
-    io.emit('starred-message', message);
-  });
-
-  socket.on('flagged-message', (message) => {
-    io.emit('flagged-message', message);
-  });
-
-  socket.on('deleted-message', (messageId) => {
-    io.emit('deleted-message', messageId);
-  });
-
-  
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
-  });
+  socket.on('disconnect', () => console.log('Client disconnected'));
 });
-export { io };
 
 // Routes
 app.use('/api/users', userRoutes);
-
-// Workspace
 app.use('/api', addNewWorkspace);
 app.get('/api/users/workspaces/selected', async (req, res) => {
   try {
-      const selectedWorkspaceRecord = await SelectedWorkspace.findOne().populate('selectedWorkspace'); // Populate the workspace reference
-      console.log("Fetched selected workspace record:", selectedWorkspaceRecord); // Log the fetched record
-      if (!selectedWorkspaceRecord) {
-          return res.status(404).json({ message: 'No selected workspace found' });
-      }
-
-      return res.status(200).json({ selectedWorkspaceRecord });
+    const selectedWorkspaceRecord = await SelectedWorkspace.findOne().populate('selectedWorkspace');
+    console.log("Fetched selected workspace record:", selectedWorkspaceRecord);
+    if (!selectedWorkspaceRecord) {
+      return res.status(404).json({ message: 'No selected workspace found' });
+    }
+    return res.status(200).json({ selectedWorkspaceRecord });
   } catch (error) {
-      return res.status(500).json({ error: error.message || 'Error fetching selected workspace' });
+    return res.status(500).json({ error: error.message || 'Error fetching selected workspace' });
   }
 });
 
-
-
-// Chat message routes
+// Quotation route
 app.get('/api/users/quotation/confirm/', confirmQuotationEmail);
-
 app.get('/quotation-complete', (req, res) => {
-// res.send('Quotation verification complete');
-res.redirect(`https://eunivate.vercel.app/quotation-complete`);
+  res.redirect('https://eunivate-heix.onrender.com/quotation-complete');
 });
-
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -110,11 +81,12 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Default route
+app.get('/', (req, res) => res.send('Welcome to the API'));
 
-
-app.get('/', (req, res) => {
-  res.send('Welcome to the API');
-});
+// Export server for deployment
+export { io };
+export default server;
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

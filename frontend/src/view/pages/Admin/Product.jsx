@@ -24,7 +24,7 @@ const Product = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/users/products');
+        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/products`);
         setProducts(response.data);
         setLoading(false);
       } catch (error) {
@@ -39,7 +39,7 @@ const Product = () => {
 
   const handleDelete = async (productId) => {
     try {
-      await axios.delete(`http://localhost:5000/api/users/products/${productId}`);
+      await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/products/${productId}`);
       setProducts(products.filter(product => product._id !== productId));
     } catch (error) {
       console.error('Error deleting product:', error);

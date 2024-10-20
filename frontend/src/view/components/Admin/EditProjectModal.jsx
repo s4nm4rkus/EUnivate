@@ -64,7 +64,7 @@ const EditProjectModal = ({ project, onClose, onSave }) => {
       };
 
       const response = await axios.put(
-        `http://localhost:5000/api/users/projects/${project._id}`,
+        `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/projects/${project._id}`,
         updatedProject
       );
 

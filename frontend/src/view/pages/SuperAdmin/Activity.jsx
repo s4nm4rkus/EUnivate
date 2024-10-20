@@ -30,7 +30,7 @@ const Activity = () => {
                 setProfilePicture(user.profilePicture?.url || user.profilePicture || defaultProfilePictureUrl);
 
                 // Fetch projects based on the selected workspace
-                const projectResponse = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
+                const projectResponse = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-getnewproject`, {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
@@ -43,7 +43,7 @@ const Activity = () => {
 
                 // Fetch tasks for each project
                 const taskDetailsPromises = projectResponse.data.map(async (project) => {
-                    const taskResponse = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}`, {
+                    const taskResponse = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-tasks/${project._id}`, {
                         headers: {
                             Authorization: `Bearer ${accessToken}`
                         }

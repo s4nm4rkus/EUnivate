@@ -37,6 +37,7 @@ const TaskMem = () => {
                     return;
                 }
 
+<<<<<<< HEAD
                 if (!selectedWorkspace) {
                     console.error('No workspace selected.');
                     setLoading(false);
@@ -45,6 +46,9 @@ const TaskMem = () => {
 
                 // Fetch projects associated with the selected workspace
                 const projectResponse = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
+=======
+                const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-getnewproject`, {
+>>>>>>> e3eb5c32da219505ca23fb4a40d064c08db9fb1c
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
@@ -55,6 +59,7 @@ const TaskMem = () => {
 
                 const tasksList = [];
                 await Promise.all(
+<<<<<<< HEAD
                     projectResponse.data.map(async (project) => {
                         const taskResponse = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}`, {
                             headers: {
@@ -62,6 +67,10 @@ const TaskMem = () => {
                             },
                         });
 
+=======
+                    response.data.map(async (project) => {
+                        const taskResponse = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-tasks/${project._id}`);
+>>>>>>> e3eb5c32da219505ca23fb4a40d064c08db9fb1c
                         const tasksWithProject = taskResponse.data.data.map(task => ({
                             ...task,
                             projectName: project.projectName, // Assign project name to each task

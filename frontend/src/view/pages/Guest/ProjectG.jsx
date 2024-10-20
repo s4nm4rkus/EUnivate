@@ -39,9 +39,16 @@ const ProjectG = () => {
           return;
         }
 
+<<<<<<< HEAD
         const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
           headers: { Authorization: `Bearer ${accessToken}` },
           params: { workspaceId },
+=======
+        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-getnewproject`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+>>>>>>> e3eb5c32da219505ca23fb4a40d064c08db9fb1c
         });
 
         if (response.status === 200) {
@@ -68,7 +75,7 @@ const ProjectG = () => {
       const counts = {};
       for (let project of projects) {
         try {
-          const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}`);
+          const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-tasks/${project._id}`);
           const totalTasks = response.data.data.length;
           const doneTasks = response.data.data.filter(task => task.status === 'Done').length;
           counts[project._id] = { totalTasks, doneTasks };
@@ -116,7 +123,7 @@ const ProjectG = () => {
 
   const handleProjectClick = async (project) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}`);
+      const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-tasks/${project._id}`);
       const tasks = response.data.data;
       setTasks(tasks);
       setSelectedProject(project._id);

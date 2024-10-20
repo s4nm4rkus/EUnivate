@@ -9,7 +9,7 @@ const EventsPage = () => {
   useEffect(() => {
     const fetchWebinars = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/users/events');
+        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/events`);
         setWebinars(response.data);
         setLoading(false);
       } catch (error) {

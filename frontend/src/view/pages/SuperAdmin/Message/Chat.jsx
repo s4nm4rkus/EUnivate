@@ -20,7 +20,7 @@ const Chat = ({ group }) => {
   const [showFlagPicker, setShowFlagPicker] = useState(null);
   const [selectedFlag, setSelectedFlag] = useState({});
   const [file, setFile] = useState(null);
-
+  const [hasMembers, setHasMembers] = useState(group.selectedMembers.length > 0); 
   const defaultProfilePictureUrl = 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png';
 
   // Create a ref for the chat container
@@ -55,10 +55,13 @@ const Chat = ({ group }) => {
       });
     }
 
-    // Fetch all chat messages
+  // Fetch all chat messages if there are members
+  if (hasMembers) {
     const fetchMessages = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/users/messages');
+        const response = await axios.get('http://localhost:5000/api/users/messages', {
+          params: { workspaceId: group.groupName }, // Fetch messages based on workspaceId
+        });
         setMessages(response.data);
       } catch (error) {
         console.error('Error fetching messages:', error);
@@ -66,6 +69,7 @@ const Chat = ({ group }) => {
     };
 
     fetchMessages();
+  }
 
     // Listen for new messages
     socket.on('new-message', (newMessage) => {
@@ -131,7 +135,7 @@ const Chat = ({ group }) => {
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [group.groupName]);
 
   // Scroll to the bottom when messages change
   useEffect(() => {
@@ -143,30 +147,42 @@ const Chat = ({ group }) => {
   // Handle sending a message
   const handleSendMessage = async () => {
     const plainTextMessage = DOMPurify.sanitize(message, { ALLOWED_TAGS: [] }).trim();
-
+  
     if (plainTextMessage && currentUser) {
-      let fileData = {};
-      if (file) {
-        fileData = await uploadImageToCloudinary(file);
-      }
-
-      const newMessage = {
-        sender: currentUser._id,
-        content: message,
-        files: fileData.url ? [fileData] : [],
-        replyTo: replyMessage ? replyMessage._id : null,
-      };
-
-      try {
-        await axios.post('http://localhost:5000/api/users/create-message', newMessage);
-        setMessage('');
-        setFile(null);
-        setReplyMessage(null);
-      } catch (error) {
-        console.error('Error sending message:', error);
-      }
+        let fileData = {};
+        if (file) {
+            fileData = await uploadImageToCloudinary(file);
+        }
+  
+        const newMessage = {
+            sender: currentUser._id,
+            content: message,
+            files: fileData.url ? [fileData] : [],
+            workspaceId: group.groupName,  // Fix: Remove typo "group.groupNameu"
+            replyTo: replyMessage ? replyMessage._id : null,
+        };
+  
+        try {
+            await axios.post('http://localhost:5000/api/users/create-message', newMessage);
+            setMessage(''); // Clear the message input
+            setFile(null);  // Clear the file input
+            setReplyMessage(null); // Clear the reply message
+        } catch (error) {
+            console.error('Error sending message:', error);
+        }
     }
   };
+   // Return empty view if there are no members
+   if (!hasMembers) {
+    return (
+      <div className="flex flex-col h-full w-full p-4">
+        <div className="text-gray-500 text-sm">
+          No members in this workspace. Please invite members to start a conversation.
+        </div>
+      </div>
+    );
+  }
+
 
   // Handle replying to a message
   const handleReplyMessage = async () => {

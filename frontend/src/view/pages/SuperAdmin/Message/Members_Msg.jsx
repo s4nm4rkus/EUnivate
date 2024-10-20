@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const Members_Msg = ({ onInvitedUsersFetched }) => {
+const Members_Msg = ({ onInvitedUsersFetched, onWorkspaceChange }) => {
   const [invitedUsers, setInvitedUsers] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -57,7 +57,7 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
           onInvitedUsersFetched(invitedUsersList);
         }
       } catch (error) {
-        setError('Failed to load users and workspaces. Please try again later.');
+        setError('Please Invite People to see the members and Ensure you Select Workspace!');
       } finally {
         setLoading(false);
       }
@@ -77,6 +77,10 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
     const selected = event.target.value;
     setSelectedWorkspace(selected);
     localStorage.setItem('selectedWorkspace', selected);  // Persist selected workspace
+
+    // Find the selected workspace title and pass it to the parent
+    const selectedWorkspaceTitle = workspaces.find(workspace => workspace._id === selected)?.workspaceTitle;
+    onWorkspaceChange(selectedWorkspaceTitle || ''); // Notify parent of workspace change
   };
 
   const totalMembers = invitedUsers.length;

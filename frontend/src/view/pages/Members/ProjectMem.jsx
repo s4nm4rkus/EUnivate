@@ -53,7 +53,7 @@ const ProjectMem = () => {
         }
       } catch (err) {
         console.error('Error fetching projects:', err);
-        setError('An error occurred while fetching projects.');
+        setError();
       } finally {
         setLoading(false);
       }

@@ -1,18 +1,74 @@
-import React from "react";
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 import { 
     dashboard_logo, 
-    messages_red, 
     project_red, 
+    task_red, 
+    messages_red, 
     settings_red, 
-    task_red,
-    messages_icon,
-    project_icon,
-    settings_icon,
-    task_icon
-} from "../../../constants/assets";
+    project_icon, 
+    task_icon, 
+    messages_icon, 
+    settings_icon 
+} from "../../../constants/assets"; 
+import { useWorkspace } from '../../components/SuperAdmin/workspaceContext';
+
+import '../../components/SuperAdmin/Css/SideNav.css'; 
+
 
 const GeustLayout = ({ isNavOpen }) => {
+    const { selectedWorkspace, setSelectedWorkspace } = useWorkspace(); // Ensure this is defined properly
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [workspaces, setWorkspaces] = useState([]);
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    // Fetch the workspaces and set selected workspace
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const workspaceId = params.get('workspaceId');
+        const workspaceTitle = params.get('workspaceTitle');
+
+        if (workspaceId && workspaceTitle) {
+            setSelectedWorkspace({ _id: workspaceId, workspaceTitle });
+        }
+
+        const fetchWorkspaces = async () => {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user || !user.accessToken) {
+                setError('User is not authenticated.');
+                return;
+            }
+
+            try {
+                const response = await axios.get('http://localhost:5000/api/users/workspaces', {
+                    headers: { Authorization: `Bearer ${user.accessToken}` },
+                });
+
+                if (response.status === 200) {
+                    setWorkspaces(response.data);
+                } else {
+                    setError('Failed to load workspaces');
+                }
+            } catch (err) {
+                setError(`Failed to load workspaces: ${err.message}`);
+            }
+        };
+
+        fetchWorkspaces();
+    }, [location.search, setSelectedWorkspace]);
+
+    const handleWorkspaceSelect = (workspace) => {
+        setSelectedWorkspace(workspace);
+        setIsDropdownOpen(false);
+        navigate(`/guest-dashboard/projectG?workspaceId=${workspace._id}&workspaceTitle=${workspace.workspaceTitle}`);
+    };
+
     return (
         <div
             className={`side-nav-admin fixed top-0 left-0 h-full bg-red-750 shadow-lg transition-transform transform ${
@@ -29,18 +85,12 @@ const GeustLayout = ({ isNavOpen }) => {
             </div>
 
             <ul className="list-none p-0">
-                {[{
-                    to: "projectG", text: "Project", icon: project_icon, hoverIcon: project_red
-                },
-                {
-                    to: "taskG", text: "My Task", icon: task_icon, hoverIcon: task_red
-                },
-                {
-                    to: "messagesG", text: "Messages", icon: messages_icon, hoverIcon: messages_red
-                },
-                {
-                    to: "settingsG", text: "Settings", icon: settings_icon, hoverIcon: settings_red
-                }].map((item, index) => (
+                {[
+                    { to: "projectG", text: "Project", icon: project_icon, hoverIcon: project_red },
+                    { to: "taskG", text: "My Task", icon: task_icon, hoverIcon: task_red },
+                    { to: "messagesG", text: "Messages", icon: messages_icon, hoverIcon: messages_red },
+                    { to: "settingsG", text: "Settings", icon: settings_icon, hoverIcon: settings_red }
+                ].map((item, index) => (
                     <li className="mb-2" key={index}>
                         <Link
                             to={item.to}
@@ -63,6 +113,35 @@ const GeustLayout = ({ isNavOpen }) => {
                     </li>
                 ))}
             </ul>
+
+            <div className="absolute bottom-0 left-0 w-full p-4 text-white text-center">
+                <p className="font-size">Workspace</p>
+
+                <div className="workspaceSelect relative inline-block">
+                    <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="workspaceDropdown flex items-center justify-between bg-transparent text-white">
+                        <span>{selectedWorkspace ? selectedWorkspace.workspaceTitle : 'Select Workspace'}</span>
+                        <FontAwesomeIcon icon={isDropdownOpen ? faChevronUp : faChevronDown} className="faChevronWS" />
+                    </button>
+
+                    {isDropdownOpen && (
+                        <ul className="workspaceList absolute z-10 bottom-full mb-2 bg-white text-black shadow max-h-48 overflow-y-scroll rounded hide-scrollbar">
+                            {workspaces.length > 0 ? (
+                                workspaces.map((workspace) => (
+                                    <li
+                                        key={workspace._id}
+                                        onClick={() => handleWorkspaceSelect(workspace)}
+                                        className="p-2 hover:bg-gray-400 cursor-pointer"
+                                    >
+                                        {workspace.workspaceTitle}
+                                    </li>
+                                ))
+                            ) : (
+                                <li className="p-2 text-gray-500">No workspaces available</li>
+                            )}
+                        </ul>
+                    )}
+                </div>
+            </div>
         </div>
     );
 };

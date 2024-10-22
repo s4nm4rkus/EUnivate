@@ -4,25 +4,26 @@
 
         // Create a new message
         export const createMessage = async (req, res) => {
-            const { sender, content, files } = req.body;
+          const { sender, content, files, workspaceId } = req.body; // Ensure workspaceId is part of the request
 
-            try {
-                const newMessage = new Message({
-                    sender,
-                    content,
-                    files
-                });
+          try {
+            const newMessage = new Message({
+              sender,
+              content,
+              files,
+              workspaceId // This should now be saved in the database
+            });
 
-                let savedMessage = await newMessage.save();
-                savedMessage = await savedMessage.populate('sender', 'firstName lastName profilePicture');
+            let savedMessage = await newMessage.save();
+            savedMessage = await savedMessage.populate('sender', 'firstName lastName profilePicture');
 
-                io.emit('new-message', savedMessage);
+            io.emit('new-message', savedMessage);
 
-                res.status(201).json(savedMessage);
-            } catch (error) {
-                console.error('Error creating message:', error);
-                res.status(500).json({ message: 'Error creating message', error });
-            }
+            res.status(201).json(savedMessage);
+          } catch (error) {
+            console.error('Error creating message:', error);
+            res.status(500).json({ message: 'Error creating message', error });
+          }
         };
 
                 // Reply to a message
@@ -155,9 +156,10 @@
 
         //Get the Message
         export const getAllMessages = async (req, res) => {
+          const { workspaceId } = req.query;
             try {
         
-                const messages = await Message.find({ removed: { $ne: true } }) 
+                const messages = await Message.find({ workspaceId, removed: { $ne: true } }) 
                     .populate('sender', 'firstName lastName profilePicture') 
                     .populate('replies.sender', 'firstName lastName profilePicture') 
                     .populate('reactions.user'); 

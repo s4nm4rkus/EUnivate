@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const Members_Msg = ({ onInvitedUsersFetched }) => {
+const Members_Msg = ({ onInvitedUsersFetched, workspaceId }) => {
   const [invitedUsers, setInvitedUsers] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [workspaces, setWorkspaces] = useState([]); // State to hold workspaces
-  const [selectedWorkspace, setSelectedWorkspace] = useState(''); // State to hold selected workspace
 
-  // Fetch workspaces and users when the component mounts
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -21,16 +18,6 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
           return;
         }
 
-        // Fetch available workspaces (teams)
-        const workspacesResponse = await axios.get('http://localhost:5000/api/users/workspaces', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-
-        // Set fetched workspaces in state
-        setWorkspaces(workspacesResponse.data);
-
         // Fetch all users
         const allUsersResponse = await axios.get('http://localhost:5000/api/users/', {
           headers: {
@@ -38,13 +25,13 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
           },
         });
 
-        // Fetch invited users from the selected workspace
-        if (selectedWorkspace) {
+        // Fetch invited users for the selected workspace
+        if (workspaceId) {
           const invitedUsersResponse = await axios.get('http://localhost:5000/api/users/invited', {
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
-            params: { workspaceId: selectedWorkspace }, // Pass selected workspaceId
+            params: { workspaceId: workspaceId }, // Pass workspace ID directly
           });
 
           const allUsers = allUsersResponse.data;
@@ -56,63 +43,25 @@ const Members_Msg = ({ onInvitedUsersFetched }) => {
           setInvitedUsers(invitedUsersList);
           setCurrentUser(allUsers.find((u) => u._id === user._id));
 
-          // Pass the invited users back to Messages component
+          // Pass the invited users back to the parent component
           onInvitedUsersFetched(invitedUsersList);
         }
       } catch (error) {
-        setError('Failed to load users and workspaces. Please try again later.');
+        setError('Please invite people to see the members and ensure you select a workspace.');
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [onInvitedUsersFetched, selectedWorkspace]); // Fetch data whenever selectedWorkspace changes
-
-  // UseEffect to load the selected workspace from localStorage on component mount
-  useEffect(() => {
-    const savedWorkspace = localStorage.getItem('selectedWorkspace');
-    if (savedWorkspace) {
-      setSelectedWorkspace(savedWorkspace);
-    }
-  }, []);
-
-  // Handle workspace selection change
-  const handleWorkspaceChange = (event) => {
-    const selected = event.target.value;
-    setSelectedWorkspace(selected);
-
-    // Save the selected workspace to localStorage to persist across refreshes
-    localStorage.setItem('selectedWorkspace', selected);
-  };
+  }, [onInvitedUsersFetched, workspaceId]);
 
   const totalMembers = invitedUsers.length;
 
   return (
     <div className="flex flex-col h-full overflow-y-auto custom-scrollbar">
-      {/* About Section */}
       <div className="mb-4">
         <h2 className="text-sm font-bold text-gray-800">About</h2>
-      </div>
-
-      {/* Workspace Selection Dropdown */}
-      <div className="mt-4">
-        <label htmlFor="workspace" className="block text-sm font-medium text-gray-700">
-          Select Workspace (Team)
-        </label>
-        <select
-          id="workspace"
-          value={selectedWorkspace}
-          onChange={handleWorkspaceChange}
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-        >
-          <option value="" disabled>Select a Workspace</option>
-          {workspaces.map((workspace) => (
-            <option key={workspace._id} value={workspace._id}>
-              {workspace.workspaceTitle}
-            </option>
-          ))}
-        </select>
       </div>
 
       {/* Workspace Description */}

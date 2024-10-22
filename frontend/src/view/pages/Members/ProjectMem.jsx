@@ -23,7 +23,6 @@ const ProjectMem = () => {
     const fetchProjects = async () => {
       setLoading(true); 
       try {
-<<<<<<< HEAD
         const user = JSON.parse(localStorage.getItem('user'));
         const accessToken = user ? user.accessToken : null;
 
@@ -55,13 +54,6 @@ const ProjectMem = () => {
       } catch (err) {
         console.error('Error fetching projects:', err);
         setError();
-=======
-        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-getnewproject`);
-        setProjects(response.data);
-      } catch (error) {
-        console.error('Error fetching projects:', error);
-        setError('An error occurred while fetching projects.');
->>>>>>> e3eb5c32da219505ca23fb4a40d064c08db9fb1c
       } finally {
         setLoading(false);
       }

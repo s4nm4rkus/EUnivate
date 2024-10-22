@@ -187,12 +187,8 @@ const People = () => {
         setLoading(true);
     
         try {
-<<<<<<< HEAD
             // Make sure this endpoint is correct and matches your backend API structure
             const response = await axios.post('http://localhost:5000/api/users/invite', {
-=======
-            const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/invite`, {
->>>>>>> e3eb5c32da219505ca23fb4a40d064c08db9fb1c
                 userIds: selectedUsers.map(user => user.id),
                 projects: selectedUsers.map(user => user.projects).flat(),
                 roles: selectedUsers.map(user => user.role),

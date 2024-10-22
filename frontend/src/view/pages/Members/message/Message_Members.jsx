@@ -25,7 +25,6 @@ const Message_Members = ({ onInvitedUsersFetched, workspaceId }) => {
           },
         });
 
-<<<<<<< HEAD:frontend/src/view/pages/Members/message/Message_Members.jsx
         // Fetch invited users for the selected workspace
         if (workspaceId) {
           const invitedUsersResponse = await axios.get('http://localhost:5000/api/users/invited', {
@@ -34,14 +33,6 @@ const Message_Members = ({ onInvitedUsersFetched, workspaceId }) => {
             },
             params: { workspaceId: workspaceId }, // Pass workspace ID directly
           });
-=======
-        // Fetch invited users from projects
-        const invitedUsersResponse = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/invited`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
->>>>>>> e3eb5c32da219505ca23fb4a40d064c08db9fb1c:frontend/src/view/pages/Members/message/Members_Msg.jsx
 
           const allUsers = allUsersResponse.data;
           const invitedUsersList = invitedUsersResponse.data.invitedUsers.map((invitedUser) => {

@@ -53,22 +53,7 @@ const Chat_Members = ({ group }) => {
         profilePicture: storedUser.profilePicture?.url || defaultProfilePictureUrl,
       });
     }
-<<<<<<< HEAD:frontend/src/view/pages/Members/message/Chat_Members.jsx
     // Listen for new messages
-=======
-
-    const fetchMessages = async () => {
-      try {
-        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/messages`);
-        setMessages(response.data);
-      } catch (error) {
-        console.error('Error fetching messages:', error);
-      }
-    };
-
-    fetchMessages();
-
->>>>>>> e3eb5c32da219505ca23fb4a40d064c08db9fb1c:frontend/src/view/pages/Members/message/Chat.jsx
     socket.on('new-message', (newMessage) => {
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     });
@@ -148,7 +133,6 @@ const Chat_Members = ({ group }) => {
         }
       };
 
-<<<<<<< HEAD:frontend/src/view/pages/Members/message/Chat_Members.jsx
       fetchMessages();
     }
   }, [group.groupName]);
@@ -187,16 +171,6 @@ const Chat_Members = ({ group }) => {
         } catch (error) {
             console.error('Error sending message:', error);
         }
-=======
-      try {
-        const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/create-message`, newMessage);
-        setMessage('');
-        setFile(null);
-        setReplyMessage(null);
-      } catch (error) {
-        console.error('Error sending message:', error);
-      }
->>>>>>> e3eb5c32da219505ca23fb4a40d064c08db9fb1c:frontend/src/view/pages/Members/message/Chat.jsx
     }
   };
 

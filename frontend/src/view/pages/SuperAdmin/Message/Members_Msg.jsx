@@ -18,19 +18,6 @@ const Members_Msg = ({ onInvitedUsersFetched, workspaceId }) => {
           return;
         }
 
-<<<<<<< HEAD
-=======
-        // Fetch available workspaces (teams)
-        const workspacesResponse = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/workspaces`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-
-        // Set fetched workspaces in state
-        setWorkspaces(workspacesResponse.data);
-
->>>>>>> e3eb5c32da219505ca23fb4a40d064c08db9fb1c
         // Fetch all users
         const allUsersResponse = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/`, {
           headers: {
@@ -38,15 +25,9 @@ const Members_Msg = ({ onInvitedUsersFetched, workspaceId }) => {
           },
         });
 
-<<<<<<< HEAD
         // Fetch invited users for the selected workspace
         if (workspaceId) {
           const invitedUsersResponse = await axios.get('http://localhost:5000/api/users/invited', {
-=======
-        // Fetch invited users from the selected workspace
-        if (selectedWorkspace) {
-          const invitedUsersResponse = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/invited`, {
->>>>>>> e3eb5c32da219505ca23fb4a40d064c08db9fb1c
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },

@@ -135,51 +135,51 @@ const GanttChart = ({ projectId }) => {
       </div>
 
       <div className="relative w-full">
-        <div className="flex items-center border-b border-gray-300">
-          <div className="w-36 min-w-[1rem] border-r border-gray-300 p-2 text-center -ml-28"></div>
-          {daysOfCurrentWeek.map((day) => (
-            <div key={day} className="flex-1 text-center border-r border-gray-300 p-2">
-              {day}
-            </div>
-          ))}
+  <div className="flex items-center border-b border-gray-300">
+    <div className="w-36 min-w-[1rem] border-r border-gray-300 p-2 text-center -ml-28"></div>
+    {daysOfCurrentWeek.map((day) => (
+      <div key={day} className="flex-1 text-center border-r border-gray-300 p-2">
+        {day}
+      </div>
+    ))}
+  </div>
+  <div className="relative w-full" style={{ overflowX: 'hidden' }}>
+    {groupedTasks.map(({ status, tasks, shrinkFactor }) => (
+      <div
+        key={status}
+        className="flex items-start border-b border-gray-300 mt-16"
+        style={{
+          minHeight: `${tasks.length * (MAX_TASK_HEIGHT + TASK_SPACING) * shrinkFactor}rem`,
+        }}
+      >
+        <div className="w-28 min-w-[7rem] border-gray-300 p-2 flex items-start -ml-20">
+          <div className="transform rotate-90 ml-20 -translate-x-1/2 mb-10 text-xl font-semibold relative translate-y-[-0.5rem]">
+            {status}
+          </div>
         </div>
-        <div className="overflow-x-auto">
-          {groupedTasks.map(({ status, tasks, shrinkFactor }) => (
-            <div
-              key={status}
-              className="flex items-start border-b border-gray-300 mt-16"
-              style={{
-                minHeight: `${tasks.length * (MAX_TASK_HEIGHT + TASK_SPACING) * shrinkFactor}rem`,
-              }}
-            >
-              <div className="w-28 min-w-[7rem] border-gray-300 p-2 flex items-start -ml-20">
-                <div className="transform rotate-90 ml-20 -translate-x-1/2 mb-10 text-xl font-semibold relative translate-y-[-0.5rem]">
-                  {status}
-                </div>
-              </div>
-              <div className="relative flex-1">
-                {tasks.map((task, index) => {
-                  const taskWidth = calculateTaskWidth(task.startDate, task.dueDate);
-                  const taskLeft = calculateTaskLeft(task.startDate);
-                  const taskHeight = MAX_TASK_HEIGHT * shrinkFactor;
-                  const textSizeClass = taskWidth < SMALL_TEXT_THRESHOLD ? 'text-xs' : 'text-sm';
+        <div className="relative flex-1">
+          {tasks.map((task, index) => {
+            const taskWidth = calculateTaskWidth(task.startDate, task.dueDate);
+            const taskLeft = calculateTaskLeft(task.startDate);
+            const taskHeight = MAX_TASK_HEIGHT * shrinkFactor;
+            const textSizeClass = taskWidth < SMALL_TEXT_THRESHOLD ? 'text-xs' : 'text-sm';
 
-                  return (
-                    <div
-                      key={task.id}
-                      className={`absolute ${getStatusIconColor(task.status)} text-white p-2 rounded-xl`}
-                      style={{
-                        width: `${taskWidth}%`,
-                        left: `${taskLeft}%`,
-                        top: `${index * (taskHeight + TASK_SPACING)}rem`,
-                        height: `${taskHeight}rem`,
-                        lineHeight: `${taskHeight}rem`,
-                        display: taskWidth > 0 ? 'flex' : 'none',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                      }}
-                      onClick={() => setSelectedTask(task)} // Open the modal on task click
-                    >
+            return (
+              <div
+                key={task.id}
+                className={`absolute ${getStatusIconColor(task.status)} text-white p-2 rounded-xl`}
+                style={{
+                  width: `${taskWidth}%`,
+                  left: `${taskLeft}%`,
+                  top: `${index * (taskHeight + TASK_SPACING)}rem`,
+                  height: `${taskHeight}rem`,
+                  lineHeight: `${taskHeight}rem`,
+                  display: taskWidth > 0 ? 'flex' : 'none',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                }}
+                onClick={() => setSelectedTask(task)} // Open the modal on task click
+              >
                       {/* Task content with assignee avatars on the left, task name, and objectives */}
                       <div className="flex items-center justify-between w-full pl-2">
                         {/* Assignee avatars */}
@@ -230,10 +230,11 @@ const GanttChart = ({ projectId }) => {
 
                       {/* Circle with a checkmark for 'Done' tasks */}
                       {task.status === 'Done' && (
-                        <div className="absolute right-5 top-1/2 transform -translate-y-1/2 bg-green-500 text-white w-7 h-7 flex items-center justify-center rounded-full">
-                          <FontAwesomeIcon icon={faCheck} className="w-4 h-4" />
-                        </div>
-                      )}
+  <div className="absolute right-5 top-1/2 transform -translate-y-1/2 bg-green-500 text-white w-7 h-7 flex items-center justify-center rounded-full hidden sm:flex">
+    <FontAwesomeIcon icon={faCheck} className="w-4 h-4" />
+  </div>
+)}
+
                     </div>
                   );
                 })}

@@ -187,7 +187,8 @@ const People = () => {
         setLoading(true);
     
         try {
-            const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/invite`, {
+            // Make sure this endpoint is correct and matches your backend API structure
+            const response = await axios.post('http://localhost:5000/api/users/invite', {
                 userIds: selectedUsers.map(user => user.id),
                 projects: selectedUsers.map(user => user.projects).flat(),
                 roles: selectedUsers.map(user => user.role),
@@ -200,22 +201,21 @@ const People = () => {
                 },
             });
     
-            if (!response.ok) {
-                throw new Error(response.data.message || 'Failed to send invitations.');
+            // No need to check for `response.ok`, as Axios throws an error for non-2xx status codes
+            if (response.status === 200) { // Assuming 200 means success in your backend
+                toast.success('Invitations sent successfully!', {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: true,
+                });
+    
+                // Fetch users again to refresh the user list
+                fetchUsers();
+                toggleModal();
             }
-    
-            fetchUsers();  // Refresh the user list
-    
-            toast.success('Invitations sent successfully!', {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: false,
-                draggable: true,
-            });
-    
-            toggleModal();
         } catch (error) {
             console.error('Error inviting users:', error.message);
             toast.error(`An error occurred: ${error.message}`, {
@@ -230,6 +230,7 @@ const People = () => {
             setLoading(false);
         }
     };
+    
     
     const handleRoleChange = async (newRole, userEmail) => {
         try {

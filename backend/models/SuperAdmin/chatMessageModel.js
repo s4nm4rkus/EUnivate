@@ -10,12 +10,16 @@ const messageSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    workspaceId: {  // Change workspaceId to be a string instead of ObjectId
+        type: String,  // Use String instead of ObjectId
+        required: true
+    },
     replies: [
         {
             sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
             content: { type: String, required: true },
             createdAt: { type: Date, default: Date.now },
-        }
+        }   
     ],
     reactions: [
         {

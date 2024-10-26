@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios'; 
 import { useWorkspace } from './workspaceContext'; 
 import { useLocation } from 'react-router-dom'; 
+import '../../components/SuperAdmin/Css/SideNav.css'; // Ensure this file exists
 
 import { 
     dashboard_logo, 
@@ -186,18 +187,23 @@ const SideNav = ({ isNavOpen }) => {
                     </button>
 
                     {isDropdownOpen && (
-                        <ul className="workspaceList absolute z-10 bottom-full mb-2 bg-white text-black shadow">
-                            {workspaces.length > 0 ? (
-                                workspaces.map((workspace) => (
-                                    <li key={workspace._id} onClick={() => handleWorkspaceSelect(workspace)} className="p-2 hover:bg-gray-400 cursor-pointer">
-                                        {workspace.workspaceTitle}
-                                    </li>
-                                ))
-                            ) : (
-                                <li className="p-2 text-gray-500">No workspaces available</li>
-                            )}
-                        </ul>
-                    )}
+    <ul className="workspaceList absolute z-10 bottom-full mb-2 bg-white text-black shadow max-h-48 overflow-y-scroll rounded hide-scrollbar">
+        {workspaces.length > 0 ? (
+            workspaces.map((workspace) => (
+                <li
+                    key={workspace._id}
+                    onClick={() => handleWorkspaceSelect(workspace)}
+                    className="p-2 hover:bg-gray-400 cursor-pointer"
+                >
+                    {workspace.workspaceTitle}
+                </li>
+            ))
+        ) : (
+            <li className="p-2 text-gray-500">No workspaces available</li>
+        )}
+    </ul>
+)}
+
                 </div>
             </div>
 

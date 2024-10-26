@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import sendEmail from '../../../utils/sendEmail.js';
 import InviteMember from '../../../models/SuperAdmin/saInvitedMember.js';
 import Project from '../../../models/SuperAdmin/saNewProject.js';
-
+import Workspace from '../../../models/SuperAdmin/addWorkspaceModel.js';
 
 //Please dont remove any comments it's used to debug if the system is not working as it's expected
 
@@ -17,9 +17,9 @@ export const getUsers = async (req, res) => {
     }
   };
   
-  
-      // Invite users with storation to sainvitedUser Schema
-export const inviteUsers = async (req, res) => {
+
+
+  export const inviteUsers = async (req, res) => {
     try {
         const { userIds, projects, roles, profilePictures, workspaceId } = req.body;
         const inviterId = req.user.id;
@@ -30,6 +30,12 @@ export const inviteUsers = async (req, res) => {
         if (!userIds || !userIds.length || !workspaceId) {
             console.log('Missing userIds or workspaceId.');
             return res.status(400).json({ message: 'No valid user IDs or workspace ID provided' });
+        }
+
+        // Find the workspace where users are being invited
+        const workspace = await Workspace.findById(workspaceId);
+        if (!workspace) {
+            return res.status(404).json({ message: 'Workspace not found' });
         }
 
         await Promise.all(
@@ -85,6 +91,12 @@ export const inviteUsers = async (req, res) => {
                         await newMember.save();
                     }
 
+                    // Now add the invited user to the workspace's invitedMembers array
+                    if (!workspace.invitedMembers.includes(userId)) {
+                        workspace.invitedMembers.push(userId);
+                    }
+
+                    // Send invitation email to the invited user
                     console.log(`Sending invitation email to: ${existingUser.email}`);
                     await sendEmail({
                         email: existingUser.email,
@@ -98,8 +110,11 @@ export const inviteUsers = async (req, res) => {
             })
         );
 
+        // Save the workspace after adding the invited members
+        await workspace.save();
+
         console.log('All invitation emails sent successfully.');
-        res.status(200).json({ message: 'Invitation emails sent successfully' });
+        res.status(200).json({ message: 'Invitation emails sent successfully and workspace updated with invited members.' });
     } catch (error) {
         console.error('Error inviting users:', error.message);
         res.status(500).json({ message: 'Error inviting users', error: error.message });
@@ -109,41 +124,84 @@ export const inviteUsers = async (req, res) => {
 
 
 
-//Get Invited Users
+
+//Get Invited Users by userId
+
+// export const getInvitedUsers = async (req, res) => {
+//     try {
+//         const userId = req.user._id;
+//         const { workspaceId } = req.query;  // Get the workspaceId from query parameters
+        
+//         if (!workspaceId) {
+//             return res.status(400).json({ message: 'Workspace ID is required' });  // Ensure workspaceId is provided
+//         }
+
+//         console.log('Fetching invited users for workspaceId:', workspaceId, 'and userId:', userId);
+
+
+//     const invitedUsers = await InviteMember.find({
+//             $and: [
+//                 { $or: [{ invitedBy: userId }] },  // Fetch users invited by the current user
+//                 { workspaceId: workspaceId }  // Filter by workspaceId
+//             ]
+//         }).populate('project', 'projectName');// Populates only the projectName field of related projects
+
+//         // console.log('Raw invitedUsers data:', invitedUsers);  // Log the invitedUsers data after fetching and populating
+
+//         if (invitedUsers.length === 0) {
+//             console.log('No invited users found for userId:', userId);  // Log if no invited users are found
+//             return res.status(404).json({ message: 'No invited users found' });
+//         }
+
+//         // console.log('Sending invitedUsers response:', invitedUsers);  // Log the data before sending the response
+//         res.status(200).json({ invitedUsers });
+//     } catch (error) {
+//         console.error('Error fetching invited users:', error.message);  // Log the error message
+//         res.status(500).json({ message: 'Error fetching invited users', error: error.message });
+//     }
+// };
+
+//Get Invited Users either project or userId
 
 export const getInvitedUsers = async (req, res) => {
     try {
-        const userId = req.user._id;
-        const { workspaceId } = req.query;  // Get the workspaceId from query parameters
-        
+        const userId = req.user._id; // The current logged-in user's ID
+        const { workspaceId } = req.query; // Get the workspaceId from query parameters
+
         if (!workspaceId) {
-            return res.status(400).json({ message: 'Workspace ID is required' });  // Ensure workspaceId is provided
+            return res.status(400).json({ message: 'Workspace ID is required' });
         }
 
-        console.log('Fetching invited users for workspaceId:', workspaceId, 'and userId:', userId);
+        // 1. Find the current user's record in saInvitedMember to get who invited them.
+        const currentUserInvite = await InviteMember.findOne({
+            userId: userId,
+            workspaceId: workspaceId,
+        });
 
+        if (!currentUserInvite) {
+            return res.status(404).json({ message: 'User not invited to this workspace' });
+        }
 
-    const invitedUsers = await InviteMember.find({
-            $and: [
-                { $or: [{ invitedBy: userId }] },  // Fetch users invited by the current user
-                { workspaceId: workspaceId }  // Filter by workspaceId
-            ]
-        }).populate('project', 'projectName');// Populates only the projectName field of related projects
+        const inviterId = currentUserInvite.invitedBy[0]; // Assuming single inviter per user
 
-        // console.log('Raw invitedUsers data:', invitedUsers);  // Log the invitedUsers data after fetching and populating
+        // 2. Fetch all users invited by the same inviter (the one who invited the current user) in the same workspace.
+        const invitedUsers = await InviteMember.find({
+            invitedBy: inviterId,
+            workspaceId: workspaceId,
+        }).populate('project', 'projectName');
 
         if (invitedUsers.length === 0) {
-            console.log('No invited users found for userId:', userId);  // Log if no invited users are found
-            return res.status(404).json({ message: 'No invited users found' });
+            return res.status(404).json({ message: 'No invited users found for this inviter' });
         }
 
-        // console.log('Sending invitedUsers response:', invitedUsers);  // Log the data before sending the response
+        // Return the list of invited users
         res.status(200).json({ invitedUsers });
     } catch (error) {
-        console.error('Error fetching invited users:', error.message);  // Log the error message
+        console.error('Error fetching invited users:', error.message);
         res.status(500).json({ message: 'Error fetching invited users', error: error.message });
     }
 };
+
 
 
 

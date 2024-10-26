@@ -5,66 +5,87 @@ import AdminNavbar from '../../components/SuperAdmin/AdminNavbar';
 import { FaFlag, FaCheckCircle } from 'react-icons/fa';
 import BoxLoader from '../SuperAdmin/Loading Style/Box Loading/BoxLoader';
 import TaskModal from './My_Task/Task_Modal';
+import { useWorkspace } from '../../components/SuperAdmin/workspaceContext';
 
 const TaskMem = () => {
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [selectedTask, setSelectedTask] = useState(null); 
+    const [selectedTask, setSelectedTask] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const { selectedWorkspace } = useWorkspace(); // Using workspace context to get the selected workspace
 
     const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
 
     const formatDate = (dateString) => {
-        const options = { day: 'numeric', month: 'short' }; 
+        const options = { day: 'numeric', month: 'short' };
         return new Date(dateString).toLocaleDateString('en-GB', options);
     };
 
+    // Fetch tasks based on selected workspace
     useEffect(() => {
         const fetchTasks = async () => {
             setLoading(true);
+
             try {
                 const user = JSON.parse(localStorage.getItem('user'));
                 const accessToken = user ? user.accessToken : null;
 
                 if (!accessToken) {
                     console.error('No access token found. Please log in again.');
+                    setLoading(false);
                     return;
                 }
 
-                const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-getnewproject`, {
+                if (!selectedWorkspace) {
+                    console.error('No workspace selected.');
+                    setLoading(false);
+                    return;
+                }
+
+                // Fetch projects associated with the selected workspace
+                const projectResponse = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
+                    params: {
+                        workspaceId: selectedWorkspace._id, // Fetching tasks by workspace ID
+                    }
                 });
 
                 const tasksList = [];
                 await Promise.all(
-                    response.data.map(async (project) => {
-                        const taskResponse = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-tasks/${project._id}`);
+                    projectResponse.data.map(async (project) => {
+                        const taskResponse = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}`, {
+                            headers: {
+                                Authorization: `Bearer ${accessToken}`, // Authorization header
+                            },
+                        });
+
                         const tasksWithProject = taskResponse.data.data.map(task => ({
                             ...task,
-                            projectName: project.projectName,
+                            projectName: project.projectName, // Assign project name to each task
                             objectiveCount: task.objectives ? task.objectives.length : 0,
                             assignedUsers: task.assignedUsers || [],
-                            invitedUsers: project.invitedUsers || [] 
+                            invitedUsers: project.invitedUsers || []
                         }));
+
                         tasksList.push(...tasksWithProject);
                     })
                 );
 
-                setTimeout(() => {
-                    setTasks(tasksList);
-                    setLoading(false);
-                }, 2000);
+                setTasks(tasksList);
+                setLoading(false);
             } catch (error) {
                 console.error('Error fetching tasks:', error);
                 setLoading(false);
             }
         };
 
-        fetchTasks();
-    }, []);
+        if (selectedWorkspace) {
+            fetchTasks(); // Fetch tasks when a workspace is selected
+        }
+    }, [selectedWorkspace]); // Re-fetch tasks when `selectedWorkspace` changes
 
     const openModal = (task) => {
         setSelectedTask(task);
@@ -79,13 +100,13 @@ const TaskMem = () => {
     const getPriorityColor = (priority) => {
         switch (priority.toLowerCase()) {
             case 'easy':
-                return 'text-green-500'; 
+                return 'text-green-500';
             case 'medium':
-                return 'text-yellow-500'; 
+                return 'text-yellow-500';
             case 'hard':
-                return 'text-red-500'; 
+                return 'text-red-500';
             default:
-                return 'text-gray-500'; 
+                return 'text-gray-500';
         }
     };
 
@@ -151,7 +172,7 @@ const TaskMem = () => {
                                             <FaFlag className={`mr-1 text-xs md:text-sm ${getPriorityColor(task.priority)}`} />
                                             <p className="text-xs md:text-sm">{task.priority}</p>
                                         </div>
-                                        <p className="hidden md:block text-center relative z-10">{task.objectiveCount} Objective</p>
+                                        <p className="hidden md:block text-center relative z-10">{task.objectiveCount} Objectives</p>
                                         <p className="text-center relative z-10 text-sm md:text-base">{task.status}</p>
                                         <p className="text-right relative z-10 text-sm md:text-base">{task.projectName}</p>
                                     </li>
@@ -162,7 +183,6 @@ const TaskMem = () => {
                 </div>
             </div>
 
-            {/* Pass modal props to TaskModal component */}
             <TaskModal
                 task={selectedTask}
                 isOpen={isModalOpen}
